@@ -21,6 +21,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 
+import camera_sensor   
 
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
@@ -30,6 +31,11 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self.ready = False
 
+        self._configure(limb,on_state_callback)
+        
+        self.ready = True
+
+    def _configure(self,limb,on_state_callback):
         self._state = None
 
         if on_state_callback:
@@ -49,9 +55,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self.set_command_timeout(0.2)
 
-        self.ready = True
-
-
+        self._camera = camera_sensor.CameraSensor()
 
     def _update_state(self):
 
@@ -70,6 +74,8 @@ class BaxterArm(baxter_interface.limb.Limb):
         state['effort']          = np.array(to_list(joint_efforts))
         state['jacobian']        = self.get_jacobian_from_joints(None)
         state['inertia']         = self.get_arm_inertia(None)
+        state['rgb_image']       = self._camera.curr_rgb_image
+        state['depth_image']     = self._camera.curr_depth_image
 
         try:
             state['ee_point'], state['ee_ori']  = self.get_ee_pose()

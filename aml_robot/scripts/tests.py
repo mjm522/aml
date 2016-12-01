@@ -23,8 +23,9 @@ from functools import partial
 import numpy as np
 
 def callback(agent,msg):
-	print(agent.c)
-	print("Hello!")
+	pass
+	# print(agent.c)
+	# print("Hello!")
 
 
 class SomeObj:
