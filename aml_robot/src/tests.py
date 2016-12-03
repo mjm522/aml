@@ -8,24 +8,24 @@ import rospy
 import baxter_interface
 import baxter_external_devices
 
+from aml_robot import baxter_robot
+
 from std_msgs.msg import (
     UInt16,
 )
 
 from baxter_interface import CHECK_VERSION
 
-import baxter_robot
-
+from aml_perception import camera_sensor
 from functools import partial
 
-#from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 import numpy as np
 
 def callback(agent,msg):
 	pass
 	# print(agent.c)
-	# print("Hello!")
+	print("Hello!")
 
 
 class SomeObj:
