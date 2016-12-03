@@ -1,6 +1,7 @@
 import numpy as np
 import quaternion
-from baxter_robot import BaxterArm
+
+from aml_robot.baxter_robot import BaxterArm
 import time
 import baxter_interface
 from baxter_interface import CHECK_VERSION
