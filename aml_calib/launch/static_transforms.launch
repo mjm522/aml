@@ -1,0 +1,9 @@
+<launch>
+
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.25 0 0 0 0 0 left_gripper_base marker 10" />-->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0.323 -0.141 -1.261 1.579 -0.804 -1.573 left_gripper_base base 10" /> -->
+
+</launch>
+
