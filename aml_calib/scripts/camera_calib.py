@@ -1,7 +1,9 @@
+#!/home/ermanoarruda/.virtualenvs/robotics/bin/python
+
 import numpy as np
 import quaternion
 import rospy
-from baxter_robot import BaxterArm
+from aml_robot.baxter_robot import BaxterArm
 import baxter_interface
 from baxter_interface import CHECK_VERSION
 from sensor_msgs.msg import Image
@@ -11,6 +13,9 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 import tf
 from tf import TransformListener
+
+import sys
+sys.argv
 
 class Baxter_Eye_Hand_Calib():
 	
@@ -87,24 +92,31 @@ class Baxter_Eye_Hand_Calib():
         calib_data = {}
         calib_data['left_arm_calib_angle'] = self.left_arm.angles()
         calib_data['right_arm_calib_angle'] = self.right_arm.angles()
-        flag = True
-        while flag:
+        got_common_time = False
+        max_attempts = 100
+        calibration_successful = False
+        counter = 0
+        while got_common_time is False and counter < max_attempts:
             #some times the tf is busy that it fails to read the time and causes exception
             # this simple hack waits till it reads it and saves it!!
             try:
+                counter += 1
                 time = self.tf.getLatestCommonTime('openni_rgb_camera', 'base')
-                flag = False
+                got_common_time = True
             except tf.Exception:
-                pass
+                print("Failed to find common time between openni_rgb_camera and base. Will try again. Attempt count %d/%d"%(counter,max_attempts))
+                rospy.sleep(0.1)
             
-            if not flag:
-                translation, rot = self.tf.lookupTransform('openni_rgb_camera', 'base', time)
-                break
+        if got_common_time:
+            translation, rot = self.tf.lookupTransform('openni_rgb_camera', 'base', time)
+            calib_data['openni_rgb_camera_pos'] = translation
+            calib_data['openni_rgb_camera_ori'] = rot
+            np.save('calib_data.npy', calib_data)
+            calibration_successful = True
+        else:
+            print("Failed to find transform from openni_rgb_camera to base")
 
-        calib_data['openni_rgb_camera_pos'] = translation
-        calib_data['openni_rgb_camera_ori'] = rot
-        np.save('calib_data.npy', calib_data)
-        return calib_data
+        return calib_data, calibration_successful
 
     def load_calib_data(self):
         # Load
@@ -114,20 +126,24 @@ class Baxter_Eye_Hand_Calib():
             print "Caliberation file cannot be loaded"
             raise e
         
-        # print(calib_data['left_arm_calib_angle']) # displays "world"
-        # print(calib_data['right_arm_calib_angle'])
+        print(calib_data['left_arm_calib_angle']) # displays "world"
+        print(calib_data['right_arm_calib_angle'])
         # print(calib_data['openni_rgb_camera_pos'])
         # print(calib_data['openni_rgb_camera_ori'])
         return calib_data
 
-    def self_caliberate(self):
+    def self_calibrate(self):
         calib_data = self.load_calib_data()
         self.left_arm.move_to_joint_position(calib_data['left_arm_calib_angle'])
         self.right_arm.move_to_joint_position(calib_data['right_arm_calib_angle'])
-        calib_data = self.save_calib_data()
-        print "the openni_rgb_params \n"
-        print "postion \t", np.around(calib_data['openni_rgb_camera_pos'],3)
-        print "orientation \t", np.around(calib_data['openni_rgb_camera_ori'],3)
+        calib_data, calib_success = self.save_calib_data()
+
+        if calib_success:
+            print "the openni_rgb_params \n"
+            print "postion \t", np.around(calib_data['openni_rgb_camera_pos'],3)
+            print "orientation \t", np.around(calib_data['openni_rgb_camera_ori'],3)
+        else:
+            print "Calibration has failed!"
 
     def get_box_transform(self):
         flag = True
@@ -149,10 +165,17 @@ def main():
     
     calib = Baxter_Eye_Hand_Calib()
 
-    calib.self_caliberate()
+    calib.self_calibrate()
+
 
     #calib.get_box_transform()
 
 if __name__ == '__main__':
     rospy.init_node('baxter_eye_hand_calib_ros_node')
+    #get the arguments passed to the script
+    cmdargs = str(sys.argv)
+    if 'save' in cmdargs:
+        calib = Baxter_Eye_Hand_Calib()
+        calib.save_calib_data()
+    
     main()
