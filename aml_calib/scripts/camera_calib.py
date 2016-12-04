@@ -1,4 +1,3 @@
-#!/home/ermanoarruda/.virtualenvs/robotics/bin/python
 
 import numpy as np
 import quaternion
