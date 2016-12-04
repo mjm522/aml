@@ -42,6 +42,7 @@ private:
   image_transport::Subscriber right_hand_image_sub, openni_rgb_image_sub;
 
   tf::TransformListener _tfListener;
+  tf::TransformBroadcaster br;
 
 public:
   MarkerOdometry()
@@ -70,6 +71,7 @@ public:
     nh.param<std::string>("camera_frame", camera_frame, "");
     nh.param<std::string>("marker_frame", marker_frame, "");
     nh.param<bool>("image_is_rectified", useRectifiedImages, true);
+
 
     ROS_ASSERT(camera_frame != "" && marker_frame != "");
 
@@ -126,9 +128,10 @@ public:
     {
       //this makes sure that right_hand_image_callback is only called till 
       // the left hand marker to base is calculated.
+      right_hand_image_sub.shutdown();
       return;
     }
-    static tf::TransformBroadcaster br;
+    
     if(right_hand_cam_info_received)
     {
       
@@ -223,13 +226,14 @@ public:
 
   void openni_rgb_image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
+    // wait until object pose is computed with respect to right hand
     if(!computedMarkerToBase)
     {
       //come after the right hand data is available and 
       // has been successfully computed
       return;
     }
-    static tf::TransformBroadcaster br;
+    
     if(openni_rgb_cam_info_received)
     {
       ros::Time curr_stamp(ros::Time::now());
@@ -258,7 +262,6 @@ public:
           if((markers[i].id == left_hand_marker_id) && (!calibrated)) //
           {
            
-            ROS_INFO("SKNDASKLFNALKFNAKLFNDAKFNDALKSFNAKLDFNADKFNADKJSFNADKSJFNADKSJFNKADSFNLKSDAFNKADLSFNADSL");
             tf::Transform transformOpenniToMarker = aruco_utils::arucoMarker2Tf(markers[i]);
             tf::StampedTransform leftHandMarkerToBase;
 
@@ -290,7 +293,7 @@ public:
             //draw a 3d cube in each marker if there is 3d info
             if(openni_rgb_camParam.isValid() && box_marker_size != -1)
             {
-              CvDrawingUtils::draw3dAxis(inImage, markers[1], openni_rgb_camParam);
+              CvDrawingUtils::draw3dAxis(inImage, markers[i], openni_rgb_camParam);
               //CvDrawingUtils::draw3dCube(inImage, markers[1], openni_rgb_camParam);
             }
 
@@ -306,6 +309,17 @@ public:
           tf::StampedTransform stampedTransformOpenniToBase(transformOpenniToBase, curr_stamp,
                                                 "base", "openni_rgb_camera");
           br.sendTransform(stampedTransformOpenniToBase);
+        }
+
+
+        if(image_pub.getNumSubscribers() > 0)
+        {
+          //show input with augmented information
+          cv_bridge::CvImage out_msg;
+          out_msg.header.stamp = curr_stamp;
+          out_msg.encoding = sensor_msgs::image_encodings::RGB8;
+          out_msg.image = inImage;
+          image_pub.publish(out_msg.toImageMsg());
         }
 
       }
@@ -338,7 +352,7 @@ public:
 
 int main(int argc,char **argv)
 {
-  ros::init(argc, argv, "marker_odometry");
+  ros::init(argc, argv, "aml_marker_odometry");
 
   MarkerOdometry node;
 
