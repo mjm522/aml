@@ -1,7 +1,7 @@
 <launch>
 
     <!-- give a defulat value to arg -->
-    <arg name="ext_cam" default="1" />
+    <arg name="ext_cam" default="0" />
 
     <!-- to launch openni2 launch file from here -->
     <group if="$(arg ext_cam)">
@@ -24,7 +24,7 @@
 
 
     
-    <node pkg="marker_odometry" type="marker_odometry_node" name="marker_odometry" output="screen">
+    <node pkg="aml_calib" type="aml_marker_odometry_node" name="marker_odometry" output="screen">
         <remap from="/right_hand_camera_info" to="/cameras/right_hand_camera/camera_info" /> <!-- "/stereo/$(arg eye)/camera_info -->
         <remap from="/right_hand_image" to="/cameras/right_hand_camera/image"/>   <!--"/stereo/$(arg eye)/image_rect_color"-->
         
