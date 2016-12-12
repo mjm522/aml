@@ -196,6 +196,27 @@ class MinJerkController():
         self.left_arm.move_to_joint_position(untuck_l)
         self.right_arm.move_to_joint_position(untuck_r)
 
+    def standard_shape_traj(self, curr_pos, no_set_points=16, shape='circle'):
+        
+        if shape == 'circle':
+            r = 0.21
+            th = np.linspace(0., 2*np.pi, no_set_points)
+            x = curr_pos[0] + r*np.cos(th)
+            y = curr_pos[1] + r*np.sin(th)
+            z = np.ones_like(x)*curr_pos[2]
+        elif shape == 'eight':
+            r  = 0.21
+            th =  np.linspace(0., 2*np.pi, no_set_points)
+            x = curr_pos[0] + r*np.cos(th)/(1. + np.sin(th)**2)
+            y = curr_pos[1] + r*np.cos(th)*np.sin(th)/(1. + np.sin(th)**2)
+            z = np.ones_like(x)*curr_pos[2]
+
+        else:
+            print "Enter a known shape"
+            raise ValueError
+
+        return np.vstack([x,y,z]).T
+
     def get_min_jerk_trajectory(self):
 
         final_q, final_w, final_al  = min_jerk_step_qt(self.start_qt, self.goal_qt,  self.tau, self.dt)
@@ -260,14 +281,24 @@ class MinJerkController():
         return u
     
     def osc_torque_cmd(self, goal_pos, goal_ori=None, limb_idx=0, orientation_ctrl=False):
+        
         arm = self.get_arm_handle(limb_idx)
+
+        #secondary goal for the manipulator
+        if limb_idx == 0:
+            q_mean = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+        elif limb_idx == 1:
+            q_mean = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
+        else:
+            print "Unknown limb idex"
+            raise ValueError
 
         #proportional gain
         kp              = 10.
         #derivative gain
         kd              = np.sqrt(kp);
         #null space control gain
-        alpha           = 0*0.15;
+        alpha           = 3.25;
 
         jnt_start     = arm.angles()
 
@@ -284,6 +315,8 @@ class MinJerkController():
         q              = arm_state['position']
 
         dq             = arm_state['velocity']
+
+        h              = arm_state['gravity_comp']
 
         # calculate the inertia matrix in joint space
         Mq             = arm.get_arm_inertia() 
@@ -319,17 +352,30 @@ class MinJerkController():
         else:
             omg_des = np.zeros(3)
 
-        # calculate desired force in (x,y,z) space
-        Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]))
-        # transform into joint space, add vel and gravity compensation
-        u                   = (kp * np.dot(jac_ee.T, Fx) - np.dot(Mq, kd * dq))
+        #print "x_des \n", x_des
+        #print "omg_des \n", omg_des
+        #print "eig values of Mx \n", np.linalg.eig(Mx)
 
-        # calculate our secondary control signal
+        #print "h: ", h
+        a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
+        #print "a_g: ", a_g
+        # calculate desired force in (x,y,z) space
+        Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
+
+        #print "Fx \n", Fx
+        #print "F_x: ", Fx
+        # transform into joint space, add vel and gravity compensation
+        u                   = kp * np.dot(jac_ee.T, Fx) - np.dot(Mq, kd * dq)
+
+        #print "u \n", u
+
+        #print "h \n", h
+        #print "u: ", u
+
+        # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
-        prop_val            = ((jnt_start - q) + np.pi) % (np.pi*2) - np.pi
-
-        q_des               = (kp * prop_val - kd * dq).reshape(-1,)
+        q_des               = (kp * (q_mean - q) - kd * dq).reshape(-1,)
 
         u_null              = np.dot(Mq, q_des)
 
@@ -339,9 +385,6 @@ class MinJerkController():
         null_filter         = np.eye(len(q)) - np.dot(jac_ee.T, Jdyn_inv)
 
         u_null_filtered     = np.dot(null_filter, u_null)
-
-        #changing the rest q as the last updated q
-        jnt_start           = q 
 
         u                   += alpha*u_null_filtered
 
@@ -386,13 +429,14 @@ class MinJerkController():
         #derivative gain
         kd              = np.sqrt(kp);
         #null space control gain
-        alpha           = 0.15;
+        alpha           = 0.0;
 
         jnt_start = arm_data['jnt_start']
         ee_xyz = arm_data['ee_point']
         jac_ee = arm_data['jacobian']
         q      = arm_data['position']
         dq     = arm_data['velocity']
+        ee_ori = arm_data['ee_ori']
         
         #to fix the nan issues that happen
         u_old  = np.zeros_like(jnt_start)
@@ -552,7 +596,7 @@ def test_torque_control(limb_idx=0):
     baxter_ctrlr.untuck_arms()
 
     start_pos, start_ori  =  arm.get_ee_pose()
-    
+
     if limb_idx == 0:
         goal_pos = start_pos + np.array([0.,0.8, 0.])
     else:
@@ -560,7 +604,7 @@ def test_torque_control(limb_idx=0):
     
     angle    = 90.0
     axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
-    goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2], axis[3])
+    goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2])
 
     baxter_ctrlr.configure(start_pos, start_ori, goal_pos, goal_ori)
 
@@ -666,7 +710,7 @@ def test_coop_torque_control():
     goal_pos = start_pos + np.array([0.,-0.0, 0.9])
     angle    = 45.0
     axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
-    goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2], axis[3])
+    goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2])
 
     baxter_ctrlr.configure(start_pos, start_ori, goal_pos, goal_ori)
 
@@ -1004,6 +1048,55 @@ def test_lift_both_sides_box():
         baxter_ctrlr.right_arm.exec_torque_cmd(right_cmd)
         time.sleep(0.1)
 
+def test_maintain_position(limb_idx=1):
+    baxter_ctrlr = MinJerkController()
+    arm = baxter_ctrlr.get_arm_handle(limb_idx)
+    #baxter_ctrlr.set_neutral()
+    baxter_ctrlr.untuck_arms()
+
+    start_pos, start_ori  =  arm.get_ee_pose()
+
+    cmd = np.zeros(7)
+    rate = 100 #Hz
+    rate = rospy.timer.Rate(rate)
+    no_set_points = 32
+
+    circle_traj = baxter_ctrlr.standard_shape_traj(curr_pos=start_pos, 
+                                                   no_set_points=no_set_points, 
+                                                   shape='circle')
+    
+    eight_traj = baxter_ctrlr.standard_shape_traj(curr_pos=start_pos, 
+                                                  no_set_points=no_set_points, 
+                                                  shape='eight')
+    idx = 0
+
+    traj_to_follow = circle_traj
+
+    while True:
+
+        curr_pos, curr_ori  =  arm.get_ee_pose()
+        
+        idx = idx%no_set_points
+        
+        error = np.linalg.norm(traj_to_follow[idx] - curr_pos)
+        
+        cmd = baxter_ctrlr.osc_torque_cmd(goal_pos=traj_to_follow[idx],
+                                          goal_ori=start_ori, 
+                                          limb_idx=limb_idx, 
+                                          orientation_ctrl=True)
+        #increment the set point only if the arm is within a certain threshold
+        if error < 0.12:
+            idx += 1
+      
+        arm.exec_torque_cmd(cmd)
+        print "the command \n", cmd
+        rate.sleep()
+
+    final_pos, final_ori  =  arm.get_ee_pose()
+    print "ERROR in position \t", np.linalg.norm(final_pos-start_pos)
+    print "ERROR in orientation \t", np.linalg.norm(final_ori-start_ori)
+
+
 ##==============================
 # Test code
 #===============================
@@ -1043,5 +1136,7 @@ if __name__ == "__main__":
     else:
         torque_mode = False
 
-    test_reach_both_sides_box(torque_mode)
+    test_maintain_position()
+
+    #test_reach_both_sides_box(torque_mode)
     #test_lift_both_sides_box()
