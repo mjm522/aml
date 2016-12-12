@@ -59,6 +59,8 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def _update_state(self):
 
+        now                 = rospy.Time.now()
+
         joint_angles        = self.joint_angles()
         joint_velocities    = self.joint_velocities()
         joint_efforts       = self.joint_efforts()
@@ -76,6 +78,9 @@ class BaxterArm(baxter_interface.limb.Limb):
         state['inertia']         = self.get_arm_inertia(None)
         state['rgb_image']       = self._camera.curr_rgb_image
         state['depth_image']     = self._camera.curr_depth_image
+
+
+        state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
         try:
             state['ee_point'], state['ee_ori']  = self.get_ee_pose()
