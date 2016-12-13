@@ -29,11 +29,11 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def __init__(self,limb,on_state_callback=None):
 
-        self.ready = False
+        self._ready = False
 
         self._configure(limb,on_state_callback)
         
-        self.ready = True
+        self._ready = True
 
     def _configure(self,limb, on_state_callback):
         self._state = None
@@ -115,7 +115,7 @@ class BaxterArm(baxter_interface.limb.Limb):
     def _on_joint_states(self, msg):
         baxter_interface.limb.Limb._on_joint_states(self,msg)
 
-        if self.ready:
+        if self._ready:
             self._state = self._update_state()
             self._on_state_callback(self._state)
 
