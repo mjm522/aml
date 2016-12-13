@@ -21,14 +21,17 @@ def main_coop_gravity_comp_demo():
     #baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
 
-    start_pos, start_ori  =  arm_right.get_ee_pose()
+    start_right_pos, start_right_ori  =  arm_right.get_ee_pose()
+    start_left_pos, start_left_ori  =  arm_left.get_ee_pose()
 
     cmd = np.zeros(7)
     rate = 100 #Hz
     rate = rospy.timer.Rate(rate)
 
-    rel_pos = np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
-    rel_ori = np.quaternion(1.,0.,0.,0.)
+    rel_pos = start_right_pos - start_left_pos #np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
+    rel_ori = start_left_ori.conjugate()*start_right_ori#np.quaternion(1.,0.,0.,0.)
+
+
 
     while True:
 
@@ -59,6 +62,7 @@ def main_coop_gravity_comp_demo():
 
     
         #following is the initiall difference when using left_arm_start and rigt_arm_start
+        goal_ori = left_ori*rel_ori
         req_ori_diff = np.array([0.0, 0.0, 0.0 ])
 
 
