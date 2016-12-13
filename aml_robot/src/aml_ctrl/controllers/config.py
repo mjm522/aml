@@ -27,6 +27,7 @@ OSC_POSTN_CNTLR = {
     'alpha':3.25,
     'null_kp': 1.5*10.,
     'null_kd': 2.5*10.,
+    'pos_threshold':0.01,
 }
 
 OSC_VELCTY_CNTLR = {

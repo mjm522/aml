@@ -4,7 +4,7 @@ import rospy
 from config import OSC_TORQUE_CNTLR
 from aml_ctrl.classical_controller import ClassicalController
 
-class OSC_Torque_Controller(ClassicalController):
+class OSC_TorqueController(ClassicalController):
     def __init__(self, robot_interface):
         self._robot    = robot_interface
         self._cmd      = np.zeros(self._robot._nu)
