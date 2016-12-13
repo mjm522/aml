@@ -139,8 +139,8 @@ class Baxter_Eye_Hand_Calib():
 
         if calib_success:
             print "the openni_rgb_params \n"
-            print "postion \t", np.around(calib_data['openni_rgb_camera_pos'],3)
-            print "orientation \t", np.around(calib_data['openni_rgb_camera_ori'],3)
+            print "postion of the openni camera in robot base frame \t", np.around(calib_data['openni_rgb_camera_pos'],3)
+            print "orientation of the openni camera in robot base frame \t", np.around(calib_data['openni_rgb_camera_ori'],3)
         else:
             print "Calibration has failed!"
 
@@ -157,8 +157,12 @@ class Baxter_Eye_Hand_Calib():
             
             if not flag:
                 translation, rot = self.tf.lookupTransform('box', 'base', time)
-                self.broadcast_frame(translation, rot, frame_name="marker_box")
+                #self.broadcast_frame(translation, rot, frame_name="marker_box")
+                print "translation of box in robot base frame \t", translation
+                print "orientation of box in robot base frame \t", rot
+
                 flag = True
+                break
 
 def main():
     
@@ -166,8 +170,7 @@ def main():
 
     calib.self_calibrate()
 
-
-    #calib.get_box_transform()
+    calib.get_box_transform()
 
 if __name__ == '__main__':
     rospy.init_node('baxter_eye_hand_calib_ros_node')

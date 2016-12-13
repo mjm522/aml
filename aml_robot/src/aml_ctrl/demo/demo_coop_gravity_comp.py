@@ -13,9 +13,7 @@ def main_coop_gravity_comp_demo():
 
     baxter_ctrlr = MinJerkController()
 
-    limb_right_idx = 1
-    limb_left_idx = 0
-
+    #limb_idx 1 = right arm and lim_idx 0 = left arm
     master_limb_idx = 1
     slave_limb_idx  = 0
 
@@ -23,7 +21,6 @@ def main_coop_gravity_comp_demo():
     arm_slave  = baxter_ctrlr.get_arm_handle(slave_limb_idx)
     #baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
-
 
     master_start_pos, master_start_ori  =  arm_master.get_ee_pose()
     slave_start_pos,  slave_start_ori   =  arm_slave.get_ee_pose()
@@ -33,7 +30,7 @@ def main_coop_gravity_comp_demo():
     rate = rospy.timer.Rate(rate)
 
     rel_pos = slave_start_pos - master_start_pos#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
-    rel_ori = slave_start_ori.conjugate()*master_start_ori#np.quaternion(1.,0.,0.,0.)
+    rel_ori = slave_start_ori.conjugate()*master_start_ori
 
     while True:
 
@@ -69,7 +66,7 @@ def main_coop_gravity_comp_demo():
         req_ori_diff = quatdiff(quat_curr=slave_ori, quat_des=goal_ori)#np.array([0.0, 0.0, 0.0 ])
 
 
-        # cmd_right = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_right, 
+        # cmd_slave = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_slave, 
         #                                       goal_pos=req_pos_diff, 
         #                                       goal_ori=req_ori_diff, 
         #                                       orientation_ctrl=True)

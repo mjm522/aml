@@ -35,6 +35,30 @@ class BaxterArm(baxter_interface.limb.Limb):
         
         self._ready = True
 
+        #number of joints
+        self._nq = 7
+        #number of control commads
+        self._nu = 7
+
+        if limb == 0:
+            #secondary goal for the manipulator
+            self.q_mean = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+            self._tuck   = np.array([-1.0, -2.07,  3.0, 2.55,  0.0, 0.01,  0.0])
+            self._untuck = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+        elif limb == 1:
+            self.q_mean = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
+            self._tuck   = np.array([1.0, -2.07, -3.0, 2.55, -0.0, 0.01,  0.0])
+            self._untuck = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
+        else:
+            print "Unknown limb idex"
+            raise ValueError
+
+    def tuck_arm(self):
+        self.move_to_joint_position(self._tuck)
+
+    def untuck_arm(self):
+        self.move_to_joint_position(self._untuck)
+
     def _configure(self,limb, on_state_callback):
         self._state = None
 
@@ -44,7 +68,7 @@ class BaxterArm(baxter_interface.limb.Limb):
             self._on_state_callback = lambda m: None
 
         # Parent constructor
-        baxter_interface.limb.Limb.__init__(self,limb)
+        baxter_interface.limb.Limb.__init__(self, limb)
 
         self._kinematics = baxter_kinematics(self)
 
