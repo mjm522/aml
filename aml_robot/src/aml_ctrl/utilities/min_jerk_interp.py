@@ -8,7 +8,7 @@ class MinJerkInterp():
         self.timesteps = np.arange(0, 2*self.tau, self.dt)
         self.min_jerk_traj = {}
 
-    def configure(self, start_pos, goal_pos, start_qt, goal_qt):
+    def configure(self, start_pos, start_qt, goal_pos, goal_qt):
         self.start_pos = start_pos
         self.goal_pos  = goal_pos
         if isinstance(start_qt, np.quaternion):
@@ -94,6 +94,7 @@ class MinJerkInterp():
 
     def  min_jerk_step_qt(self):
         final_q = np.zeros((len(self.timesteps),4))
+
         for j in range(4):
             # generate the minimum jerk trajectory between each component of
             # quarternions
@@ -211,7 +212,7 @@ def main():
     goal_pos  = np.array([2.,3.,4.])
     start_qt  = np.quaternion(1.0, 0.,0., 0.)
     goal_qt   = np.quaternion(0.707, 0.707,0.,0.)
-    minjerk.configure(start_pos, goal_pos, start_qt, goal_qt)
+    minjerk.configure(start_pos=start_pos, goal_pos=goal_pos, start_qt=start_qt, goal_qt=goal_qt)
     minjerk.plot_min_jerk_traj()
 
 

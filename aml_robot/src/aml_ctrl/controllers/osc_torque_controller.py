@@ -11,6 +11,8 @@ class OSC_Torque_Controller(ClassicalController):
 
         config         = copy.deepcopy(OSC_TORQUE_CNTLR)
 
+        ClassicalController.__init__(self, robot_interface)
+
         #proportional gain
         self._kp       = config['kp']
         #derivative gain
@@ -104,7 +106,7 @@ class OSC_Torque_Controller(ClassicalController):
 
         u_null_filtered     = np.dot(null_filter, u_null)
 
-        u                   += alpha*u_null_filtered
+        u                   += self._alpha*u_null_filtered
 
         if np.any(np.isnan(u)):
             u               = self._cmd

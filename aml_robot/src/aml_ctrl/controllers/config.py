@@ -7,7 +7,7 @@ CONTROLLER = {
     'kd': np.sqrt(10.),
     'alpha': 3.25,
     'null_kp':  1.5*10.,
-    'null_kd:': 2.5*10.,
+    'null_kd': 2.5*10.,
 }
 
 
@@ -17,7 +17,7 @@ OSC_TORQUE_CNTLR = {
     'kd': np.sqrt(10.),
     'alpha': 3.25,
     'null_kp':  1.5*10.,
-    'null_kd:': 2.5*10.,
+    'null_kd': 2.5*10.,
 }
 
 OSC_POSTN_CNTLR = {
@@ -35,5 +35,5 @@ OSC_VELCTY_CNTLR = {
     'kd': np.sqrt(10.),
     'alpha': 3.25,
     'null_kp': 1.5*10.,
-    'null_kd:': 2.5*10.,
+    'null_kd': 2.5*10.,
 }
