@@ -382,12 +382,12 @@ class MinJerkController():
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
-        prop_val            = ((q_mean - q) + np.pi) % (np.pi*2) - np.pi
+        prop_val            = (q_mean - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
 
-        print "Prop_val \n",  prop_val
-        print "error \n", q_mean - q
+        # print "Prop_val \n",  prop_val
+        # print "error \n", q_mean - q
 
-        q_des               = (1.1*kp * prop_val - 2.*kd * dq).reshape(-1,)
+        q_des               = (1.5*kp * prop_val - 2.5*kd * dq).reshape(-1,)
 
         u_null              = np.dot(Mq, q_des)
 
@@ -398,9 +398,9 @@ class MinJerkController():
 
         u_null_filtered     = np.dot(null_filter, u_null)
 
-        print "u \n", u
-        print "u_null \n", u_null
-        print "u_null_filtered \n", u_null_filtered
+        # print "u \n", u
+        # print "u_null \n", u_null
+        # print "u_null_filtered \n", u_null_filtered
 
         u                   += alpha*u_null_filtered
 
