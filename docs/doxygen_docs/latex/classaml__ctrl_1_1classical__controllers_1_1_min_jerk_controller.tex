@@ -1,0 +1,92 @@
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller}{}\section{aml\+\_\+ctrl.\+classical\+\_\+controllers.\+Min\+Jerk\+Controller Class Reference}
+\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller}\index{aml\+\_\+ctrl.\+classical\+\_\+controllers.\+Min\+Jerk\+Controller@{aml\+\_\+ctrl.\+classical\+\_\+controllers.\+Min\+Jerk\+Controller}}
+
+
+Collaboration diagram for aml\+\_\+ctrl.\+classical\+\_\+controllers.\+Min\+Jerk\+Controller\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a67156f9aad386b58bfc7f471d99cc526}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a67156f9aad386b58bfc7f471d99cc526} 
+def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, extern\+\_\+call=False, trial\+\_\+arm=None, aux\+\_\+arm=None, tau=5., dt=0.\+05)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_acd75044b827ff71bec15f996077a17b7}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_acd75044b827ff71bec15f996077a17b7} 
+def {\bfseries configure} (self, start\+\_\+pos, start\+\_\+ori, goal\+\_\+pos, goal\+\_\+ori)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aa4549f8c58d03aa508ef7f3dd5b8318e}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aa4549f8c58d03aa508ef7f3dd5b8318e} 
+def {\bfseries get\+\_\+arm\+\_\+handle} (self, limb\+\_\+idx=0)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a37671ba5ea1592a2bf3e169c6d060d9d}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a37671ba5ea1592a2bf3e169c6d060d9d} 
+def {\bfseries set\+\_\+neutral} (self)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a33f260a4253ebdeb0c8d2e6701101bc9}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a33f260a4253ebdeb0c8d2e6701101bc9} 
+def {\bfseries tuck\+\_\+arms} (self)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a72d1867cce1d400fc8ce0f4604da7dfc}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a72d1867cce1d400fc8ce0f4604da7dfc} 
+def {\bfseries untuck\+\_\+arms} (self)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a825535b9b198ad177f27d5d5689ad419}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a825535b9b198ad177f27d5d5689ad419} 
+def {\bfseries standard\+\_\+shape\+\_\+traj} (self, curr\+\_\+pos, no\+\_\+set\+\_\+points=16, shape=\textquotesingle{}circle\textquotesingle{})
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_affaeff25c410f9d0617b551392c4fcdf}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_affaeff25c410f9d0617b551392c4fcdf} 
+def {\bfseries get\+\_\+min\+\_\+jerk\+\_\+trajectory} (self)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aa4cdd987c45c52d39f38ec3ff83f8f1d}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aa4cdd987c45c52d39f38ec3ff83f8f1d} 
+def {\bfseries osc\+\_\+position\+\_\+cmd} (self, goal\+\_\+pos, goal\+\_\+ori=None, limb\+\_\+idx=0, orientation\+\_\+ctrl=False)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a54182a9ca601563ef471063650978820}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a54182a9ca601563ef471063650978820} 
+def {\bfseries osc\+\_\+torque\+\_\+cmd} (self, goal\+\_\+pos, goal\+\_\+ori=None, limb\+\_\+idx=0, orientation\+\_\+ctrl=False)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a9b88c1b2a047a254b7e59c4cc0627995}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a9b88c1b2a047a254b7e59c4cc0627995} 
+def {\bfseries relative\+\_\+jac} (self, rel\+\_\+pos)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a05fe88df81c713f6d4a4eb683c463f57}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a05fe88df81c713f6d4a4eb683c463f57} 
+def {\bfseries osc\+\_\+torque\+\_\+cmd\+\_\+2} (self, arm\+\_\+data, goal\+\_\+pos, goal\+\_\+ori=None, orientation\+\_\+ctrl=False)
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a8f6ff35c217c121c2de2e805c173845b}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a8f6ff35c217c121c2de2e805c173845b} 
+def {\bfseries plot\+\_\+min\+\_\+jerk\+\_\+traj} (self)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aabe9d1a061a6f6cb9b26979e2a93c7c6}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aabe9d1a061a6f6cb9b26979e2a93c7c6} 
+{\bfseries left\+\_\+arm}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a2f49b270f60da2410036f62b293643a1}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a2f49b270f60da2410036f62b293643a1} 
+{\bfseries right\+\_\+arm}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a51a6ea302e41b4ced13f44a8ed1873f9}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a51a6ea302e41b4ced13f44a8ed1873f9} 
+{\bfseries start\+\_\+pos}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a457eed8bb3e71b2ce6da0a3f470f37b4}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a457eed8bb3e71b2ce6da0a3f470f37b4} 
+{\bfseries goal\+\_\+pos}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a7c27621e163f2c438c1b76cfb9477e82}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a7c27621e163f2c438c1b76cfb9477e82} 
+{\bfseries start\+\_\+qt}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a1b557c17e8356729fb179ab67ec0d1d1}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a1b557c17e8356729fb179ab67ec0d1d1} 
+{\bfseries goal\+\_\+qt}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a23a689c23418cac10b3ad373eec3dcd0}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a23a689c23418cac10b3ad373eec3dcd0} 
+{\bfseries tau}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aceb3147e0da967bfc101ea5a1e6489a5}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aceb3147e0da967bfc101ea5a1e6489a5} 
+{\bfseries dt}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aedd1be03de0d0d6707a5b94716123b3b}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_aedd1be03de0d0d6707a5b94716123b3b} 
+{\bfseries timesteps}
+\item 
+\hypertarget{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a409c6319b72e2f79bb962f9d1a69cf12}{}\label{classaml__ctrl_1_1classical__controllers_1_1_min_jerk_controller_a409c6319b72e2f79bb962f9d1a69cf12} 
+{\bfseries osc\+\_\+pos\+\_\+threshold}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+aml\+\_\+robot/src/aml\+\_\+ctrl/classical\+\_\+controllers.\+py\end{DoxyCompactItemize}
