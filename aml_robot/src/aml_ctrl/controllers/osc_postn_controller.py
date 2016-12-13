@@ -1,7 +1,9 @@
 import numpy as np
+import quaternion
 import copy
 import rospy
 from config import OSC_POSTN_CNTLR
+from aml_ctrl.utilities.utilities import quatdiff
 from aml_ctrl.classical_controller import ClassicalController
 
 class OSC_PostnController(ClassicalController):
