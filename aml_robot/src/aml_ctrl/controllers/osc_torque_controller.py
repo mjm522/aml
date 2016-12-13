@@ -2,33 +2,33 @@ import numpy as np
 import copy
 import rospy
 from config import OSC_TORQUE_CNTLR
-from aml_robot.aml_ctrl import ClassicalController
+from aml_ctrl.classical_controller import ClassicalController
 
 class OSC_Torque_Controller(ClassicalController):
-	def __init__(self, robot_interface):
-		self._robot    = robot_interface
-		self._cmd      = np.zeros(self._robot._nu)
+    def __init__(self, robot_interface):
+        self._robot    = robot_interface
+        self._cmd      = np.zeros(self._robot._nu)
 
-		config         = copy.deepcopy(OSC_TORQUE_CNTLR)
+        config         = copy.deepcopy(OSC_TORQUE_CNTLR)
 
-		#proportional gain
-		self._kp       = config['kp']
-		#derivative gain
-		self._kd       = config['kd']
-		#proportional gain for null space controller
-		self._null_kp  = config['null_kp']
-		#derivative gain for null space controller
-		self._null_kd  = config['null_kd']
-		#null space control gain
-		self._alpha    = config['alpha']
+        #proportional gain
+        self._kp       = config['kp']
+        #derivative gain
+        self._kd       = config['kd']
+        #proportional gain for null space controller
+        self._null_kp  = config['null_kp']
+        #derivative gain for null space controller
+        self._null_kd  = config['null_kd']
+        #null space control gain
+        self._alpha    = config['alpha']
 
-		if 'rate' in config:
-			self._rate = rospy.timer.Rate(config['rate'])
+        if 'rate' in config:
+            self._rate = rospy.timer.Rate(config['rate'])
 
-	def compute_cmd(self, goal_pos, goal_ori, orientation_ctrl=False):
+    def compute_cmd(self, goal_pos, goal_ori, orientation_ctrl=False):
 
         # calculate the Jacobian for the end effector
-        
+
         robot_state    = self._robot._state
 
         q              = robot_state['position']
@@ -38,10 +38,10 @@ class OSC_Torque_Controller(ClassicalController):
         h              = robot_state['gravity_comp']
 
         # calculate the jacobian of the end effector
-        jac_ee		   = robot_state['jacobian']
+        jac_ee         = robot_state['jacobian']
 
         # calculate the inertia matrix in joint space
-        Mq			   = robot_state['inertia']
+        Mq             = robot_state['inertia']
 
         # calculate position of the end-effector
         ee_xyz, ee_ori = self._robot.get_ee_pose()
@@ -86,7 +86,7 @@ class OSC_Torque_Controller(ClassicalController):
 
 
         # transform into joint space, add vel and gravity compensation
-        u           		= self._kp * np.dot(jac_ee.T, Fx) - np.dot(Mq, self._kd * dq)
+        u                   = self._kp * np.dot(jac_ee.T, Fx) - np.dot(Mq, self._kd * dq)
 
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
@@ -113,6 +113,6 @@ class OSC_Torque_Controller(ClassicalController):
 
         return self._cmd
 
-	def send_cmd(self):
-		self._robot.exec_torque_cmd(self._cmd)
-		self._rate.sleep()
+    def send_cmd(self):
+        self._robot.exec_torque_cmd(self._cmd)
+        self._rate.sleep()
