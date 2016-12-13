@@ -445,7 +445,7 @@ class MinJerkController():
         #derivative gain
         kd              = np.sqrt(kp)
         #null space control gain
-        alpha           = 0.
+        alpha           = 3.25
 
         jnt_start = arm_data['jnt_start']
         ee_xyz = arm_data['ee_point']

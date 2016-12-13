@@ -21,15 +21,16 @@ def main_coop_gravity_comp_demo():
     #baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
 
-    left_start_pos,  left_start_ori    =  arm_left.get_ee_pose()
-    right_start_pos, right_start_ori   =  arm_right.get_ee_pose()
+
+    start_right_pos, start_right_ori  =  arm_right.get_ee_pose()
+    start_left_pos, start_left_ori  =  arm_left.get_ee_pose()
 
     cmd = np.zeros(7)
-    rate = 100 #Hz
+    rate = 500 #Hz
     rate = rospy.timer.Rate(rate)
 
-    rel_pos = right_start_pos-left_start_pos#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
-    rel_ori = np.quaternion(1.,0.,0.,0.)
+    rel_pos = start_right_pos - start_left_pos #np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
+    rel_ori = start_left_ori.conjugate()*start_right_ori#np.quaternion(1.,0.,0.,0.)
 
     while True:
 
@@ -60,16 +61,21 @@ def main_coop_gravity_comp_demo():
 
     
         #following is the initiall difference when using left_arm_start and rigt_arm_start
-        req_ori_diff = quatdiff(quat_curr=right_ori, quat_des=left_ori)#np.array([0.0, 0.0, 0.0 ])
+        goal_ori = left_ori*rel_ori
+
+        req_ori_diff = quatdiff(quat_curr=right_ori, quat_des=goal_ori)#np.array([0.0, 0.0, 0.0 ])
 
 
-        cmd_right = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_right, 
-                                              goal_pos=req_pos_diff, 
-                                              goal_ori=req_ori_diff, 
-                                              orientation_ctrl=True)
+        # cmd_right = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_right, 
+        #                                       goal_pos=req_pos_diff, 
+        #                                       goal_ori=req_ori_diff, 
+        #                                       orientation_ctrl=True)
+        cmd_right = baxter_ctrlr.osc_torque_cmd(goal_pos=goal_pos, 
+                                                goal_ori=goal_ori, 
+                                                limb_idx=1, 
+                                                orientation_ctrl=True)
         
         
-    
         arm_right.exec_torque_cmd(cmd_right)
         #print "the command \n", cmd_right
         rate.sleep()
