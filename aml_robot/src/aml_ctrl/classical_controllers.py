@@ -136,6 +136,13 @@ def  min_jerk_step_qt(start_qt, goal_qt, tau, dt):
     return final_q, final_w, final_al
 
 def quatdiff(quat_curr, quat_des):
+    #convert to array is the input arguments are of quaternion type
+    if isinstance(quat_des, np.quaternion):
+        quat_des = quaternion.as_float_array(quat_des)[0]
+
+    if isinstance(quat_curr, np.quaternion):
+        quat_curr = quaternion.as_float_array(quat_curr)[0]
+
     return quat_des[0]*quat_curr[1:4] - quat_curr[0]*quat_des[1:4] + np.cross(quat_des[1:4],quat_curr[1:4])
 
 class MinJerkController():
@@ -298,7 +305,7 @@ class MinJerkController():
         #derivative gain
         kd              = np.sqrt(kp);
         #null space control gain
-        alpha           = 3.25;
+        alpha           = 3.25
 
         jnt_start     = arm.angles()
 
@@ -375,7 +382,12 @@ class MinJerkController():
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
-        q_des               = (kp * (q_mean - q) - kd * dq).reshape(-1,)
+        prop_val            = ((q_mean - q) + np.pi) % (np.pi*2) - np.pi
+
+        print "Prop_val \n",  prop_val
+        print "error \n", q_mean - q
+
+        q_des               = (1.1*kp * prop_val - 2.*kd * dq).reshape(-1,)
 
         u_null              = np.dot(Mq, q_des)
 
@@ -385,6 +397,10 @@ class MinJerkController():
         null_filter         = np.eye(len(q)) - np.dot(jac_ee.T, Jdyn_inv)
 
         u_null_filtered     = np.dot(null_filter, u_null)
+
+        print "u \n", u
+        print "u_null \n", u_null
+        print "u_null_filtered \n", u_null_filtered
 
         u                   += alpha*u_null_filtered
 
@@ -427,9 +443,9 @@ class MinJerkController():
         #proportional gain
         kp              = 10.
         #derivative gain
-        kd              = np.sqrt(kp);
+        kd              = np.sqrt(kp)
         #null space control gain
-        alpha           = 0.0;
+        alpha           = 0.
 
         jnt_start = arm_data['jnt_start']
         ee_xyz = arm_data['ee_point']
@@ -1080,7 +1096,7 @@ def test_maintain_position(limb_idx=1):
         
         error = np.linalg.norm(traj_to_follow[idx] - curr_pos)
         
-        cmd = baxter_ctrlr.osc_torque_cmd(goal_pos=traj_to_follow[idx],
+        cmd = baxter_ctrlr.osc_torque_cmd(goal_pos=start_pos,#traj_to_follow[idx],
                                           goal_ori=start_ori, 
                                           limb_idx=limb_idx, 
                                           orientation_ctrl=True)
@@ -1089,7 +1105,7 @@ def test_maintain_position(limb_idx=1):
             idx += 1
       
         arm.exec_torque_cmd(cmd)
-        print "the command \n", cmd
+        #print "the command \n", cmd
         rate.sleep()
 
     final_pos, final_ori  =  arm.get_ee_pose()

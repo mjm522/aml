@@ -1,4 +1,4 @@
-from aml_ctrl.classical_controllers import MinJerkController
+from aml_ctrl.classical_controllers import MinJerkController, quatdiff
 from aml_ctrl.classical_controllers import test_follow_gps_policy, test_follow_gps_policy2
 
 import numpy as np
@@ -21,18 +21,19 @@ def main_coop_gravity_comp_demo():
     #baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
 
-    start_pos, start_ori  =  arm_right.get_ee_pose()
+    left_start_pos,  left_start_ori    =  arm_left.get_ee_pose()
+    right_start_pos, right_start_ori   =  arm_right.get_ee_pose()
 
     cmd = np.zeros(7)
     rate = 100 #Hz
     rate = rospy.timer.Rate(rate)
 
-    rel_pos = np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
+    rel_pos = right_start_pos-left_start_pos#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
     rel_ori = np.quaternion(1.,0.,0.,0.)
 
     while True:
 
-        left_pos, left_ori  =  arm_left.get_ee_pose()
+        left_pos, left_ori    =  arm_left.get_ee_pose()
         right_pos, right_ori  =  arm_right.get_ee_pose()
 
         state_right  = arm_right._state
@@ -59,7 +60,7 @@ def main_coop_gravity_comp_demo():
 
     
         #following is the initiall difference when using left_arm_start and rigt_arm_start
-        req_ori_diff = np.array([0.0, 0.0, 0.0 ])
+        req_ori_diff = quatdiff(quat_curr=right_ori, quat_des=left_ori)#np.array([0.0, 0.0, 0.0 ])
 
 
         cmd_right = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_right, 
@@ -68,11 +69,7 @@ def main_coop_gravity_comp_demo():
                                               orientation_ctrl=True)
         
         
-        
-        #increment the set point only if the arm is within a certain threshold
-        if error < 0.12:
-            pass
-      
+    
         arm_right.exec_torque_cmd(cmd_right)
         #print "the command \n", cmd_right
         rate.sleep()
