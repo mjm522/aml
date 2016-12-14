@@ -11,7 +11,6 @@ class OSCPositionController(ClassicalController):
 
         ClassicalController.__init__(self,robot_interface, config)
 
-        print(config)
         #proportional gain
         self._kp       = self._config['kp']
         #derivative gain
