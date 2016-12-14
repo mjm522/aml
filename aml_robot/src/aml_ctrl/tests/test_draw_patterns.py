@@ -7,9 +7,9 @@ from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 
 def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
     
-    ctrlr = OSCTorqueController(robot_interface)
-
     robot_interface.untuck_arm()
+
+    ctrlr = OSCTorqueController(robot_interface)
 
     start_pos, start_ori  =  robot_interface.get_ee_pose()
 
@@ -30,7 +30,7 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
             # Set new goal for controller
         ctrlr.set_goal(traj_to_follow[idx],start_ori)
 
-        lin_error, ang_error, success, time_elapsed = ctrlr.waitUntilGoalReached(timeout=1)
+        lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1)
 
         print("lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
 
@@ -38,7 +38,7 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
 
         rate.sleep()
 
-
+    ctrlr.set_active(False)
 
 
 if __name__ == '__main__':

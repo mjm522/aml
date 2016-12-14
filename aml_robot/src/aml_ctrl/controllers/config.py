@@ -23,7 +23,8 @@ OSC_TORQUE_CNTLR = {
     'null_kd': 2.5*10.,
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.13,
-    'angular_error_thr': 0.3
+    'angular_error_thr': 0.3,
+    'deactivate_wait_time': 2,
 }
 
 OSC_POSTN_CNTLR = {

@@ -40,7 +40,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
             ctrlr.set_goal(goal_pos,start_ori)
             
             print "Waiting..."
-            lin_error, ang_error, success, time_elapsed = ctrlr.waitUntilGoalReached(timeout=0.5)
+            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=2.0)
             
             print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
 
@@ -50,8 +50,10 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
 
         rate.sleep()
 
+    
+    ctrlr.wait_until_goal_reached(timeout=5.0)
     ctrlr.set_active(False)
-    robot_interface.exec_position_cmd2(np.zeros(7))
+
 
     # Error stored in ctrlr._error is the most recent error w.r.t to the most recent sent goal
     print "ERROR in position \t", np.linalg.norm(ctrlr._error['linear'])

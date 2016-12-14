@@ -26,6 +26,8 @@ class OSCTorqueController(ClassicalController):
         #null space control gain
         self._alpha    = self._config['alpha']
 
+        self._deactivate_wait_time = self._config['deactivate_wait_time']
+
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
 
@@ -128,3 +130,13 @@ class OSCTorqueController(ClassicalController):
 
     def send_cmd(self,time_elapsed):
         self._robot.exec_torque_cmd(self._cmd)
+
+
+    def set_active(self,is_active):
+
+        ClassicalController.set_active(self,is_active)
+
+        hold_time = rospy.Duration(self._deactivate_wait_time)
+        last_time = rospy.Time.now()
+        while (rospy.Time.now() - last_time) <= hold_time:
+            self._robot.exec_position_cmd2(np.zeros(self._robot._nu))

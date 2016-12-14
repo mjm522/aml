@@ -17,7 +17,7 @@ class ClassicalController(object):
         self._robot    = robot_interface
         self._cmd      = np.zeros(self._robot._nu)
 
-        update_period = rospy.Duration(1.0/config['rate']);
+        update_period = rospy.Duration(1.0/config['rate'])
         rospy.Timer(update_period, self.update)
 
         self._last_time = rospy.Time.now()
@@ -67,7 +67,7 @@ class ClassicalController(object):
 
 
     # Wait timeout seconds for reaching the last set goal
-    def waitUntilGoalReached(self, timeout = 5.0):
+    def wait_until_goal_reached(self, timeout = 5.0):
 
         timeout = rospy.Duration(timeout)
         reached_goal = False
