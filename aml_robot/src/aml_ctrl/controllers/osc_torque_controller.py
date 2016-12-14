@@ -1,39 +1,43 @@
 import numpy as np
 import quaternion
+
 import copy
+
 import rospy
+
 from config import OSC_TORQUE_CNTLR
-from aml_ctrl.utilities.utilities import quatdiff
 from aml_ctrl.classical_controller import ClassicalController
 
-class OSC_TorqueController(ClassicalController):
-    def __init__(self, robot_interface):
-        self._robot    = robot_interface
-        self._cmd      = np.zeros(self._robot._nu)
+from aml_ctrl.utilities.utilities import quatdiff
 
-        config         = copy.deepcopy(OSC_TORQUE_CNTLR)
+class OSCTorqueController(ClassicalController):
+    def __init__(self, robot_interface, config = OSC_TORQUE_CNTLR):
 
-        ClassicalController.__init__(self, robot_interface)
+        ClassicalController.__init__(self,robot_interface, config)
 
         #proportional gain
-        self._kp       = config['kp']
+        self._kp       = self._config['kp']
         #derivative gain
-        self._kd       = config['kd']
+        self._kd       = self._config['kd']
         #proportional gain for null space controller
-        self._null_kp  = config['null_kp']
+        self._null_kp  = self._config['null_kp']
         #derivative gain for null space controller
-        self._null_kd  = config['null_kd']
+        self._null_kd  = self._config['null_kd']
         #null space control gain
-        self._alpha    = config['alpha']
+        self._alpha    = self._config['alpha']
 
-        if 'rate' in config:
-            self._rate = rospy.timer.Rate(config['rate'])
+        if 'rate' in self._config:
+            self._rate = rospy.timer.Rate(self._config['rate'])
 
-    def compute_cmd(self, goal_pos, goal_ori, orientation_ctrl=False):
+    def compute_cmd(self,time_elapsed):
 
         # calculate the Jacobian for the end effector
 
-        robot_state    = self._robot._state
+        goal_pos       = self._goal_pos
+
+        goal_ori       = self._goal_ori
+
+        robot_state    = self._state
 
         q              = robot_state['position']
 
@@ -48,7 +52,9 @@ class OSC_TorqueController(ClassicalController):
         Mq             = robot_state['inertia']
 
         # calculate position of the end-effector
-        ee_xyz, ee_ori = self._robot.get_ee_pose()
+        ee_xyz         = robot_state['ee_point']
+        ee_ori         = robot_state['ee_ori']
+
 
         # convert the mass compensation into end effector space
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
@@ -66,7 +72,7 @@ class OSC_TorqueController(ClassicalController):
 
         x_des   = goal_pos - ee_xyz
  
-        if orientation_ctrl:
+        if self._orientation_ctrl:
             if goal_ori is None:
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
@@ -115,8 +121,10 @@ class OSC_TorqueController(ClassicalController):
         else:
             self._cmd       = u
 
+        # Never forget to update the error
+        self._error = {'linear' : x_des, 'angular' : omg_des}
+
         return self._cmd
 
-    def send_cmd(self):
+    def send_cmd(self,time_elapsed):
         self._robot.exec_torque_cmd(self._cmd)
-        self._rate.sleep()

@@ -2,49 +2,43 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.utilities import quatdiff, standard_shape_traj
-from aml_ctrl.controllers.osc_torque_controller import OSC_TorqueController
+from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 
-def test_maintain_position(robot_interface, start_pos, start_ori):
-
-    ctrlr = OSC_TorqueController(robot_interface)
-
-    while True:
-        
-        ctrlr.compute_cmd(goal_pos=start_pos,
-                          goal_ori=start_ori,  
-                          orientation_ctrl=True)
-      
-        ctrlr.send_cmd()
 
 def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
     
-    ctrlr = OSC_TorqueController(robot_interface)
+    ctrlr = OSCTorqueController(robot_interface)
 
     robot_interface.untuck_arm()
 
     start_pos, start_ori  =  robot_interface.get_ee_pose()
 
+    # Generate trajectory to follow
     traj_to_follow = standard_shape_traj(curr_pos=start_pos, 
                                         no_set_points=no_set_points,
                                         shape=shape)
     idx = 0
 
-    while True:
+    # Set first goal and active controller
+    ctrlr.set_active(True)
 
-        curr_pos, curr_ori  =  arm.get_ee_pose()
-        
-        idx = idx%no_set_points
-        
-        error = np.linalg.norm(traj_to_follow[idx] - curr_pos)
-        
-        ctrlr.compute_cmd(goal_pos=traj_to_follow[idx],
-                          goal_ori=start_ori, 
-                          orientation_ctrl=True)
-        #increment the set point only if the arm is within a certain threshold
-        if error < 0.12:
-            idx += 1
-      
-        ctrlr.send_cmd()
+
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+
+            
+            # Set new goal for controller
+        ctrlr.set_goal(traj_to_follow[idx],start_ori)
+
+        lin_error, ang_error, success, time_elapsed = ctrlr.waitUntilGoalReached(timeout=1)
+
+        print("lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
+
+        idx = (idx+1)%no_set_points
+
+        rate.sleep()
+
+
 
 
 if __name__ == '__main__':
@@ -53,9 +47,6 @@ if __name__ == '__main__':
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
-    start_pos, start_ori  =  arm.get_ee_pose()
-
-    #test_maintain_position(robot_interface=arm, start_pos=start_pos, start_ori=start_ori)
 
     test_draw_pattern(robot_interface=arm, no_set_points = 32, shape='circle')
     

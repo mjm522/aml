@@ -6,32 +6,34 @@ from config import OSC_POSTN_CNTLR
 from aml_ctrl.utilities.utilities import quatdiff
 from aml_ctrl.classical_controller import ClassicalController
 
-class OSC_PostnController(ClassicalController):
-    def __init__(self, robot_interface):
-        self._robot    = robot_interface
-        self._cmd      = np.zeros(self._robot._nu)
+class OSCPositionController(ClassicalController):
+    def __init__(self, robot_interface, config = OSC_POSTN_CNTLR):
 
-        config         = copy.deepcopy(OSC_POSTN_CNTLR)
+        ClassicalController.__init__(self,robot_interface, config)
 
-        ClassicalController.__init__(self, robot_interface)
-
+        print(config)
         #proportional gain
-        self._kp       = config['kp']
+        self._kp       = self._config['kp']
         #derivative gain
-        self._kd       = config['kd']
+        self._kd       = self._config['kd']
         #proportional gain for null space controller
-        self._null_kp  = config['null_kp']
+        self._null_kp  = self._config['null_kp']
         #derivative gain for null space controller
-        self._null_kd  = config['null_kd']
+        self._null_kd  = self._config['null_kd']
         #null space control gain
-        self._alpha    = config['alpha']
+        self._alpha    = self._config['alpha']
 
-        self._pos_threshold = config['pos_threshold']
+        self._pos_threshold = self._config['pos_threshold']
 
-        if 'rate' in config:
-            self._rate = rospy.timer.Rate(config['rate'])
+        self._dt = self._config['dt']
 
-    def compute_cmd(self, goal_pos, goal_ori, orientation_ctrl=False):
+
+    def compute_cmd(self,time_elapsed):
+
+        
+        goal_pos       = self._goal_pos
+
+        goal_ori       = self._goal_ori
         
         robot_state    = self._robot._state
 
@@ -50,10 +52,10 @@ class OSC_PostnController(ClassicalController):
         curr_pos, curr_ori  = self._robot.get_ee_pose()
 
 
-        delta_pos      = goal_pos-curr_pos
+        delta_pos      = (goal_pos-curr_pos)
 
 
-        if orientation_ctrl:
+        if self._orientation_ctrl:
             if goal_ori is None:
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
@@ -66,15 +68,18 @@ class OSC_PostnController(ClassicalController):
             delta           = delta_pos
 
         jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
-        null_q              = self._alpha*np.dot(jac_star, delta) + np.dot((np.eye(len(q)) - np.dot(jac_star,jac_ee)),(self._robot.q_mean - q))
-        self._cmd           = q + null_q
+        null_q              = self._kp*np.dot(jac_star, delta) + self._alpha*np.dot((np.eye(len(q)) - np.dot(jac_star,jac_ee)),(self._robot.q_mean - q))
+        self._cmd           = q + null_q*self._dt
 
         if np.any(np.isnan(self._cmd)) or np.linalg.norm(delta_pos) < self._pos_threshold:
             self._cmd       = q
 
+
+        # Never forget to update the error
+        self._error = {'linear' : delta_pos, 'angular' : delta_ori}
+
         return self._cmd
 
 
-    def send_cmd(self):
+    def send_cmd(self,time_elapsed):
         self._robot.exec_position_cmd(self._cmd)
-        self._rate.sleep()
