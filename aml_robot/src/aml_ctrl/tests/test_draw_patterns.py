@@ -5,7 +5,7 @@ from aml_ctrl.utilities.utilities import quatdiff, standard_shape_traj
 from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 
 
-def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
+def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight'):
     
     robot_interface.untuck_arm()
 
@@ -30,7 +30,7 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='circle'):
             # Set new goal for controller
         ctrlr.set_goal(traj_to_follow[idx],start_ori)
 
-        lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1)
+        lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=10.0)
 
         print("lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
 

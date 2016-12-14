@@ -136,7 +136,8 @@ class OSCTorqueController(ClassicalController):
 
         ClassicalController.set_active(self,is_active)
 
-        hold_time = rospy.Duration(self._deactivate_wait_time)
-        last_time = rospy.Time.now()
-        while (rospy.Time.now() - last_time) <= hold_time:
-            self._robot.exec_position_cmd2(np.zeros(self._robot._nu))
+        if is_active is False:
+            hold_time = rospy.Duration(self._deactivate_wait_time)
+            last_time = rospy.Time.now()
+            while (rospy.Time.now() - last_time) <= hold_time:
+                self._robot.exec_position_cmd2(np.zeros(self._robot._nu))

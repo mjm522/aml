@@ -1,8 +1,14 @@
-from aml_ctrl.classical_controllers import MinJerkController, quatdiff
-from aml_ctrl.classical_controllers import test_follow_gps_policy, test_follow_gps_policy2
 
 import numpy as np
 import quaternion
+import rospy
+from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
+
+import numpy as np
+import quaternion
+
+from aml_robot.baxter_robot import BaxterArm
+
 
 import rospy
 
@@ -11,34 +17,34 @@ def main_coop_gravity_comp_demo():
 
     rospy.init_node("coop_gravity_comp_demo_node")
 
-    baxter_ctrlr = MinJerkController()
 
-    #limb_idx 1 = right arm and lim_idx 0 = left arm
-    master_limb_idx = 1
-    slave_limb_idx  = 0
+    master_limb = 'left'
+    slave_limb  = 'right'
 
-    arm_master = baxter_ctrlr.get_arm_handle(master_limb_idx)
-    arm_slave  = baxter_ctrlr.get_arm_handle(slave_limb_idx)
+    arm_master = BaxterArm(master_limb)
+    arm_slave  = BaxterArm(slave_limb)
     #baxter_ctrlr.set_neutral()
-    baxter_ctrlr.untuck_arms()
+    arm_master.untuck_arm()
+    arm_slave.untuck_arm()
 
     master_start_pos, master_start_ori  =  arm_master.get_ee_pose()
     slave_start_pos,  slave_start_ori   =  arm_slave.get_ee_pose()
 
+    ctrlr_slave = OSCTorqueController(arm_slave)
+
     cmd = np.zeros(7)
-    rate = 500 #Hz
+    rate = 200 #Hz
     rate = rospy.timer.Rate(rate)
 
     rel_pos = slave_start_pos - master_start_pos#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
     rel_ori = slave_start_ori.conjugate()*master_start_ori
 
-    while True:
+    ctrlr_slave.set_active(True)
+
+    while not rospy.is_shutdown():
 
         master_pos, master_ori =  arm_master.get_ee_pose()
         slave_pos,  slave_ori  =  arm_slave.get_ee_pose()
-
-        state_slave  = arm_slave._state
-        state_slave['jnt_start'] = arm_slave.angles()
 
 
         #find the rotation to coordinate frame
@@ -53,30 +59,19 @@ def main_coop_gravity_comp_demo():
 
         #compute required change in position
         goal_pos = (master_pos + rel_pos_rl) # goal position of right arm w.r.t. base
-        req_pos_diff = goal_pos - slave_pos # error
-
-        error = np.linalg.norm(req_pos_diff)
-
-        print(error)
-
     
         #following is the initiall difference when using left_arm_start and rigt_arm_start
         goal_ori = master_ori*rel_ori
 
-        req_ori_diff = quatdiff(quat_curr=slave_ori, quat_des=goal_ori)#np.array([0.0, 0.0, 0.0 ])
+
+        ctrlr_slave.set_goal(goal_pos,goal_ori)
+        
+
+        lin_error, ang_error, success, time_elapsed = ctrlr_slave.wait_until_goal_reached(timeout=0.5)
+        
+        print("lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
 
 
-        # cmd_slave = baxter_ctrlr.osc_torque_cmd_2(arm_data=state_slave, 
-        #                                       goal_pos=req_pos_diff, 
-        #                                       goal_ori=req_ori_diff, 
-        #                                       orientation_ctrl=True)
-        cmd_slave = baxter_ctrlr.osc_torque_cmd(goal_pos=goal_pos, 
-                                                goal_ori=goal_ori, 
-                                                limb_idx=slave_limb_idx, 
-                                                orientation_ctrl=True)
-        
-        
-        arm_slave.exec_torque_cmd(cmd_slave)
         #print "the command \n", cmd_right
         rate.sleep()
 

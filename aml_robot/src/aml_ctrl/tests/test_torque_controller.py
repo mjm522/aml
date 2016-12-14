@@ -22,7 +22,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
     rate = rospy.Rate(100)
 
     finished = False
-    t = 10
+    t = 0
     ctrlr.set_active(True)
 
     n_steps = len(min_jerk_interp.timesteps)
@@ -40,7 +40,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
             ctrlr.set_goal(goal_pos,start_ori)
             
             print "Waiting..."
-            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=2.0)
+            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0)
             
             print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
 
@@ -52,7 +52,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
 
     
     ctrlr.wait_until_goal_reached(timeout=5.0)
-    ctrlr.set_active(False)
+    #ctrlr.set_active(False)
 
 
     # Error stored in ctrlr._error is the most recent error w.r.t to the most recent sent goal
@@ -73,9 +73,9 @@ if __name__ == '__main__':
     print("Starting position:", start_pos)
     
     if limb == 'left':
-        goal_pos = start_pos + np.array([0.,0.35, 0.])
+        goal_pos = start_pos + np.array([0.,0.0, 0.3])
     else:
-        goal_pos = start_pos - np.array([0.,0.35, 0.])
+        goal_pos = start_pos + np.array([0.,0.0, 0.3])
 
     angle    = 90.0
     axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)

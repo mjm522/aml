@@ -19,12 +19,12 @@ OSC_TORQUE_CNTLR = {
     'kp': 10.,
     'kd': np.sqrt(10.),
     'alpha': 3.25,
-    'null_kp':  1.5*10.,
-    'null_kd': 2.5*10.,
+    'null_kp':  1.0*10.,
+    'null_kd': 0.25*10.,
     'use_orientation_ctrl': True,
-    'linear_error_thr': 0.13,
+    'linear_error_thr': 0.12,
     'angular_error_thr': 0.3,
-    'deactivate_wait_time': 2,
+    'deactivate_wait_time': 5,
 }
 
 OSC_POSTN_CNTLR = {
@@ -32,8 +32,8 @@ OSC_POSTN_CNTLR = {
     'kp': 20.0,
     'kd': np.sqrt(10.),
     'alpha': 3.14,
-    'null_kp': 1.5*10.,
-    'null_kd': 2.5*10.,
+    'null_kp': 1.0*10.,
+    'null_kd': 1.0*10.,
     'use_orientation_ctrl': True,
     'pos_threshold': 0.0001,
     'linear_error_thr': 0.025, # error of 2 cm
