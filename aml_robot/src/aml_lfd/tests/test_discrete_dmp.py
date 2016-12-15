@@ -8,7 +8,7 @@ from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
 from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
 from aml_lfd.utilities.utilities import get_ee_traj
 
-def plot_traj(des_path):
+def plot_traj(des_path, tau=1.0):
 
     dmp = DiscreteDMPShell()
     dmp.configure(traj2follow=des_path, start=des_path[0,:], goal=des_path[-1,:])
@@ -16,45 +16,34 @@ def plot_traj(des_path):
     dmp.reset_state_dmp(new_start)
     new_goal = des_path[-1,:]
     dmp.goal = new_goal;
-    tau = 1.0
+
     y_track, dy_track, ddy_track = dmp.rollout_dmp(tau)
     
     import matplotlib.pyplot as plt
 
-    # test imitation of path run
     plt.figure(1)
     plt.subplot(311)
     plt.plot(des_path[:,0], 'r--', lw=2)
-    plt.title('X traj')
+    plt.plot(y_track[:,0],  'g--', lw=2)
     plt.subplot(312)
-    plt.plot(des_path[:,1], 'g--', lw=2)
-    plt.title('Y traj')
+    plt.plot(des_path[:,1], 'r--', lw=2)
+    plt.plot(y_track[:,1],  'g--', lw=2)
     plt.subplot(313)
-    plt.plot(des_path[:,2], 'b--', lw=2)
-    plt.title('Z traj')
-
-    plt.figure(2)
-    plt.subplot(311)
-    plt.plot(des_path[:,0], lw=2)
-    plt.plot(y_track[:,0],  lw=2)
-    plt.subplot(312)
-    plt.plot(des_path[:,1], lw=2)
-    plt.plot(y_track[:,1],  lw=2)
-    plt.subplot(313)
-    plt.plot(des_path[:,2], lw=2)
-    plt.plot(y_track[:,2],  lw=2)
+    plt.plot(des_path[:,2], 'r--', lw=2)
+    plt.plot(y_track[:,2],  'g--', lw=2)
 
     plt.tight_layout()
     plt.show()
 
-def test_discrete_dmp(robot_interface, des_path):
+def test_discrete_dmp(robot_interface, des_path, tau=1.0):
 
-    ctrlr = OSCPositionController(robot_interface)
-
-    tau      = 1.0
+    #ctrlr = OSCPositionController(robot_interface)
+    ctrlr = OSCTorqueController(robot_interface)
 
     dmp = DiscreteDMPShell()
     dmp.configure(traj2follow=des_path, start=des_path[0,:], goal=des_path[-1,:])
+
+    _, start_ori = robot_interface.get_ee_pose()
 
     print "Starting position controller"
 
@@ -62,7 +51,7 @@ def test_discrete_dmp(robot_interface, des_path):
 
     reach_thr = 0.12
 
-    finished = False
+    finished  = False
     t = 0
     ctrlr.set_active(True)
 
@@ -79,7 +68,7 @@ def test_discrete_dmp(robot_interface, des_path):
         if np.any(np.isnan(goal_pos)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
         else:
-            ctrlr.set_goal(goal_pos,start_ori)
+            ctrlr.set_goal(goal_pos, start_ori)
 
             print "Waiting..." 
             lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
@@ -94,15 +83,17 @@ def test_discrete_dmp(robot_interface, des_path):
     
 if __name__ == '__main__':
 
-    # rospy.init_node('classical_postn_controller')
-    # from aml_robot.baxter_robot import BaxterArm
-    # limb = 'right'
-    # arm = BaxterArm(limb)
+    rospy.init_node('classical_postn_controller')
+    from aml_robot.baxter_robot import BaxterArm
+    limb = 'right'
+    arm = BaxterArm(limb)
 
     demo_idx = 1
 
-    des_path = get_ee_traj(demo_idx=demo_idx)
+    des_path = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
+    # des_path = get_ee_traj(debug=True) #tau=2.0 makes it almost match
 
-    plot_traj(des_path)
+    #larger the tau, faster the system would reach the goal
+    # plot_traj(des_path, tau=0.1)
 
-    # test_discrete_dmp(robot_interface=arm, des_path=des_path)
+    test_discrete_dmp(robot_interface=arm, des_path=des_path, tau=0.1)

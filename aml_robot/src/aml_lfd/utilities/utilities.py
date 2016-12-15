@@ -1,29 +1,51 @@
 import numpy as np
 import os 
 
-def load_demo_data(demo_idx=1):
-    try:
-        #get the parent folder
-        parent_path = os.path.normpath(os.getcwd() + os.sep + os.pardir)
-        #add the file name of the stored demo file
-        file_path   = parent_path + '/data/demo_data_' + str(demo_idx) + '.npy'
-        #loads binary file
-        demo_data   = np.load(file_path)
-    
-    except Exception as e:
-        print "Data file cannot be loaded, check demo index..."
-        raise ValueError
+def load_demo_data(demo_idx=1, debug=False):
+
+    #get the parent folder
+    data_folder_path = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '/data/'
+
+    if debug:
+        #for debugging purposes, load a known trajectory
+        try:
+            file_path = data_folder_path + 'debug.txt'
+            demo_data = np.loadtxt(file_path, dtype='float', delimiter=',')
+
+        except Exception as e:
+            print "Data file cannot be loaded"
+            raise e
+
+    else:
+
+        try:
+
+            #add the file name of the stored demo file
+            file_path   = data_folder_path + 'demo_data_' + str(demo_idx) + '.npy'
+            #loads binary file
+            demo_data   = np.load(file_path)
+        
+        except Exception as e:
+            print "Data file cannot be loaded, check demo index..."
+            raise e
 
     return demo_data
 
-def get_ee_traj(demo_idx=1):
+def get_ee_traj(demo_idx=1, debug=False):
     
-    demo_data = load_demo_data(demo_idx=demo_idx)
+    demo_data = load_demo_data(demo_idx=demo_idx, debug=debug)
     ee_list = []
-    for arm_data in demo_data:
-        ee_list.append(arm_data['ee_pos'])
 
-    ee_list =  np.asarray(ee_list).squeeze()
+    if debug:
+
+        ee_list = np.asarray(demo_data).squeeze()
+
+    else:
+
+        for arm_data in demo_data:
+            ee_list.append(arm_data['ee_pos'])
+
+        ee_list =  np.asarray(ee_list).squeeze()
 
     return ee_list
 

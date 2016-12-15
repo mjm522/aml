@@ -12,4 +12,5 @@ DISCRETE_DMP = {'gain':1000, # pd gain for trajectory following
         'num_goals':3,
         'dmps':3,
         'dt':0.01, # how fast the trajectory rolls out
+        'ax':1.0, #canonical system constant
 }

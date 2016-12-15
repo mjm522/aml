@@ -3,23 +3,18 @@ from aml_lfd.lfd import LfD
 from config import DISCRETE_DMP
 
 class DiscreteDMPShell(LfD):
-    """
-    A shell that uses dynamic movement primitives to 
-    control a robotic arm end-effector.
-    """   
+ 
     def __init__(self, config = DISCRETE_DMP):
-        """
-        bfs int: the number of basis functions per DMP
-        add_to_goals np.array: floats to add to the DMP goals
-                               used to scale the DMPs spatially
-        pattern string: specifies either 'discrete' or 'rhythmic' DMPs
-        """
+
         LfD.__init__(self, config)
 
+        #number of dpms required, one dmp per dimension
         self._num_dmps     = config['dmps']
+        #number of basis functions for the dmp
         self._bfs          = config['bfs']
 
         self._gain         = config['gain']
+        #time scaling factor
         self._tau          = config['tau']
         
         self._threshold    = config['threshold']
@@ -43,7 +38,7 @@ class DiscreteDMPShell(LfD):
         self._alpha_z      = np.ones(self._num_dmps) * config['alpha_z'] # Schaal 2012
         self._beta_z       = self._alpha_z.copy() / config['beta_z'] # Schaal 2012
         
-        self._ax           = 1.0
+        self._ax           = config['ax']
 
         #generate centers for the canonical system
         self._cs_centers   = None
@@ -56,10 +51,24 @@ class DiscreteDMPShell(LfD):
         pass
         
     def configure(self, traj2follow, start, goal):
-    	self._des_path    = traj2follow
+        
+        #self._des_path expects the demonstrated trajectory to be
+        #of shape num_dmps x number of points.
+        if traj2follow.shape[0] == self._num_dmps:
+            self._des_path    = traj2follow
+
+        elif traj2follow.shape[1] == self._num_dmps:
+            self._des_path    = traj2follow.T
+
+        else:
+            print "Number of dmps has to match number of rows of demonstrated trajectory"
+            raise ValueError
+            
     	self._y0          = start
         self._goal        = goal 
-                
+        
+        #these are the time steps in which the rollout will be completed.
+        #by default the run_time is kept at 1.0
         self._timesteps   = int(self._run_time / self._dt)
 
         self._cs_centers  = self.gen_cs_centers()
