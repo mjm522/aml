@@ -12,6 +12,9 @@ import copy
 import time
 import threading # Used for time locks to synchronize position data.
 from threading import Timer
+from os.path import dirname, abspath
+#get the parent folder
+data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
 
 class LfD():
 
@@ -56,7 +59,7 @@ class LfD():
         # Load
         try:
             if not modified:
-                demo_data = np.load('demo_data.npy')
+                demo_data = np.load(data_folder_path+'demo_data.npy')
             else:
                 demo_data = np.load('demo_data_modified.npy')
         
@@ -118,7 +121,7 @@ class LfD():
         import matplotlib.pyplot as plt
         plt.plot(torque_mags)
         plt.show()
-        np.save('demo_data_modified.npy', arm_demo)
+        np.save(data_folder_path+'demo_data_modified.npy', arm_demo)
 
     def check_demo_data(self, demo_idx=0, limb_idx=1):
         
@@ -150,7 +153,7 @@ class LfD():
         
         demo_start_flag = False
         arm_demo = []
-        rate = 200
+        rate = 100
         rate = rospy.timer.Rate(rate)
         #btn.right_dash_btn_state will be false initially
         while True:
@@ -162,7 +165,7 @@ class LfD():
             if demo_start_flag and (not btn.right_dash_btn_state):
                 break
 
-        np.save('demo_data.npy', arm_demo)
+        np.save(data_folder_path+'demo_data.npy', arm_demo)
 
 
 def main(args):
