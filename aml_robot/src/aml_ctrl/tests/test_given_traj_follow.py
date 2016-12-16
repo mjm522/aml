@@ -15,7 +15,7 @@ def test_position_controller(robot_interface, pos_traj, ori_traj=None):
 
     rate = rospy.Rate(100)
 
-    reach_thr = 0.01
+    reach_thr = 0.12
 
     finished = False
     t = 0
@@ -33,7 +33,7 @@ def test_position_controller(robot_interface, pos_traj, ori_traj=None):
         goal_pos = pos_traj[t,:]
         
         if ori_traj is not None:
-        	goal_ori = ori_traj[t,:]
+        	goal_ori = ori_traj[t]
 
         print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
 

@@ -1,4 +1,5 @@
 import numpy as np
+import quaternion
 from os.path import dirname, abspath
 
 def load_demo_data(demo_idx=1, debug=False):
@@ -48,7 +49,7 @@ def get_ee_traj(demo_idx=1, debug=False):
             ee_ori_list.append(arm_data['ee_ori'])
 
         ee_pos_list =  np.asarray(ee_pos_list).squeeze()
-        ee_ori_list =  np.asarray(ee_ori_list).squeeze()
+        ee_ori_list =  quaternion.as_quat_array(np.asarray(ee_ori_list).squeeze())
 
     return ee_pos_list, ee_ori_list
 
