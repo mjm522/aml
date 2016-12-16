@@ -12,7 +12,6 @@ import copy
 import time
 import threading # Used for time locks to synchronize position data.
 from threading import Timer
-from ilqr_traj_follow import find_optimal_control_sequence, DDP_TrajFollowClass
 
 class LfD():
 

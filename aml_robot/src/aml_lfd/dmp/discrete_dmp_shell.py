@@ -13,38 +13,27 @@ class DiscreteDMPShell(LfD):
         #number of basis functions for the dmp
         self._bfs          = config['bfs']
 
-        self._gain         = config['gain']
         #time scaling factor
         self._tau          = config['tau']
-        
-        self._threshold    = config['threshold']
 
-        self._pen_down     = config['pen_down']
         self._dt           = config['dt']
 
-        self._des_path     = None
-        self._y0           = None
-        self._goal         = None
-         
-        self._done          = False
-        self._not_at_start  = True
-        self._num_seq       = config['num_seq']
-        self._run_time      = config['run_time']
-        
-        self._timesteps    = None
-        
-        self._weights      = np.zeros((self._num_dmps, self._bfs))
-
-        self._alpha_z      = np.ones(self._num_dmps) * config['alpha_z'] # Schaal 2012
-        self._beta_z       = self._alpha_z.copy() / config['beta_z'] # Schaal 2012
-        
+        #coeffiecient of the canonical system
         self._ax           = config['ax']
 
-        #generate centers for the canonical system
+        #runtime for the system
+        self._run_time     = config['run_time']
+        
+        self._alpha_z      = np.ones(self._num_dmps) * config['alpha_z'] 
+        self._beta_z       = self._alpha_z.copy() / config['beta_z'] 
+        
+        self._des_path     = None
+        self._y0           = None
+        self._goal         = None        
+        self._timesteps    = None
+        self._weights      = None
         self._cs_centers   = None
-        # set variance of Gaussian basis functions
         self._sigma        = None
-
         self._true_traj    = None
 
     def encode_demo(self):
@@ -70,12 +59,14 @@ class DiscreteDMPShell(LfD):
         #these are the time steps in which the rollout will be completed.
         #by default the run_time is kept at 1.0
         self._timesteps   = int(self._run_time / self._dt)
-
+        #pre-allocation for weights of the basis functions
+        self._weights     = np.zeros((self._num_dmps, self._bfs))
+        #generate centers for the canonical system
         self._cs_centers  = self.gen_cs_centers()
-
+        # set variance of Gaussian basis functions
         self._sigma       = np.ones(self._bfs) * self._bfs**1.5 / self._cs_centers
 
-        self._true_traj   = self.gen_path(self._des_path)
+        self._true_traj   = self.imitate_path()
 
         # self.set_target()
         self.check_offset()
@@ -98,23 +89,7 @@ class DiscreteDMPShell(LfD):
             cs_centers[n] = -np.log(des_c[n])  # x = exp(-c), solving for c
         return cs_centers
 
-    def gen_path(self, trajectory):
-        """Generate the DMPs necessary to follow the 
-        specified trajectory.
-
-        trajectory np.array: the time series of points to follow
-                             [DOFs, time], with a column of None
-                             wherever the pen should be lifted
-        """
-        # break up the trajectory into its different words
-        # NaN or None signals a new word / break in drawing
-        breaks = np.array(np.where(trajectory[0] != trajectory[0]))[0] 
-        self._num_seqs = len(breaks) - 1       
-        self._dmp_sets = []
-        return self.imitate_path(y_des=trajectory)
-
-
-    def imitate_path(self, y_des):
+    def imitate_path(self):
         """Takes in a desired trajectory and generates the set of 
         system parameters that best realize this path.
     
@@ -122,8 +97,10 @@ class DiscreteDMPShell(LfD):
                           should be shaped [dmps, run_time]
         """
         # set initial state and goal
-        if y_des.ndim == 1: 
-            y_des = y_des.reshape(1,len(y_des))
+        if self._des_path.ndim == 1: 
+            y_des = self._des_path.reshape(1,len(self._des_path))
+        else:
+            y_des = self._des_path
 
         self._y0 = y_des[:,0].copy()
         self._y_des = y_des.copy()
@@ -325,8 +302,3 @@ class DiscreteDMPShell(LfD):
             self.step_cs(**kwargs)
 
         return self._x_track
-
-    def set_next_seq(self):
-        """Get the next sequence in the list.
-        """
-        self._num_dmps = self.dmp_sets[self._num_seq]

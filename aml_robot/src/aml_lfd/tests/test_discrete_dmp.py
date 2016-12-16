@@ -47,7 +47,7 @@ def test_discrete_dmp(robot_interface, des_path, tau=1.0):
 
     print "Starting position controller"
 
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(10)
 
     reach_thr = 0.12
 
@@ -71,7 +71,7 @@ def test_discrete_dmp(robot_interface, des_path, tau=1.0):
             ctrlr.set_goal(goal_pos, start_ori)
 
             print "Waiting..." 
-            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
+            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=0.5)
             print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
 
         t = (t+1)
@@ -88,12 +88,14 @@ if __name__ == '__main__':
     limb = 'right'
     arm = BaxterArm(limb)
 
-    demo_idx = 1
+    arm.untuck_arm()
+
+    demo_idx = 2
 
     des_path = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
     # des_path = get_ee_traj(debug=True) #tau=2.0 makes it almost match
 
     #larger the tau, faster the system would reach the goal
-    # plot_traj(des_path, tau=0.1)
+    #plot_traj(des_path, tau=0.1)
 
-    test_discrete_dmp(robot_interface=arm, des_path=des_path, tau=0.1)
+    test_discrete_dmp(robot_interface=arm, des_path=des_path, tau=1.0)

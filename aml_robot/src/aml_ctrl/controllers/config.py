@@ -20,7 +20,7 @@ OSC_TORQUE_CNTLR = {
     'kd': np.sqrt(10.),
     'alpha': 3.25,
     'null_kp':  1.0*10.,
-    'null_kd': 0.25*10.,
+    'null_kd': 0.5*10.,
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.12,
     'angular_error_thr': 0.3,
