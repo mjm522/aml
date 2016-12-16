@@ -35,7 +35,7 @@ def test_position_controller(robot_interface, pos_traj, ori_traj=None):
         if ori_traj is not None:
         	goal_ori = ori_traj[t]
 
-        print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
+        print "Sending goal ",t, " goal_pos:",goal_pos.ravel(), "goal_ori:", goal_ori
 
         if np.any(np.isnan(goal_pos)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
