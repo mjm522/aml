@@ -83,7 +83,7 @@ def test_discrete_dmp(robot_interface, des_path, tau=1.0):
     
 if __name__ == '__main__':
 
-    rospy.init_node('classical_postn_controller')
+    rospy.init_node('discrete_dmp_test')
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     demo_idx = 2
 
-    des_path = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
+    des_path, _ = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
     # des_path = get_ee_traj(debug=True) #tau=2.0 makes it almost match
 
     #larger the tau, faster the system would reach the goal

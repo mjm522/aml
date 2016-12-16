@@ -1,10 +1,10 @@
 import numpy as np
-import os 
+from os.path import dirname, abspath
 
 def load_demo_data(demo_idx=1, debug=False):
 
     #get the parent folder
-    data_folder_path = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '/data/'
+    data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
 
     if debug:
         #for debugging purposes, load a known trajectory
@@ -34,24 +34,27 @@ def load_demo_data(demo_idx=1, debug=False):
 def get_ee_traj(demo_idx=1, debug=False):
     
     demo_data = load_demo_data(demo_idx=demo_idx, debug=debug)
-    ee_list = []
+    ee_pos_list = []
+    ee_ori_list = []
 
     if debug:
 
-        ee_list = np.asarray(demo_data).squeeze()
+        ee_pos_list = np.asarray(demo_data).squeeze()
 
     else:
 
         for arm_data in demo_data:
-            ee_list.append(arm_data['ee_pos'])
+            ee_pos_list.append(arm_data['ee_pos'])
+            ee_ori_list.append(arm_data['ee_ori'])
 
-        ee_list =  np.asarray(ee_list).squeeze()
+        ee_pos_list =  np.asarray(ee_pos_list).squeeze()
+        ee_ori_list =  np.asarray(ee_ori_list).squeeze()
 
-    return ee_list
+    return ee_pos_list, ee_ori_list
 
 def plot_demo_data(demo_idx=1):
 
-    ee_list = get_ee_traj(demo_idx=demo_idx)
+    ee_list, _ = get_ee_traj(demo_idx=demo_idx)
     #ee_vel_list = np.diff(ee_list, axis=0)
     #print ee_list
     import matplotlib.pyplot as plt
