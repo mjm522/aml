@@ -36,7 +36,7 @@ OSC_POSTN_CNTLR = {
     'null_kd': 1.0*10.,
     'use_orientation_ctrl': True,
     'pos_threshold': 0.0001,
-    'linear_error_thr': 0.025, # error of 2 cm
+    'linear_error_thr': 0.05, # error of 2 cm
     'angular_error_thr': 0.3, # allowing angular errors of 0.3 radians
     'dt' : 0.01
 }
