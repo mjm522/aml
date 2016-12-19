@@ -59,7 +59,7 @@ class ClassicalController(object):
 
         self.send_cmd(time_elapsed)
 
-    def set_goal(self,goal_pos,goal_ori,orientation_ctrl = True):
+    def set_goal(self, goal_pos, goal_ori, orientation_ctrl = True):
         self._goal_pos = goal_pos
         self._goal_ori = goal_ori
         self._orientation_ctrl = orientation_ctrl

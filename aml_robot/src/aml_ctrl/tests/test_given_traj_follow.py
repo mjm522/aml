@@ -1,19 +1,15 @@
 import numpy as np
 import quaternion
 import rospy
-from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
+from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_lfd.utilities.utilities import get_ee_traj, plot_demo_data
 
-def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, goal_ori):
+def test_position_controller(robot_interface, pos_traj, ori_traj=None):
     #0 is left and 1 is right
 
     ctrlr = OSCPositionController(robot_interface)
-
-    min_jerk_interp = MinJerkInterp()
-
-    min_jerk_interp.configure(start_pos=start_pos, goal_pos=goal_pos, start_qt=start_ori, goal_qt=goal_ori)
-
-    min_jerk_traj = min_jerk_interp.get_min_jerk_trajectory()
+    #ctrlr = OSCTorqueController(robot_interface)
 
     print "Starting position controller"
 
@@ -25,20 +21,26 @@ def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, go
     t = 0
     ctrlr.set_active(True)
 
-    n_steps = len(min_jerk_interp.timesteps)
+    n_steps = len(pos_traj)
+
+    if ori_traj is None:
+    	_, goal_ori = robot_interface.get_ee_pose()
 
     while not rospy.is_shutdown() and not finished:
 
         error_lin = np.linalg.norm(ctrlr._error['linear'])
 
-        goal_pos = min_jerk_traj['pos_traj'][t,:]
+        goal_pos = pos_traj[t,:]
+        
+        if ori_traj is not None:
+        	goal_ori = ori_traj[t]
 
-        print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
+        print "Sending goal ",t, " goal_pos:",goal_pos.ravel(), "goal_ori:", goal_ori
 
         if np.any(np.isnan(goal_pos)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
         else:
-            ctrlr.set_goal(goal_pos,start_ori)
+            ctrlr.set_goal(goal_pos, goal_ori)
 
             print "Waiting..." 
             lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
@@ -66,15 +68,10 @@ if __name__ == '__main__':
 
     arm.untuck_arm()
 
-    start_pos, start_ori  =  arm.get_ee_pose()
-    
-    if limb == 'left':
-        goal_pos = start_pos + np.array([0.,0.35, 0.])
-    else:
-        goal_pos = start_pos - np.array([0.,0.35, 0.])
+    demo_idx = 1
 
-    angle    = 90.0
-    axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
-    goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2])
+    #plot_demo_data(demo_idx=demo_idx)
+
+    pos_traj, ori_traj  = get_ee_traj(demo_idx=demo_idx)
     
-    test_position_controller(arm, start_pos, start_ori, goal_pos, goal_ori)
+    test_position_controller(robot_interface=arm, pos_traj=pos_traj, ori_traj=ori_traj)
