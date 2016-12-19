@@ -147,12 +147,13 @@ def euler_to_q(euler):
     q[3] = c1*c2*s3 - s1*s2*c3
     return q
 
+#this is the same as above quat_mult
 def quat_multiply(lq, rq):
     #// quaternion entries in order: w, x, y, z
     quat    = np.zeros(4)
-    quat[0] = lq[3]*rq[3] - lq[0]*rq[0] - lq[1]*rq[1] - lq[2]*rq[2]
-    quat[1] = lq[3]*rq[1] - lq[0]*rq[2] + lq[1]*rq[3] + lq[2]*rq[0]
-    quat[2] = lq[3]*rq[2] + lq[0]*rq[1] - lq[1]*rq[0] + lq[2]*rq[3]
-    quat[3] = lq[3]*rq[0] + lq[0]*rq[3] + lq[1]*rq[2] - lq[2]*rq[1]
+    quat[0] = lq[0]*rq[0] - lq[3]*rq[3] - lq[1]*rq[1] - lq[2]*rq[2]
+    quat[1] = lq[0]*rq[1] - lq[3]*rq[2] + lq[1]*rq[0] + lq[2]*rq[3]
+    quat[2] = lq[0]*rq[2] + lq[3]*rq[1] - lq[1]*rq[3] + lq[2]*rq[0]
+    quat[3] = lq[0]*rq[3] + lq[3]*rq[0] + lq[1]*rq[2] - lq[2]*rq[1]
     return quat
 

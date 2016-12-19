@@ -6,7 +6,7 @@ import time
 import rospy
 
 from aml_robot.baxter_robot import BaxterArm
-from aml_lfd.utilities.utilities import quat_mult, compute_exp, load_demo_data, euler_to_q, quat_multiply
+from aml_lfd.utilities.utilities import quat_mult, compute_exp, load_demo_data, euler_to_q
 
 class DDPTrajFollow():
     def __init__(self, robot_interface, idx, H, target_traj, reward):
@@ -50,7 +50,7 @@ class DDPTrajFollow():
 
     def compute_dx(self, xtarget, x):
         dx  = x - xtarget
-        # dx[self.idx['ori']] = quat_multiply(lq=np.multiply(np.array([1., -1., -1., -1.]),xtarget[self.idx['ori']]), 
+        # dx[self.idx['ori']] = quat_mult(lq=np.multiply(np.array([1., -1., -1., -1.]),xtarget[self.idx['ori']]), 
         #                                        rq=x[self.idx['ori']])
         # dx[self.idx['ori'][0]] = 1
         return dx
@@ -69,7 +69,7 @@ class DDPTrajFollow():
         # x0[self.idx['ori']] = x0[self.idx['ori']]/np.linalg.norm(x0[self.idx['ori']])
         # quat0             = x0[self.idx['ori']]
         # dq                = np.hstack([ dx[[self.idx['ori'][1:4]]], np.sqrt(1-np.linalg.norm(dx[[self.idx['ori'][1:4]]])**2) ])
-        # x1[self.idx['ori']] = quat_multiply(quat0, dq)
+        # x1[self.idx['ori']] = quat_mult(quat0, dq)
         return x1
 
     def simulate_f(self, x0, delta_u0, sim_time, magic_factor=0, x1_star=0):
