@@ -55,6 +55,9 @@ class BaxterArm(baxter_interface.limb.Limb):
             
         baxter_interface.RobotEnable(CHECK_VERSION).enable()
 
+    def set_sampling_rate(self, sampling_rate=100):
+        self._pub_rate.publish(sampling_rate)
+
     def tuck_arm(self):
         self.move_to_joint_position(self._tuck)
 
@@ -82,7 +85,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         #gravity + feed forward torques
         self._h = [0. for _ in range(7)]
 
-        self._pub_rate.publish(100)
+        self.set_sampling_rate()
 
         self.set_command_timeout(0.2)
 

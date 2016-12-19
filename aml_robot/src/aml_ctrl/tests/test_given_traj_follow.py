@@ -3,17 +3,17 @@ import quaternion
 import rospy
 from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
-from aml_lfd.utilities.utilities import get_ee_traj, plot_demo_data
+from aml_lfd.utilities.utilities import get_ee_traj, plot_demo_data, get_sampling_rate
 
 def test_position_controller(robot_interface, pos_traj, ori_traj=None):
     #0 is left and 1 is right
 
-    ctrlr = OSCPositionController(robot_interface)
-    #ctrlr = OSCTorqueController(robot_interface)
+    #ctrlr = OSCPositionController(robot_interface)
+    ctrlr = OSCTorqueController(robot_interface)
 
     print "Starting position controller"
 
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(get_sampling_rate())
 
     reach_thr = 0.12
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     arm.untuck_arm()
 
-    demo_idx = 1
+    demo_idx = 6
 
     #plot_demo_data(demo_idx=demo_idx)
 

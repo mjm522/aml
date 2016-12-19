@@ -2,30 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import copy
-import cProfile
-from aml_robot.baxter_robot import BaxterArm
 import time
 import rospy
 
-from aml_lfd.utilities.utilities import quat_mult, compute_exp, load_demo_data
+from aml_robot.baxter_robot import BaxterArm
+from aml_lfd.utilities.utilities import quat_mult, compute_exp, load_demo_data, euler_to_q, quat_multiply
 
-#[.95, .8, .5, .2, .1, .05, .02, .01, .005, .002, .001, 0]
-class DDP_TrajFollowClass():
-    def __init__(self, idx, H, model, target_traj, reward, model_bias):
+class DDPTrajFollow():
+    def __init__(self, robot_interface, idx, H, target_traj, reward):
         self.idx            = idx
         self.H              = H
         self.target_traj    = target_traj
         self.reward         = reward
         self.cost           = 0.
-        self.model          = model
-        self.model_bias     = model_bias
-        self.magic_factors  = [.95, .8, .5, .2, .1, .05, .02, .01, .005, .002, .001, 0]
+        self.magic_factors  = [.95, .8, .5, .2, .1, .05, .02, .01, .005,  .005] #, .002, .001, 0
         self.num_states     = None
         self.num_ctrls      = None
         self.num_links      = None
         self.configure()
 
-        self.right_arm  = BaxterArm('right')
+        self.robot          = robot_interface
     
     def configure(self):
         self.num_states = len(self.reward['state_multipliers'])
@@ -33,7 +29,7 @@ class DDP_TrajFollowClass():
         self.num_links  = len(self.reward['input_multipliers'])
         self.A  = np.zeros((self.num_states, self.num_states))
         self.B  = np.zeros((self.num_states, self.num_ctrls))
-        self.Mq = np.zeros((self.num_links, self.num_links))
+        self.Mq = np.zeros((self.num_links,  self.num_links))
         self.Cq = np.zeros((self.num_links,1))
         self.Q  = np.diag(self.reward['state_multipliers'])
         self.Qf = np.diag(self.reward['state_multipliers'])
@@ -54,61 +50,39 @@ class DDP_TrajFollowClass():
 
     def compute_dx(self, xtarget, x):
         dx  = x - xtarget
-        dx[self.idx['q']] = self.quat_multiply(lq=np.multiply(np.array([1., -1., -1., -1.]),xtarget[self.idx['q']]), 
-                                               rq=x[self.idx['q']])
-        dx[self.idx['q'][0]] = 1
+        # dx[self.idx['ori']] = quat_multiply(lq=np.multiply(np.array([1., -1., -1., -1.]),xtarget[self.idx['ori']]), 
+        #                                        rq=x[self.idx['ori']])
+        # dx[self.idx['ori'][0]] = 1
         return dx
 
-    def euler_to_q(self, euler):
-        c1 = np.cos(euler[2] * 0.5)
-        c2 = np.cos(euler[1] * 0.5)
-        c3 = np.cos(euler[0] * 0.5)
-        s1 = np.sin(euler[2] * 0.5)
-        s2 = np.sin(euler[1] * 0.5)
-        s3 = np.sin(euler[0] * 0.5)
-
-        q = np.zeros(4)
-
-        q[0] = c1*c2*c3 + s1*s2*s3
-        q[1] = c1*s2*c3 + s1*c2*s3
-        q[2] = s1*c2*c3 - c1*s2*s3
-        q[3] = c1*c2*s3 - s1*s2*c3
-        return q
-    
-    def quat_multiply(self, lq, rq):
-        #// quaternion entries in order: w, x, y, z
-        quat    = np.zeros(4)
-        quat[0] = lq[3]*rq[3] - lq[0]*rq[0] - lq[1]*rq[1] - lq[2]*rq[2]
-        quat[1] = lq[3]*rq[1] - lq[0]*rq[2] + lq[1]*rq[3] + lq[2]*rq[0]
-        quat[2] = lq[3]*rq[2] + lq[0]*rq[1] - lq[1]*rq[0] + lq[2]*rq[3]
-        quat[3] = lq[3]*rq[0] + lq[0]*rq[3] + lq[1]*rq[2] - lq[2]*rq[1]
-        return quat
-
-    def err_simulate(self, index, dx0, u0, xnom0, xnom1, sim_time, model_bias, magic_factor=0, x1star=0):
+    def err_simulate(self, dx0, u0, xnom0, xnom1, sim_time, magic_factor=0, x1star=0):
         # dx0 is a state relative to some nominal trajectory
         x0  = self.compose_dx(xnom0, dx0)
         # x1 = run simulator on x0, u0
-        x1  = self.simulate_f(index, x0, u0, sim_time, model_bias, magic_factor, x1star)
+        x1  = self.simulate_f(x0, u0, sim_time, magic_factor, x1star)
         # compute state relative to nominal trajectory at next step
         dx1 = self.compute_dx(xnom1, x1)
         return dx1
 
     def compose_dx(self,x0, dx):
         x1                = x0 + dx
-        x0[self.idx['q']] = x0[self.idx['q']]/np.linalg.norm(x0[self.idx['q']])
-        quat0             = x0[self.idx['q']]
-        dq                = np.hstack([ dx[[self.idx['q'][1:4]]], np.sqrt(1-np.linalg.norm(dx[[self.idx['q'][1:4]]])**2) ])
-        x1[self.idx['q']] = self.quat_multiply(quat0, dq)
+        # x0[self.idx['ori']] = x0[self.idx['ori']]/np.linalg.norm(x0[self.idx['ori']])
+        # quat0             = x0[self.idx['ori']]
+        # dq                = np.hstack([ dx[[self.idx['ori'][1:4]]], np.sqrt(1-np.linalg.norm(dx[[self.idx['ori'][1:4]]])**2) ])
+        # x1[self.idx['ori']] = quat_multiply(quat0, dq)
         return x1
 
-    def simulate_f(self, index, x0, delta_u0, sim_time, model_bias=None, magic_factor=0, x1_star=0):
+    def simulate_f(self, x0, delta_u0, sim_time, magic_factor=0, x1_star=0):
 
         dt = sim_time   
-        x1 = np.zeros_like(x0)
-        ##
-        genq = x0[self.idx['genq']]
+        
+        x1    = np.zeros_like(x0)
 
-        Mq   = self.right_arm.get_arm_inertia(joint_angles=genq[:7])
+        q     = x0[self.idx['q']]
+
+        dq    = x0[self.idx['dq']]
+
+        Mq    = self.robot.get_arm_inertia(joint_angles=q)
 
         ## for our feedback controllers it's important to have past inputs and
         ## change in inputs stored into the state:
@@ -117,123 +91,80 @@ class DDP_TrajFollowClass():
         ## position and orientation merely require integration (we use Euler
         ## integration):
         
-        ddgenq = np.dot(np.linalg.inv(Mq),(x0[self.idx['u_prev']]))
+        ddq  = np.dot(np.linalg.inv(Mq),(x0[self.idx['u_prev']]))
         
-        dgenq  = np.hstack([genq[7:14], ddgenq])
+        dq  +=  ddq*dt
 
-        x1_genq = x0[self.idx['genq']] + dt*dgenq
+        q   +=  dt*dq
 
-        x1[self.idx['genq']] = x1_genq
+        x1[self.idx['q']]  = q
+        x1[self.idx['dq']] = dq
        
-        J = self.right_arm.get_jacobian_from_joints(joint_angles=x1_genq[:7])
+        # J = self.robot.get_jacobian_from_joints(joint_angles=q)
 
-        ee_pose_dot = np.dot(J, dgenq[:7])
+        # ee_pose_dot = np.dot(J, dq)
 
-        x1[self.idx['xyz_dot']] = ee_pose_dot[0:3]
+        # x1[self.idx['xyz_dot']] = ee_pose_dot[0:3]
 
-        x1[self.idx['xyz']] = x0[self.idx['xyz']] + ee_pose_dot[0:3]*dt
+        # x1[self.idx['xyz']] = x0[self.idx['xyz']] + ee_pose_dot[0:3]*dt
 
-        x1[self.idx['q']] = quat_mult(compute_exp(dt/2.*ee_pose_dot[3:6]), x0[self.idx['q']])
+        # x1[self.idx['ori']] = quat_mult(compute_exp(dt/2.*ee_pose_dot[3:6]), x0[self.idx['ori']])
     
         x1 = magic_factor*x1_star + (1.-magic_factor)*x1
 
         return x1
 
-    def quaternion_from_axis_rotation(self, axis_rotation):
-        rotation_angle = np.linalg.norm(axis_rotation)
-        quat = np.zeros(4)
-        if(rotation_angle < 1e-4):  # avoid division by zero -- also: can use simpler computation in this case, since for small angles sin(x) = x is a good approximation
-            quat[1:4] = axis_rotation/2
-        else:
-            normalized_axis = axis_rotation / rotation_angle
-            quat[1:4] = normalized_axis * np.sin(rotation_angle/2)
-        quat[0] = np.sqrt(1 - np.linalg.norm(quat[1:4],2)**2)
-        return quat
 
-    def express_vector_in_quat_frame(self, vin, q):
-        vout = self.rotate_vector(vin, np.vstack([q[0],-q[1:4]]))
-        return vout
-
-    def rotate_vector(self, vin, q):
-    #   // return   ( ( q * quaternion(vin) ) * q_conj ) .complex_part
-        vout = self.quat_multiply( quat_multiply ( q, np.hstack( np.vstack([0, vin]), np.vstack([q[0],- q[1:4]]) ) ) )
-        vout = vout[1:4]
-        return vout
-
-    #this function is to stack states while re-simulating the 
-    #calculated trajectory
-    def stack_state(self, u_old, u_new):
-        arm_state      = self.right_arm.state
-        ee_pos, ee_ori = self.right_arm.ee_pose()
-        ee_ori         = np.array([ee_ori[0], ee_ori[1], ee_ori[2], ee_ori[3]])
-
-        return np.hstack([u_old,   
-                          unew-u_old,  
-                          np.dot(arm_state['jacobian'], 
-                          arm_state['velocity']),  
-                          ee_pos, np.zeros(3), 
-                          arm_state['position'], 
-                          arm_state['velocity'] , 
-                          ee_ori]).T
-
-    def linearized_dynamics(self, x0, u0, xt0, xt1, dt_sim, model_bias, magic_factor, x1star):
+    def linearized_dynamics(self, x0, u0, xt0, xt1, dt_sim, magic_factor, x1star):
 
         dx0     = self.compute_dx(xt0, x0)
-        fx_t0   = self.err_simulate(0, dx0, u0, xt0, xt1, dt_sim, model_bias, magic_factor, x1star)
-        epsilon = np.ones(dx0.shape[0])*.01
+        fx_t0   = self.err_simulate(dx0, u0, xt0, xt1, dt_sim, magic_factor, x1star)
+        epsilon = np.ones(self.num_states)*.01
         #epsilon(end-4:end-1) = ones(1,4) %% seems better to linearize with large step for the inputs
         #%% recall last entry of state corresponds to intercept, do not
         #%% linearize!
 
-        for i in range(0,dx0.shape[0]-1): #[0],epsilon.shape[1]
-            delta       = np.zeros(dx0.shape[0])
+        for i in range(self.num_states-1): #[0],epsilon.shape[1]
+            delta       = np.zeros_like(x0)
             delta[i]    = epsilon[i]
 
-            fx_t1m      = self.err_simulate(index=i, 
-                                            dx0=dx0 - delta, 
+            fx_t1m      = self.err_simulate(dx0=dx0 - delta, 
                                             u0=u0, 
                                             xnom0=xt0, 
                                             xnom1=xt1, 
-                                            sim_time=dt_sim, 
-                                            model_bias=model_bias, 
+                                            sim_time=dt_sim,  
                                             magic_factor=magic_factor, 
                                             x1star=x1star)
 
-            fx_t1p      = self.err_simulate(index=i, 
-                                            dx0=dx0 + delta, 
+            fx_t1p      = self.err_simulate(dx0=dx0 + delta, 
                                             u0=u0, 
                                             xnom0=xt0, 
                                             xnom1=xt1, 
-                                            sim_time=dt_sim, 
-                                            model_bias=model_bias, 
+                                            sim_time=dt_sim,  
                                             magic_factor=magic_factor, 
                                             x1star=x1star)
 
             self.A[:,i] = ((fx_t1p - fx_t1m)/epsilon[i]/2).reshape(-1)
         
-        epsilon = np.ones(u0.shape[0])
+        epsilon = np.ones(self.num_ctrls)
 
-        for i in range(0,u0.shape[0]):
-            delta       = np.zeros(u0.shape[0])
+        for i in range(self.num_ctrls):
+            delta       = np.zeros_like(u0)
             delta[i]    = epsilon[i]
 
-            fx_t1m      = self.err_simulate(index=i, 
-                                            dx0=dx0, 
+            fx_t1m      = self.err_simulate(dx0=dx0, 
                                             u0=u0 - delta, 
                                             xnom0=xt0, 
                                             xnom1=xt1, 
-                                            sim_time=dt_sim, 
-                                            model_bias=model_bias, 
+                                            sim_time=dt_sim,  
                                             magic_factor=magic_factor, 
                                             x1star=x1star)
 
-            fx_t1p      = self.err_simulate(index=i, 
-                                            dx0=dx0, 
+            fx_t1p      = self.err_simulate(dx0=dx0, 
                                             u0=u0 + delta, 
                                             xnom0=xt0, 
                                             xnom1=xt1, 
-                                            sim_time=dt_sim, 
-                                            model_bias=model_bias, 
+                                            sim_time=dt_sim,  
                                             magic_factor=magic_factor, 
                                             x1star=x1star)
 
@@ -330,8 +261,7 @@ class DDP_TrajFollowClass():
                                      u0=nom_traj['u'][i].T, 
                                      xt0=target_traj['x'][i].T, 
                                      xt1=target_traj['x'][i+1].T, \
-                                     dt_sim=dt, 
-                                     model_bias=self.model_bias[i].T, 
+                                     dt_sim=dt,  
                                      magic_factor=magic_factor, 
                                      x1star=target_traj['x'][i+1].T)
             
@@ -386,7 +316,6 @@ class DDP_TrajFollowClass():
         return lqr_traj 
 
     def lqr_run_controller_in_nonlinear_sim(self, start_state, lqr_traj, magic_factor, open_loop_flag):     
-        model_bias = self.model_bias
         
         # run lqr controllers on non-linear dynamics
         if(open_loop_flag == 1):
@@ -413,11 +342,9 @@ class DDP_TrajFollowClass():
             
             sim_time = lqr_traj['t'][i+1] - lqr_traj['t'][i]
 
-            x = self.simulate_f(index=i, 
-                                x0=x, 
+            x = self.simulate_f(x0=x, 
                                 delta_u0=u, 
-                                sim_time=sim_time, 
-                                model_bias=model_bias[i,:].T, 
+                                sim_time=sim_time,  
                                 magic_factor=magic_factor, 
                                 x1_star=traj['target_x'][i+1].T)#state-noise: + randn(1,2)
             #x(1:end-4) = x(1:end-4)+randn(length(x)-4,1)*.01
@@ -444,9 +371,22 @@ class DDP_TrajFollowClass():
             rscore = rscore + np.dot(np.dot(u,self.R),u.T)
         return qscore, rscore
 
+    def get_real_state(self, u_old, u_new):
+        x = np.zeros(self.num_states)
+        x[self.idx['u_prev']] = u_old
+        x[self.idx['u_delta_prev']] = u_new-u_old
+
+        curr_state = self.robot._state
+
+        x[self.idx['q']] = curr_state['position']
+        x[self.idx['dq']] = curr_state['velocity']
+
+        return x
+
+
 
 ######     MAIN ########
-def find_optimal_control_sequence(data, dt=0.01):
+def find_optimal_control_sequence(robot_interface, data, dt=0.01):
     cost = 0
 
     num_ctrls  = 7 
@@ -459,42 +399,35 @@ def find_optimal_control_sequence(data, dt=0.01):
     k = 0
     idx = {}
     #state variables
-    idx['u_prev']       = range(k, k+num_ctrls);   k += num_ctrls    # 0-6   => previous control input
-    idx['u_delta_prev'] = range(k,k+num_ctrls);    k += num_ctrls    # 7-13  => change in control signals
-    idx['xyz_dot']      = range(k,k+num_ee_pos);   k += num_ee_pos   # 14-16 => end effecter velocities
-    idx['xyz']          = range(k,k+num_ee_pos);   k += num_ee_pos   # 17-19 => end effecter positions
-    idx['abg_dot']      = range(k,k+num_ee_omg);   k += num_ee_omg   # 20-22 => end-effecter angular velocities
-    idx['genq']         = range(k,k+num_states*2); k += num_states*2 # 23-37 => generalized coordinates
-    idx['q']            = range(k,k+num_ee_ori);   k += num_ee_ori   # 38-41 => it's critical for compose_dx.m, compute_dx.m (and likely other functions) for the quaternion to be the last entry in the state
+    idx['u_prev']        = range(k, k+num_ctrls);    k += num_ctrls    # 0-6   => previous control input
+    idx['u_delta_prev']  = range(k, k+num_ctrls);    k += num_ctrls    # 7-13  => change in control signals
+    idx['q']             = range(k, k+num_states);   k += num_states   # 23-37 => generalized coordinates
+    idx['dq']            = range(k, k+num_states);   k += num_states   # 23-37 => generalized coordinates
+    idx['xyz']           = range(k, k+num_ee_pos);   k += num_ee_pos   # 17-19 => end effecter positions
+    idx['ori']           = range(k, k+num_ee_pos);   k += num_ee_ori   # 17-19 => end effecter positions
+    idx['xyz_dot']       = range(k, k+num_ee_pos);   k += num_ee_pos   # 14-16 => end effecter velocities
+    idx['omg']           = range(k, k+num_ee_omg);   k += num_ee_omg   # 20-22 => end-effecter angular velocities
 
     # non-state variables used as features in the model:
     idx['inputs']       = range(k,k+num_ctrls);    k += num_ctrls   
-    idx['uvw']          = range(k,k+num_ee_omg);   k += num_ee_omg
 
     #horizon length = length of the trajectory to be followed
     H = num_data_pts
 
-
-    move_quaternion_target = data[-1]['ee_ori']
-
-    target_move_state = np.hstack([np.zeros(num_ctrls), 
-                                   np.zeros(num_ctrls),
-                                   np.zeros(num_ee_pos),
-                                   np.zeros(num_ee_pos),
-                                   np.zeros(num_ee_omg),
-                                   np.zeros(num_states*2),
-                                   move_quaternion_target])                              
+    target_move_state = np.hstack([ np.zeros(num_ctrls),
+                                    np.zeros(num_ctrls),
+                                    np.zeros(num_states), 
+                                    np.zeros(num_states)])                              
 
     target_traj = {}
-    #target_traj_x = []
 
     start_state   = copy.deepcopy(target_move_state)
     #just pre allocating memory
     target_traj_x = [start_state for _ in range(H)]
 
     for i in range(H):
-        target_move_state[idx['xyz']]  = data[i]['ee_pos']
-        target_move_state[idx['genq']] = np.hstack([data[i]['position'], data[i]['velocity']])
+        target_move_state[idx['q']]    = data[i]['position']
+        target_move_state[idx['dq']]   = data[i]['velocity']
         target_traj_x[i]               = target_move_state.copy()
 
     #state trajectory
@@ -504,69 +437,90 @@ def find_optimal_control_sequence(data, dt=0.01):
     #time trajectory
     target_traj['t'] = np.asarray([i for i in range(H)])*dt
 
-
-    model_bias_est = np.zeros((H,6))
-
-    u_prev_mult       = 0.5 # weightage given for control signal
-    u_delta_prev_mult = 10  # weightage given for change in control signal
-    xyz_dot_mult      = 1.  # weightage given for ee velocity
+    q_mult            = 1.5
+    q_dot_mult        = 1.5
     xyz_mult          = 1.  # weightage given for ee position
-    pqr_mult          = 0.4 # weightage given for ee angular velocity
-    q_mult            = 0.5 # weightage given for ee angular position
-    genq_mult         = 0.5 # weightage given for joint position and joint velocity
+    ori_mult          = 0.1
+    xyz_dot_mult      = 1.  # weightage given for ee velocity
+    omg_mult          = 0.4
+    u_mult            = 0.1
+    u_delta_prev      = 2.
 
     reward={}
-    #running cost for state 
-    reward['state_multipliers'] = np.hstack([u_prev_mult       * np.ones(num_ctrls),
-                                             u_delta_prev_mult * np.ones(num_ctrls),
-                                             xyz_dot_mult      * np.ones(num_ee_pos),  
-                                             xyz_mult          * np.ones(num_ee_pos),
-                                             pqr_mult          * np.ones(num_ee_omg),
-                                             genq_mult         * np.ones(num_states*2), 
-                                             q_mult            * np.ones(num_ee_ori)]).T
+
+    #running cost for the state
+    reward['state_multipliers'] = np.hstack([u_mult            * np.ones(num_ctrls),
+                                             u_delta_prev      * np.ones(num_ctrls),
+                                             q_mult            * np.ones(num_states),
+                                             q_dot_mult        * np.ones(num_states)]).T
     #running cost for control signal
-    reward['input_multipliers'] = np.ones(num_ctrls)*0.1
+    reward['input_multipliers'] = np.ones(num_ctrls)*u_mult
 
     
-    ddp = DDP_TrajFollowClass(idx=idx, 
+    ddp = DDPTrajFollow(robot_interface=robot_interface,
+                              idx=idx, 
                               H=H, 
-                              model=data,
                               target_traj=target_traj, 
-                              reward=reward, 
-                              model_bias=model_bias_est)
+                              reward=reward)
 
-    [lqr_traj, result_traj, im_trajs] = ddp.ddp_for_trajectory_following(start_state)
+    # [lqr_traj, result_traj, im_trajs] = ddp.ddp_for_trajectory_following(start_state)
+
+    # plt.figure(3)
+    # plt.plot(result_traj['x'][14,:])
+    # plt.plot(target_traj_x[14,:])
+    # plt.show()
 
     # let's check how well we perform:
     # note: for any given system, we could run all the code we have in matlab,
     # and then just use the lines below "on-board" or in a C-code control loop
 
-    x = start_state
+    x = target_traj_x[0]
     #preallocating memory
     traj_xlist = [np.zeros_like(x) for _ in range(H)]
     
-    rate = 40
+    rate = 100
     rate = rospy.timer.Rate(rate)
     print "Starting to re-do demo"
-    # lqr_traj = {}
-    # lqr_traj['target_x'] = np.load('tgt_x.npy')
-    # lqr_traj['K'] = np.load('tgt_k.npy')
+    lqr_traj = {}
+    lqr_traj['target_x'] = np.load('tgt_x.npy')
+    lqr_traj['K'] = np.load('tgt_k.npy')
+
+    x_err_list = np.zeros((ddp.num_states,H))
+    ulist = np.zeros((ddp.num_ctrls,H))
+
+    u_old = np.zeros(ddp.num_ctrls)
 
     for i in range(0,H-1):
         #print "step \t", i
         dx = ddp.compute_dx(lqr_traj['target_x'][i], x)
         u  = np.dot(lqr_traj['K'][i],dx)
         # print lqr_traj['K'][i]
-        #print "u \n", u
-        #ddp.right_arm.exec_torque_cmd(u)
+        print "u \n", u
+
+        ddp.robot.exec_torque_cmd(u*30)
         
         traj_xlist[i] = x.copy() 
 
-        x = ddp.simulate_f(index=i,
-                           x0=x,
+        x = ddp.simulate_f(x0=x,
                            delta_u0=u,
                            sim_time=dt)
-        #rate.sleep()
+
+        # x = ddp.get_real_state(u_old=u_old, u_new=u)
+        
+        x_err_list[:,i] = x - traj_xlist[i]
+        ulist[:,i] = u
+        u_old = u.copy()
+        rate.sleep()
+
+    plt.figure(1)
+    for i in range(ddp.num_states):
+        plt.plot(x_err_list[i,:])
+    
+    plt.figure(2)
+    for i in range(ddp.num_ctrls):
+        plt.plot(ulist[i,:])
+
+    plt.show()
 
     traj_xlist[H-1] = x
     np.save('tgt_x.npy', lqr_traj['target_x'])
@@ -577,16 +531,20 @@ def find_optimal_control_sequence(data, dt=0.01):
     #resulting Xtraj with optimal control inputs
     Xtraj = np.asarray(traj_xlist)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
     #ax.scatter(ee_list[0][0], ee_list[0][1], ee_list[0][2],  linewidths=20, color='r', marker='*')
     #ax.scatter(ee_list[-1][0],ee_list[-1][1],ee_list[-1][2], linewidths=20, color='g', marker='*')
-    ax.scatter(Xtraj[:,idx['xyz'][0]],Xtraj[:,idx['xyz'][1]],Xtraj[:,idx['xyz'][2]], color='b', marker='*')
-    ax.plot(targetXtraj[:,idx['xyz'][0]],targetXtraj[:,idx['xyz'][1]],targetXtraj[:,idx['xyz'][2]], color='m')
-    ax.grid()
-    plt.show()
+    # ax.scatter(Xtraj[:,idx['xyz'][0]],Xtraj[:,idx['xyz'][1]],Xtraj[:,idx['xyz'][2]], color='b', marker='*')
+    # ax.plot(targetXtraj[:,idx['xyz'][0]],targetXtraj[:,idx['xyz'][1]],targetXtraj[:,idx['xyz'][2]], color='m')
+    # ax.grid()
+    # plt.show()
 
 if __name__=="__main__":
     rospy.init_node('lfd_node')
     demo_data = load_demo_data(demo_idx=6)
-    find_optimal_control_sequence(data=demo_data, dt=0.01)
+
+    arm  = BaxterArm('right')
+    arm.untuck_arm()
+    
+    find_optimal_control_sequence(robot_interface=arm, data=demo_data, dt=0.01)

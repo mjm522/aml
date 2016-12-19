@@ -26,6 +26,9 @@ class LfD():
         self.controller = MinJerkController(extern_call=True, 
                                             trial_arm=self.left_arm, 
                                             aux_arm=self.right_arm)
+        #this will be rate at which data will be read from the arm
+        self.sampling_rate = 100
+        self.left_arm.set_sampling_rate(sampling_rate=self.sampling_rate):
         self.stale_observation = False
         #time at which the baxter data should be called
         self.sample_period = 0.5
@@ -136,8 +139,7 @@ class LfD():
         demo_data = self.load_demo_data(modified=True)
         #set the arm to initial joint demo position
         arm.move_to_joint_position(demo_data[0]['position'])
-        rate = 100
-        rate = rospy.timer.Rate(rate)
+        rate = rospy.timer.Rate(self.sampling_rate)
         for arm_data in demo_data:
             #apply computed torques
             #arm.exec_torque_cmd(arm_data['torque'])
@@ -153,8 +155,7 @@ class LfD():
         
         demo_start_flag = False
         arm_demo = []
-        rate = 100
-        rate = rospy.timer.Rate(rate)
+        rate = rospy.timer.Rate(self.sampling_rate)
         #btn.right_dash_btn_state will be false initially
         while True:
             if btn.right_dash_btn_state is True:
@@ -165,6 +166,8 @@ class LfD():
             if demo_start_flag and (not btn.right_dash_btn_state):
                 break
 
+        #storing the sampling rate in the first element of the data set.
+        arm_demo[0]['sampling_rate'] = rate
         np.save(data_folder_path+'demo_data.npy', arm_demo)
 
 
