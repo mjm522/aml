@@ -16,7 +16,7 @@ from tf import TransformListener
 import sys
 sys.argv
 
-class Baxter_Eye_Hand_Calib():
+class BaxterEyeHandCalib():
 	
     def __init__(self):
         self.left_arm 	= BaxterArm('left') #object of type Baxter from baxter_mechanism
@@ -166,7 +166,7 @@ class Baxter_Eye_Hand_Calib():
 
 def main():
     
-    calib = Baxter_Eye_Hand_Calib()
+    calib = BaxterEyeHandCalib()
 
     calib.self_calibrate()
 
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     #get the arguments passed to the script
     cmdargs = str(sys.argv)
     if 'save' in cmdargs:
-        calib = Baxter_Eye_Hand_Calib()
+        calib = BaxterEyeHandCalib()
         calib.save_calib_data()
     
     main()
