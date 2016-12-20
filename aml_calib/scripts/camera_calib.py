@@ -12,6 +12,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 import tf
 from tf import TransformListener
+from os.path import dirname, abspath
 
 import sys
 sys.argv
@@ -119,8 +120,9 @@ class BaxterEyeHandCalib():
 
     def load_calib_data(self):
         # Load
+        calib_data_folder_path = dirname(dirname(abspath(__file__))) + '/scripts/'
         try:
-            calib_data = np.load('calib_data.npy').item()
+            calib_data = np.load(calib_data_folder_path+'calib_data.npy').item()
         except Exception as e:
             print "Caliberation file cannot be loaded"
             raise e

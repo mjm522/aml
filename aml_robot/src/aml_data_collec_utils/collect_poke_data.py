@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 # A simply python controller for Baxter compatible with GPS (TODO)
-
-
 import rospy
 import cv2
 
@@ -10,13 +8,19 @@ import tf
 from tf import TransformListener
 
 import numpy as np
+import quaternion
 
 from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
 from aml_io.io import save_data, load_data
 from aml_perception import camera_sensor
+import aml_calib
+import camera_calib
 
 def main(robot_interface):
+
+    hand_eye_calib = camera_calib.BaxterEyeHandCalib()
+    # hand_eye_calib.self_calibrate()
 
     box_tf = TransformListener()
     ctrlr  = OSCPositionController(robot_interface)
@@ -26,9 +30,14 @@ def main(robot_interface):
     box_breadth = 0.153
     box_height  = 0.080
 
-    reach_thr = 0.12
+    reach_thr = 0.05
+    flag_box = False
 
     arm_pos, arm_ori = robot_interface.get_ee_pose()
+
+    rate = rospy.Rate(100)
+
+    set_goal_flag = True
 
     while not rospy.is_shutdown():
 
@@ -44,15 +53,16 @@ def main(robot_interface):
             box_pos = np.array([box_pos[0],box_pos[1],box_pos[2]])
             box_ori = np.quaternion(box_ori[3],box_ori[0],box_ori[1],box_ori[2])
 
-            goal_pos  = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([box_length/2., -box_height/2.,0.]))
+            goal_pos  = box_pos #+ np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-box_length/2., -box_height/2., 0.]))
 
-
-            print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
+            print "Sending goal_pos:",goal_pos.ravel()
 
             if np.any(np.isnan(goal_pos)):
                 print "Goal", t, "is NaN, that is not good, we will skip it!"
             else:
-                ctrlr.set_goal(goal_pos, arm_ori)
+                
+                if set_goal_flag is True:
+                    ctrlr.set_goal(goal_pos, arm_ori)
 
                 print "Waiting..." 
                 lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
@@ -60,12 +70,8 @@ def main(robot_interface):
 
             rate.sleep()
 
-
-        if lin_error < reach_thr:
-            break
-
-    # save_data(data,'data_std1.pkl')
-
+            # if lin_error < reach_thr:
+            #     set_goal_flag = False
 
 
 if __name__ == "__main__":
