@@ -45,4 +45,5 @@ class BaxterController(object):
 
     def do_plan(self, plan, limb = None):
         group = self.get_arm(limb)
+        
 return group.execute(plan)
