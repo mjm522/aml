@@ -4,13 +4,13 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.controllers.osc_bi_arm_controller import OSC_BiArmController
+from aml_ctrl.controllers.osc_bi_arm_controller import OSCBiArmController
 
 def test_reach_both_sides_box(right_arm,left_arm):
     flag_box = False
     box_tf = TransformListener()
 
-    ctrlr  = OSC_BiArmController(right_arm=right_arm , left_arm=left_arm, mode='torque')
+    ctrlr  = OSCBiArmController(right_arm=right_arm , left_arm=left_arm, mode='torque')
 
     min_jerk_interp = MinJerkInterp()
 
@@ -50,10 +50,10 @@ def test_reach_both_sides_box(right_arm,left_arm):
            
             #minimum jerk trajectory for left arm
             min_jerk_interp.configure(left_pos, left_ori, left_goal_pos, box_ori)
-            min_jerk_traj_left   = min_jerk_interp.get_min_jerk_trajectory()
+            min_jerk_traj_left   = min_jerk_interp.get_interpolated_trajectory()
             #minimum jerk trajectory for right arm
             min_jerk_interp.configure(right_pos, right_ori, right_goal_pos, box_ori)
-            min_jerk_traj_right  = min_jerk_interp.get_min_jerk_trajectory()
+            min_jerk_traj_right  = min_jerk_interp.get_interpolated_trajectory()
             
             for t in range(baxter_ctrlr.timesteps):
                 #compute the left joint torque command

@@ -27,7 +27,7 @@ class OSCPositionController(ClassicalController):
         self._dt = self._config['dt']
 
 
-    def compute_cmd(self,time_elapsed):
+    def compute_cmd(self, time_elapsed):
 
         
         goal_pos       = self._goal_pos
@@ -46,7 +46,7 @@ class OSCPositionController(ClassicalController):
         # calculate the jacobian of the end effector
         jac_ee         = robot_state['jacobian']
 
-        error                   = 100.
+        error          = 100.
 
         curr_pos, curr_ori  = self._robot.get_ee_pose()
 
@@ -64,16 +64,24 @@ class OSCPositionController(ClassicalController):
         else:
 
             jac_ee          = jac_ee[0:3,:]
+            delta_ori       = None
             delta           = delta_pos
 
         jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
-        null_q              = self._kp*np.dot(jac_star, delta) + self._alpha*np.dot((np.eye(len(q)) - np.dot(jac_star,jac_ee)),(self._robot.q_mean - q))
-        self._cmd           = q + null_q*self._dt
+
+        prop_val            = (self._robot.q_mean - q) #+ np.pi) % (np.pi*2) - np.pi
+
+        q_null              = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
+
+        u_null              = self._alpha*np.dot((np.eye(self._robot._nu) - np.dot(jac_star,jac_ee)), q_null)
+
+        u_err               = self._kp*np.dot(jac_star, delta) - self._kd*dq
+
+        self._cmd           = (u_null + u_err)*self._dt
 
         if np.any(np.isnan(self._cmd)) or np.linalg.norm(delta_pos) < self._pos_threshold:
-            self._cmd       = q
-
-
+            self._cmd       = np.zeros(self._robot._nu)
+            
         # Never forget to update the error
         self._error = {'linear' : delta_pos, 'angular' : delta_ori}
 
@@ -81,4 +89,5 @@ class OSCPositionController(ClassicalController):
 
 
     def send_cmd(self,time_elapsed):
-        self._robot.exec_position_cmd(self._cmd)
+        # self._robot.exec_position_cmd(self._cmd)
+        self._robot.exec_position_cmd2(self._cmd)

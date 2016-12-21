@@ -5,7 +5,7 @@ import rospy
 from config import OSC_TORQUE_CNTLR
 from aml_ctrl.classical_controller import ClassicalController
 
-class OSC_BiArmController(ClassicalController):
+class OSCBiArmController(ClassicalController):
 
     def __init__(self, right_arm , left_arm, mode='torque'):
 

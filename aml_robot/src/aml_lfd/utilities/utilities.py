@@ -157,3 +157,40 @@ def quat_multiply(lq, rq):
     quat[3] = lq[0]*rq[3] + lq[3]*rq[0] + lq[1]*rq[2] - lq[2]*rq[1]
     return quat
 
+#dot product of quaternions
+def quat_dot(q1, q2):
+    s1 = q1[0]
+    s2 = q2[0]
+    v1 = q1[1:4]
+    v2 = q2[1:4]
+
+    return np.dot(v1,v2) + s1*s2
+
+def quat_norm(q):
+    return np.linalg.norm(q)
+
+#linear interpolation between two quaternions
+def quat_lerp(q1, q2, t):
+
+    q = q1*(1-t) + q2*t
+
+    return q/quat_norm(q)
+
+#spherical interpolation between two quaternions
+def quat_slerp(q1, q2, t):
+
+    dot = quat_dot(q1, q2)
+    # /*  dot = cos(theta)
+    #     if (dot < 0), q1 and q2 are more than 90 degrees apart,
+    #     so we can invert one to reduce spinning */
+    if dot < 0.:
+        dot = -dot
+        q3 = -q2
+    else:
+        q3 = q2
+    
+    if dot < 0.95:
+        angle = np.arccos(dot)
+        return (q1*np.sin(angle*(1-t)) + q3*np.sin(angle*t))/np.sin(angle)
+    else: #// if the angle is small, use linear interpolation                               
+        return quat_lerp(q1,q3,t);       

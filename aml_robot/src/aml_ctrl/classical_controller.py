@@ -78,8 +78,11 @@ class ClassicalController(object):
         ang_error = 0.0
         while not reached_goal and not failed:
             lin_error = np.linalg.norm(self._error['linear'])
-            ang_error = np.linalg.norm(self._error['angular'])
 
+            if self._orientation_ctrl:
+                ang_error = np.linalg.norm(self._error['angular'])
+            else:
+                ang_error = None
 
 
             if lin_error <= self._lin_thr and ang_error <= self._ang_thr:

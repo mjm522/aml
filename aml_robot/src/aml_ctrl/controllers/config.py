@@ -33,7 +33,7 @@ OSC_POSTN_CNTLR = {
     'kd': np.sqrt(10.),
     'alpha': 3.14,
     'null_kp': 1.0*10.,
-    'null_kd': 1.0*10.,
+    'null_kd': 0.5*10.,
     'use_orientation_ctrl': True,
     'pos_threshold': 0.0001,
     'linear_error_thr': 0.05, # error of 2 cm
