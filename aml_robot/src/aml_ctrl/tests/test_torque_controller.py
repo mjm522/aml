@@ -11,8 +11,6 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
 
     min_jerk_interp = MinJerkInterp()
 
-    
-
     min_jerk_interp.configure(start_pos=start_pos, goal_pos=goal_pos, start_qt=start_ori, goal_qt=goal_ori)
 
     min_jerk_traj = min_jerk_interp.get_interpolated_trajectory()
@@ -29,26 +27,32 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
 
     while not rospy.is_shutdown() and not finished:
 
-        goal_pos = min_jerk_traj['pos_traj'][t,:]
+        goal_pos = min_jerk_traj['pos_traj'][t]
+        goal_ori = min_jerk_traj['ori_traj'][t]
+        goal_vel = min_jerk_traj['vel_traj'][t]
+        goal_omg = min_jerk_traj['omg_traj'][t]
 
         print "Sending goal ",t, " goal_pos:",goal_pos.ravel() 
 
-        if np.any(np.isnan(goal_pos)):
+        if np.any(np.isnan(goal_pos)) or np.any(np.isnan(goal_vel)) or np.any(np.isnan(goal_vel)) or np.any(np.isnan(goal_omg)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
         else:
             # Setting new goal
-            ctrlr.set_goal(goal_pos,start_ori)
+            ctrlr.set_goal(goal_pos=goal_pos, 
+                           goal_ori=goal_ori, 
+                           goal_vel=goal_vel, 
+                           goal_omg=goal_omg, 
+                           orientation_ctrl = False)
             
             print "Waiting..."
             lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0)
             
-            print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
+            # print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
 
         t = (t+1)
         finished = (t == n_steps)
 
         rate.sleep()
-
     
     ctrlr.wait_until_goal_reached(timeout=5.0)
     #ctrlr.set_active(False)

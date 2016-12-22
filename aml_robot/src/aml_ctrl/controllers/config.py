@@ -16,13 +16,13 @@ CONTROLLER = {
 
 OSC_TORQUE_CNTLR = {
     'rate': 500,
-    'kp_p': 2., #gains for position
-    'kd_p': np.sqrt(2.),
-    'kp_o': 1.25, #gains for orientation
-    'kd_o': np.sqrt(1.25), #gains for orientation
-    'alpha': 3.25,
-    'null_kp':  1.0*10.,
-    'null_kd': 0.5*10.,
+    'kp_p': 0.0001, #gains for position
+    'kd_p': np.sqrt(0.),
+    'kp_o': 0., #gains for orientation
+    'kd_o': np.sqrt(0.), #gains for orientation
+    'alpha': 0.0,
+    'null_kp': 5.,
+    'null_kd': 3.01,
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.12,
     'angular_error_thr': 0.3,
@@ -33,7 +33,7 @@ OSC_POSTN_CNTLR = {
     'rate': 100,
     'kp_p': 10., #gains for position
     'kd_p': np.sqrt(0.),
-    'kp_o': 5.0, #gains for orientation
+    'kp_o': 0.0, #gains for orientation
     'kd_o': np.sqrt(0.0), #gains for orientation
     'alpha': 3.14,
     'null_kp': 1.0*0.,

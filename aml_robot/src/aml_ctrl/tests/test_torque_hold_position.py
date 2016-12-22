@@ -17,11 +17,9 @@ def test_maintain_position(robot_interface):
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         
-
         lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached()
         # print("Current error:", ctrlr._error)
         print("lin_error: %0.4f ang_error: %0.4f elapsed_time: %d.%d"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
-
 
         rate.sleep()
 

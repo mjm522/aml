@@ -146,6 +146,11 @@ class BaxterArm(baxter_interface.limb.Limb):
         except:
             pass
 
+        try:
+            state['ee_vel'],   state['ee_omg']  = self.get_ee_velocity()
+        except:
+            pass
+
         # ee_velocity              = self.endpoint_velocity()['linear']
         # state['ee_velocity']     = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
 
@@ -240,33 +245,36 @@ class BaxterArm(baxter_interface.limb.Limb):
         time_now =  rospy.Time.now()
         return time_now.secs + time_now.nsecs*1e-9
 
-    def get_ee_vel(self):
+    def get_ee_velocity(self, real_robot=True):
         #this is a simple finite difference based velocity computation
         #please note that this might produce a bug since self._goal_ori_old gets 
         #updated only if get_ee_vel is called. 
         #TODO : to update in get_ee_pose or find a better way to compute velocity
-        time_now_new = self.get_time_in_seconds()
         
-        ee_pos_new, ee_ori_new = self.get_ee_pose()  
+        if real_robot:
+            
+            ee_velocity = self.endpoint_velocity()['linear']
+            ee_vel      = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
+            ee_omega    = self.endpoint_velocity()['angular']
+            ee_omg      = np.array([ee_omega.x, ee_omega.y, ee_omega.z])
 
-        dt = time_now_new-self._time_now_old
+        else:
 
-        ee_vel = (ee_pos_new - self._ee_pos_old)/dt
+            time_now_new = self.get_time_in_seconds()
+            
+            ee_pos_new, ee_ori_new = self.get_ee_pose()  
 
-        ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
+            dt = time_now_new-self._time_now_old
 
-        self._goal_ori_old = ee_ori_new
-        self._goal_pos_old = ee_pos_new
-        self._time_now_old = time_now_new
+            ee_vel = (ee_pos_new - self._ee_pos_old)/dt
+
+            ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
+
+            self._goal_ori_old = ee_ori_new
+            self._goal_pos_old = ee_pos_new
+            self._time_now_old = time_now_new
         
         return ee_vel, ee_omg
-
-    def get_ee_velocity(self):
-        
-        ee_velocity     = self.endpoint_velocity()['linear']
-        ee_velocity     = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
-        
-        return ee_velocity
 
 
     def get_cartesian_pos_from_joints(self, joint_angles=None):
