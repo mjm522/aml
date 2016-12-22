@@ -15,7 +15,7 @@ def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, go
 
     min_jerk_traj = min_jerk_interp.get_interpolated_trajectory()
 
-    print "Starting position controller"
+    # print "Starting position controller"
 
     rate = rospy.Rate(100)
 
@@ -33,19 +33,26 @@ def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, go
 
         goal_pos = min_jerk_traj['pos_traj'][t]
         goal_ori = min_jerk_traj['ori_traj'][t]
+        goal_vel = min_jerk_traj['vel_traj'][t]
+        goal_omg = min_jerk_traj['omg_traj'][t]
 
-        print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
+        # print "Sending goal ",t, " goal_pos:", goal_pos.ravel(), " goal_vel:", goal_vel.ravel()
 
-        if np.any(np.isnan(goal_pos)):
+        if np.any(np.isnan(goal_pos)) or np.any(np.isnan(goal_vel)) or np.any(np.isnan(goal_vel)) or np.any(np.isnan(goal_omg)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
         else:
-            ctrlr.set_goal(goal_pos, goal_ori)
-
-            print "Waiting..." 
+            ctrlr.set_goal(goal_pos=goal_pos, 
+                           goal_ori=goal_ori, 
+                           goal_vel=goal_vel, 
+                           goal_omg=goal_omg, 
+                           orientation_ctrl = False)
+            # print "\n command calculated \n", ctrlr._cmd
+            # print "Waiting..." 
             lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
-            print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
-
-
+            # print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
+            # print "lin_error: %0.4f ang_error: %0.4f"%(lin_error,ang_error)
+            print "lin_error:", lin_error
+            
         t = (t+1)
         finished = (t == n_steps)
 
@@ -55,8 +62,8 @@ def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, go
     ctrlr.set_active(False)
 
     # Error stored in ctrlr._error is the most recent error w.r.t to the most recent sent goal
-    print "ERROR in position \t", np.linalg.norm(ctrlr._error['linear'])
-    print "ERROR in orientation \t", np.linalg.norm(ctrlr._error['angular'])
+    # print "ERROR in position \t", np.linalg.norm(ctrlr._error['linear'])
+    # print "ERROR in orientation \t", np.linalg.norm(ctrlr._error['angular'])
 
 if __name__ == '__main__':
 

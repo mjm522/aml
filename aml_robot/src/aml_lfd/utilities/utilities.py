@@ -75,6 +75,12 @@ def plot_demo_data(demo_idx=1):
 
 #quaternion utilities
 
+def quat_convert(q):
+    if isinstance(q, np.quaternion):
+        return quaternion.as_float_array(q)[0]
+    else:
+        return q
+
 def quat_conj(q):
     return np.hstack([q[0],-q[1:4]])
 
@@ -193,4 +199,8 @@ def quat_slerp(q1, q2, t):
         angle = np.arccos(dot)
         return (q1*np.sin(angle*(1-t)) + q3*np.sin(angle*t))/np.sin(angle)
     else: #// if the angle is small, use linear interpolation                               
-        return quat_lerp(q1,q3,t);       
+        return quat_lerp(q1,q3,t)
+
+def compute_omg(q1, q2):
+    
+    return 2.*compute_log( quat_mult( quat_convert(q1), quat_conj( quat_convert(q2) ) ) )     

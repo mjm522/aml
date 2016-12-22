@@ -11,10 +11,14 @@ class OSCPositionController(ClassicalController):
 
         ClassicalController.__init__(self,robot_interface, config)
 
-        #proportional gain
-        self._kp       = self._config['kp']
-        #derivative gain
-        self._kd       = self._config['kd']
+        #proportional gain for position
+        self._kp_p       = self._config['kp_p']
+        #derivative gain for position
+        self._kd_p       = self._config['kd_p']
+        #proportional gain for orientation
+        self._kp_o       = self._config['kp_o']
+        #derivative gain for orientation
+        self._kd_o       = self._config['kd_o']
         #proportional gain for null space controller
         self._null_kp  = self._config['null_kp']
         #derivative gain for null space controller
@@ -28,11 +32,14 @@ class OSCPositionController(ClassicalController):
 
 
     def compute_cmd(self, time_elapsed):
-
-        
+    
         goal_pos       = self._goal_pos
 
         goal_ori       = self._goal_ori
+
+        goal_vel       = self._goal_vel
+
+        goal_omg       = self._goal_omg
         
         robot_state    = self._robot._state
 
@@ -49,9 +56,11 @@ class OSCPositionController(ClassicalController):
         error          = 100.
 
         curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_vel, curr_omg  = self._robot.get_ee_vel()
 
+        delta_pos      = goal_pos - curr_pos
 
-        delta_pos      = (goal_pos-curr_pos)
+        delta_vel      = goal_vel - curr_vel
 
 
         if self._orientation_ctrl:
@@ -60,12 +69,15 @@ class OSCPositionController(ClassicalController):
                 raise ValueError
 
             delta_ori       = quatdiff(quaternion.as_float_array(goal_ori)[0], quaternion.as_float_array(curr_ori)[0])
-            delta           = np.hstack([delta_pos, delta_ori])
+            delta_omg       = goal_omg - curr_omg
+
+            delta           = np.hstack([self._kp_p*delta_pos - self._kd_p*delta_vel, 
+                                         self._kp_o*delta_ori - self._kd_o*delta_omg])
         else:
 
             jac_ee          = jac_ee[0:3,:]
             delta_ori       = None
-            delta           = delta_pos
+            delta           = self._kp_p*delta_pos + self._kd_p*delta_vel
 
         jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
 
@@ -75,7 +87,7 @@ class OSCPositionController(ClassicalController):
 
         u_null              = self._alpha*np.dot((np.eye(self._robot._nu) - np.dot(jac_star,jac_ee)), q_null)
 
-        u_err               = self._kp*np.dot(jac_star, delta) - self._kd*dq
+        u_err               = np.dot(jac_star, delta)
 
         self._cmd           = (u_null + u_err)*self._dt
 

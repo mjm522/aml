@@ -3,7 +3,6 @@ roslib.load_manifest('aml_robot')
 
 import rospy
 
-
 import baxter_interface
 import baxter_external_devices
 
@@ -21,7 +20,10 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 
-from aml_perception import camera_sensor   
+from aml_perception import camera_sensor 
+
+#for computation of angular velocity
+from aml_lfd.utilities.utilities import compute_omg
 
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
@@ -57,6 +59,10 @@ class BaxterArm(baxter_interface.limb.Limb):
             
         baxter_interface.RobotEnable(CHECK_VERSION).enable()
 
+        #this will be useful to compute ee_velocity using finite differences
+        self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
+        self._time_now_old = self.get_time_in_seconds()
+
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)
 
@@ -82,7 +88,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
                                          UInt16, queue_size=10)
 
-        self._gravity_comp = rospy.Subscriber('robot/limb/' + limb +'/gravity_compensation_torques', 
+        self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', 
                                                SEAJointState, self._gravity_comp_callback)
         #gravity + feed forward torques
         self._h = [0. for _ in range(7)]
@@ -95,6 +101,19 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def _gravity_comp_callback(self, msg):
         self._h = msg.gravity_model_effort
+        # print "commanded_effort \n",   msg.commanded_effort
+        # print "commanded_velocity \n", msg.commanded_velocity
+        # print "commanded_position \n", msg.commanded_position
+        # print "actual_position \n", msg.actual_position
+        # print "actual_velocity \n", msg.actual_velocity
+        # print "actual_effort \n", msg.actual_effort
+        # print "gravity_model_effort \n", msg.gravity_model_effort
+        # print "hysteresis_model_effort \n", msg.hysteresis_model_effort
+        # print "crosstalk_model_effort \n", msg.crosstalk_model_effort
+        # print "difference effort \n", np.array(msg.commanded_effort) - np.array(msg.actual_effort)
+        # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
+        # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
+
 
     def _update_state(self):
 
@@ -216,6 +235,31 @@ class BaxterArm(baxter_interface.limb.Limb):
         ee_ori          = np.quaternion(ee_ori.w, ee_ori.x, ee_ori.y, ee_ori.z)
         
         return ee_point, ee_ori
+
+    def get_time_in_seconds(self):
+        time_now =  rospy.Time.now()
+        return time_now.secs + time_now.nsecs*1e-9
+
+    def get_ee_vel(self):
+        #this is a simple finite difference based velocity computation
+        #please note that this might produce a bug since self._goal_ori_old gets 
+        #updated only if get_ee_vel is called. 
+        #TODO : to update in get_ee_pose or find a better way to compute velocity
+        time_now_new = self.get_time_in_seconds()
+        
+        ee_pos_new, ee_ori_new = self.get_ee_pose()  
+
+        dt = time_now_new-self._time_now_old
+
+        ee_vel = (ee_pos_new - self._ee_pos_old)/dt
+
+        ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
+
+        self._goal_ori_old = ee_ori_new
+        self._goal_pos_old = ee_pos_new
+        self._time_now_old = time_now_new
+        
+        return ee_vel, ee_omg
 
     def get_ee_velocity(self):
         

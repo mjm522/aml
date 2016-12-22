@@ -31,6 +31,9 @@ class ClassicalController(object):
 
         self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
 
+        self._goal_vel = np.zeros(3)
+        self._goal_omg  = np.zeros(3)
+
         self._is_active = False
 
     @abc.abstractmethod
@@ -59,9 +62,16 @@ class ClassicalController(object):
 
         self.send_cmd(time_elapsed)
 
-    def set_goal(self, goal_pos, goal_ori, orientation_ctrl = True):
+    def set_goal(self, goal_pos, goal_ori, goal_vel=None, goal_omg=None, orientation_ctrl = True):
         self._goal_pos = goal_pos
         self._goal_ori = goal_ori
+
+        if goal_vel is not None:
+            self._goal_vel = goal_vel
+
+        if goal_omg is not None:
+            self._goal_omg = goal_omg
+
         self._orientation_ctrl = orientation_ctrl
         self._has_reached_goal = False
 

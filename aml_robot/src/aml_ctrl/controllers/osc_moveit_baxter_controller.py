@@ -7,7 +7,8 @@ from std_msgs.msg import (Header, String)
 from geometry_msgs.msg import (PoseStamped, Pose, Point, Quaternion)
 
 import moveit_commander
-import moveit_msgs.msg
+from moveit_msgs.msg import DisplayTrajectory, CollisionObject
+from shape_msgs.msg import SolidPrimitive
 
 import numpy as np
 import quaternion
@@ -42,7 +43,46 @@ class BaxterMoveItController():
         self.both_group_configured  = False
 
         #We create this DisplayTrajectory publisher which is used below to publish trajectories for RVIZ to visualize.
-        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory)
+        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', DisplayTrajectory)
+
+    def add_static_objects_to_scene(self, limb_group=0, obj_pos=None, obj_ori=None):
+        #TODO: this funciton is buggy, will crash, need to fix it, if needed
+
+        collision_object = CollisionObject()
+        
+        #get handle of the move group
+        # move_group =  self.get_group_handle(limb_group=limb_group)
+        # move_group = self.scene.MoveGroupInterface('left_arm')
+
+        
+        # collision_object.header.frame_id = moveit_commander.getPlanningFrame()
+        
+        #id of the object is used to identify it
+        collision_object.id = "box1"
+        
+        #define a box to add to the world
+        primitive = SolidPrimitive()
+        primitive.type = primitive.BOX
+        primitive.dimensions.resize(3)
+        primitive.dimensions[0] = 0.4
+        primitive.dimensions[1] = 0.1
+        primitive.dimensions[2] = 0.4
+
+        #define a pose for the box
+        box_pose = Pose()
+        box_pose.orientation.w = 1.0
+        box_pose.position.x = 0.6
+        box_pose.position.y = -0.4
+        box_pose.position.z = 1.2
+
+        # collision_object.primitives.push_back(primitive)
+        # collision_object.primitive_poses.push_back(box_pose)
+        # collision_object.operation = collision_object.ADD
+        add_box()
+        #add the collision object into the world
+        # self.scene.addCollisionObjects(collision_object)
+        #Sleep to allow MoveGroup to recieve and process the collision object message
+        rospy.sleep(1.0)
 
 
     def set_group_handles(self, limb_group=1):

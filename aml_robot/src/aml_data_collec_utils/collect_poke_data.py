@@ -26,14 +26,17 @@ class CollectPokeData():
 
     def __init__(self, robot_interface, box_config=BOX_TYPE_1):
         self._robot = robot_interface
-        # self._interp_fn = MinJerkInterp(dt=0.5, tau=15.)
+
+        # self.calib_extern_cam()
+
+        self._interp_fn = MinJerkInterp(dt=0.5, tau=15.)
         # self._interp_fn = LinInterp(dt=0.5, tau=15.)
         self._box_tf = TransformListener()
 
-        self._ctrlr    = BaxterMoveItController()
+        # self._ctrlr    = BaxterMoveItController()
         # self._ctrlr  = OSCTorqueController(robot_interface)
-        # self._ctrlr  = OSCPositionController(robot_interface)
-        # self._ctrlr.set_active(True)
+        self._ctrlr  = OSCPositionController(robot_interface)
+        self._ctrlr.set_active(True)
 
         self._goal_pos_old = None
         self._goal_ori_old = None
@@ -47,8 +50,14 @@ class CollectPokeData():
         self._box_breadth = box_config['breadth']
         self._box_height  = box_config['height']
 
+    def calib_extern_cam(self):
+        hand_eye_calib = camera_calib.BaxterEyeHandCalib()
+        hand_eye_calib.self_calibrate()
+        rospy.sleep(10)
+
     def plan_traj(self):
         #minimum jerk trajectory for left arm
+        self._robot.untuck_arm()
         robot_pos, robot_ori = self._robot.get_ee_pose()
 
         self._interp_fn.configure(robot_pos, robot_ori, self._goal_pos_new, self._goal_ori_new)
@@ -56,7 +65,7 @@ class CollectPokeData():
 
     def compute_goal_pose(self):
         box_pos, box_ori = self.get_box_pose()
-        goal_pos  = box_pos #+ np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.5*self._box_length, -0.5*self._box_height, 0.]))
+        goal_pos  = box_pos #+ np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.0*self._box_length, -0.0*self._box_height, -0.8]))
         self._goal_pos_new = goal_pos
         self._goal_ori_new = box_ori
 
@@ -65,6 +74,8 @@ class CollectPokeData():
             self._goal_ori_old = box_ori
 
     def check_change_goal_pose(self):
+        self.compute_goal_pose()
+
         if (np.linalg.norm(self._goal_pos_new-self._goal_pos_old) < 0.1) and (self._interp_traj is not None):
             return False
         else:
@@ -102,7 +113,6 @@ class CollectPokeData():
 
 def main(robot_interface):
 
-    hand_eye_calib = camera_calib.BaxterEyeHandCalib()
     cpd = CollectPokeData(robot_interface=robot_interface)
     
     n_steps = len(cpd._interp_fn.timesteps)
@@ -119,19 +129,25 @@ def main(robot_interface):
         #reset the index if there is a change in the trajectory
         if (cpd.update_traj()):
             t = 0
-            print "DAHFLKADHFKADHFLKADHF"
+            print "Detected change in position, trajectory updated, moving to neutral pose..."
 
         error_lin = np.linalg.norm(cpd._ctrlr._error['linear'])
 
         goal_pos  = cpd._interp_traj['pos_traj'][t]
         goal_ori  = cpd._interp_traj['ori_traj'][t]
+        goal_vel  = cpd._interp_traj['vel_traj'][t]
+        goal_omg  = cpd._interp_traj['omg_traj'][t]
 
         print "Sending goal ",t, " goal_pos:",goal_pos.ravel()
 
         if np.any(np.isnan(goal_pos)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
         else:
-            cpd._ctrlr.set_goal(goal_pos, goal_ori, orientation_ctrl=False)
+            cpd._ctrlr.set_goal(goal_pos=goal_pos, 
+                                goal_ori=goal_ori, 
+                                goal_vel=goal_vel, 
+                                goal_omg=goal_omg, 
+                                orientation_ctrl = False)
 
             # print "Waiting..." 
             lin_error, ang_error, success, time_elapsed = cpd._ctrlr.wait_until_goal_reached(timeout=1.0)
@@ -152,16 +168,18 @@ def main(robot_interface):
 def moveit_main(robot_interface):
 
     cpd = CollectPokeData(robot_interface=robot_interface)
+    
     limb_group = robot_interface._limb_group
 
     cpd._ctrlr.set_group_handles(limb_group=limb_group)
     # cpd._ctrlr.self_test(limb_group=limb_group)
+    # cpd._ctrlr.add_static_objects_to_scene(limb_group=limb_group, obj_pos=None, obj_ori=None)
     
     cpd.compute_goal_pose()
     
     plan = cpd._ctrlr.get_plan(limb_group=limb_group, pos=cpd._goal_pos_new, ori=cpd._goal_ori_new, wait_time=15)
     
-    cpd._ctrlr.execute_plan(limb_group=limb_group, plan=plan, real_robot=True)
+    # cpd._ctrlr.execute_plan(limb_group=limb_group, plan=plan, real_robot=True)
     
     cpd._ctrlr.clean_shutdown()
 
@@ -171,8 +189,8 @@ if __name__ == "__main__":
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
-    # main(arm)
-    moveit_main(arm)
+    main(arm)
+    # moveit_main(arm)
     
 
     
