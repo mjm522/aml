@@ -34,8 +34,8 @@ class CollectPokeData():
         self._box_tf = TransformListener()
 
         # self._ctrlr    = BaxterMoveItController()
-        self._ctrlr  = OSCTorqueController(robot_interface)
-        # self._ctrlr  = OSCPositionController(robot_interface)
+        # self._ctrlr  = OSCTorqueController(robot_interface)
+        self._ctrlr  = OSCPositionController(robot_interface)
         self._ctrlr.set_active(True)
 
         self._goal_pos_old = None

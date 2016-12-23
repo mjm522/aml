@@ -13,7 +13,7 @@ from aml_ctrl.utilities.utilities import quatdiff
 class OSCTorqueController(ClassicalController):
     def __init__(self, robot_interface, config = OSC_TORQUE_CNTLR):
 
-        ClassicalController.__init__(self,robot_interface, config)
+        ClassicalController.__init__(self, robot_interface, config)
 
         #proportional gain for position
         self._kp_p       = self._config['kp_p']
