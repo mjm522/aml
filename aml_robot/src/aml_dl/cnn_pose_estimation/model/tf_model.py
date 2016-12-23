@@ -9,6 +9,22 @@ def init_bias(shape, name=None):
     return tf.get_variable(name, initializer=tf.zeros(shape, dtype='float'))
 
 
+def batched_matrix_vector_multiply(vector, matrix):
+    """ computes x^T A in mini-batches. """
+    vector_batch_as_matricies = tf.expand_dims(vector, [1])
+    mult_result = tf.batch_matmul(vector_batch_as_matricies, matrix)
+    squeezed_result = tf.squeeze(mult_result, [1])
+    return squeezed_result
+
+
+def euclidean_loss_layer(a, b, precision, batch_size):
+    """ Math:  out = (action - mlp_out)'*precision*(action-mlp_out)
+                    = (u-uhat)'*A*(u-uhat)"""
+    scale_factor = tf.constant(2*batch_size, dtype='float')
+    uP = batched_matrix_vector_multiply(a-b, precision)
+    uPu = tf.reduce_sum(uP*(a-b))  # this last dot product is then summed, so we just the sum all at once.
+    return uPu/scale_factor
+
 def euclidean_loss(a, b, batch_size):
     scale_factor = tf.constant(2*batch_size, dtype='float')
     squared_diff = tf.square(a-b)
