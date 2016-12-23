@@ -1,6 +1,8 @@
 import numpy as np
 import quaternion
 
+from aml_lfd.utilities.utilities import compute_w
+
 class MinJerkInterp():
     def __init__(self, dt=0.05, tau=5.):
         self.dt = dt
@@ -17,14 +19,6 @@ class MinJerkInterp():
             goal_qt = quaternion.as_float_array(goal_qt)[0]
         self.start_qt  = start_qt
         self.goal_qt   = goal_qt
-
-    def compute_w(self, q, qdot):
-        Q = np.array([[-q[1],-q[2],-q[3]],
-                      [q[0],-q[3],q[2]],
-                      [q[3],q[0],-q[1]],
-                      [-q[2],q[1],q[0]]])
-        w = 2*np.dot(Q.T,qdot)
-        return w
 
     def min_jerk_step(self, x, xd, xdd, goal, tau):
         # function [x,xd,xdd] = min_jerk_step(x,xd,xdd,goal,tau, dt) computes
@@ -123,7 +117,7 @@ class MinJerkInterp():
         #compute angular velocity
         final_w = np.zeros((len(self.timesteps),3))
         for i in range(len(self.timesteps)):
-            final_w[i,:] = self.compute_w(final_q[i,:], final_dot[i,:])
+            final_w[i,:] = compute_w(final_q[i,:], final_dot[i,:])
 
         #compute angular acceleration
         final_al = np.diff(final_w, axis=0)/self.dt
@@ -136,7 +130,7 @@ class MinJerkInterp():
 
         return final_q, final_w, final_al
 
-    def get_min_jerk_trajectory(self):
+    def get_interpolated_trajectory(self):
 
         final_q, final_w, final_al  = self.min_jerk_step_qt()
 
@@ -158,7 +152,7 @@ class MinJerkInterp():
         return self.min_jerk_traj
 
     def plot_min_jerk_traj(self):
-        min_jerk_traj = self.get_min_jerk_trajectory()
+        min_jerk_traj = self.get_interpolated_trajectory()
 
         import matplotlib.pyplot as plt
         plt.figure(1)

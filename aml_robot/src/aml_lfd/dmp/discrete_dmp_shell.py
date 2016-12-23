@@ -102,10 +102,8 @@ class DiscreteDMPShell(LfD):
         else:
             y_des = self._des_path
 
-        self._y0 = y_des[:,0].copy()
         self._y_des = y_des.copy()
-        self._goal = self.gen_goal(y_des)
-        
+
         self.check_offset()
         
         # generate function to interpolate the desired trajectory
@@ -176,14 +174,13 @@ class DiscreteDMPShell(LfD):
             self._y = self._y0.copy()
         else:
             self._y = new_start
-        self._dy = np.zeros(self._num_dmps)   
+        self._dy  = np.zeros(self._num_dmps)   
         self._ddy = np.zeros(self._num_dmps)  
         self.reset_state_cs()
 
     def reset_state_cs(self):
         """Reset the system state"""
         self._x = 1.0
-
 
     def gen_psi(self, x):
         """Generates the activity of the basis functions for a given 
@@ -265,15 +262,6 @@ class DiscreteDMPShell(LfD):
             ddy_track[t] = ddy
 
         return y_track, dy_track, ddy_track
-
-    def gen_goal(self, y_des): 
-        """Generate the goal for path imitation. 
-        For rhythmic DMPs the goal is the average of the 
-        desired trajectory.
-    
-        y_des np.array: the desired trajectory to follow
-        """
-        return y_des[:,-1].copy()
 
     def step_cs(self, tau=1.0, error_coupling=1.0):
         """Generate a single step of x for discrete

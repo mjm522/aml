@@ -9,6 +9,9 @@ from cnn_pose_estimation.training.config import network_params
 import numpy as np
 import tensorflow as tf
 
+# Fixing seed
+np.random.seed(seed=42)
+
 def fakeImageInput(network_params):
     image = np.random.randn(network_params['image_height'],network_params['image_width'],network_params['image_channels'])
     image = np.transpose(image,(2,1,0)) # If the image is WxHxC, make it CxWxH
@@ -27,6 +30,7 @@ features_op = nn['features']
 loss_op = nn['loss']
 input_tensor = nn['input']
 position = nn['position']
+train_op = tf_model.train_adam_step(loss_op)
 
 
 # Initialialise session and variables
@@ -39,25 +43,23 @@ sess.run(init_op)
 # Run a simple test with a fake image
 image = fakeImageInput(network_params)
 
-output = sess.run([fc_op,loss_op], feed_dict={input_tensor: np.expand_dims(image,axis=0),
-                                 position: np.expand_dims(np.ones(3),axis=0)
-                                })
-print "fc_output:", output[0]
-print "loss_output:", output[1]
+### Training ###
 
-######## RESTORING MODEL #######
+for iteration in range(5000):
+    with tf.device("/gpu:0"):
+        loss = sess.run([loss_op,train_op],feed_dict={input_tensor: np.expand_dims(image,axis=0),
+                                     position: np.expand_dims(np.ones(3),axis=0)
+                                    })
+
+        # print every 50 iters
+        if iteration%50 == 0:
+            print "iteration %d loss: "%(iteration), loss
+
+
+######## SAVING MODEL #######
 save_path = saver.save(sess, "model.ckpt")
 print("Model saved in file: %s" % save_path)
-
-######## RESTORING MODEL #######
-saver.restore(sess, "model.ckpt")
-print("Model restored.")
-# Do some work with the model
-output = sess.run([fc_op,loss_op], feed_dict={input_tensor: np.expand_dims(image,axis=0),
-                                 position: np.expand_dims(np.ones(3),axis=0)
-                                })
-print "fc_output:", output[0]
-print "loss_output:", output[1]
+    
 
 sess.close()
 

@@ -12,11 +12,12 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 import tf
 from tf import TransformListener
+from os.path import dirname, abspath
 
 import sys
 sys.argv
 
-class Baxter_Eye_Hand_Calib():
+class BaxterEyeHandCalib():
 	
     def __init__(self):
         self.left_arm 	= BaxterArm('left') #object of type Baxter from baxter_mechanism
@@ -119,8 +120,9 @@ class Baxter_Eye_Hand_Calib():
 
     def load_calib_data(self):
         # Load
+        calib_data_folder_path = dirname(dirname(abspath(__file__))) + '/scripts/'
         try:
-            calib_data = np.load('calib_data.npy').item()
+            calib_data = np.load(calib_data_folder_path+'calib_data.npy').item()
         except Exception as e:
             print "Caliberation file cannot be loaded"
             raise e
@@ -166,7 +168,7 @@ class Baxter_Eye_Hand_Calib():
 
 def main():
     
-    calib = Baxter_Eye_Hand_Calib()
+    calib = BaxterEyeHandCalib()
 
     calib.self_calibrate()
 
@@ -177,7 +179,7 @@ if __name__ == '__main__':
     #get the arguments passed to the script
     cmdargs = str(sys.argv)
     if 'save' in cmdargs:
-        calib = Baxter_Eye_Hand_Calib()
+        calib = BaxterEyeHandCalib()
         calib.save_calib_data()
     
     main()

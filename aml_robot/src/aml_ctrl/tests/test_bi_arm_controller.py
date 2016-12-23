@@ -35,7 +35,7 @@ def test_coop_position_control():
     jnt_l = arm_l.angles()
     jnt_r = arm_r.angles()
 
-    min_jerk_traj   = baxter_ctrlr.get_min_jerk_trajectory()
+    min_jerk_traj   = baxter_ctrlr.get_interpolated_trajectory()
 
     print "Starting co-operative position controller"
 
@@ -101,7 +101,7 @@ def test_coop_torque_control():
     jnt_l = arm_l.angles()
     jnt_r = arm_r.angles()
 
-    min_jerk_traj   = baxter_ctrlr.get_min_jerk_trajectory()
+    min_jerk_traj   = baxter_ctrlr.get_interpolated_trajectory()
 
     print "Starting co-operative torque controller"
 

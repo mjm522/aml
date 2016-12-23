@@ -13,12 +13,16 @@ from aml_ctrl.utilities.utilities import quatdiff
 class OSCTorqueController(ClassicalController):
     def __init__(self, robot_interface, config = OSC_TORQUE_CNTLR):
 
-        ClassicalController.__init__(self,robot_interface, config)
+        ClassicalController.__init__(self, robot_interface, config)
 
-        #proportional gain
-        self._kp       = self._config['kp']
-        #derivative gain
-        self._kd       = self._config['kd']
+        #proportional gain for position
+        self._kp_p       = self._config['kp_p']
+        #derivative gain for position
+        self._kd_p       = self._config['kd_p']
+        #proportional gain for orientation
+        self._kp_o       = self._config['kp_o']
+        #derivative gain for orientation
+        self._kd_o       = self._config['kd_o']
         #proportional gain for null space controller
         self._null_kp  = self._config['null_kp']
         #derivative gain for null space controller
@@ -39,6 +43,10 @@ class OSCTorqueController(ClassicalController):
 
         goal_ori       = self._goal_ori
 
+        goal_vel       = self._goal_vel
+
+        goal_omg       = self._goal_omg
+
         robot_state    = self._state
 
         q              = robot_state['position']
@@ -57,6 +65,8 @@ class OSCTorqueController(ClassicalController):
         ee_xyz         = robot_state['ee_point']
         ee_ori         = robot_state['ee_ori']
 
+        curr_vel       = robot_state['ee_vel']
+        curr_omg       = robot_state['ee_omg']
 
         # convert the mass compensation into end effector space
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
@@ -72,7 +82,8 @@ class OSCTorqueController(ClassicalController):
         # convert the mass compensation into end effector space
         Mx   = np.dot(svd_v.T, np.dot(np.diag(svd_s), svd_u.T))
 
-        x_des   = goal_pos - ee_xyz
+        # x_des   = goal_pos - ee_xyz
+        x_des   = self._kp_p*(goal_pos - ee_xyz) + self._kd_p*(goal_vel - curr_vel)
  
         if self._orientation_ctrl:
             if goal_ori is None:
@@ -82,13 +93,13 @@ class OSCTorqueController(ClassicalController):
                 if type(goal_ori) is np.quaternion:
                     omg_des  = quatdiff(quaternion.as_float_array(goal_ori)[0], quaternion.as_float_array(ee_ori)[0])
                 elif len(goal_ori) == 3:
-                    omg_des = goal_ori
+                    # omg_des = goal_ori
+                    omg_des = self._kp_o*goal_ori + self._kd_o*(goal_omg - curr_omg)
                 else:
                     print "Wrong dimension"
                     raise ValueError
         else:
             omg_des = np.zeros(3)
-
 
         #print "h: ", h
         a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
@@ -98,7 +109,7 @@ class OSCTorqueController(ClassicalController):
 
 
         # transform into joint space, add vel and gravity compensation
-        u                   = self._kp * np.dot(jac_ee.T, Fx) - np.dot(Mq, self._kd * dq)
+        u                   = np.dot(jac_ee.T, Fx)
 
         # calculate our secondary control signa
         # calculated desired joint angle acceleration

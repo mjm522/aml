@@ -11,10 +11,14 @@ class OSCPositionController(ClassicalController):
 
         ClassicalController.__init__(self,robot_interface, config)
 
-        #proportional gain
-        self._kp       = self._config['kp']
-        #derivative gain
-        self._kd       = self._config['kd']
+        #proportional gain for position
+        self._kp_p       = self._config['kp_p']
+        #derivative gain for position
+        self._kd_p       = self._config['kd_p']
+        #proportional gain for orientation
+        self._kp_o       = self._config['kp_o']
+        #derivative gain for orientation
+        self._kd_o       = self._config['kd_o']
         #proportional gain for null space controller
         self._null_kp  = self._config['null_kp']
         #derivative gain for null space controller
@@ -27,12 +31,15 @@ class OSCPositionController(ClassicalController):
         self._dt = self._config['dt']
 
 
-    def compute_cmd(self,time_elapsed):
-
-        
+    def compute_cmd(self, time_elapsed):
+    
         goal_pos       = self._goal_pos
 
         goal_ori       = self._goal_ori
+
+        goal_vel       = self._goal_vel
+
+        goal_omg       = self._goal_omg
         
         robot_state    = self._robot._state
 
@@ -46,12 +53,14 @@ class OSCPositionController(ClassicalController):
         # calculate the jacobian of the end effector
         jac_ee         = robot_state['jacobian']
 
-        error                   = 100.
+        error          = 100.
 
         curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_vel, curr_omg  = self._robot.get_ee_velocity()
 
+        delta_pos      = goal_pos - curr_pos
 
-        delta_pos      = (goal_pos-curr_pos)
+        delta_vel      = goal_vel - curr_vel
 
 
         if self._orientation_ctrl:
@@ -60,20 +69,31 @@ class OSCPositionController(ClassicalController):
                 raise ValueError
 
             delta_ori       = quatdiff(quaternion.as_float_array(goal_ori)[0], quaternion.as_float_array(curr_ori)[0])
-            delta           = np.hstack([delta_pos, delta_ori])
+            delta_omg       = goal_omg - curr_omg
+
+            delta           = np.hstack([self._kp_p*delta_pos - self._kd_p*delta_vel, 
+                                         self._kp_o*delta_ori - self._kd_o*delta_omg])
         else:
 
             jac_ee          = jac_ee[0:3,:]
-            delta           = delta_pos
+            delta_ori       = None
+            delta           = self._kp_p*delta_pos + self._kd_p*delta_vel
 
         jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
-        null_q              = self._kp*np.dot(jac_star, delta) + self._alpha*np.dot((np.eye(len(q)) - np.dot(jac_star,jac_ee)),(self._robot.q_mean - q))
-        self._cmd           = q + null_q*self._dt
+
+        prop_val            = (self._robot.q_mean - q) #+ np.pi) % (np.pi*2) - np.pi
+
+        q_null              = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
+
+        u_null              = self._alpha*np.dot((np.eye(self._robot._nu) - np.dot(jac_star,jac_ee)), q_null)
+
+        u_err               = np.dot(jac_star, delta)
+
+        self._cmd           = (u_null + u_err)*self._dt
 
         if np.any(np.isnan(self._cmd)) or np.linalg.norm(delta_pos) < self._pos_threshold:
-            self._cmd       = q
-
-
+            self._cmd       = np.zeros(self._robot._nu)
+            
         # Never forget to update the error
         self._error = {'linear' : delta_pos, 'angular' : delta_ori}
 
@@ -81,4 +101,5 @@ class OSCPositionController(ClassicalController):
 
 
     def send_cmd(self,time_elapsed):
-        self._robot.exec_position_cmd(self._cmd)
+        # self._robot.exec_position_cmd(self._cmd)
+        self._robot.exec_position_cmd2(self._cmd)

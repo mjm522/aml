@@ -15,10 +15,10 @@ def plot_traj(des_path, tau=1.0):
     new_start = des_path[0,:]
     dmp.reset_state_dmp(new_start)
     new_goal = des_path[-1,:]
-    dmp.goal = new_goal;
+    dmp.goal = new_goal
 
     y_track, dy_track, ddy_track = dmp.rollout_dmp(tau)
-    
+
     import matplotlib.pyplot as plt
 
     plt.figure(1)
@@ -37,8 +37,8 @@ def plot_traj(des_path, tau=1.0):
 
 def test_discrete_dmp(robot_interface, des_path, tau=1.0):
 
-    #ctrlr = OSCPositionController(robot_interface)
-    ctrlr = OSCTorqueController(robot_interface)
+    ctrlr = OSCPositionController(robot_interface)
+    #ctrlr = OSCTorqueController(robot_interface)
 
     dmp = DiscreteDMPShell()
     dmp.configure(traj2follow=des_path, start=des_path[0,:], goal=des_path[-1,:])
@@ -90,12 +90,12 @@ if __name__ == '__main__':
 
     arm.untuck_arm()
 
-    demo_idx = 2
+    demo_idx = 6 #for 4-6: tau = 0.27; for 1-3: tau = 0.1
 
     des_path, _ = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
     # des_path = get_ee_traj(debug=True) #tau=2.0 makes it almost match
 
     #larger the tau, faster the system would reach the goal
-    #plot_traj(des_path, tau=0.1)
+    plot_traj(des_path, tau=0.27)
 
-    test_discrete_dmp(robot_interface=arm, des_path=des_path, tau=1.0)
+    # test_discrete_dmp(robot_interface=arm, des_path=des_path, tau=0.27)
