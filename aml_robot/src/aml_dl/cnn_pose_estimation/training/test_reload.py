@@ -31,6 +31,24 @@ input_tensor = nn['input']
 position = nn['position']
 train_op = tf_model.train_adam_step(loss_op)
 
+with tf.variable_scope('action_net'):
+    dim_output = 7
+    n_layers = 3
+    layer_size = 20
+    dim_hidden = (n_layers - 1)*[layer_size]
+    dim_hidden.append(dim_output)
+
+    state_input = tf.placeholder("float", [None, 27], name='nn_state_input')
+    precision = tf.placeholder("float", [None, dim_output,dim_output], name='precision')
+    action = tf.placeholder("float", [None, dim_output], name='action')
+
+    fc2_input = tf.concat(concat_dim=1, values=[features_op, state_input])
+
+    fc2_output, weights_FC2, biases_FC2 = tf_model.get_mlp_layers(fc2_input, n_layers, dim_hidden)
+    fc2_vars = weights_FC2 + biases_FC2
+    loss_fc2 = tf_model.euclidean_loss_layer(a=action, b=fc2_output, precision=precision, batch_size=25)
+
+
 
 # Initialialise session and variables
 
@@ -41,17 +59,25 @@ sess.run(init_op)
 
 # Run a simple test with a fake image
 image = fakeImageInput(network_params)
+state = np.random.randn(27)
+action_groundtruth = np.random.randn(7)
+prc = np.random.randn(7,7)
 
 ######## RESTORING MODEL #######
 saver.restore(sess, "model.ckpt")
 print("Model restored.")
 # Do some work with the model
-output = sess.run([fc_op,loss_op], feed_dict={input_tensor: np.expand_dims(image,axis=0),
-                                 position: np.expand_dims(np.ones(3),axis=0)
+output = sess.run([fc_op,loss_op,fc2_output,loss_fc2], feed_dict={input_tensor: np.expand_dims(image,axis=0),
+                                 						position: np.expand_dims(np.ones(3),axis=0),
+                                 						state_input: np.expand_dims(state,axis=0),
+                                 						action: np.expand_dims(action_groundtruth,axis=0),
+                                 						precision: np.expand_dims(prc,axis=0),
                                 })
 
 print "fc_output:", output[0]
 print "loss_output:", output[1]
+print "fc2_output:", output[2]
+print "loss_fc2:", output[3]
 
 
 sess.close()

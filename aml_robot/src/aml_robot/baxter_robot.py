@@ -366,6 +366,9 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return np.array(self._kinematics.inertia(argument))
 
+    def ik(self,position,orientation=None):
+        return self._kinematics.inverse_kinematics(position,orientation)
+
 
 class BaxterButtonStatus():
     def __init__(self):
