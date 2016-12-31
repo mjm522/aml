@@ -91,20 +91,39 @@ class CollectPokeData():
         self.reset_arm()
         robot_pos, robot_ori = self._robot.get_ee_pose()
 
-        self._interp_fn.configure(robot_pos, robot_ori, self._goal_pos_new, self._goal_ori_new)
-        self._interp_traj   = self._interp_fn.get_interpolated_trajectory()
+        box_pos, box_ori = self.get_box_pose()
+        inter_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori),  np.array([0.0, 0.2, 0.]))
+
+        self._interp_fn.configure(robot_pos, robot_ori, inter_pos, box_ori)
+
+        #this trajectory will help just to reach a point above the box
+        interp_traj_curr_tmp   = self._interp_fn.get_interpolated_trajectory()
+
+        self._interp_fn.configure(inter_pos, box_ori, self._goal_pos_new, self._goal_ori_new)
+
+        #this trajectory will help just to reach from the point above the box to the side of the box
+        interp_traj_tmp_goal   = self._interp_fn.get_interpolated_trajectory()
+
+        self._interp_traj = {}
+        self._interp_traj['pos_traj'] = np.vstack([interp_traj_curr_tmp['pos_traj'], interp_traj_tmp_goal['pos_traj']])
+        #these are quaternions and hence hstack
+        self._interp_traj['ori_traj'] = np.hstack([interp_traj_curr_tmp['ori_traj'], interp_traj_tmp_goal['ori_traj']])
+        self._interp_traj['vel_traj'] = np.vstack([interp_traj_curr_tmp['vel_traj'], interp_traj_tmp_goal['vel_traj']])
+        self._interp_traj['omg_traj'] = np.vstack([interp_traj_curr_tmp['omg_traj'], interp_traj_tmp_goal['omg_traj']])
+
+        # self._interp_traj   = self._interp_fn.get_interpolated_trajectory()
 
     def rand_location_on_box(self, choice=1):
         #this function randomly chooses between four locations
         #on the box
         if choice == 1:
-            vect = np.array([0.3,  -0.5, 0.])
+            vect = np.array([0.3,  -0.8, 0.])
         elif choice == 2:
-            vect = np.array([-0.3, -0.5, 0.])
+            vect = np.array([-0.3, -0.8, 0.])
         elif choice == 3:
-            vect = np.array([0.,   -0.5, -0.3])
+            vect = np.array([0.,   -0.8, -0.3])
         else:
-            vect = np.array([0.,   -0.5, 0.3])
+            vect = np.array([0.,   -0.8, 0.3])
 
         return np.multiply(vect, np.array([self._box_length, self._box_height, self._box_breadth]))
 
@@ -138,7 +157,7 @@ class CollectPokeData():
                 pass
 
         if self._tfmn_time is not None:
-            box_pos, box_ori     = self._box_tf.lookupTransform('base', 'box', self._tfmn_time)
+            box_pos, box_ori   = self._box_tf.lookupTransform('base', 'box', self._tfmn_time)
 
             self._tfmn_time = None
 
@@ -158,7 +177,8 @@ class CollectPokeData():
             return False
 
     def update_choice(self):
-          self._choice = random.randint(1,4)
+        #not choosing 4, it causes singularity
+          self._choice = random.randint(1,3)
 
 
 def main(robot_interface):
@@ -247,7 +267,7 @@ if __name__ == "__main__":
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
-    arm.untuck_arm()
+    # arm.untuck_arm()
     main(arm)
     # set_reset_jnt_pos()
     # moveit_main(arm)
