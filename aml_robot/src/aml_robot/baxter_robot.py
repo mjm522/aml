@@ -29,7 +29,7 @@ from aml_lfd.utilities.utilities import compute_omg
 
 class BaxterArm(baxter_interface.limb.Limb):
 
-    def __init__(self,limb,on_state_callback=None):
+    def __init__(self, limb, on_state_callback=None):
 
         self._ready = False
 
@@ -41,6 +41,8 @@ class BaxterArm(baxter_interface.limb.Limb):
         self._nq = 7
         #number of control commads
         self._nu = 7
+
+        self._limb = limb
 
         #these values are from the baxter urdf file
         self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
@@ -57,6 +59,7 @@ class BaxterArm(baxter_interface.limb.Limb):
             self.q_mean  = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
             self._tuck   = np.array([-1.0, -2.07,  3.0, 2.55,  0.0, 0.01,  0.0])
             self._untuck = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+        
         elif limb == 'right':
             self._limb_group = 1
             self.q_mean  = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
@@ -77,12 +80,12 @@ class BaxterArm(baxter_interface.limb.Limb):
         self._pub_rate.publish(sampling_rate)
 
     def tuck_arm(self):
-        self.move_to_joint_position(self._tuck)
+        self.exec_position_cmd(self._tuck)
 
     def untuck_arm(self):
-        self.move_to_joint_position(self._untuck)
+        self.exec_position_cmd(self._untuck)
 
-    def _configure(self,limb, on_state_callback):
+    def _configure(self, limb, on_state_callback):
         self._state = None
 
         if on_state_callback:
@@ -193,11 +196,29 @@ class BaxterArm(baxter_interface.limb.Limb):
         return self._kinematics._base_link
 
     
-    def exec_position_cmd(self,cmd):
+    def exec_position_cmd(self, cmd):
+        
+        curr_q = self._state['position']
+        
+        #does a linear interpolation between required joint position and current position
+        #if beyond a certain threshold
+        if np.linalg.norm(curr_q-cmd) > 0.5:
+            
+            interp=10 #number of interpolation steps
 
-        joint_command = dict(zip(self.joint_names(), cmd))
+            jnt_cmds = np.zeros((self._nu,interp))
+            
+            for i in range(self._nu):
+                jnt_cmds[i,:] = np.linspace(curr_q[i], cmd[i], interp)
 
-        self.set_joint_positions(joint_command)
+            for i in range(interp):
+                self.move_to_joint_pos(jnt_cmds[:,i])
+
+        else:
+
+            joint_command = dict(zip(self.joint_names(), cmd))
+
+            self.set_joint_positions(joint_command)
 
     def exec_position_cmd2(self,cmd):
         curr_q = self.joint_angles()

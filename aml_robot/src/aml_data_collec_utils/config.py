@@ -3,9 +3,9 @@
 
 #the white box
 BOX_TYPE_1 = {
-    'length': 0.210,
-    'breadth':0.153,
-    'height':0.080,
+    'length': 0.210, # along x axis
+    'breadth':0.153, # along z axis
+    'height':0.080,  # along y axis
 }
 
 #amazon box
