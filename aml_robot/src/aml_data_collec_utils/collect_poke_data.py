@@ -89,29 +89,32 @@ class CollectPokeData():
     def plan_traj(self):
         #minimum jerk trajectory for left arm
         self.reset_arm()
+        
         robot_pos, robot_ori = self._robot.get_ee_pose()
 
-        box_pos, box_ori = self.get_box_pose()
-        inter_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori),  np.array([0.0, 0.2, 0.]))
+        # box_pos, box_ori = self.get_box_pose()
+        # inter_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori),  np.array([0.0, 0.2, 0.]))
 
-        self._interp_fn.configure(robot_pos, robot_ori, inter_pos, box_ori)
+        # self._interp_fn.configure(robot_pos, robot_ori, inter_pos, box_ori)
 
-        #this trajectory will help just to reach a point above the box
-        interp_traj_curr_tmp   = self._interp_fn.get_interpolated_trajectory()
+        # #this trajectory will help just to reach a point above the box
+        # interp_traj_curr_tmp   = self._interp_fn.get_interpolated_trajectory()
 
-        self._interp_fn.configure(inter_pos, box_ori, self._goal_pos_new, self._goal_ori_new)
+        # self._interp_fn.configure(inter_pos, box_ori, self._goal_pos_new, self._goal_ori_new)
 
-        #this trajectory will help just to reach from the point above the box to the side of the box
-        interp_traj_tmp_goal   = self._interp_fn.get_interpolated_trajectory()
+        # #this trajectory will help just to reach from the point above the box to the side of the box
+        # interp_traj_tmp_goal   = self._interp_fn.get_interpolated_trajectory()
 
-        self._interp_traj = {}
-        self._interp_traj['pos_traj'] = np.vstack([interp_traj_curr_tmp['pos_traj'], interp_traj_tmp_goal['pos_traj']])
-        #these are quaternions and hence hstack
-        self._interp_traj['ori_traj'] = np.hstack([interp_traj_curr_tmp['ori_traj'], interp_traj_tmp_goal['ori_traj']])
-        self._interp_traj['vel_traj'] = np.vstack([interp_traj_curr_tmp['vel_traj'], interp_traj_tmp_goal['vel_traj']])
-        self._interp_traj['omg_traj'] = np.vstack([interp_traj_curr_tmp['omg_traj'], interp_traj_tmp_goal['omg_traj']])
+        # self._interp_traj = {}
+        # self._interp_traj['pos_traj'] = np.vstack([interp_traj_curr_tmp['pos_traj'], interp_traj_tmp_goal['pos_traj']])
+        # #these are quaternions and hence hstack
+        # self._interp_traj['ori_traj'] = np.hstack([interp_traj_curr_tmp['ori_traj'], interp_traj_tmp_goal['ori_traj']])
+        # self._interp_traj['vel_traj'] = np.vstack([interp_traj_curr_tmp['vel_traj'], interp_traj_tmp_goal['vel_traj']])
+        # self._interp_traj['omg_traj'] = np.vstack([interp_traj_curr_tmp['omg_traj'], interp_traj_tmp_goal['omg_traj']])
 
-        # self._interp_traj   = self._interp_fn.get_interpolated_trajectory()
+        self._interp_fn.configure(robot_pos, robot_ori, self._goal_pos_new, self._goal_ori_new)
+
+        self._interp_traj   = self._interp_fn.get_interpolated_trajectory()
 
     def rand_location_on_box(self, choice=1):
         #this function randomly chooses between four locations
