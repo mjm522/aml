@@ -44,6 +44,11 @@ class JSTrajGenerator():
         #acceleration trajectory
         self._js_traj['acc_traj'] = js_acc
 
-        # plot_demo_data(demo_idx=self._demo_idx)
+        plot_demo_data(demo_idx=self._demo_idx)
 
         return self._js_traj
+
+if __name__ == '__main__':
+    h =JSTrajGenerator()
+    h.configure(demo_idx=4)
+    h.get_interpolated_trajectory()

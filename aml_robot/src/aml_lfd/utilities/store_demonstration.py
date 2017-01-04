@@ -150,7 +150,7 @@ class LfD():
             rate.sleep()
             #arm.move_to_joint_position(arm_data['position'])
 
-    def save_demo_data(self, limb_idx=0):
+    def save_demo_data(self, limb_idx):
         btn = BaxterButtonStatus()
         
         demo_start_flag = False
