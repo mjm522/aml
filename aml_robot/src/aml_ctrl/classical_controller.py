@@ -22,17 +22,22 @@ class ClassicalController(object):
 
         self._last_time = rospy.Time.now()
 
-        self._error = {'linear' : np.zeros(3), 'angular' : np.zeros(3)}
+        self._error = {'linear' : np.zeros(3), 'angular' : np.zeros(3), 'js_pos' : np.zeros(self._robot._nu)}
 
         self._orientation_ctrl = config['use_orientation_ctrl']
 
         self._lin_thr = config['linear_error_thr']
         self._ang_thr = config['angular_error_thr']
+        self._js_thr = config['js_pos_error_thr']
 
         self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
 
-        self._goal_vel = np.zeros(3)
+        self._goal_vel  = np.zeros(3)
         self._goal_omg  = np.zeros(3)
+
+        self._goal_js_pos = self._robot._state['position']
+        self._goal_js_vel = self._robot._state['velocity']
+        self._goal_js_acc = np.zeros_like(self._goal_js_pos)
 
         self._is_active = False
 
@@ -47,6 +52,7 @@ class ClassicalController(object):
             return
 
         time_elapsed = event.current_real - self._last_time
+        
         self._last_time = event.current_real
 
 
@@ -62,6 +68,7 @@ class ClassicalController(object):
 
         self.send_cmd(time_elapsed)
 
+    #this is for operation space controller
     def set_goal(self, goal_pos, goal_ori, goal_vel=None, goal_omg=None, orientation_ctrl = True):
         self._goal_pos = goal_pos
         self._goal_ori = goal_ori
@@ -75,9 +82,18 @@ class ClassicalController(object):
         self._orientation_ctrl = orientation_ctrl
         self._has_reached_goal = False
 
+    #this is for joint space controller
+    def set_goal(self, goal_js_pos, goal_js_vel, goal_js_acc):
+        
+        self._goal_js_pos = goal_js_pos
+        self._goal_js_vel = goal_js_vel
+        self._goal_js_acc = goal_js_acc
+
+        self._has_reached_goal = False
+
 
     # Wait timeout seconds for reaching the last set goal
-    def wait_until_goal_reached(self, timeout = 5.0):
+    def wait_until_goal_reached(self, timeout = 5.0, jsc=False):
 
         timeout = rospy.Duration(timeout)
         reached_goal = False
@@ -87,16 +103,24 @@ class ClassicalController(object):
         lin_error = 0.0
         ang_error = 0.0
         while not reached_goal and not failed:
-            lin_error = np.linalg.norm(self._error['linear'])
+
+            if jsc:
+                js_error = np.linalg.norm(self._error['js_pos'])
+
+            else:
+                lin_error = np.linalg.norm(self._error['linear'])
 
             if self._orientation_ctrl:
                 ang_error = np.linalg.norm(self._error['angular'])
             else:
                 ang_error = None
 
-
-            if lin_error <= self._lin_thr and ang_error <= self._ang_thr:
-                reached_goal = True
+            if jsc:
+                if js_error <= self._js_thr:
+                    reached_goal = True
+            else:
+                if lin_error <= self._lin_thr and ang_error <= self._ang_thr:
+                    reached_goal = True
 
             time_elapsed = rospy.Time.now() - time_start
 

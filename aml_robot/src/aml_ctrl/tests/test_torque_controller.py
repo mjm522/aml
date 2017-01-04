@@ -64,7 +64,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
 
 if __name__ == '__main__':
 
-    rospy.init_node('classical_postn_controller')
+    rospy.init_node('classical_torque_controller')
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)

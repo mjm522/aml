@@ -29,6 +29,20 @@ OSC_TORQUE_CNTLR = {
     'deactivate_wait_time': 5,
 }
 
+JSC_TORQUE_CNTLR = {
+    'rate': 500,
+    'kp_q': 10., #gains for position
+    'kd_dq': np.sqrt(10.),
+    'alpha': 0.0,
+    'null_kp': 5.,
+    'null_kd': 3.01,
+    'use_orientation_ctrl': False, #REMOVE THIS
+    'linear_error_thr': 0.12, #REMOVE THIS
+    'angular_error_thr': 0.3, #REMOVE THIS
+    'js_pos_error_thr' :0.1,
+    'deactivate_wait_time': 5,
+}
+
 OSC_POSTN_CNTLR = {
     'rate': 100,
     'kp_p': 10., #gains for position

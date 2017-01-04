@@ -53,6 +53,25 @@ def get_ee_traj(demo_idx=1, debug=False):
 
     return ee_pos_list, ee_ori_list
 
+def get_js_traj(demo_idx=1):
+    #this function takes the position and velocity of a demonstrated data
+    demo_data = load_demo_data(demo_idx=demo_idx, debug=False)
+    js_pos_traj = []
+    js_vel_traj = []
+
+    for arm_data in demo_data:
+        js_pos_traj.append(arm_data['position'])
+        js_vel_traj.append(arm_data['velocity'])
+
+    js_pos_traj =  np.asarray(js_pos_traj).squeeze()
+    js_vel_traj =  np.asarray(js_vel_traj).squeeze()
+    #acceleration trajectory using finite differences
+    js_acc_traj =  np.diff(js_vel_traj, axis=0)
+    js_acc_traj =  np.vstack([np.zeros_like(js_acc_traj[0]), js_acc_traj])
+
+    return js_pos_traj, js_vel_traj, js_acc_traj
+
+
 def get_sampling_rate(demo_idx=1):
     demo_data = load_demo_data(demo_idx=demo_idx)
     return demo_data[0]['sampling_rate']
@@ -60,18 +79,37 @@ def get_sampling_rate(demo_idx=1):
 def plot_demo_data(demo_idx=1):
 
     ee_list, _ = get_ee_traj(demo_idx=demo_idx)
+
+    js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(demo_idx=demo_idx)
+
     #ee_vel_list = np.diff(ee_list, axis=0)
     #print ee_list
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
+    
     fig = plt.figure()
+    plt.title('Task space trajectories')
+    
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(ee_list[0][0], ee_list[0][1], ee_list[0][2],  linewidths=20, color='r', marker='*')
     ax.scatter(ee_list[-1][0],ee_list[-1][1],ee_list[-1][2], linewidths=20, color='g', marker='*')
     ax.plot(ee_list[:,0],ee_list[:,1],ee_list[:,2])
     #ax.plot(ee_vel_list[:,0],ee_vel_list[:,1],ee_vel_list[:,2], color='m')
-    plt.show()
 
+    plt.figure(2)
+    plt.title('Joint space trajectories')
+
+    num_jnts = js_pos_traj.shape[1]
+    plot_no = num_jnts*100 + 11 #just for getting number of joints
+
+    for i in range(num_jnts):
+        plt.subplot(plot_no)
+        plt.plot(js_pos_traj[:,i])
+        plt.plot(js_vel_traj[:,i])
+        plt.plot(js_acc_traj[:,i])
+        plot_no += 1
+
+    plt.show()
 
 #quaternion utilities
 

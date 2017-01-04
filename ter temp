@@ -1,0 +1,95 @@
+* [33mb97cf11[m[33m ([1;36mHEAD[m[33m, [1;32mtemp[m[33m)[m trajectroy to reach box
+* [33m8b37b99[m collecting poke data
+[31m|[m * [33m8db0ec6[m[33m ([1;31morigin/aml_dev[m[33m, [1;32maml_dev[m[33m)[m loading checkpoints and modifying checkpoint net
+[31m|[m *   [33m958b26b[m Merge branch 'aml_dev' of github.com:eaa3/aml into aml_dev
+[31m|[m [33m|[m[31m\[m  
+[31m|[m [33m|[m[31m/[m  
+[31m|[m[31m/[m[33m|[m   
+* [33m|[m [33m9322ed6[m data collec utility for gravity compensation added
+* [33m|[m [33mda2413f[m test_torque_controller.py works
+* [33m|[m [33m66b0840[m position controller working
+* [33m|[m [33m0532f6e[m moveit packages, other bug corrections
+* [33m|[m [33ma56cade[m modified moveit files
+* [33m|[m [33m47f5d14[m started testing moveit packages
+* [33m|[m   [33m2cd6105[m Merge branch 'aml_dev' of https://github.com/eaa3/aml into aml_dev
+[35m|[m[36m\[m [33m\[m  
+[35m|[m * [33m\[m   [33m912404f[m Merge branch 'aml_dev' of github.com:eaa3/aml into aml_dev
+[35m|[m [1;31m|[m[1;32m\[m [33m\[m  
+[35m|[m * [1;32m|[m [33m|[m [33m8a81ce0[m added training and reload test
+* [1;32m|[m [1;32m|[m [33m|[m [33m8ce19dd[m adding setup.py for calib module
+[1;32m|[m [1;32m|[m[1;32m/[m [33m/[m  
+[1;32m|[m[1;32m/[m[1;32m|[m [33m|[m   
+* [1;32m|[m [33m|[m [33m78f19d0[m poking experiments
+* [1;32m|[m [33m|[m   [33me60f680[m Merge branch 'aml_dev' of https://github.com/eaa3/aml into aml_dev
+[1;33m|[m[1;34m\[m [1;32m\[m [33m\[m  
+* [1;34m|[m [1;32m|[m [33m|[m [33m8aed77a[m added new files
+[1;34m|[m [1;34m|[m [1;32m|[m * [33mbbbac11[m adding ik helper method on baxter robot
+[1;34m|[m [1;34m|[m [1;32m|[m[1;34m/[m  
+[1;34m|[m [1;34m|[m[1;34m/[m[1;32m|[m   
+[1;34m|[m * [1;32m|[m   [33mebab6f6[m Merge branch 'aml_dev' of github.com:eaa3/aml into aml_dev
+[1;34m|[m [1;35m|[m[1;32m\[m [1;32m\[m  
+[1;34m|[m [1;35m|[m [1;32m|[m[1;32m/[m  
+[1;34m|[m [1;35m|[m * [33mf6203c3[m adding deep network module, initial pose tracking neural model
+[1;34m|[m [1;35m|[m[1;34m/[m  
+[1;34m|[m[1;34m/[m[1;35m|[m   
+* [1;35m|[m [33mc9ca079[m demo_data_4,5,6 are sampled at 100hz while 1,2,3 are sampled at 200hz
+* [1;35m|[m [33md71fc58[m verbose for quaternion
+* [1;35m|[m [33m2218a73[m bug corrected
+* [1;35m|[m [33m45d94e3[m new test case
+* [1;35m|[m [33m18a3ab9[m bug correction, more demos
+* [1;35m|[m [33m3ecb7d3[m dmp working for both torque and position control
+* [1;35m|[m [33me458102[m learning from demos module, under tests
+[1;36m|[m * [33m667975e[m adding initial collect poke data script
+[1;36m|[m[1;36m/[m  
+* [33m60d6ef1[m updating coop gravity comp demo and general parameter tunning
+* [33m324605c[m quick fixes
+* [33m050f69d[m removing print from position controller constructor
+* [33m824b76b[m controllers with individual timer update threads, refactoring tests and allowing seperate loop frequency for tests, adjusting class naming conventions, and updating controller configs
+*   [33ma0513ec[m merging Merge branch 'aml_dev' of https://github.com/eaa3/aml into aml_dev
+[31m|[m[32m\[m  
+[31m|[m * [33m0b490b3[m adding doxygen documentation
+* [32m|[m [33ma1f4b95[m test_reach_box
+[32m|[m[32m/[m  
+* [33m2518344[m tested position controller
+* [33mc3a4f2c[m test torque controller works
+* [33mf4c2281[m solving issues with constants, indentation syntax, and module definitions
+*   [33mb478953[m Merge branch 'aml_dev' of github.com:eaa3/aml into aml_dev
+[33m|[m[34m\[m  
+[33m|[m * [33mc0052bb[m restructring aml_ctrl
+* [34m|[m [33m6d0169e[m renaming ready flag
+[34m|[m[34m/[m  
+* [33m2702cfd[m generalized master slave demo
+*   [33mc99f6e8[m added torque_cmd_1 in demo code
+[35m|[m[36m\[m  
+[35m|[m * [33m268d9cf[m adding initial transformations
+* [36m|[m [33m3e81dce[m quatdiff is changed
+[36m|[m[36m/[m  
+* [33m147366b[m adding demo for coop gravity demo for ctrl module
+*   [33m45da217[m Merge branch 'aml_dev' of github.com:eaa3/aml into aml_dev
+[1;31m|[m[1;32m\[m  
+[1;31m|[m *   [33md573733[m[33m ([1;31morigin/master[m[33m, [1;31morigin/HEAD[m[33m)[m Merge branch 'master' into aml_dev
+[1;31m|[m [1;33m|[m[1;34m\[m  
+[1;31m|[m [1;33m|[m * [33mc3ad1c6[m adding docs
+[1;31m|[m * [1;34m|[m   [33m491950b[m merging Merge branch 'aml_dev' of https://github.com/eaa3/aml into aml_dev
+[1;31m|[m [1;35m|[m[1;36m\[m [1;34m\[m  
+[1;31m|[m * [1;36m|[m [1;34m|[m [33m79175dd[m working classical controllers
+* [1;36m|[m [1;36m|[m [1;34m|[m [33m095ae74[m added utilities for data collection and io
+[1;36m|[m [1;36m|[m[1;36m/[m [1;34m/[m  
+[1;36m|[m[1;36m/[m[1;36m|[m [1;34m|[m   
+* [1;36m|[m [1;34m|[m [33m762f294[m updating camera sensor
+[1;36m|[m[1;36m/[m [1;34m/[m  
+* [1;34m|[m [33m9eecd95[m removing python header
+* [1;34m|[m [33m15edfb7[m fixing calibration issues
+* [1;34m|[m [33m72ca131[m fixing bug on axis drawing
+* [1;34m|[m [33me8300dc[m adding michael modifications
+* [1;34m|[m [33mff53ae1[m fixing package naming in launch and package files
+* [1;34m|[m [33ma548288[m re-organising the calibration package
+* [1;34m|[m [33m32a73c8[m fixing controller imports
+* [1;34m|[m [33m767371a[m integrating modules
+* [1;34m|[m [33m927492b[m added new scripts
+[1;34m|[m[1;34m/[m  
+* [33mdf363f8[m[33m ([1;32mmaster[m[33m)[m refactoring code and adding rgb and depth image to state
+*   [33mda15a32[m Merge branch 'master' of github.com:eaa3/aml
+[31m|[m[32m\[m  
+[31m|[m * [33m4b4a152[m Initial commit
+* [33m8f6039b[m setting up meta package and aml_robot
