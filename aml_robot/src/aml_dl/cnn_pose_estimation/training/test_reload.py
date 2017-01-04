@@ -67,8 +67,14 @@ prc = np.random.randn(7,7)
 saver.restore(sess, "model.ckpt")
 print("Model restored.")
 # Do some work with the model
+
+p0 = np.array([0,0,0])
+p1 = np.array([0,1,0])
+p2 = np.array([0,1,1])
+points = np.concatenate((p0,p1,p2))
+
 output = sess.run([fc_op,loss_op,fc2_output,loss_fc2], feed_dict={input_tensor: np.expand_dims(image,axis=0),
-                                 						position: np.expand_dims(np.ones(3),axis=0),
+                                 						position: np.expand_dims(points,axis=0),
                                  						state_input: np.expand_dims(state,axis=0),
                                  						action: np.expand_dims(action_groundtruth,axis=0),
                                  						precision: np.expand_dims(prc,axis=0),
