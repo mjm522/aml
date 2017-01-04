@@ -150,7 +150,7 @@ class LfD():
             rate.sleep()
             #arm.move_to_joint_position(arm_data['position'])
 
-    def save_demo_data(self):
+    def save_demo_data(self, limb_idx=0):
         btn = BaxterButtonStatus()
         
         demo_start_flag = False
@@ -166,7 +166,7 @@ class LfD():
             if demo_start_flag and (not btn.right_dash_btn_state):
                 break
 
-        #storing the sampling rate in the first element of the data set.
+        arm_demo[0]['limb_idx'] = limb_idx
         arm_demo[0]['sampling_rate'] = rate
         np.save(data_folder_path+'demo_data.npy', arm_demo)
 
@@ -175,7 +175,7 @@ def main(args):
     lfd = LfD()
     
     if 'save' in args:
-        lfd.save_demo_data()
+        lfd.save_demo_data(limb_idx=args['limb_idx'])
     
     if 'plot' in args:
         lfd.plot_demo_data()
