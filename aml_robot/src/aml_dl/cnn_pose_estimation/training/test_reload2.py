@@ -18,7 +18,7 @@ def fakeImageInput(network_params):
 
     return image, random_image
 
-nn = tf_model.multi_modal_network_fp(dim_input=network_params['image_size'],
+nn = tf_model.multi_modal_network_fp(dim_input=network_params['image_size']+32,
                                       network_config=network_params)
 
 # Add ops to save and restore all the variables.
@@ -28,7 +28,7 @@ fc_op = nn['fc_pose_out']
 # fc_action = nn['fc_action_out']
 features_op = nn['features']
 loss_op = nn['loss_pose']
-input_tensor = nn['image_input']
+input_tensor = nn['nn_input']
 position = nn['pose']
 train_op = tf_model.train_adam_step(loss_op)
 
@@ -59,7 +59,7 @@ p1 = np.array([0,1,0])
 p2 = np.array([0,1,1])
 points = np.concatenate((p0,p1,p2))
 
-output = sess.run([fc_op,loss_op,features_op], feed_dict={input_tensor: np.expand_dims(random_image,axis=0),
+output = sess.run([fc_op,loss_op,features_op], feed_dict={input_tensor: np.expand_dims(np.r_[np.zeros(32),image],axis=0),
                                  						position: np.expand_dims(points,axis=0),
                                  						# state_input: np.expand_dims(state,axis=0),
                                  						# action: np.expand_dims(action_groundtruth,axis=0),

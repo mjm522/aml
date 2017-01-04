@@ -6,9 +6,9 @@ import os, sys
 
 
 # Adding slim path
-tf_slim_path = os.environ['TF_SLIM_PATH']
-tf_slim_path = os.path.abspath(os.path.join(tf_slim_path, 'models/slim', ''))
-sys.path.append(tf_slim_path)
+# tf_slim_path = os.environ['TF_SLIM_PATH']
+# tf_slim_path = os.path.abspath(os.path.join(tf_slim_path, 'models/slim', ''))
+# sys.path.append(tf_slim_path)
 
 from nets import inception
 from preprocessing import inception_preprocessing
@@ -300,8 +300,15 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
 
     nn_input, action, precision, pose = get_input_layer_fp(dim_input, dim_output, dim_pose_output)
 
+    print "STATE IDX:", x_idx[-1]
+    print "IMAGE IDX:", img_idx[-1]
+
     state_input = nn_input[:, 0:x_idx[-1]+1]
     image_input = nn_input[:, x_idx[-1]+1:img_idx[-1]+1]
+
+    print "SHAPE INPUT:", nn_input.get_shape()
+    print "SHAPE STATE:", state_input.get_shape()
+    print "SHAPE IMAGE:", image_input.get_shape()
 
     # image goes through 3 convnet layers
     num_filters = network_config['num_filters']
@@ -367,5 +374,5 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     # nnet = TfMap.init_from_lists([nn_input, action, precision], [fc_output], [loss_action], fp=fp)
     last_conv_vars = fc_action_input
 
-    return {'state_input': state_input, 'image_input': image_input, 'pose': pose, 'fc_pose_out': fc_pose_output, 'loss_pose': loss_pose, 'features' : fp, 'init_fn': init_fn}
+    return {'nn_input': nn_input, 'pose': pose, 'fc_pose_out': fc_pose_output, 'loss_pose': loss_pose, 'features' : fp, 'init_fn': init_fn}
     # return nnet, fc_action_vars, last_conv_vars
