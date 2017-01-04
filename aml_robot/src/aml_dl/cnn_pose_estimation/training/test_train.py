@@ -45,10 +45,15 @@ image = fakeImageInput(network_params)
 
 ### Training ###
 
+p0 = np.array([0,0,0])
+p1 = np.array([0,1,0])
+p2 = np.array([0,1,1])
+points = np.concatenate((p0,p1,p2))
+
 for iteration in range(5000):
     with tf.device("/gpu:0"):
         loss = sess.run([loss_op,train_op],feed_dict={input_tensor: np.expand_dims(image,axis=0),
-                                     position: np.expand_dims(np.ones(3),axis=0)
+                                     position: np.expand_dims(points,axis=0)
                                     })
 
         # print every 50 iters
