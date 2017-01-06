@@ -281,7 +281,7 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     dim_hidden = (n_layers - 1)*[layer_size]
     dim_hidden.append(dim_output)
 
-    dim_pose_output = 9
+    dim_pose_output = 3
     dim_pose_hidden = (n_layers - 1)*[layer_size]
     dim_pose_hidden.append(dim_pose_output)
 
@@ -300,15 +300,9 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
 
     nn_input, action, precision, pose = get_input_layer_fp(dim_input, dim_output, dim_pose_output)
 
-    print "STATE IDX:", x_idx[-1]
-    print "IMAGE IDX:", img_idx[-1]
 
     state_input = nn_input[:, 0:x_idx[-1]+1]
     image_input = nn_input[:, x_idx[-1]+1:img_idx[-1]+1]
-
-    print "SHAPE INPUT:", nn_input.get_shape()
-    print "SHAPE STATE:", state_input.get_shape()
-    print "SHAPE IMAGE:", image_input.get_shape()
 
     # image goes through 3 convnet layers
     num_filters = network_config['num_filters']
@@ -338,11 +332,7 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
         }
 
 
-    image_size = inception.inception_v1.default_image_size
-
-    print "SHAPE:", image_input.get_shape()
-
-    image_input_inception = inception_preprocessing.preprocess_image(image_input[0], im_height, im_width, is_training=False)
+    image_input_inception = inception_preprocessing.preprocess_image(image_input[0], im_height, im_width, is_training=True)
 
     logits, end_points, init_fn, image_input_inception = load_inception_model(network_config,image_input)
 
@@ -374,5 +364,20 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     # nnet = TfMap.init_from_lists([nn_input, action, precision], [fc_output], [loss_action], fp=fp)
     last_conv_vars = fc_action_input
 
-    return {'nn_input': nn_input, 'pose': pose, 'fc_pose_out': fc_pose_output, 'loss_pose': loss_pose, 'features' : fp, 'init_fn': init_fn}
+    net_dict = {'nn_input': nn_input, 
+                'pose': pose, 
+                'action': action,
+                'precision': precision,
+                'fc_pose_out': fc_pose_output,
+                'fc_action_out': fc_action_output, 
+                'loss_pose': loss_pose, 
+                'loss_action': loss_action,
+                'last_conv_vars': last_conv_vars,
+                'fc_action_vars': fc_action_vars,
+                'features' : fp, 
+                'init_fn': init_fn}
+    
+
+    return net_dict
+
     # return nnet, fc_action_vars, last_conv_vars
