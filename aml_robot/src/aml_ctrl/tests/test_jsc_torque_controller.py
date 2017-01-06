@@ -1,7 +1,7 @@
 import numpy as np
 import quaternion
 import rospy
-from aml_ctrl.utilities.js_traj_generator import JSTrajGenerator
+from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 from aml_ctrl.controllers.jsc_torque_controller import JSCTorqueController
 
 def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_ori=None, goal_pos=None, goal_ori=None):

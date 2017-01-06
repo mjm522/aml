@@ -3,37 +3,26 @@ roslib.load_manifest('aml_robot')
 
 import rospy
 
-import baxter_interface
-import baxter_external_devices
-
-from std_msgs.msg import (
-    UInt16,
-)
-from baxter_core_msgs.msg import SEAJointState
-from baxter_interface import CHECK_VERSION
-from baxter_kinematics import baxter_kinematics
+import mujoco_py
+from mujoco_py import mjcore
+from mujoco_py import mjtypes
 
 import numpy as np
 import quaternion
 
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-
-
 from aml_perception import camera_sensor 
 
-#for computation of angular velocity
-from aml_lfd.utilities.utilities import compute_omg
+class MujocoRobot():
 
-#from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
+    def __init__(self, xml_path, on_state_callback=None):
 
-class BaxterArm(baxter_interface.limb.Limb):
-
-    def __init__(self, limb, on_state_callback=None):
+    	self._xml_path = xml_path
+        self._model    = mjcore.MjModel(self._xml_path)
+        self._dt       = self._model.opt.timestep
 
         self._ready = False
 
-        self._configure(limb,on_state_callback)
+        self._configure(limb, on_state_callback)
         
         self._ready = True
 
@@ -56,15 +45,15 @@ class BaxterArm(baxter_interface.limb.Limb):
         if limb == 'left':
             #secondary goal for the manipulator
             self._limb_group = 0
-            self.q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
-            self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
-            self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
+            self.q_mean  = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+            self._tuck   = np.array([-1.0, -2.07,  3.0, 2.55,  0.0, 0.01,  0.0])
+            self._untuck = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
         
         elif limb == 'right':
             self._limb_group = 1
-            self.q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
-            self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
-            self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
+            self.q_mean  = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
+            self._tuck   = np.array([1.0, -2.07, -3.0, 2.55, -0.0, 0.01,  0.0])
+            self._untuck = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
                                                             
         else:
             print "Unknown limb idex"
@@ -368,90 +357,4 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def ik(self,position,orientation=None):
         return self._kinematics.inverse_kinematics(position,orientation)
-
-
-class BaxterButtonStatus():
-    
-    def __init__(self):
-        self.left_cuff_btn   = baxter_interface.DigitalIO('left_lower_cuff')
-        self.left_dash_btn   = baxter_interface.DigitalIO('left_upper_button')
-        self.left_circle_btn = baxter_interface.DigitalIO('left_lower_button')
-
-        self.right_cuff_btn   = baxter_interface.DigitalIO('right_lower_cuff')
-        self.right_dash_btn   = baxter_interface.DigitalIO('right_upper_button')
-        self.right_circle_btn = baxter_interface.DigitalIO('right_lower_button')
-
-        # DigitalIO('<limb_name>_upper_button' )  # 'dash' btn
-        # DigitalIO('<limb_name>_lower_button')   # 'circle' btn
-        # DigitalIO('<limb_name>_lower_cuff')    # cuff squeeze
-
-        #it pass the cuff sensor state to _cuff_cb
-        self.left_cuff_btn.state_changed.connect(self.left_cuff_callback) 
-                                                        
-        #it pass the dash button state to _dash_cb
-        self.left_dash_btn.state_changed.connect(self.left_dash_callback) 
-                                                        
-        self.left_circle_btn.state_changed.connect(self.left_circle_callback)
-
-        #it pass the cuff sensor state to _cuff_cb
-        self.right_cuff_btn.state_changed.connect(self.right_cuff_callback) 
-                                                        
-        #it pass the dash button state to _dash_cb
-        self.right_dash_btn.state_changed.connect(self.right_dash_callback) 
-                                  
-        #it pass the circle button state to _circle_cb                      
-        self.right_circle_btn.state_changed.connect(self.right_circle_callback)
-        
-        self.left_gripper  = baxter_interface.Gripper('left', CHECK_VERSION)
-        self.right_gripper = baxter_interface.Gripper('right', CHECK_VERSION)                                              
-
-        self.left_cuff_btn_state = False
-        self.left_dash_btn_state = False
-        self.left_dash_btn_value = False
-        self.left_circle_btn_state = False
-
-        self.right_cuff_btn_state = False
-        self.right_dash_btn_state = False
-        self.right_dash_btn_value = False
-        self.right_circle_btn_state = False
-
-    def left_cuff_callback(self, value):
-        self.left_cuff_btn_state = value
-
-    def left_dash_callback(self, value):
-        self.left_dash_btn_value = value
-        if self.left_dash_btn_value:
-            if self.left_dash_btn_state:
-                self.left_dash_btn_state = False
-            else:
-                self.left_dash_btn_state = True
-
-    def left_circle_callback(self, value):
-        if value and not self.left_dash_btn_value:
-            if self.left_circle_btn_state:
-                self.left_gripper.open()
-                self.left_circle_btn_state = False
-            else:
-                self.left_gripper.close()
-        self.left_circle_btn_state = True
-
-    def right_cuff_callback(self, value):
-        self.right_cuff_btn_state = value
-
-    def right_dash_callback(self, value):
-        self.right_dash_btn_value = value
-        if self.right_dash_btn_value:
-            if self.right_dash_btn_state:
-                self.right_dash_btn_state = False
-            else:
-                self.right_dash_btn_state = True
-
-    def right_circle_callback(self, value):
-        if value and not self.right_dash_btn_value:
-            if self.right_circle_btn_state:
-                self.right_gripper.open()
-                self.right_circle_btn_state = False
-            else:
-                self.right_gripper.close()
-        self.right_circle_btn_state = True
 

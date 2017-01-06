@@ -3,7 +3,7 @@ import quaternion
 import rospy
 from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
-from aml_lfd.utilities.utilities import get_ee_traj, plot_demo_data, get_sampling_rate
+from aml_lfd.utilities.utilities import get_os_traj, plot_demo_data, get_sampling_rate
 
 def test_position_controller(robot_interface, pos_traj, ori_traj=None):
     #0 is left and 1 is right
@@ -72,6 +72,6 @@ if __name__ == '__main__':
 
     #plot_demo_data(demo_idx=demo_idx)
 
-    pos_traj, ori_traj  = get_ee_traj(demo_idx=demo_idx)
+    pos_traj, ori_traj,_,_,_,_  = get_os_traj(demo_idx=demo_idx)
     
     test_position_controller(robot_interface=arm, pos_traj=pos_traj, ori_traj=ori_traj)

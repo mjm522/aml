@@ -6,7 +6,7 @@ from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
 
 from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
-from aml_lfd.utilities.utilities import get_ee_traj
+from aml_lfd.utilities.utilities import get_os_traj
 
 def plot_traj(des_path, tau=1.0):
 
@@ -92,8 +92,8 @@ if __name__ == '__main__':
 
     demo_idx = 6 #for 4-6: tau = 0.27; for 1-3: tau = 0.1
 
-    des_path, _ = get_ee_traj(demo_idx=demo_idx) #tau=0.1 makes it match
-    # des_path = get_ee_traj(debug=True) #tau=2.0 makes it almost match
+    des_path, _, _, _, _, _ = get_os_traj(demo_idx=demo_idx) #tau=0.1 makes it match
+    # des_path = get_os_traj(debug=True) #tau=2.0 makes it almost match
 
     #larger the tau, faster the system would reach the goal
     plot_traj(des_path, tau=0.27)

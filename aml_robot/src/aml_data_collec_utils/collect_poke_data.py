@@ -12,7 +12,8 @@ import quaternion
 
 from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
 from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
-from aml_ctrl.controllers.osc_moveit_baxter_controller import BaxterMoveItController
+from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.osc_jt_torque_controller import OSCJTTorqueController
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 from aml_ctrl.utilities.lin_interp import LinInterp
 from config import BOX_TYPE_1
@@ -50,6 +51,7 @@ class CollectPokeData():
         self._robot = robot_interface
 
         # self.calib_extern_cam()
+        # print asfdkla
 
         self._interp_fn = MinJerkInterp(dt=0.5, tau=15.)
         # self._interp_fn = LinInterp(dt=0.5, tau=15.)
@@ -68,9 +70,6 @@ class CollectPokeData():
 
         self._tfmn_time    = None
 
-        self._box_length  = box_config['length']
-        self._box_breadth = box_config['breadth']
-        self._box_height  = box_config['height']
         self._reset_jnt_pos = get_reset_jnt_pos()
 
     def calib_extern_cam(self):
@@ -108,11 +107,11 @@ class CollectPokeData():
 
         np.save('rel_tip_pos.npy', rel_tip_pos)
 
-        # print "ee_pos", ee_pos
-        # print "tip pose", tip_pos
-        # print "box_pos", box_pos
-        # print "diff pos", box_pos-ee_pos
-        # print "rel_tip_pose", rel_tip_pos
+        print "ee_pos", ee_pos
+        print "tip pose", tip_pos
+        print "box_pos", box_pos
+        print "diff pos", box_pos-ee_pos
+        print "rel_tip_pose", rel_tip_pos
 
         #HACK, FIX THIS
 
@@ -180,56 +179,112 @@ def reach_point(robot_interface, goal_pos, goal_ori):
     execute_trajectory(robot_interface=robot_interface, trajectory=interp_traj, rate=rate)
 
 
+def execute_trajectory_jt(robot_interface, goal_pos, goal_ori):
+    rate = rospy.Rate(10)
+
+    ctrlr  = OSCJTTorqueController(robot_interface)
+
+    ctrlr.set_active(True)
+
+    robot_pos, robot_ori = robot_interface.get_ee_pose()
+
+    if goal_ori is None:
+        goal_ori = robot_ori
+
+    error = np.linalg.norm(goal_pos-robot_pos)
+
+    while error > 0.01:
+
+        ctrlr.set_goal(goal_pos=goal_pos, 
+                       goal_ori=goal_ori, 
+                       orientation_ctrl = True)
+
+        lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
+
+        rate.sleep()
+
+        error = np.linalg.norm(goal_pos-robot_pos)
+
+    lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=10)
+    ctrlr.set_active(False)
+
+def get_pre_push_pose(pre_push_pos):
+
+    #in box frame offset from ee_pos if the tip is touching the box top
+    box_top      = np.array([-0.00556044, 0.15976646, -0.00500357])
+
+    box_dim      = np.array([BOX_TYPE_1['length'], BOX_TYPE_1['height'], BOX_TYPE_1['breadth']])
+
+    if pre_push_pos==0:
+
+        return box_top
+
+    elif pre_push_pos==1:
+
+        return box_top + np.multiply(np.array([0., -0.9, -0.9]), box_dim)
+
+    elif pre_push_pos==2:
+
+        return box_top + np.multiply(np.array([-0.7, -0.9, 0.]), box_dim)
+
+    elif pre_push_pos==4:
+
+        return box_top + np.multiply(np.array([-0.7, -0.9, 0.]), box_dim)
+
+
+def get_push_pose(push_side):
+
+    if push_side==1:
+
+        return get_pre_push_pose(1) + np.array([0., 0., 10.])
+
+    elif push_side==2:
+
+        return get_pre_push_pose(2) + np.array([10., 0., 0.])
+
+    elif push_side==4:
+
+        return get_pre_push_pose(4) + np.array([-10., 0., 0.])
+
+
 def reach_pre_push_pose(robot_interface, pre_push_pos=0):
     cpd = CollectPokeData(robot_interface=robot_interface)
 
     robot_interface.untuck_arm()
 
     box_pos, box_ori = cpd.get_box_pose()
-    
-    if pre_push_pos==0:
-        #top of the box
-        #if the box in default location, this is the position
-        #np.array([0.075, 0., 0.2])
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.00686956, 0.19261781, 0.09206622]))
+    if pre_push_pos==0:
+
+        print "Chosen side : top"
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_pre_push_pose(pre_push_pos))
         goal_ori = None
 
     elif pre_push_pos==1:
-        #reach pre-push side A
-        #if the box in default location, this is the position
-        #np.array([-0.05, 0., 0.2])
-
-        #0.20360926
 
         print "Chosen side : A"
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.00554294, 0.15360926, -0.03182051]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_pre_push_pose(pre_push_pos))
         goal_ori = None
 
     elif pre_push_pos==2:
-        #reach pre-push side B
-        #if the box in default location, this is the position
-        #np.array([0.075, -0.15, 0.2])
-        #0.19425561
 
         print "Chosen side : B"
         
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.15644594, 0.15425561, 0.07690531]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_pre_push_pose(pre_push_pos))
         goal_ori = None
 
     elif pre_push_pos==4:
-        #reach pre-push side D
-        #if the box in default location, this is the position
-        #np.array([0.075, 0.15, 0.2])
-        #0.19071947
 
         print "Chosen side : D"
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.14285224, 0.15071947, 0.10650972]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_pre_push_pose(pre_push_pos))
         goal_ori = None
 
-    reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    # reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+
+    execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
 
 def push_box(robot_interface, push_side=1):
     cpd = CollectPokeData(robot_interface=robot_interface)
@@ -239,22 +294,24 @@ def push_box(robot_interface, push_side=1):
     if push_side==1:
         #push side A
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.00554294, 0.15360926, 0.08182051]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_push_pose(push_side))
         goal_ori = None
 
     elif push_side==2:
         #push side B
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([ 0.0344594, 0.15425561, 0.07690531]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_push_pose(push_side))
         goal_ori = None
 
     elif push_side==4:
         #push side D
 
-        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.03285224, 0.15071947, 0.10650972]))
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), get_push_pose(push_side))
         goal_ori = None
 
-    reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    # reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+
+    execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
 
 
 def main(robot_interface):
@@ -276,11 +333,11 @@ def main(robot_interface):
 
         side = side_list[random.randint(0,2)]
 
-        print "Moving to neutral position ...."
+        print "Moving to neutral position ..."
         
         robot_interface.untuck_arm()
 
-        print "Moving to pre-push position ...."
+        print "Moving to pre-push position ..."
         
         reach_pre_push_pose(robot_interface=robot_interface, pre_push_pos=side)
 
@@ -289,12 +346,25 @@ def main(robot_interface):
         push_box(robot_interface=robot_interface, push_side=side)
 
 
+def debug_main(robot_interface):
+
+    cpd = CollectPokeData(robot_interface=robot_interface)
+
+    # while True:
+    #     cpd.get_tip_pose()
+
+    reach_pre_push_pose(robot_interface=robot_interface, pre_push_pos=1)
+    push_box(robot_interface, push_side=1)
+
+
 if __name__ == "__main__":
     rospy.init_node('poke_box', anonymous=True)
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
-    main(arm)
+    # main(arm)
+    debug_main(arm)
+
     
 
     

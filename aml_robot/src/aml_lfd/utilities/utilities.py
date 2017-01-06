@@ -32,11 +32,16 @@ def load_demo_data(demo_idx=1, debug=False):
 
     return demo_data
 
-def get_ee_traj(demo_idx=1, debug=False):
+def get_os_traj(demo_idx=1, debug=False):
     
     demo_data = load_demo_data(demo_idx=demo_idx, debug=debug)
-    ee_pos_list = []
-    ee_ori_list = []
+    ee_pos_traj = []
+    ee_vel_traj = []
+    ee_acc_traj = []
+    ee_ori_traj = []
+    ee_omg_traj = []
+    ee_ang_traj = []
+
 
     if debug:
 
@@ -45,13 +50,33 @@ def get_ee_traj(demo_idx=1, debug=False):
     else:
 
         for arm_data in demo_data:
-            ee_pos_list.append(arm_data['ee_pos'])
-            ee_ori_list.append(arm_data['ee_ori'])
+            ee_pos_traj.append(arm_data['ee_pos'])
+            ee_ori_traj.append(arm_data['ee_ori'])
+            
+            if arm_data.has_key('ee_vel'):
+                ee_vel_traj.append(arm_data['ee_vel'])
+            
+            if arm_data.has_key('ee_omg'):
+                ee_omg_traj.append(arm_data['ee_omg'])
 
-        ee_pos_list =  np.asarray(ee_pos_list).squeeze()
-        ee_ori_list =  quaternion.as_quat_array(np.asarray(ee_ori_list).squeeze())
+        #check is the list is empty
+        if ee_vel_traj:
+        
+            ee_vel_traj =  np.asarray(ee_vel_traj).squeeze()
+            ee_acc_traj =  np.diff(ee_vel_traj, axis=0)
+            ee_acc_traj =  np.vstack([np.zeros_like(ee_acc_traj[0]), ee_acc_traj])
 
-    return ee_pos_list, ee_ori_list
+        #check is the list is empty
+        if  ee_omg_traj:
+
+            ee_omg_traj =  np.asarray(ee_omg_traj).squeeze()
+            ee_ang_traj =  np.diff(ee_omg_traj, axis=0)
+            ee_ang_traj =  np.vstack([np.zeros_like(ee_ang_traj[0]), ee_ang_traj])
+
+        ee_pos_traj =  np.asarray(ee_pos_traj).squeeze()
+        ee_ori_traj =  quaternion.as_quat_array(np.asarray(ee_ori_traj).squeeze())
+
+    return ee_pos_traj, ee_ori_traj, ee_vel_traj, ee_omg_traj, ee_acc_traj, ee_ang_traj
 
 def get_js_traj(demo_idx=1):
     #this function takes the position and velocity of a demonstrated data
@@ -78,7 +103,7 @@ def get_sampling_rate(demo_idx=1):
 
 def plot_demo_data(demo_idx=1):
 
-    ee_list, _ = get_ee_traj(demo_idx=demo_idx)
+    ee_list, _, _, _, _, _  = get_os_traj(demo_idx=demo_idx)
 
     js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(demo_idx=demo_idx)
 

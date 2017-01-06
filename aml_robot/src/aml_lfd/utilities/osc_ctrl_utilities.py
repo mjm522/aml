@@ -11,7 +11,7 @@ from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 
 data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
 
-def save_test_locations(arm, btn_state, limb_idx, num_points=3):
+def save_test_locations(arm, limb_idx, num_points=3):
 
     arm_test_points = []
     
@@ -143,7 +143,7 @@ def main(args):
 
     test_saved_test_locations(arm)
     
-    # save_test_locations(arm=arm, btn_state=btn_state, limb_idx=limb_idx)
+    # save_test_locations(arm=arm, limb_idx=limb_idx, num_points=4)
 
 
 

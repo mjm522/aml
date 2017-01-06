@@ -72,6 +72,7 @@ class ClassicalController(object):
 
     #this is for operation space controller
     def set_goal(self, goal_pos, goal_ori, goal_vel=None, goal_omg=None, orientation_ctrl = True):
+        
         self._goal_pos = goal_pos
         self._goal_ori = goal_ori
 

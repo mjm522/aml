@@ -53,6 +53,13 @@ class MinJerkInterp():
         x   = c1*t5 + c2*t4 + c3*t3 + c4*t2 + c5*t1 + c6
         xd  = 5.*c1*t4 + 4.*c2*t3 + 3.*c3*t2 + 2.*c4*t1 + c5
         xdd = 20.*c1*t3 + 12.*c2*t2 + 6.*c3*t1 + 2.*c4
+
+        if np.isnan(x) or np.isnan(xd) or np.isnan(xdd):
+            
+            x   = 0.
+            xd  = 0.
+            xdd = 0.
+
         return x, xd, xdd
 
 
@@ -101,8 +108,7 @@ class MinJerkInterp():
             for i in range(len(self.timesteps)):
                 t,td,tdd = self.min_jerk_step(t, td, tdd, goal, self.tau-i*self.dt)
                 T[i,:]   = np.array([t, td, tdd])
-                	#print i, '\t', T[i,:]
-            #print T[:,j]
+
             final_q[:,j] = T[:,0].copy()
 
         #normalize the quarternions
@@ -136,19 +142,21 @@ class MinJerkInterp():
         final_q, final_w, final_al  = self.min_jerk_step_qt()
 
         final_p, final_v, final_a   = self.min_jerk_step_pos()
-
+    
         #position trajectory
-        self.min_jerk_traj['pos_traj'] = final_p
+        self.min_jerk_traj['pos_traj'] = final_p 
         #velocity trajectory
         self.min_jerk_traj['vel_traj'] = final_v
         #acceleration trajectory
         self.min_jerk_traj['acc_traj'] = final_al
+
+
         #orientation trajectory
         self.min_jerk_traj['ori_traj'] = final_q
         #angular velocity trajector
         self.min_jerk_traj['omg_traj'] = final_w
         #angular acceleration trajectory
-        self.min_jerk_traj['alp_traj'] = final_a
+        self.min_jerk_traj['ang_traj'] = final_a
 
         return self.min_jerk_traj
 
@@ -174,9 +182,9 @@ class MinJerkInterp():
     
         plt.subplot(313)
         plt.title('alpha')
-        plt.plot(min_jerk_traj['alp_traj'][:,0]) 
-        plt.plot(min_jerk_traj['alp_traj'][:,1]) 
-        plt.plot(min_jerk_traj['alp_traj'][:,2])
+        plt.plot(min_jerk_traj['ang_traj'][:,0]) 
+        plt.plot(min_jerk_traj['ang_traj'][:,1]) 
+        plt.plot(min_jerk_traj['ang_traj'][:,2])
 
         plt.figure(2)
         plt.subplot(311)
