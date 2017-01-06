@@ -25,8 +25,8 @@ SENSOR_DIMS = {
 
 network_params = {
     'num_filters': [5, 5, NUM_FP],
-    'obs_include': [JOINT_ANGLES, JOINT_VELOCITIES,END_EFFECTOR_POINTS,END_EFFECTOR_POINT_VELOCITIES,RGB_IMAGE], 
-    'obs_vector_data': [JOINT_ANGLES, JOINT_VELOCITIES,END_EFFECTOR_POINTS,END_EFFECTOR_POINT_VELOCITIES,RGB_IMAGE],
+    'obs_include': [JOINT_ANGLES, JOINT_VELOCITIES,RGB_IMAGE], 
+    'obs_vector_data': [JOINT_ANGLES, JOINT_VELOCITIES,RGB_IMAGE],
     'obs_image_data': [RGB_IMAGE],
     'batch_size': 25,
     'image_width': IMAGE_WIDTH,
