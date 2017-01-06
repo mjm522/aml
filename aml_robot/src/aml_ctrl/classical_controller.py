@@ -24,10 +24,12 @@ class ClassicalController(object):
 
         self._error = {'linear' : np.zeros(3), 'angular' : np.zeros(3), 'js_pos' : np.zeros(self._robot._nu)}
 
+        #for operation space controller
         self._orientation_ctrl = config['use_orientation_ctrl']
-
         self._lin_thr = config['linear_error_thr']
         self._ang_thr = config['angular_error_thr']
+
+        #for joint space controller
         self._js_thr = config['js_pos_error_thr']
 
         self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
@@ -83,13 +85,13 @@ class ClassicalController(object):
         self._has_reached_goal = False
 
     #this is for joint space controller
-    def set_goal(self, goal_js_pos, goal_js_vel, goal_js_acc):
+    # def set_goal(self, goal_js_pos, goal_js_vel, goal_js_acc):
         
-        self._goal_js_pos = goal_js_pos
-        self._goal_js_vel = goal_js_vel
-        self._goal_js_acc = goal_js_acc
+    #     self._goal_js_pos = goal_js_pos
+    #     self._goal_js_vel = goal_js_vel
+    #     self._goal_js_acc = goal_js_acc
 
-        self._has_reached_goal = False
+    #     self._has_reached_goal = False
 
 
     # Wait timeout seconds for reaching the last set goal

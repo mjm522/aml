@@ -26,6 +26,7 @@ OSC_TORQUE_CNTLR = {
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.12,
     'angular_error_thr': 0.3,
+    'js_pos_error_thr' :0.1,
     'deactivate_wait_time': 5,
 }
 
@@ -56,6 +57,7 @@ OSC_POSTN_CNTLR = {
     'pos_threshold': 0.0001,
     'linear_error_thr': 0.05, # error of 2 cm
     'angular_error_thr': 0.3, # allowing angular errors of 0.3 radians
+    'js_pos_error_thr' :0.1,
     'dt' : 0.01
 }
 

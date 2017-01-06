@@ -55,16 +55,16 @@ class CollectPokeData():
         # self._interp_fn = LinInterp(dt=0.5, tau=15.)
         self._box_tf = TransformListener()
 
-        # self._ctrlr    = BaxterMoveItController()
-        # self._ctrlr  = OSCTorqueController(robot_interface)
-        self._ctrlr  = OSCPositionController(robot_interface)
-        self._ctrlr.set_active(True)
-
         self._goal_pos_old = None
         self._goal_ori_old = None
         self._goal_pos_new = None
         self._goal_ori_new = None
-        self._interp_traj  = None
+
+        self._goal_pre_push_pos_new = None
+        self._goal_pre_push_ori_new = None
+
+        self._interp_traj_push  = None
+        self._interp_traj_pre_push  = None
 
         self._tfmn_time    = None
 
@@ -73,83 +73,10 @@ class CollectPokeData():
         self._box_height  = box_config['height']
         self._reset_jnt_pos = get_reset_jnt_pos()
 
-        #this is the option to choose to opt between various locations on the box
-        self.update_choice()
-
     def calib_extern_cam(self):
         hand_eye_calib = camera_calib.BaxterEyeHandCalib()
         hand_eye_calib.self_calibrate()
         rospy.sleep(10)
-
-    def reset_arm(self):
-        #reset the arm under consideration to the position
-        self._robot.exec_position_cmd(self._reset_jnt_pos[self._robot._limb])
-        # self._robot.untuck_arm()
-
-    def plan_traj(self):
-        #minimum jerk trajectory for left arm
-        self.reset_arm()
-        
-        robot_pos, robot_ori = self._robot.get_ee_pose()
-
-        # box_pos, box_ori = self.get_box_pose()
-        # inter_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori),  np.array([0.0, 0.2, 0.]))
-
-        # self._interp_fn.configure(robot_pos, robot_ori, inter_pos, box_ori)
-
-        # #this trajectory will help just to reach a point above the box
-        # interp_traj_curr_tmp   = self._interp_fn.get_interpolated_trajectory()
-
-        # self._interp_fn.configure(inter_pos, box_ori, self._goal_pos_new, self._goal_ori_new)
-
-        # #this trajectory will help just to reach from the point above the box to the side of the box
-        # interp_traj_tmp_goal   = self._interp_fn.get_interpolated_trajectory()
-
-        # self._interp_traj = {}
-        # self._interp_traj['pos_traj'] = np.vstack([interp_traj_curr_tmp['pos_traj'], interp_traj_tmp_goal['pos_traj']])
-        # #these are quaternions and hence hstack
-        # self._interp_traj['ori_traj'] = np.hstack([interp_traj_curr_tmp['ori_traj'], interp_traj_tmp_goal['ori_traj']])
-        # self._interp_traj['vel_traj'] = np.vstack([interp_traj_curr_tmp['vel_traj'], interp_traj_tmp_goal['vel_traj']])
-        # self._interp_traj['omg_traj'] = np.vstack([interp_traj_curr_tmp['omg_traj'], interp_traj_tmp_goal['omg_traj']])
-
-        self._interp_fn.configure(robot_pos, robot_ori, self._goal_pos_new, self._goal_ori_new)
-
-        self._interp_traj   = self._interp_fn.get_interpolated_trajectory()
-
-    def rand_location_on_box(self, choice=1):
-        #this function randomly chooses between four locations
-        #on the box
-        if choice == 1:
-            vect = np.array([0.3,  -0.8, 0.])
-        elif choice == 2:
-            vect = np.array([-0.3, -0.8, 0.])
-        elif choice == 3:
-            vect = np.array([0.,   -0.8, -0.3])
-        else:
-            vect = np.array([0.,   -0.8, 0.3])
-
-        return np.multiply(vect, np.array([self._box_length, self._box_height, self._box_breadth]))
-
-    def compute_goal_pose(self):
-        box_pos, box_ori = self.get_box_pose()
-        goal_pos  = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), self.rand_location_on_box(self._choice))
-        
-        self._goal_pos_new = goal_pos
-        self._goal_ori_new = box_ori
-
-        if (self._goal_pos_old is None) and (self._goal_ori_old is None):
-            self._goal_pos_old = goal_pos
-            self._goal_ori_old = box_ori
-
-    def check_change_goal_pose(self):
-        self.compute_goal_pose()
-
-        if (np.linalg.norm(self._goal_pos_new-self._goal_pos_old) < 0.05) and (self._interp_traj is not None):
-            return False
-        else:
-            self._goal_pos_old = self._goal_pos_new
-            self._goal_ori_old = self._goal_ori_new
-            return True
 
     def get_box_pose(self):
 
@@ -170,18 +97,164 @@ class CollectPokeData():
 
         return box_pos, box_ori
 
+    def get_tip_pose(self):
+        box_pos, box_ori = self.get_box_pose()
+        ee_pos,  ee_ori = self._robot.get_ee_pose()
 
-    def update_traj(self):
-        #update the traj only if there is change in goal position
-        if self.check_change_goal_pose():
-            self.plan_traj()
-            return True
+        tip_pos = box_pos + np.array([0., 0.0, 0.096])
+        tip_ori = ee_ori
+
+        rel_tip_pos = tip_pos - ee_pos
+
+        np.save('rel_tip_pos.npy', rel_tip_pos)
+
+        # print "ee_pos", ee_pos
+        # print "tip pose", tip_pos
+        # print "box_pos", box_pos
+        # print "diff pos", box_pos-ee_pos
+        # print "rel_tip_pose", rel_tip_pos
+
+        #HACK, FIX THIS
+
+def execute_trajectory(robot_interface, trajectory, rate):
+
+    ctrlr  = OSCPositionController(robot_interface)
+    # ctrlr    = BaxterMoveItController()
+    # ctrlr  = OSCTorqueController(robot_interface)
+    ctrlr.set_active(True)
+
+    t = 0
+    n_steps = len(trajectory['pos_traj'])
+
+    while t < n_steps:
+    
+        goal_pos  = trajectory['pos_traj'][t]
+        goal_ori  = trajectory['ori_traj'][t]
+        goal_vel  = trajectory['vel_traj'][t]
+        goal_omg  = trajectory['omg_traj'][t]
+
+        print "Sending goal ",t, " goal_pos:", goal_pos.ravel()
+
+        if np.any(np.isnan(goal_pos)):
+
+            print "Goal", t, "is NaN, that is not good, we will skip it!"
+
         else:
-            return False
+            
+            ctrlr.set_goal(goal_pos=goal_pos, 
+                           goal_ori=goal_ori, 
+                           goal_vel=goal_vel, 
+                           goal_omg=goal_omg, 
+                           orientation_ctrl = True)
 
-    def update_choice(self):
-        #not choosing 4, it causes singularity
-          self._choice = random.randint(1,3)
+            # print "Waiting..." 
+            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
+            # print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
+
+        t = (t+1)
+
+        rate.sleep()
+
+        finished = (t == n_steps)
+
+    lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=10)
+    ctrlr.set_active(False)
+
+    return finished
+
+def reach_point(robot_interface, goal_pos, goal_ori):
+
+    interp_fn = MinJerkInterp()
+
+    rate = rospy.Rate(10)
+
+    robot_pos, robot_ori = robot_interface.get_ee_pose()
+
+    if goal_ori is None:
+        goal_ori = robot_ori
+    
+    interp_fn.configure(robot_pos, robot_ori, goal_pos, goal_ori)
+
+    interp_traj  = interp_fn.get_interpolated_trajectory()
+
+    execute_trajectory(robot_interface=robot_interface, trajectory=interp_traj, rate=rate)
+
+
+def reach_pre_push_pose(robot_interface, pre_push_pos=0):
+    cpd = CollectPokeData(robot_interface=robot_interface)
+
+    robot_interface.untuck_arm()
+
+    box_pos, box_ori = cpd.get_box_pose()
+    
+    if pre_push_pos==0:
+        #top of the box
+        #if the box in default location, this is the position
+        #np.array([0.075, 0., 0.2])
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.00686956, 0.19261781, 0.09206622]))
+        goal_ori = None
+
+    elif pre_push_pos==1:
+        #reach pre-push side A
+        #if the box in default location, this is the position
+        #np.array([-0.05, 0., 0.2])
+
+        #0.20360926
+
+        print "Chosen side : A"
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.00554294, 0.15360926, -0.03182051]))
+        goal_ori = None
+
+    elif pre_push_pos==2:
+        #reach pre-push side B
+        #if the box in default location, this is the position
+        #np.array([0.075, -0.15, 0.2])
+        #0.19425561
+
+        print "Chosen side : B"
+        
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.15644594, 0.15425561, 0.07690531]))
+        goal_ori = None
+
+    elif pre_push_pos==4:
+        #reach pre-push side D
+        #if the box in default location, this is the position
+        #np.array([0.075, 0.15, 0.2])
+        #0.19071947
+
+        print "Chosen side : D"
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.14285224, 0.15071947, 0.10650972]))
+        goal_ori = None
+
+    reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+
+def push_box(robot_interface, push_side=1):
+    cpd = CollectPokeData(robot_interface=robot_interface)
+
+    box_pos, box_ori = cpd.get_box_pose()
+
+    if push_side==1:
+        #push side A
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([0.00554294, 0.15360926, 0.08182051]))
+        goal_ori = None
+
+    elif push_side==2:
+        #push side B
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([ 0.0344594, 0.15425561, 0.07690531]))
+        goal_ori = None
+
+    elif push_side==4:
+        #push side D
+
+        goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-0.03285224, 0.15071947, 0.10650972]))
+        goal_ori = None
+
+    reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
 
 
 def main(robot_interface):
@@ -190,79 +263,30 @@ def main(robot_interface):
     
     n_steps = len(cpd._interp_fn.timesteps)
 
-    finished = False
+    push_finished = True
+    pre_push_finished = True
+
     t = 0
 
     rate = rospy.Rate(10)
 
+    side_list = [1,2,4]
+
     while not rospy.is_shutdown():# and not finished:
-  
-        cpd.get_box_pose()
 
-        if finished:
-            #once the earlier rollout is done
-            #choose a different location
-            #on the box
-            cpd.update_choice()
+        side = side_list[random.randint(0,2)]
 
-        #reset the index if there is a change in the trajectory
-        if (cpd.update_traj()):
-            t = 0
-            finished = False
-            print "Choice is \t", cpd._choice
-            print "Detected change in position, trajectory updated, moving to neutral pose..."
+        print "Moving to neutral position ...."
+        
+        robot_interface.untuck_arm()
 
-        error_lin = np.linalg.norm(cpd._ctrlr._error['linear'])
+        print "Moving to pre-push position ...."
+        
+        reach_pre_push_pose(robot_interface=robot_interface, pre_push_pos=side)
 
-        if not finished:
-            
-            goal_pos  = cpd._interp_traj['pos_traj'][t]
-            goal_ori  = cpd._interp_traj['ori_traj'][t]
-            goal_vel  = cpd._interp_traj['vel_traj'][t]
-            goal_omg  = cpd._interp_traj['omg_traj'][t]
+        print "Gonna push the box ..."
 
-            print "Sending goal ",t, " goal_pos:", goal_pos.ravel()
-
-            if np.any(np.isnan(goal_pos)):
-
-                print "Goal", t, "is NaN, that is not good, we will skip it!"
-
-            else:
-                cpd._ctrlr.set_goal(goal_pos=goal_pos, 
-                                    goal_ori=goal_ori, 
-                                    goal_vel=goal_vel, 
-                                    goal_omg=goal_omg, 
-                                    orientation_ctrl = False)
-
-                # print "Waiting..." 
-                lin_error, ang_error, success, time_elapsed = cpd._ctrlr.wait_until_goal_reached(timeout=1.0)
-                # print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
-
-            t = (t+1)
-            finished = (t == n_steps)
-
-            rate.sleep()
-
-    lin_error, ang_error, success, time_elapsed = cpd._ctrlr.wait_until_goal_reached(timeout=10)
-    cpd._ctrlr.set_active(False)
-
-def moveit_main(robot_interface):
-
-    cpd = CollectPokeData(robot_interface=robot_interface)
-    
-    limb_group = robot_interface._limb_group
-
-    cpd._ctrlr.set_group_handles(limb_group=limb_group)
-    # cpd._ctrlr.self_test(limb_group=limb_group)
-    # cpd._ctrlr.add_static_objects_to_scene(limb_group=limb_group, obj_pos=None, obj_ori=None)
-    
-    cpd.compute_goal_pose()
-    
-    plan = cpd._ctrlr.get_plan(limb_group=limb_group, pos=cpd._goal_pos_new, ori=cpd._goal_ori_new, wait_time=15)
-    
-    # cpd._ctrlr.execute_plan(limb_group=limb_group, plan=plan, real_robot=True)
-    
-    cpd._ctrlr.clean_shutdown()
+        push_box(robot_interface=robot_interface, push_side=side)
 
 
 if __name__ == "__main__":
@@ -270,10 +294,7 @@ if __name__ == "__main__":
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
-    # arm.untuck_arm()
     main(arm)
-    # set_reset_jnt_pos()
-    # moveit_main(arm)
     
 
     

@@ -204,7 +204,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         #if beyond a certain threshold
         if np.linalg.norm(curr_q-cmd) > 0.5:
             
-            interp=10 #number of interpolation steps
+            interp=5 #number of interpolation steps
 
             jnt_cmds = np.zeros((self._nu,interp))
             
@@ -371,6 +371,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
 
 class BaxterButtonStatus():
+    
     def __init__(self):
         self.left_cuff_btn   = baxter_interface.DigitalIO('left_lower_cuff')
         self.left_dash_btn   = baxter_interface.DigitalIO('left_upper_button')

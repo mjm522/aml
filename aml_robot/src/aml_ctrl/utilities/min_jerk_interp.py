@@ -1,5 +1,6 @@
 import numpy as np
 import quaternion
+import copy
 
 from aml_lfd.utilities.utilities import compute_w
 
@@ -11,14 +12,14 @@ class MinJerkInterp():
         self.min_jerk_traj = {}
 
     def configure(self, start_pos, start_qt, goal_pos, goal_qt):
-        self.start_pos = start_pos
-        self.goal_pos  = goal_pos
+        self.start_pos = copy.deepcopy(start_pos)
+        self.goal_pos  = copy.deepcopy(goal_pos)
         if isinstance(start_qt, np.quaternion):
             start_qt = quaternion.as_float_array(start_qt)[0]
         if isinstance(goal_qt, np.quaternion):
             goal_qt = quaternion.as_float_array(goal_qt)[0]
-        self.start_qt  = start_qt
-        self.goal_qt   = goal_qt
+        self.start_qt  = copy.deepcopy(start_qt)
+        self.goal_qt   = copy.deepcopy(goal_qt)
 
     def min_jerk_step(self, x, xd, xdd, goal, tau):
         # function [x,xd,xdd] = min_jerk_step(x,xd,xdd,goal,tau, dt) computes
