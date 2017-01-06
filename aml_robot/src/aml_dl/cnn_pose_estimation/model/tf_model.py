@@ -332,11 +332,7 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
         }
 
 
-    image_size = inception.inception_v1.default_image_size
-
-    print "SHAPE:", image_input.get_shape()
-
-    image_input_inception = inception_preprocessing.preprocess_image(image_input[0], im_height, im_width, is_training=False)
+    image_input_inception = inception_preprocessing.preprocess_image(image_input[0], im_height, im_width, is_training=True)
 
     logits, end_points, init_fn, image_input_inception = load_inception_model(network_config,image_input)
 
