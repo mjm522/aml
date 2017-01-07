@@ -5,17 +5,18 @@ from aml_robot.baxter_ik import IKBaxter
 from aml_robot.baxter_robot import BaxterArm
 from store_replay_os_poses import get_saved_test_locations
 
-def test_ik_robot(ik_client, robot_interface, test_poses):
+def test_ik_robot(robot_interface, test_poses):
 
-    pos, ori = ik_client.test_pose()
+    pos, ori = robot_interface._ik_baxter.test_pose()
+    
 
     for k in range(0,4):
 
         pose = test_poses[k]
+        
+        print pose['ee_point'], pose['ee_ori']
 
-        ik_client.configure_ik_service()
-    
-        success, soln =  ik_client.ik_servive_request(pos=pose['ee_point'], ori=pose['ee_ori'])
+        soln =  robot_interface.ik(pos=pose['ee_point'], ori=pose['ee_ori'])
 
         print "soln \t", np.round(soln, 3)
 
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     rospy.init_node('ik_robot', anonymous=True)
     
     limb = 'left'
-    
-    test_ik_robot(IKBaxter(limb=limb), BaxterArm(limb), get_saved_test_locations())
+    arm = BaxterArm(limb)
+
+    test_ik_robot(arm, get_saved_test_locations())
     

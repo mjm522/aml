@@ -1,6 +1,5 @@
 import rospy
 import numpy as np
-from aml_robot.baxter_robot import BaxterArm
 
 from geometry_msgs.msg import (
     PoseStamped,
@@ -19,20 +18,19 @@ import struct
 
 class IKBaxter():
 
-    def __init__(self, limb='right'):
+    def __init__(self, limb):
         
-        self._limb = limb
+        self._limb = limb.name
         self.iksvc = None
         self.ikreq = None
 
-        self.arm = BaxterArm(self._limb)
+        self.arm = limb
 
         self.configure_ik_service()
 
     def configure_ik_service(self):
         self.ns = "ExternalTools/" + self._limb + "/PositionKinematicsNode/IKService"
         self.iksvc = rospy.ServiceProxy(self.ns, SolvePositionIK)
-        self.ikreq = SolvePositionIKRequest()
 
     def test_pose(self):
 
@@ -57,6 +55,9 @@ class IKBaxter():
             return right_pose['pos'], right_pose['ori']
 
     def ik_servive_request(self, pos, ori):
+
+        self.ikreq = SolvePositionIKRequest()
+        
         #remember the ori will be in w, x,y,z format as opposed to usual ROS format
         success_flag = False
         #incase of failure return back current joints
