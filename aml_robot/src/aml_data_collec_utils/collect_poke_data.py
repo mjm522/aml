@@ -282,7 +282,7 @@ def get_pre_push_pose(pre_push_pos):
 
     elif pre_push_pos==4:
 
-        return box_top + np.multiply(np.array([-0.7, -0.9, 0.]), box_dim)
+        return box_top + np.multiply(np.array([0.7, -0.9, 0.]), box_dim)
 
 
 def get_push_pose(push_side):
