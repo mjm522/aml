@@ -199,26 +199,10 @@ class BaxterArm(baxter_interface.limb.Limb):
     def exec_position_cmd(self, cmd):
         
         curr_q = self._state['position']
-        
-        #does a linear interpolation between required joint position and current position
-        #if beyond a certain threshold
-        if np.linalg.norm(curr_q-cmd) > 0.5:
-            
-            interp=5 #number of interpolation steps
 
-            jnt_cmds = np.zeros((self._nu,interp))
-            
-            for i in range(self._nu):
-                jnt_cmds[i,:] = np.linspace(curr_q[i], cmd[i], interp)
+        joint_command = dict(zip(self.joint_names(), cmd))
 
-            for i in range(interp):
-                self.move_to_joint_pos(jnt_cmds[:,i])
-
-        else:
-
-            joint_command = dict(zip(self.joint_names(), cmd))
-
-            self.set_joint_positions(joint_command)
+        self.set_joint_positions(joint_command)
 
     def exec_position_cmd2(self,cmd):
         curr_q = self.joint_angles()
@@ -366,8 +350,8 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return np.array(self._kinematics.inertia(argument))
 
-    def ik(self,position,orientation=None):
-        return self._kinematics.inverse_kinematics(position,orientation)
+    def ik(self, pos, ori=None):
+        return self._kinematics.inverse_kinematics(pos, ori)
 
 
 class BaxterButtonStatus():

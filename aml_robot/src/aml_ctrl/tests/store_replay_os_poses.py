@@ -143,7 +143,31 @@ def main(args):
 
         raise ValueError
 
-    test_saved_test_locations(arm)
+    
+    test_points_data = get_saved_test_locations()
+    
+    for k in range(4):
+
+        ee_pos = test_points_data[k]['ee_point']
+
+        ee_ori = test_points_data[k]['ee_ori']
+
+        print [ee_pos[0],ee_pos[1],ee_pos[2], ee_ori[0],ee_ori[1],ee_ori[2],ee_ori[3]]
+
+        # ee_ori = quaternion.as_rotation_matrix(np.quaternion(ee_ori[0],ee_ori[1],ee_ori[2],ee_ori[3]))
+
+        # ee_pose = np.hstack([ee_ori, ee_pos[:,None]])
+
+        # print "ee_pose \n"
+
+        # print ee_pose
+
+        # print "ee_pose one line \n"
+
+        # print ee_pose.ravel()
+
+
+    # test_saved_test_locations(arm)
     
     # save_test_locations(arm=arm, limb_idx=limb_idx, num_points=4)
 

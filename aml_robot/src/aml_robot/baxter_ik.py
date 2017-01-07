@@ -1,4 +1,5 @@
 import rospy
+import numpy as np
 from aml_robot.baxter_robot import BaxterArm
 
 from geometry_msgs.msg import (
@@ -19,6 +20,7 @@ import struct
 class IKBaxter():
 
     def __init__(self, limb='right'):
+        
         self._limb = limb
         self.iksvc = None
         self.ikreq = None
@@ -98,16 +100,19 @@ class IKBaxter():
                   (seed_str,))
             # Format solution into Limb API-compatible dictionary
             limb_joints = dict(zip(resp.joints[0].name, resp.joints[0].position))
-            print "\nIK Joint Solution:\n", limb_joints
+            # print "\nIK Joint Solution:\n", limb_joints
 
             success_flag = True
+
+            joint_names         = self.arm.joint_names()
+
+            
+            def to_list(ls):
+                return [ls[n] for n in joint_names]
+
+            limb_joints        = np.array(to_list(limb_joints))
+        
         else:
             print("INVALID POSE - No Valid Joint Solution Found.")
 
         return limb_joints
-
-if __name__ == "__main__":
-    rospy.init_node('poke_box', anonymous=True)
-    ik_baxter = IKBaxter(limb='right')
-    pos, ori = ik_baxter.test_pose()
-    ik_baxter.ik_servive_request(pos=pos, ori=ori)

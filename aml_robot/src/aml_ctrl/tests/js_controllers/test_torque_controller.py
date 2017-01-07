@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     rospy.init_node('classical_jsc_torque_controller')
     from aml_robot.baxter_robot import BaxterArm
-    limb = 'right'
+    limb = 'left'
     arm = BaxterArm(limb)
     
     test_torque_controller(robot_interface=arm, demo_idx=4)
