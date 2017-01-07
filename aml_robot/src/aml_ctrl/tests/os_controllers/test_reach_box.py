@@ -4,13 +4,13 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.controllers.osc_bi_arm_controller import OSCBiArmController
+from aml_ctrl.controllers.os_controllers.os_bi_arm_controller import OSBiArmController
 
-def test_reach_both_sides_box(right_arm,left_arm):
+def test_reach_both_sides_box(right_arm, left_arm):
     flag_box = False
     box_tf = TransformListener()
 
-    ctrlr  = OSCBiArmController(right_arm=right_arm , left_arm=left_arm, mode='torque')
+    ctrlr  = OSBiArmController(right_arm=right_arm , left_arm=left_arm, mode='torque')
 
     min_jerk_interp = MinJerkInterp()
 

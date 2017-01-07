@@ -2,22 +2,20 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
-from aml_ctrl.controllers.jsc_torque_controller import JSCTorqueController
+from aml_ctrl.controllers.js_controllers.js_torque_controller import JSTorqueController
 
-def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_ori=None, goal_pos=None, goal_ori=None):
+def test_torque_controller(robot_interface, demo_idx=1):
     #0 is left and 1 is right
 
-    ctrlr = JSCTorqueController(robot_interface)
+    ctrlr = JSTorqueController(robot_interface)
 
-    js_traj_gen = JSTrajGenerator()
+    kwargs = {}
 
-    js_traj_gen.configure(demo_idx=demo_idx, 
-    	                  start_pos=start_pos, 
-    	                  goal_pos=goal_pos, 
-    	                  start_qt=start_ori, 
-    	                  goal_qt=goal_ori)
+    kwargs['demo_idx'] = demo_idx
 
-    js_traj = js_traj_gen.get_interpolated_trajectory()
+    js_traj_gen = JSTrajGenerator(load_from_demo=True, **kwargs)
+
+    js_traj = js_traj_gen.generate_traj()
 
     #sending the arm to the initial location of js trajectory
     robot_interface.exec_position_cmd(js_traj['pos_traj'][0])
@@ -28,6 +26,7 @@ def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_or
 
     finished = False
     t = 0
+    
     ctrlr.set_active(True)
 
     n_steps = js_traj_gen._timesteps
@@ -38,7 +37,7 @@ def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_or
         goal_js_vel = js_traj['vel_traj'][t]
         goal_js_acc = js_traj['acc_traj'][t]
 
-        print "Sending goal ",t, " goal_pos:", goal_js_pos.ravel() 
+        print "Sending goal ",t, " goal_js_pos:", np.round(goal_js_pos.ravel(), 2)
 
         if np.any(np.isnan(goal_js_pos)) or np.any(np.isnan(goal_js_vel)) or np.any(np.isnan(goal_js_acc)):
             print "Goal", t, "is NaN, that is not good, we will skip it!"
@@ -49,7 +48,8 @@ def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_or
                            goal_js_acc=goal_js_acc)
             
             print "Waiting..."
-            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0, jsc=True)
+            
+            js_pos_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0)
             
             # print "lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " reached: ", success
 
@@ -59,22 +59,16 @@ def test_torque_controller(robot_interface, demo_idx=1, start_pos=None, start_or
         rate.sleep()
     
     ctrlr.wait_until_goal_reached(timeout=5.0)
-    #ctrlr.set_active(False)
-
+    ctrlr.set_active(False)
 
     # Error stored in ctrlr._error is the most recent error w.r.t to the most recent sent goal
-    print "ERROR in position \t", np.linalg.norm(ctrlr._error['linear'])
-    print "ERROR in orientation \t", np.linalg.norm(ctrlr._error['angular'])
+    print "ERROR in position \t", np.linalg.norm(ctrlr._error['js_pos'])
 
 if __name__ == '__main__':
 
     rospy.init_node('classical_jsc_torque_controller')
     from aml_robot.baxter_robot import BaxterArm
-    limb = 'left'
+    limb = 'right'
     arm = BaxterArm(limb)
-
-    # angle    = 90.0
-    # axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
-    # goal_ori = np.quaternion(np.cos(0.5*angle*np.pi/180.), axis[0], axis[1], axis[2])
     
     test_torque_controller(robot_interface=arm, demo_idx=4)

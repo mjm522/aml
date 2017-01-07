@@ -2,14 +2,14 @@ import numpy as np
 import quaternion
 import copy
 import rospy
-from config import OSC_POSTN_CNTLR
+from config import OS_POSTN_CNTLR
 from aml_ctrl.utilities.utilities import quatdiff
-from aml_ctrl.classical_controller import ClassicalController
+from aml_ctrl.controllers.os_controller import OSController
 
-class OSCPositionController(ClassicalController):
-    def __init__(self, robot_interface, config = OSC_POSTN_CNTLR):
+class OSPositionController(OSController):
+    def __init__(self, robot_interface, config = OS_POSTN_CNTLR):
 
-        ClassicalController.__init__(self,robot_interface, config)
+        OSController.__init__(self,robot_interface, config)
 
         #proportional gain for position
         self._kp_p       = self._config['kp_p']

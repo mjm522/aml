@@ -5,15 +5,15 @@ import copy
 
 import rospy
 
-from config import JSC_TORQUE_CNTLR
-from aml_ctrl.classical_controller import ClassicalController
+from config import JS_TORQUE_CNTLR
+from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
 
-class JSCTorqueController(ClassicalController):
-    def __init__(self, robot_interface, config = JSC_TORQUE_CNTLR):
+class JSTorqueController(JSController):
+    def __init__(self, robot_interface, config = JS_TORQUE_CNTLR):
 
-        ClassicalController.__init__(self, robot_interface, config)
+        JSController.__init__(self, robot_interface, config)
 
         #proportional gain for position
         self._kp_q        = self._config['kp_q']
@@ -92,7 +92,7 @@ class JSCTorqueController(ClassicalController):
 
     def set_active(self,is_active):
 
-        ClassicalController.set_active(self,is_active)
+        JSController.set_active(self,is_active)
 
         if is_active is False:
             hold_time = rospy.Duration(self._deactivate_wait_time)

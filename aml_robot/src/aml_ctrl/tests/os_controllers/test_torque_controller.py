@@ -2,12 +2,12 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 
 def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal_ori):
     #0 is left and 1 is right
 
-    ctrlr = OSCTorqueController(robot_interface)
+    ctrlr = OSTorqueController(robot_interface)
 
     min_jerk_interp = MinJerkInterp()
 
@@ -55,8 +55,7 @@ def test_torque_controller(robot_interface, start_pos, start_ori, goal_pos, goal
         rate.sleep()
     
     ctrlr.wait_until_goal_reached(timeout=5.0)
-    #ctrlr.set_active(False)
-
+    # ctrlr.set_active(False)
 
     # Error stored in ctrlr._error is the most recent error w.r.t to the most recent sent goal
     print "ERROR in position \t", np.linalg.norm(ctrlr._error['linear'])

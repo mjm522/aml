@@ -2,12 +2,12 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 
 def test_position_controller(robot_interface, start_pos, start_ori, goal_pos, goal_ori):
     #0 is left and 1 is right
 
-    ctrlr = OSCPositionController(robot_interface)
+    ctrlr = OSPositionController(robot_interface)
 
     min_jerk_interp = MinJerkInterp()
 

@@ -2,14 +2,14 @@ import numpy as np
 import quaternion
 import copy
 import rospy
-from config import OSC_JT_TORQUE_CNTLR
+from config import OS_JT_TORQUE_CNTLR
 from aml_ctrl.utilities.utilities import quatdiff
-from aml_ctrl.classical_controller import ClassicalController
+from aml_ctrl.controllers.os_controller import OSController
 
-class OSCJTTorqueController(ClassicalController):
-    def __init__(self, robot_interface, config = OSC_JT_TORQUE_CNTLR):
+class OSJTTorqueController(OSController):
+    def __init__(self, robot_interface, config = OS_JT_TORQUE_CNTLR):
 
-        ClassicalController.__init__(self,robot_interface, config)
+        OSController.__init__(self,robot_interface, config)
 
         #proportional gain for position
         self._kp_p       = self._config['kp_p']

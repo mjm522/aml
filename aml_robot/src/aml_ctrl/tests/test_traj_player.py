@@ -1,11 +1,10 @@
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller  import OSPositionController
 from aml_ctrl.traj_generator.os_traj_generator import OSTrajGenerator
 from aml_ctrl.traj_player.traj_player import TrajPlayer
 
 import rospy
 import numpy as np
-
 
 def main(robot_interface):
 
@@ -19,7 +18,7 @@ def main(robot_interface):
 
     os_traj = OSTrajGenerator(traj_type='os', load_from_demo=False, **kwargs)
 
-    traj_player = TrajPlayer(robot_interface=robot_interface, controller=OSCTorqueController, trajectory=os_traj.generate_traj())
+    traj_player = TrajPlayer(robot_interface=robot_interface, controller=OSPositionController, trajectory=os_traj.generate_traj())
 
     traj_player.player()
 

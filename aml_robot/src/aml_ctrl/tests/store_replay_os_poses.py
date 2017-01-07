@@ -1,15 +1,15 @@
 import numpy as np
 import quaternion
 import sys
-from aml_robot.baxter_robot import BaxterArm, BaxterButtonStatus
+
 from os.path import dirname, abspath
 import rospy
 
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 
-data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
+data_folder_path = dirname(dirname(abspath(__file__))) + '/tests/data/'
 
 def save_test_locations(arm, limb_idx, num_points=3):
 
@@ -49,7 +49,7 @@ def get_saved_test_locations():
 
 def execute_trajectory(robot_interface, trajectory, rate, orientation_ctrl = True):
 
-    ctrlr  = OSCPositionController(robot_interface)
+    ctrlr  = OSPositionController(robot_interface)
     # ctrlr    = BaxterMoveItController()
     # ctrlr  = OSCTorqueController(robot_interface)
     ctrlr.set_active(True)
@@ -125,6 +125,8 @@ def test_saved_test_locations(arm):
 
 def main(args):
 
+    from aml_robot.baxter_robot import BaxterArm
+
     if 'limb_idx=0' in args:
 
         limb_idx  = 0
@@ -144,11 +146,6 @@ def main(args):
     test_saved_test_locations(arm)
     
     # save_test_locations(arm=arm, limb_idx=limb_idx, num_points=4)
-
-
-
-
-
 
 if __name__ == '__main__':
     rospy.init_node('lfd_node')

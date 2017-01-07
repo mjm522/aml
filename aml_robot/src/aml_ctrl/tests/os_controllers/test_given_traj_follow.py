@@ -1,15 +1,15 @@
 import numpy as np
 import quaternion
 import rospy
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 from aml_lfd.utilities.utilities import get_os_traj, plot_demo_data, get_sampling_rate
 
 def test_position_controller(robot_interface, pos_traj, ori_traj=None):
     #0 is left and 1 is right
 
-    #ctrlr = OSCPositionController(robot_interface)
-    ctrlr = OSCTorqueController(robot_interface)
+    #ctrlr = OSPositionController(robot_interface)
+    ctrlr = OSTorqueController(robot_interface)
 
     print "Starting position controller"
 

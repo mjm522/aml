@@ -2,7 +2,7 @@
 import numpy as np
 import quaternion
 import rospy
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 
 import numpy as np
 import quaternion

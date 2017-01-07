@@ -1,11 +1,11 @@
 import numpy as np
 import quaternion
 import rospy
-from aml_ctrl.controllers.osc_bi_arm_controller import OSC_BiArmController
+from aml_ctrl.controllers.os_controllers.os_bi_arm_controller import OSBiArmController
 
 def test_follow_gps_policy(vel_ee_master, master_arm, slave_arm, dt):
 
-    ctrlr = OSC_BiArmController(master_arm=master_arm, slave_arm=slave_arm)
+    ctrlr = OSBiArmController(master_arm=master_arm, slave_arm=slave_arm)
     
     master_pos, master_ori   = master_arm.get_ee_pose()
     # vel_ee_master = arm_l.get_ee_velocity()[0:3]

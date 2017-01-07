@@ -2,14 +2,13 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.utilities import quatdiff, standard_shape_traj
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 
 def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight'):
     
     robot_interface.untuck_arm()
 
-    ctrlr = OSCTorqueController(robot_interface)
+    ctrlr = OSTorqueController(robot_interface)
 
     start_pos, start_ori  =  robot_interface.get_ee_pose()
 
@@ -25,7 +24,6 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight'):
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
-
             
             # Set new goal for controller
         ctrlr.set_goal(traj_to_follow[idx],start_ori)

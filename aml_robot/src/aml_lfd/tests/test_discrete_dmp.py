@@ -2,8 +2,8 @@ import numpy as np
 import quaternion
 import rospy
 
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 
 from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
 from aml_lfd.utilities.utilities import get_os_traj
@@ -37,8 +37,8 @@ def plot_traj(des_path, tau=1.0):
 
 def test_discrete_dmp(robot_interface, des_path, tau=1.0):
 
-    ctrlr = OSCPositionController(robot_interface)
-    #ctrlr = OSCTorqueController(robot_interface)
+    ctrlr = OSPositionController(robot_interface)
+    #ctrlr = OSTorqueController(robot_interface)
 
     dmp = DiscreteDMPShell()
     dmp.configure(traj2follow=des_path, start=des_path[0,:], goal=des_path[-1,:])

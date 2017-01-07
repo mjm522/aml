@@ -8,7 +8,7 @@ class OSTrajGenerator(TrajGenerator):
     
     def __init__(self, load_from_demo=False, **kwargs):
 
-        TrajGenerator.__init__(self, load_from_demo=False, **kwargs)
+        TrajGenerator.__init__(self, load_from_demo=load_from_demo, **kwargs)
 
     def get_demo_traj(self):
 

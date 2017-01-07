@@ -2,8 +2,8 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.controllers.osc_bi_arm_controller import OSC_BiArmController
-from aml_ctrl.controllers.osc_torque_controller import OSC_TorqueController
+from aml_ctrl.controllers.os_controllers.os_bi_arm_controller import OSBiArmController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 
 def test_coop_position_control():
     limb_idx_l = 0 #0 is left and 1 is right

@@ -10,10 +10,10 @@ from tf import TransformListener
 import numpy as np
 import quaternion
 
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController
-from aml_ctrl.controllers.osc_jt_torque_controller import OSCJTTorqueController
+from aml_ctrl.controllers.os_controllers import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
+from aml_ctrl.controllers.os_controllers import OSPositionController
+from aml_ctrl.controllers.os_controllers import OSJTTorqueController
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 from aml_ctrl.utilities.lin_interp import LinInterp
 from config import BOX_TYPE_1
@@ -117,9 +117,9 @@ class CollectPokeData():
 
 def execute_trajectory(robot_interface, trajectory, rate):
 
-    ctrlr  = OSCPositionController(robot_interface)
+    ctrlr  = OSPositionController(robot_interface)
     # ctrlr    = BaxterMoveItController()
-    # ctrlr  = OSCTorqueController(robot_interface)
+    # ctrlr  = OSTorqueController(robot_interface)
     ctrlr.set_active(True)
 
     t = 0
@@ -182,7 +182,7 @@ def reach_point(robot_interface, goal_pos, goal_ori):
 def execute_trajectory_jt(robot_interface, goal_pos, goal_ori):
     rate = rospy.Rate(10)
 
-    ctrlr  = OSCJTTorqueController(robot_interface)
+    ctrlr  = OSJTTorqueController(robot_interface)
 
     ctrlr.set_active(True)
 

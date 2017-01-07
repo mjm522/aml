@@ -1,6 +1,6 @@
 import numpy as np
 import quaternion
-from aml_ctrl.traj_generator import TrajGenerator
+from aml_ctrl.traj_generator.traj_generator import TrajGenerator
 
 from aml_lfd.utilities.utilities import get_js_traj
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
@@ -9,7 +9,7 @@ class JSTrajGenerator(TrajGenerator):
     
     def __init__(self, load_from_demo=False, **kwargs):
 
-        TrajGenerator.__init__(self, load_from_demo=False, **kwargs)
+        TrajGenerator.__init__(self, load_from_demo=load_from_demo, **kwargs)
 
     def get_demo_traj(self):
 

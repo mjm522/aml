@@ -2,14 +2,14 @@ import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.utilities.utilities import quatdiff, standard_shape_traj
-from aml_ctrl.controllers.osc_torque_controller import OSCTorqueController 
-from aml_ctrl.controllers.osc_postn_controller import OSCPositionController 
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController 
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController 
 
 def test_maintain_position(robot_interface):
 
     robot_interface.untuck_arm()
 
-    ctrlr = OSCTorqueController(robot_interface)
+    ctrlr = OSTorqueController(robot_interface)
 
     # Activating a controller without setting a goal will just hold its current position and orientation
     ctrlr.set_active(True)

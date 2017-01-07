@@ -5,15 +5,15 @@ import copy
 
 import rospy
 
-from config import OSC_VELCTY_CNTLR
-from aml_ctrl.classical_controller import ClassicalController
+from config import OS_VELCTY_CNTLR
+from aml_ctrl.controllers.os_controller import OSController
 
 from aml_ctrl.utilities.utilities import quatdiff
 
-class OSCVelocityController(ClassicalController):
-    def __init__(self, robot_interface, config = OSC_VELCTY_CNTLR):
+class OSVelocityController(OSController):
+    def __init__(self, robot_interface, config = OS_VELCTY_CNTLR):
 
-        ClassicalController.__init__(self, robot_interface, config)
+        OSController.__init__(self, robot_interface, config)
 
         #proportional gain for position
         self._kp_p       = self._config['kp_p']
@@ -189,7 +189,7 @@ class OSCVelocityController(ClassicalController):
 
     def set_active(self,is_active):
 
-        ClassicalController.set_active(self,is_active)
+        OSController.set_active(self,is_active)
 
         if is_active is False:
             hold_time = rospy.Duration(self._deactivate_wait_time)

@@ -2,10 +2,10 @@ import numpy as np
 import quaternion
 import copy
 import rospy
-from config import OSC_TORQUE_CNTLR
-from aml_ctrl.classical_controller import ClassicalController
+from config import OS_TORQUE_CNTLR
+from aml_ctrl.controllers.os_controller import OSController
 
-class OSCBiArmController(ClassicalController):
+class OSBiArmController(OSController):
 
     def __init__(self, right_arm , left_arm, mode='torque'):
 
@@ -13,13 +13,13 @@ class OSCBiArmController(ClassicalController):
         self._left_arm   = left_arm
 
         if mode == 'torque':
-            from aml_ctrl.controllers.osc_torque_controller import OSC_TorqueController
-            self._right_arm_ctrlr = OSC_TorqueController(self._right_arm)
-            self._left_arm_ctrlr  = OSC_TorqueController(self._left_arm)
+            from aml_ctrl.controllers.os_torque_controller import OSTorqueController
+            self._right_arm_ctrlr = OSTorqueController(self._right_arm)
+            self._left_arm_ctrlr  = OSTorqueController(self._left_arm)
         elif mode == 'postn':
-            from aml_ctrl.controllers.osc_postn_controller import OSC_PostnController
-            self._right_arm_ctrlr = OSC_PostnController(self._right_arm)
-            self._left_arm_ctrlr  = OSC_PostnController(self._left_arm)
+            from aml_ctrl.controllers.os_postn_controller import OSPostnController
+            self._right_arm_ctrlr = OSPostnController(self._right_arm)
+            self._left_arm_ctrlr  = OSPostnController(self._left_arm)
         else:
             print "Unknown mode of controller..."
             raise ValueError
