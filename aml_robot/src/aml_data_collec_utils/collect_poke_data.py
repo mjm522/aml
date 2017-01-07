@@ -10,11 +10,12 @@ from tf import TransformListener
 import numpy as np
 import quaternion
 
-from aml_ctrl.controllers.os_controllers import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
-from aml_ctrl.controllers.os_controllers import OSPositionController
-from aml_ctrl.controllers.os_controllers import OSJTTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
+from aml_ctrl.controllers.os_controllers.os_jt_torque_controller import OSJTTorqueController
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
+from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 from aml_ctrl.utilities.lin_interp import LinInterp
 from config import BOX_TYPE_1
 from aml_io.io import save_data, load_data
@@ -55,7 +56,9 @@ class CollectPokeData():
 
         self._interp_fn = MinJerkInterp(dt=0.5, tau=15.)
         # self._interp_fn = LinInterp(dt=0.5, tau=15.)
+
         self._box_tf = TransformListener()
+
 
         self._goal_pos_old = None
         self._goal_ori_old = None
@@ -208,6 +211,56 @@ def execute_trajectory_jt(robot_interface, goal_pos, goal_ori):
     lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=10)
     ctrlr.set_active(False)
 
+def execute_trajectory_js(robot_interface, goal_pos, goal_ori):
+    
+    rate = rospy.Rate(5)
+
+    start_pos, start_ori = robot_interface.get_ee_pose()
+
+    if goal_ori is None:
+         goal_ori = start_ori
+
+    goal_ori = quaternion.as_float_array(goal_ori)[0]
+    success, js_pos = robot_interface.ik(goal_pos,goal_ori)
+
+    if success:
+        robot_interface.move_to_joint_position(js_pos)
+    else:
+        print "Couldnt find a solution"
+
+    # rate = rospy.Rate(500)
+
+    # kwargs = {}
+
+    # kwargs['start_pos'], kwargs['start_ori'] = robot_interface.get_ee_pose()
+
+    # kwargs['goal_pos'] = goal_pos
+
+    # if goal_ori is None:
+    #     goal_ori = kwargs['start_ori']
+
+    # kwargs['goal_ori'] = goal_ori
+
+    # js_traj_gen  = JSTrajGenerator(**kwargs)
+
+    # js_traj_gen.configure(robot_interface)
+
+    # js_traj = js_traj_gen.generate_traj()['pos_traj']
+
+    # i = 0 
+    # for js_pos in js_traj:
+
+    #     if i%10 == 0:
+    #         robot_interface.move_to_joint_position(js_pos)
+
+    #     i += 1
+
+    #     rate.sleep()
+
+
+
+
+
 def get_pre_push_pose(pre_push_pos):
 
     #in box frame offset from ee_pos if the tip is touching the box top
@@ -236,23 +289,22 @@ def get_push_pose(push_side):
 
     if push_side==1:
 
-        return get_pre_push_pose(1) + np.array([0., 0., 10.])
+        return get_pre_push_pose(1) + np.array([0., 0., 0.10])
 
     elif push_side==2:
 
-        return get_pre_push_pose(2) + np.array([10., 0., 0.])
+        return get_pre_push_pose(2) + np.array([0.10, 0., 0.])
 
     elif push_side==4:
 
-        return get_pre_push_pose(4) + np.array([-10., 0., 0.])
+        return get_pre_push_pose(4) + np.array([-0.10, 0., 0.])
 
 
-def reach_pre_push_pose(robot_interface, pre_push_pos=0):
-    cpd = CollectPokeData(robot_interface=robot_interface)
+def reach_pre_push_pose(object_interface, robot_interface, pre_push_pos=0):
 
     robot_interface.untuck_arm()
 
-    box_pos, box_ori = cpd.get_box_pose()
+    box_pos, box_ori = object_interface.get_box_pose()
 
     if pre_push_pos==0:
 
@@ -283,13 +335,12 @@ def reach_pre_push_pose(robot_interface, pre_push_pos=0):
         goal_ori = None
 
     # reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    # execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    execute_trajectory_js(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
 
-    execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+def push_box(object_interface, robot_interface, push_side=1):
 
-def push_box(robot_interface, push_side=1):
-    cpd = CollectPokeData(robot_interface=robot_interface)
-
-    box_pos, box_ori = cpd.get_box_pose()
+    box_pos, box_ori = object_interface.get_box_pose()
 
     if push_side==1:
         #push side A
@@ -310,8 +361,8 @@ def push_box(robot_interface, push_side=1):
         goal_ori = None
 
     # reach_point(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
-
-    execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    # execute_trajectory_jt(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
+    execute_trajectory_js(robot_interface=robot_interface, goal_pos=goal_pos, goal_ori=goal_ori)
 
 
 def main(robot_interface):
@@ -339,22 +390,19 @@ def main(robot_interface):
 
         print "Moving to pre-push position ..."
         
-        reach_pre_push_pose(robot_interface=robot_interface, pre_push_pos=side)
+        reach_pre_push_pose(object_interface=cpd, robot_interface=robot_interface, pre_push_pos=side)
 
         print "Gonna push the box ..."
 
-        push_box(robot_interface=robot_interface, push_side=side)
+        push_box(object_interface=cpd,robot_interface=robot_interface, push_side=side)
 
 
 def debug_main(robot_interface):
 
     cpd = CollectPokeData(robot_interface=robot_interface)
 
-    # while True:
-    #     cpd.get_tip_pose()
-
-    reach_pre_push_pose(robot_interface=robot_interface, pre_push_pos=1)
-    push_box(robot_interface, push_side=1)
+    reach_pre_push_pose(object_interface=cpd, robot_interface=robot_interface, pre_push_pos=0)
+    # push_box(object_interface=cpd, robot_interface=robot_interface, push_side=1)
 
 
 if __name__ == "__main__":
@@ -363,7 +411,9 @@ if __name__ == "__main__":
     limb = 'left'
     arm = BaxterArm(limb)
     # main(arm)
-    debug_main(arm)
+    # debug_main(arm)
+
+    main(arm)
 
     
 

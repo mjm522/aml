@@ -82,10 +82,10 @@ class BaxterArm(baxter_interface.limb.Limb):
         self._pub_rate.publish(sampling_rate)
 
     def tuck_arm(self):
-        self.exec_position_cmd(self._tuck)
+        self.move_to_joint_pos(self._tuck)
 
     def untuck_arm(self):
-        self.exec_position_cmd(self._untuck)
+        self.move_to_joint_pos(self._untuck)
 
     def _configure(self, limb, on_state_callback):
         self._state = None
@@ -358,9 +358,9 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def ik(self, pos, ori=None):
 
-        soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+        success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
 
-        return soln
+        return success, soln
 
 
 class BaxterButtonStatus():

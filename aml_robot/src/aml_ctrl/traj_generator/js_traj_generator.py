@@ -12,11 +12,11 @@ class JSTrajGenerator(TrajGenerator):
 
         TrajGenerator.__init__(self, load_from_demo=load_from_demo, **kwargs)
 
-        self._ik_client = None
+        self._robot = None
 
-    def configure(self, ik_client):
+    def configure(self, robot_interface):
 
-        self._ik_client =  ik_client
+        self._robot =  robot_interface
 
     def get_demo_traj(self):
 
@@ -44,14 +44,14 @@ class JSTrajGenerator(TrajGenerator):
 
     def convert_os_to_js(self, os_traj=None):
 
-        if self._ik_client is None:
+        if self._robot is None:
 
             print "Inverse Kinematics client not configured, please configure ..."
             raise ValueError
 
         if os_traj is None:
 
-            os_traj = get_traj_interp()
+            os_traj = self.get_traj_interp()
 
         n_steps = len(os_traj['ori_traj'])
 
@@ -60,25 +60,25 @@ class JSTrajGenerator(TrajGenerator):
         for t in range(n_steps):
             
             goal_pos = os_traj['pos_traj'][t]
-            goal_ori = os_traj['ori_traj'][t]
+            goal_ori = quaternion.as_float_array(os_traj['ori_traj'][t])[0]
 
-        if np.any(np.isnan(goal_pos)) or np.any(np.isnan(goal_ori)):
-            
-            pass
-
-        else:
-
-            ik_client.configure_ik_service()
-
-            success, limb_joints = ik_client.ik_servive_request(pos=goal_pos, ori=goal_ori)
-
-            if success:
-
-                js_traj.append(limb_joints)
+            if np.any(np.isnan(goal_pos)) or np.any(np.isnan(goal_ori)):
+                
+                pass
 
             else:
 
-                print "Failed to find IK solution for pose on index \t", t
+                success, limb_joints = self._robot.ik(pos=goal_pos, ori=goal_ori)
+
+                # print "limb joints \t", np.round(limb_joints ,3)
+
+                if success:
+
+                    js_traj.append(limb_joints)
+
+                else:
+
+                    print "Failed to find IK solution for pose on index \t", t
 
 
         #position trajectory
