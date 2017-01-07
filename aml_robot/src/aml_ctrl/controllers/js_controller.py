@@ -22,7 +22,7 @@ class JSController(Controller):
         self._goal_js_acc = np.zeros_like(self._goal_js_pos)
 
 
-    def set_goal(self, goal_js_pos, goal_js_vel, goal_js_acc):
+    def set_goal(self, goal_js_pos, goal_js_vel=None, goal_js_acc=None):
         
         self._goal_js_pos = goal_js_pos
         self._goal_js_vel = goal_js_vel

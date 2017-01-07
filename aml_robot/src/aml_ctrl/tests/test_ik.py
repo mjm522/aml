@@ -15,7 +15,7 @@ def test_ik_robot(ik_client, robot_interface, test_poses):
 
         ik_client.configure_ik_service()
     
-        soln =  ik_client.ik_servive_request(pos=pose['ee_point'], ori=pose['ee_ori'])
+        success, soln =  ik_client.ik_servive_request(pos=pose['ee_point'], ori=pose['ee_ori'])
 
         print "soln \t", np.round(soln, 3)
 

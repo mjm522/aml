@@ -115,4 +115,4 @@ class IKBaxter():
         else:
             print("INVALID POSE - No Valid Joint Solution Found.")
 
-        return limb_joints
+        return success_flag, limb_joints
