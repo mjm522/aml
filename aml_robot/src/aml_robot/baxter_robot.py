@@ -25,6 +25,8 @@ from aml_perception import camera_sensor
 #for computation of angular velocity
 from aml_lfd.utilities.utilities import compute_omg
 
+from aml_robot.baxter_ik import IKBaxter
+
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 class BaxterArm(baxter_interface.limb.Limb):
@@ -97,6 +99,10 @@ class BaxterArm(baxter_interface.limb.Limb):
         baxter_interface.limb.Limb.__init__(self, limb)
 
         self._kinematics = baxter_kinematics(self)
+
+        self._ik_baxter = IKBaxter(limb=self)
+
+        self._ik_baxter.configure_ik_service()
 
         self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
                                          UInt16, queue_size=10)
@@ -351,7 +357,10 @@ class BaxterArm(baxter_interface.limb.Limb):
         return np.array(self._kinematics.inertia(argument))
 
     def ik(self, pos, ori=None):
-        return self._kinematics.inverse_kinematics(pos, ori)
+
+        soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+
+        return soln
 
 
 class BaxterButtonStatus():
