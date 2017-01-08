@@ -12,6 +12,7 @@ import quaternion
 
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
+from record_sample import RecordSample
 from aml_ctrl.utilities.lin_interp import LinInterp
 from config import config
 from aml_io.io import save_data, load_data
@@ -187,6 +188,8 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
+        self._record_sample = RecordSample(robot_interface)
+
 
     def compute_next_state(self,idx):
 
@@ -217,12 +220,18 @@ class PushMachine(object):
             for goal in pushes[idx]['poses']:
                 success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
+
+            if success:
+                self._record_sample.start_record(idx)
+
             print "Gonna push the box ..."
 
             success = success and self.goto_pose(goal_pos=pushes[idx]['push_action'], goal_ori=None)
             
             if success:
                 self._push_counter += 1
+            
+            self._record_sample.stop_record(success)
             
             idx = (idx+1)%(len(pushes))
         else:
