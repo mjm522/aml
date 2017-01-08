@@ -4,7 +4,7 @@ import pickle
 
 
 
-def save_data(data,filename):
+def save_data(data, filename):
 
 	output = open(filename, 'wb')
 
@@ -18,7 +18,11 @@ def save_data(data,filename):
 
 
 def load_data(filename):
-	pkl_file = open(filename, 'rb')
+	
+	try:
+		pkl_file = open(filename, 'rb')
+	except Exception as e:
+		raise e
 
 	data = pickle.load(pkl_file)
 

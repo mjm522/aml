@@ -4,3 +4,5 @@ aml_calib/scripts/calib_data.npy
 aml_calib/scripts/camera_calib.pyc
 checkpoints
 
+*.pkl
+
