@@ -154,7 +154,8 @@ class BoxObject(object):
             # Reset push is a special kind of push
             
             reset_offset = config['reset_spot_offset']
-            pos_rel_box = np.array([reset_offset[0],reset_offset[1]+pre_push_offset[1],reset_offset[2],1])
+            pre_reset_offset = config['pre_reset_offsets']
+            pos_rel_box = np.array([reset_offset[0],reset_offset[1]+pre_reset_offset[1],reset_offset[2],1])
             pre_reset_pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
 
             reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': self._box_reset_pos0 - reset_pos, 'name' : 'reset_spot'}
@@ -186,6 +187,52 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
+
+    def compute_next_state(self,idx):
+
+        # Decide next state
+        if idx == 0 and self._push_counter > 0 and self._state != self._states['RESET']:
+            self._state = self._states['RESET']
+        else:
+            self._state = self._states['PUSH']
+
+    def goto_next_state(self,idx,pushes, box_pose, reset_push):
+
+        success = True
+
+        # Take machine to next state
+        if self._state == self._states['RESET']:
+            print "RESETING WITH NEW POSE"
+            success = self.reset_box(reset_push)
+
+        elif self._state == self._states['PUSH']:
+            print "Moving to neutral position ..."
+                        
+            self._robot.untuck_arm()
+
+            print "Moving to pre-push position ..."
+                    
+            # There might be a sequence of positions prior to a push action
+            
+            for goal in pushes[idx]['poses']:
+                success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
+
+            print "Gonna push the box ..."
+
+            success = success and self.goto_pose(goal_pos=pushes[idx]['push_action'], goal_ori=None)
+            
+            if success:
+                self._push_counter += 1
+            
+            idx = (idx+1)%(len(pushes))
+        else:
+            print "UNKNOWN STATE"
+
+
+        return idx, success
+
+
+
     def run(self):
 
         push_finished = True
@@ -205,38 +252,11 @@ class PushMachine(object):
 
             if pushes:
 
-                # Decide next state
-                if idx == 0 and self._push_counter > 0 and self._state != self._states['RESET']:
-                    self._state = self._states['RESET']
-                else:
-                    self._state = self._states['PUSH']
+                self.compute_next_state(idx)
 
-                # Take machine to next state
-                if self._state == self._states['RESET']:
-                    print "RESETING WITH NEW POSE"
-                    self.reset_box(reset_push)
+                idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
 
-                elif self._state == self._states['PUSH']:
-                    print "Moving to neutral position ..."
-                        
-                    self._robot.untuck_arm()
-
-                    print "Moving to pre-push position ..."
-                    
-                    # There might be a sequence of positions prior to a push action
-                    success = True
-                    for goal in pushes[idx]['poses']:
-                        success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
-
-                    print "Gonna push the box ..."
-
-                    success = success and self.goto_pose(goal_pos=pushes[idx]['push_action'], goal_ori=None)
-                    if success:
-                        self._push_counter += 1
-
-                    idx = (idx+1)%(len(pushes))
-                else:
-                    print "UNKNOWN STATE"
+                
 
 
             rate.sleep()
@@ -259,12 +279,14 @@ class PushMachine(object):
         return success
 
     def reset_box(self,reset_push):
-
+        success = True
         # There might be a sequence of positions prior to a push action
         for goal in reset_push['poses']:
-            self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
+            success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
-        self.goto_pose(goal_pos=reset_push['push_action'], goal_ori=None)
+        success = success and self.goto_pose(goal_pos=reset_push['push_action'], goal_ori=None)
+
+        return success
 
 
 
