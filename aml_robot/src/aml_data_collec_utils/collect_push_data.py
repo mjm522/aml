@@ -152,10 +152,14 @@ class BoxObject(object):
 
                     # position relative to the box        
                     pos_rel_box = np.multiply(position,np.array([s,1,s,1]))
-                    pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
+                    pre_push_pos1 = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
+
+                    pre_push_dir0 = pre_push_pos1 - ee_pos
+                    pre_push_dir0[2] = 0
+                    pre_push_pos0 = ee_pos + pre_push_dir0
 
                     push_action = np.asarray(np.dot(pose,np.array([0, pre_push_offset[1], 0, 1]))).ravel()[:3]
-                    pushes.append({'poses': [{'pos': pos, 'ori': q}], 'push_action': push_action, 'name' : 'pre_push%d'%(count,)})
+                    pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': q}, {'pos': pre_push_pos1, 'ori': q}], 'push_action': push_action, 'name' : 'pre_push%d'%(count,)})
 
                     count += 1
 
