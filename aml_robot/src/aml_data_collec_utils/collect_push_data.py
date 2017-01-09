@@ -110,7 +110,7 @@ class BoxObject(object):
 
 
         except Exception as e:
-            print e
+            print "Error on update frames", e
             pass
 
     # Computes a list of "pushes", a push contains a pre-push pose, 
@@ -148,7 +148,7 @@ class BoxObject(object):
 
                 success = True
             except Exception as e:
-                print e
+                print "Failed to get required transforms", e
                 trial_count += 1
 
 
@@ -234,7 +234,6 @@ class PushMachine(object):
 
         success = True
 
-
         # Take machine to next state
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
@@ -256,7 +255,7 @@ class PushMachine(object):
 
                 self._push_counter += 1
 
-            self._record_sample.stop_record(success)
+            # self._record_sample.stop_record(success)
             
             idx = (idx+1)%(len(pushes))
         else:
@@ -351,7 +350,7 @@ class PushMachine(object):
         success = True
         # There might be a sequence of positions prior to a push action
         for goal in reset_push['poses']:
-            print "going to:", goal
+
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
 
