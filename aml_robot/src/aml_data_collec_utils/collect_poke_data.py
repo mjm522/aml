@@ -51,8 +51,8 @@ class CollectPokeData():
     def __init__(self, robot_interface, box_config=BOX_TYPE_1):
         self._robot = robot_interface
 
-        # self.calib_extern_cam()
-        # print asfdkla
+        self.calib_extern_cam()
+        print asfdkla
 
         self._interp_fn = MinJerkInterp(dt=0.5, tau=15.)
         # self._interp_fn = LinInterp(dt=0.5, tau=15.)

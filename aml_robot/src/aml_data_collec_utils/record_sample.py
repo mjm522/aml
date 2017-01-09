@@ -10,15 +10,17 @@ class Sample():
 
     def __init__(self, sample_id=None):
 
-        self._data = {}
+        self._data                = {}
 
-        self._sample_id = sample_id
+        self._sample_id           = sample_id
 
-        self._data['sample_id'] = sample_id
+        self._data['sample_id']   = sample_id
 
-        self._data['state'] = []
+        self._data['state']       = []
 
         self._data['task_action'] = []
+
+        self._data['task_effect'] = []
 
         self._data['task_status'] = False
 
@@ -42,9 +44,11 @@ class Sample():
 
 class RecordSample():
 
-    def __init__(self, robot_interface, record_rate=30):
+    def __init__(self, robot_interface, task_interface, record_rate=30):
 
         self._robot          = robot_interface
+
+        self._task           = task_interface
         
         self._stale_data     = None
         
@@ -55,6 +59,8 @@ class RecordSample():
         self._sample_idx     = None
 
         self._old_time_stamp = None
+
+        self._callback       = None
 
     def configure(self, task_action):
 
@@ -81,12 +87,18 @@ class RecordSample():
         
         self._record = False
         
-        self._callback.shutdown()
+        if self._callback is None:
+            
+            print "Nothing to kill, since the recorder was not started ..."
+        
+        else:
+            
+            self._callback.shutdown()
 
-        #update the task status was a success and fail
-        self._sample._data['task_status'] = task_status
+            #update the task status was a success and fail
+            self._sample._data['task_status'] = task_status
 
-        self._sample.write_sample()
+            self._sample.write_sample()
 
     def check_sample(self, time_stamp):
 
@@ -116,10 +128,17 @@ class RecordSample():
         if self.check_sample(data['timestamp']):
 
             #np.quaternion causes problem, hence convert to array
-            data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+            if isinstance(data['ee_ori'], np.quaternion):
+
+                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+
+            else:
+
+                print type(data['ee_ori'])
 
             self._sample._data['state'].append(data)
             self._sample._data['task_action'].append(task_action)
+            self._sample._data['task_effect'].append(self._task.get_status())
 
             
 

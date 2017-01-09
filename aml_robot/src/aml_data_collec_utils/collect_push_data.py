@@ -54,6 +54,19 @@ class BoxObject(object):
 
         return get_pose(self._tf,self._base_frame_name,self._frame_name, time)
 
+    #this is a util that makes the data in storing form
+    def get_status(self):
+        pose   = self.get_pose()
+        p, q   = transform_to_pq(pose)
+        status = {}
+        status['pos'] = p
+        #all the files in package follows np.quaternion convention, that is
+        # w,x,y,z while ros follows x,y,z,w convention
+        status['ori'] = np.array([q[3],q[0],q[1],q[2]])
+
+        return status
+
+
     def get_pre_push(self,idx):
 
         time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
@@ -204,7 +217,7 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
-        self._record_sample = RecordSample(robot_interface=robot_interface, record_rate=50)
+        self._record_sample = RecordSample(robot_interface=robot_interface, task_interface=BoxObject() ,record_rate=50)
 
 
     def compute_next_state(self,idx):
@@ -243,7 +256,7 @@ class PushMachine(object):
 
             if success:
                 pass
-                # self._record_sample.start_record(idx)
+                self._record_sample.start_record(idx)
 
             print "Gonna push the box ..."
 
@@ -252,7 +265,7 @@ class PushMachine(object):
             if success:
                 self._push_counter += 1
             
-                # self._record_sample.stop_record(success)
+            self._record_sample.stop_record(success)
             
             idx = (idx+1)%(len(pushes))
         else:
