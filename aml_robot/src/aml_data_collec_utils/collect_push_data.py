@@ -91,7 +91,9 @@ class BoxObject(object):
 
                 now = rospy.Time.now()
                 for pose in push['poses']:
-                    self._br.sendTransform(pose['pos'], pose['ori'], now, push['name'], 'base')
+
+                    self._br.sendTransform(pose['pos'], pose['ori'], now, "%s%d"%(push['name'],count), 'base')
+                    count += 1
 
 
         except Exception as e:
@@ -127,7 +129,7 @@ class BoxObject(object):
                 time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
                 ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
 
-                ee_pos, q = transform_to_pq(ee_pose)
+                ee_pos, q_ee = transform_to_pq(ee_pose)
 
                 reset_pos, reset_q = self.get_reset_pose()
 
@@ -223,34 +225,22 @@ class PushMachine(object):
         # Take machine to next state
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
-
-            self._robot.untuck_arm()
-
             success = self.reset_box(reset_push)
 
         elif self._state == self._states['PUSH']:
-            print "Moving to neutral position ..."
-                        
-            self._robot.untuck_arm()
-
             print "Moving to pre-push position ..."
                     
             # There might be a sequence of positions prior to a push action
-            
-            for goal in pushes[idx]['poses']:
-                success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
+            goals = self.pack_push_goals(pushes[idx])
 
+            success = self.goto_goals(goals)
+            goals.reverse()
+            success = self.goto_goals(goals[1:])
 
-            if success:
-                pass
-                # self._record_sample.start_record(idx)
-
-            print "Gonna push the box ..."
-
-            success = success and self.goto_pose(goal_pos=pushes[idx]['push_action'], goal_ori=None)
-            
             if success:
                 self._push_counter += 1
+
+
             
                 # self._record_sample.stop_record(success)
             
@@ -260,6 +250,36 @@ class PushMachine(object):
 
 
         return idx, success
+
+    def pack_push_goals(self,push):
+
+        goals = []
+        for goal in push['poses']:
+            goals.append(goal)
+
+        push_action = push['push_action']
+
+        goals.append({'pos': push_action, 'ori': None})
+
+
+        return goals
+
+    def goto_goals(self,goals):
+
+        c = 0
+        for goal in goals:
+
+            # Push is always the last
+            if c == len(goals)-1:
+                print "Gonna push the box ..."
+
+            success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
+            c += 1
+
+            if not success:
+                return False
+
+        return True
 
 
 
@@ -277,6 +297,11 @@ class PushMachine(object):
 
             pushes = None
             box_pose = None
+
+            print "Moving to neutral position ..."
+                        
+            self._robot.untuck_arm()
+
             
             pushes, box_pose, reset_push = self._box.get_pushes()
 
