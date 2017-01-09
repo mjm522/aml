@@ -237,7 +237,9 @@ class PushMachine(object):
         # Take machine to next state
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
-            success = self.reset_box(reset_push)
+            #success = self.reset_box(reset_push)
+
+            raw_input("Please reset the box, Much appreciated dear human")
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -245,17 +247,13 @@ class PushMachine(object):
             # There might be a sequence of positions prior to a push action
             goals = self.pack_push_goals(pushes[idx])
 
-            success = self.goto_goals(goals)
+            success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
+
             goals.reverse()
             success = self.goto_goals(goals[1:])
 
             if success:
-                # pass
-                # self._record_sample.start_record(idx)
-
                 self._push_counter += 1
-
-            # self._record_sample.stop_record(success)
             
             idx = (idx+1)%(len(pushes))
         else:
@@ -277,22 +275,29 @@ class PushMachine(object):
 
         return goals
 
-    def goto_goals(self,goals):
+    def goto_goals(self,goals, record=False, push = None):
 
         c = 0
-        for goal in goals:
+        success = False
+        for i in range(len(goals)-1):
 
-            # Push is always the last
-            if c == len(goals)-1:
-                print "Gonna push the box ..."
+            goal = goals[i]
 
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
-            c += 1
 
             if not success:
                 return False
 
-        return True
+        # Push is always the last
+        goal = goals[len(goals)-1]
+        if record and push:
+            print "Gonna push the box ..."
+            self._record_sample.start_record(push)
+            success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
+            self._record_sample.stop_record(success)
+
+
+        return success
 
 
 
