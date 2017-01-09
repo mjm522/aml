@@ -5,6 +5,18 @@ import numpy as np
 import quaternion
 import matplotlib.pyplot as plt
 from aml_data_collec_utils.record_sample import Sample
+from cv_bridge import CvBridge, CvBridgeError
+
+
+
+def show_depth_image(depth_image):
+
+    try:
+        img = cv2.cvtColor(depth_image, cv2.COLOR_GRAY2BGR)
+        cv2.imshow("Depth Image window", img)
+    except CvBridgeError as e:
+        print(e)
+
 
 
 def show_image(image):
@@ -45,7 +57,7 @@ def visualize_data(data):
 
         traj.append(data['task_effect'][k]['pos'])
 
-        # show_image(image_rgb)
+        show_image(image_rgb)
 
     plot_demo_data(np.asarray(traj).squeeze())
     
