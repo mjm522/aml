@@ -9,13 +9,15 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 
-def show_depth_image(depth_image):
+# def show_depth_image(depth_image):
 
-    try:
-        img = cv2.cvtColor(depth_image, cv2.COLOR_GRAY2BGR)
-        cv2.imshow("Depth Image window", img)
-    except CvBridgeError as e:
-        print(e)
+#     try:
+#          # print("Max",max_val,"Min",min_val)
+#     #     # cv_image.convertTo(B,CV_8U,255.0/(Max-Min));
+#         img = cv2.cvtColor(depth_image, cv2.COLOR_GRAY2BGR)
+#         cv2.imshow("Depth Image window", img)
+#     except CvBridgeError as e:
+#         print(e)
 
 
 
@@ -58,6 +60,7 @@ def visualize_data(data):
         traj.append(data['task_effect'][k]['pos'])
 
         show_image(image_rgb)
+        # show_depth_image(image_depth)
 
     plot_demo_data(np.asarray(traj).squeeze())
     

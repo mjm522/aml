@@ -44,7 +44,7 @@ class Sample():
 
 class RecordSample():
 
-    def __init__(self, robot_interface, task_interface, record_rate=30):
+    def __init__(self, robot_interface, task_interface, record_rate=30, sample_start_index=None):
 
         self._robot          = robot_interface
 
@@ -56,7 +56,7 @@ class RecordSample():
 
         self._record_period  = rospy.Duration(1.0/record_rate)
 
-        self._sample_idx     = None
+        self._sample_idx     = sample_start_index
 
         self._old_time_stamp = None
 
@@ -67,15 +67,16 @@ class RecordSample():
         if self._sample_idx is None:
 
             self._sample_idx  = 0
-        else:
-            self._sample_idx += 1
-
+            
         #configure the sample
         self._sample   = Sample(self._sample_idx)
 
         #create a sample record callback on an 
         #independent thread and record the data 
         self._callback = rospy.Timer(self._record_period, partial(self.record_sample,task_action))
+
+        #increment the sample count
+        self._sample_idx += 1
     
     def start_record(self, task_action):
         

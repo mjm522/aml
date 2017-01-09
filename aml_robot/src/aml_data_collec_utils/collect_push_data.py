@@ -21,6 +21,9 @@ import aml_calib
 import camera_calib
 import random
 import cv2
+import os
+import sys
+import argparse
 
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
@@ -210,7 +213,7 @@ class BoxObject(object):
 
 class PushMachine(object):
 
-    def __init__(self,robot_interface):
+    def __init__(self, robot_interface, sample_start_index=None):
 
         self._push_counter = 0
         self._box = BoxObject()
@@ -219,7 +222,10 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
-        self._record_sample = RecordSample(robot_interface=robot_interface, task_interface=BoxObject() ,record_rate=15)
+        self._record_sample = RecordSample(robot_interface=robot_interface, 
+                                           task_interface=BoxObject(),
+                                           record_rate=15,
+                                           sample_start_index=sample_start_index)
 
 
     def compute_next_state(self,idx):
@@ -238,8 +244,8 @@ class PushMachine(object):
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
             #success = self.reset_box(reset_push)
-
-            raw_input("Please reset the box, Much appreciated dear human")
+            os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+            raw_input("Press enter to continue...")
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -329,9 +335,6 @@ class PushMachine(object):
 
                 idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
 
-                
-
-
             rate.sleep()
 
     def goto_pose(self,goal_pos, goal_ori): 
@@ -366,13 +369,20 @@ class PushMachine(object):
         return success
 
 
-
 if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser(description='Data collection for push manipulation')
+    
+    parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
+    
+    args = parser.parse_args()
+
     rospy.init_node('poke_box', anonymous=True)
     from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
-    push_machine = PushMachine(arm)
+    
+    push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index)
 
     print "calling run"
     push_machine.run()
