@@ -219,7 +219,7 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
-        self._record_sample = RecordSample(robot_interface=robot_interface, task_interface=BoxObject() ,record_rate=50)
+        self._record_sample = RecordSample(robot_interface=robot_interface, task_interface=BoxObject() ,record_rate=15)
 
 
     def compute_next_state(self,idx):
