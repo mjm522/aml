@@ -75,7 +75,8 @@ class BoxObject(object):
         p, q = transform_to_pq(pose)
 
         reset_offset = config['reset_spot_offset']
-        pos_rel_box = np.array([reset_offset[0],reset_offset[1],reset_offset[2],1])
+        tip_offset = config['end_effector_tip_offset']
+        pos_rel_box = np.array([reset_offset[0],reset_offset[1]+tip_offset[1],reset_offset[2],1])
         pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
 
         return pos, q
@@ -107,22 +108,32 @@ class BoxObject(object):
         max_trials = 200
         trial_count = 0
 
-        pos = pose = time = None
+        pos = pose = time = ee_pose = None
 
-        p = q = None
+        box_pos = q = None
 
         while trial_count < max_trials and not success:
 
             try:
                 time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
 
+                # Getting box center (adding center offset to retrieved pose)
                 pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
-                p, q = transform_to_pq(pose)
+                box_center_offset = config['box_center_offset']
+                box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
+                _, q = transform_to_pq(pose)
+                pose = pq_to_transform(self._tf,box_pos,q)
+
+                time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
+                ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
+
+                ee_pos, q = transform_to_pq(ee_pose)
 
                 reset_pos, reset_q = self.get_reset_pose()
 
                 success = True
             except Exception as e:
+                print e
                 trial_count += 1
 
 
@@ -159,7 +170,8 @@ class BoxObject(object):
             pos_rel_box = np.array([reset_offset[0],reset_offset[1]+pre_reset_offset[1],reset_offset[2],1])
             pre_reset_pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
 
-            reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': self._box_reset_pos0 - reset_pos, 'name' : 'reset_spot'}
+            reset_displacement = (self._box_reset_pos0 - reset_pos)
+            reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': reset_displacement, 'name' : 'reset_spot'}
             
 
             # pushes.append(reset_push)
@@ -203,9 +215,13 @@ class PushMachine(object):
 
         success = True
 
+
         # Take machine to next state
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
+
+            self._robot.untuck_arm()
+
             success = self.reset_box(reset_push)
 
         elif self._state == self._states['PUSH']:
@@ -222,7 +238,8 @@ class PushMachine(object):
 
 
             if success:
-                self._record_sample.start_record(idx)
+                pass
+                # self._record_sample.start_record(idx)
 
             print "Gonna push the box ..."
 
@@ -231,7 +248,7 @@ class PushMachine(object):
             if success:
                 self._push_counter += 1
             
-            self._record_sample.stop_record(success)
+                # self._record_sample.stop_record(success)
             
             idx = (idx+1)%(len(pushes))
         else:
@@ -291,9 +308,13 @@ class PushMachine(object):
         success = True
         # There might be a sequence of positions prior to a push action
         for goal in reset_push['poses']:
+            print "going to:", goal
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
-        success = success and self.goto_pose(goal_pos=reset_push['push_action'], goal_ori=None)
+
+        ee_pos, _ = self._robot.get_ee_pose()
+
+        success = success and self.goto_pose(goal_pos=ee_pos+reset_push['push_action'], goal_ori=None)
 
         return success
 
