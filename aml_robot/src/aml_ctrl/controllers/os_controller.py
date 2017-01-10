@@ -24,6 +24,12 @@ class OSController(Controller):
         self._goal_vel  = np.zeros(3)
         self._goal_omg  = np.zeros(3)
 
+        self._type = 'os'
+
+    @property
+    def type(self):
+        return self._type
+
     def set_goal(self, goal_pos, goal_ori, goal_vel=None, goal_omg=None, orientation_ctrl = True):
         
         self._goal_pos = goal_pos
