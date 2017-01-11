@@ -1,32 +1,23 @@
 #!/usr/bin/env python
 
 # A simply python controller for Baxter compatible with GPS (TODO)
-import rospy
-import cv2
-
 import tf
-from tf import TransformListener
+import os
+import rospy
+import argparse
 
 import numpy as np
 import quaternion
 
-from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
-from record_sample import RecordSample
-from aml_ctrl.utilities.lin_interp import LinInterp
-from config import config
-from aml_io.io import save_data, load_data
-from aml_perception import camera_sensor
 import aml_calib
 import camera_calib
-import random
-import cv2
-import os
-import sys
-import argparse
 
+from config import config
+from tf import TransformListener
+from record_sample import RecordSample
+from aml_perception import camera_sensor
+from aml_io.io import save_data, load_data
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
-
 
 class BoxObject(object):
 
@@ -203,13 +194,6 @@ class BoxObject(object):
             return [], None, None
 
 
-# class Sample(object):
-
-#     def __init__(self,sample_id):
-
-#         self._id = sample_id
-
-
 
 class PushMachine(object):
 
@@ -225,7 +209,9 @@ class PushMachine(object):
         self._record_sample = RecordSample(robot_interface=robot_interface, 
                                            task_interface=BoxObject(),
                                            record_rate=15,
-                                           sample_start_index=sample_start_index)
+                                           data_folder_path=None,
+                                           sample_start_index=sample_start_index,
+                                           sample_name_prefix='push_data')
 
 
     def compute_next_state(self,idx):

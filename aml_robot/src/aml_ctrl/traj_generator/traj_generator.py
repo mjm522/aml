@@ -12,7 +12,7 @@ class TrajGenerator(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, load_from_demo=False, **kwargs):
-    
+
         self._traj = {}
 
         self._time_steps = 0
@@ -31,6 +31,7 @@ class TrajGenerator(object):
         if kwargs.has_key('demo_idx'):
 
             self._demo_idx = kwargs['demo_idx']
+            self._limb_name = kwargs['limb_name']
 
         else:
 

@@ -71,12 +71,30 @@ class BaxterArm(baxter_interface.limb.Limb):
         else:
             print "Unknown limb idex"
             raise ValueError
+
+        self._cuff = baxter_interface.DigitalIO('%s_lower_cuff' % (limb,))
+        
+        self._cuff.state_changed.connect(self.cuff_cb)
+
+        self._cuff_state = None
             
         baxter_interface.RobotEnable(CHECK_VERSION).enable()
 
         #this will be useful to compute ee_velocity using finite differences
         self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
         self._time_now_old = self.get_time_in_seconds()
+
+    def cuff_cb(self, value):
+        self._cuff_state = value
+
+    #this function returns self._cuff_state to be true
+    #when arm is moved by a demonstrator, the moment arm stops 
+    #moving, the status returns to false
+    #initial value of the cuff is None, it is made False by pressing the
+    #cuff button once
+    @property
+    def get_lfd_status(self):
+        return self._cuff_state
 
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)
@@ -203,6 +221,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     
     def exec_position_cmd(self, cmd):
+        #there is some issue with this function ... move_to_joint_pos works far better.
         
         curr_q = self._state['position']
 

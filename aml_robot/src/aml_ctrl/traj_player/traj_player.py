@@ -40,7 +40,7 @@ class TrajPlayer():
                                        goal_js_acc=self._traj['acc_traj'][t])
             
             
-                js_pos_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0)
+                js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
             t += 1
             
@@ -54,7 +54,7 @@ class TrajPlayer():
         
         elif self._ctrlr.type is 'js':
             
-            js_pos_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=5.0)
+            js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=5.0)
 
         self._ctrlr.set_active(False)
 

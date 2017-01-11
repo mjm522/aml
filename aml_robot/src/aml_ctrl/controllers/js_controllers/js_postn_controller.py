@@ -62,7 +62,7 @@ class JSPositionController(JSController):
 
         js_delta       = goal_js_pos-q
 
-        u              = self._kp_q*goal_js_pos + self._kd_dq*(goal_js_vel-dq)
+        u              = goal_js_pos
 
         if np.any(np.isnan(u)):
             u               = self._cmd
@@ -75,7 +75,7 @@ class JSPositionController(JSController):
         return self._cmd
 
     def send_cmd(self,time_elapsed):
-        self._robot.exec_position_cmd(self._cmd)
+        self._robot.move_to_joint_pos(self._cmd)
 
 
     def set_active(self,is_active):

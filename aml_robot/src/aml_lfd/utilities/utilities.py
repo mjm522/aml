@@ -1,8 +1,9 @@
 import numpy as np
 import quaternion
+from aml_io.io import load_data
 from os.path import dirname, abspath
 
-def load_demo_data(demo_idx=1, debug=False):
+def load_demo_data(limb_name, demo_idx, debug=False):
 
     #get the parent folder
     data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
@@ -21,10 +22,10 @@ def load_demo_data(demo_idx=1, debug=False):
 
         try:
 
-            #add the file name of the stored demo file
-            file_path   = data_folder_path + 'demo_data_' + str(demo_idx) + '.npy'
+            file_path   = data_folder_path + limb_name + '_demo_data' +  ('_sample_%02d.pkl' % demo_idx)
+            
             #loads binary file
-            demo_data   = np.load(file_path)
+            demo_data   = load_data(file_path)
         
         except Exception as e:
             print "Data file cannot be loaded, check demo index..."
@@ -32,9 +33,31 @@ def load_demo_data(demo_idx=1, debug=False):
 
     return demo_data
 
-def get_os_traj(demo_idx=1, debug=False):
+def js_inverse_dynamics(limb_name, demo_idx, h_component=True):
+
+    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
+    js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(limb_name=limb_name, demo_idx=demo_idx)
+
+    tau = np.zeros_like(js_acc_traj)
     
-    demo_data = load_demo_data(demo_idx=demo_idx, debug=debug)
+    for k in range(len(js_pos_traj)):
+    
+        if h_component:
+
+            h = demo_data['state'][k]['gravity_comp']
+
+        else:
+
+            h = np.zeros_like(tau[0])
+
+        tau[k] = np.dot(demo_data['state'][k]['inertia'], js_acc_traj[k]) + h
+
+    return tau
+
+def get_os_traj(limb_name, demo_idx, debug=False):
+    
+    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=debug)
+    #the limb on which demo was taken
     ee_pos_traj = []
     ee_vel_traj = []
     ee_acc_traj = []
@@ -49,7 +72,7 @@ def get_os_traj(demo_idx=1, debug=False):
 
     else:
 
-        for arm_data in demo_data:
+        for arm_data in demo_data['state']:
             ee_pos_traj.append(arm_data['ee_pos'])
             ee_ori_traj.append(arm_data['ee_ori'])
             
@@ -78,13 +101,13 @@ def get_os_traj(demo_idx=1, debug=False):
 
     return ee_pos_traj, ee_ori_traj, ee_vel_traj, ee_omg_traj, ee_acc_traj, ee_ang_traj
 
-def get_js_traj(demo_idx=1):
+def get_js_traj(limb_name, demo_idx):
     #this function takes the position and velocity of a demonstrated data
-    demo_data = load_demo_data(demo_idx=demo_idx, debug=False)
+    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=False)
     js_pos_traj = []
     js_vel_traj = []
 
-    for arm_data in demo_data:
+    for arm_data in demo_data['state']:
         js_pos_traj.append(arm_data['position'])
         js_vel_traj.append(arm_data['velocity'])
 
@@ -97,15 +120,15 @@ def get_js_traj(demo_idx=1):
     return js_pos_traj, js_vel_traj, js_acc_traj
 
 
-def get_sampling_rate(demo_idx=1):
-    demo_data = load_demo_data(demo_idx=demo_idx)
-    return demo_data[0]['sampling_rate']
+def get_sampling_rate(limb_name, demo_idx):
+    demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
+    return demo_data['sampling_rate']
 
-def plot_demo_data(demo_idx=1):
+def plot_demo_data(limb_name, demo_idx):
 
-    ee_list, _, _, _, _, _  = get_os_traj(demo_idx=demo_idx)
+    ee_list, _, _, _, _, _  = get_os_traj(limb_name=limb_name, demo_idx=demo_idx)
 
-    js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(demo_idx=demo_idx)
+    js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(limb_name=limb_name, demo_idx=demo_idx)
 
     #ee_vel_list = np.diff(ee_list, axis=0)
     #print ee_list

@@ -20,7 +20,7 @@ class JSTrajGenerator(TrajGenerator):
 
     def get_demo_traj(self):
 
-        js_pos, js_vel, js_acc = get_js_traj(demo_idx=self._demo_idx)
+        js_pos, js_vel, js_acc = get_js_traj(limb_name=self._limb_name, demo_idx=self._demo_idx)
 
         self._timesteps = len(js_pos)
 

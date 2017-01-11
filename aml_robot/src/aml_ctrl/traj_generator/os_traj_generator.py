@@ -13,7 +13,7 @@ class OSTrajGenerator(TrajGenerator):
     def get_demo_traj(self):
 
         ee_pos_traj, ee_ori_traj, ee_vel_traj, ee_omg_traj, ee_acc_traj, ee_ang_traj =\
-        get_os_traj(demo_idx=self._demo_idx)
+        get_os_traj(limb_name=self._limb_name, demo_idx=self._demo_idx)
 
         self._timesteps = len(js_pos)
 

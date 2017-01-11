@@ -8,13 +8,19 @@ from aml_io.io import save_data, load_data
 
 class Sample():
 
-    def __init__(self, sample_id=None):
+    def __init__(self, sample_id=None, sampling_rate=None, data_folder_path=None, sample_name_prefix=None):
 
         self._data                = {}
 
         self._sample_id           = sample_id
 
         self._data['sample_id']   = sample_id
+
+        if sampling_rate is None:
+
+            print "WARNING: Sampling rate not stored, pass it if you want to store it."
+
+        self._data['sampling_rate'] = sampling_rate
 
         self._data['state']       = []
 
@@ -25,17 +31,31 @@ class Sample():
         self._data['task_status'] = False
 
         #this could be set from a hyper param file
-        self._data_folder_path = dirname(dirname(abspath(__file__))) + '/aml_data_collec_utils/data/'
+        if data_folder_path is None:
+            
+            self._data_folder_path = dirname(dirname(abspath(__file__))) + '/aml_data_collec_utils/data/'
+
+        else:
+            
+            self._data_folder_path = data_folder_path
+
+        if sample_name_prefix is None:
+
+            self._sample_name_prefix = 'unknown_task_name'
+
+        else:
+
+            self._sample_name_prefix = sample_name_prefix
 
     def write_sample(self):
 
-        data_file = self._data_folder_path + ('push_data_sample_%02d.pkl' % self._sample_id)
+        data_file = self._data_folder_path + self._sample_name_prefix + ('_sample_%02d.pkl' % self._sample_id)
 
         save_data(data=self._data, filename=data_file)
 
     def get_sample(self, sample_id):
 
-        data_file = self._data_folder_path + ('push_data_sample_%02d.pkl' % sample_id)
+        data_file = self._data_folder_path + self._sample_name_prefix +  ('_sample_%02d.pkl' % sample_id)
 
         data = load_data(data_file)
 
@@ -44,15 +64,15 @@ class Sample():
 
 class RecordSample():
 
-    def __init__(self, robot_interface, task_interface, record_rate=30, sample_start_index=None):
+    def __init__(self, robot_interface, task_interface, record_rate=30, data_folder_path=None, sample_start_index=None, sample_name_prefix=None):
 
         self._robot          = robot_interface
 
         self._task           = task_interface
         
-        self._stale_data     = None
-        
         self._record         = False
+
+        self._record_rate    = record_rate
 
         self._record_period  = rospy.Duration(1.0/record_rate)
 
@@ -62,6 +82,10 @@ class RecordSample():
 
         self._callback       = None
 
+        self._sample_name_prefix = sample_name_prefix
+
+        self._data_folder_path = data_folder_path
+
     def configure(self, task_action):
 
         if self._sample_idx is None:
@@ -69,7 +93,10 @@ class RecordSample():
             self._sample_idx  = 0
             
         #configure the sample
-        self._sample   = Sample(self._sample_idx)
+        self._sample   = Sample(sample_id=self._sample_idx,
+                                sampling_rate=self._record_rate,
+                                data_folder_path=self._data_folder_path, 
+                                sample_name_prefix=self._sample_name_prefix)
 
         #create a sample record callback on an 
         #independent thread and record the data 

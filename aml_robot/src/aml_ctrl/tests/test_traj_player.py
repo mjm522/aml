@@ -22,7 +22,8 @@ def main(robot_interface, load_from_demo=False, demo_idx=None):
 
         else:
 
-            kwargs['demo_idx'] = demo_idx
+            kwargs['limb_name'] = robot_interface._limb
+            kwargs['demo_idx']  = demo_idx
 
     else:
 
@@ -33,7 +34,7 @@ def main(robot_interface, load_from_demo=False, demo_idx=None):
         kwargs['goal_ori'] = kwargs['start_ori'] 
 
     # gen_traj = OSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
-    gen_traj = JSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
+    gen_traj    = JSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
 
     traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=gen_traj.generate_traj())
 
@@ -51,8 +52,8 @@ if __name__ == '__main__':
 
     arm.untuck_arm()
 
-    demo_idx = 6
+    demo_idx = 0
 
-    main(robot_interface=arm,load_from_demo=True, demo_idx=demo_idx)
+    main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx)
 
 
