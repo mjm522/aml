@@ -5,13 +5,15 @@ import numpy as np
 import rospy
 import random
 
+
 import time
 
 class MujocoSimulator():      
-    def __init__(self, mujoco_robot, update_rate=500):  
+    def __init__(self, mujoco_robot, update_rate=100):  
         
         self._robot = mujoco_robot
         self._update_rate = update_rate
+        self._inited = False
 
     def viewer_setup(self):
         self._width = 640
@@ -69,8 +71,9 @@ class MujocoSimulator():
         
         rospy.Timer(update_period, self.update)
 
+
         
-    def update(self, event):
-        
-        self.viewer_render()
-    
+    def update(self,event):
+
+        self._robot._model.step()
+

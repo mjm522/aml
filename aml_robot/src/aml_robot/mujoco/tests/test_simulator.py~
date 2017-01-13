@@ -55,7 +55,7 @@ def main():
 
     robot      = MujocoRobot(xml_path=model_folder_path+model_name)
 
-    simulate   = MujocoViewer(mujoco_robot=robot)
+    simulate   = MujocoSimulator(mujoco_robot=robot)
 
     simulate.configure()
 
