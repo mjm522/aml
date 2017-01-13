@@ -195,4 +195,4 @@ class OSVelocityController(OSController):
             hold_time = rospy.Duration(self._deactivate_wait_time)
             last_time = rospy.Time.now()
             while (rospy.Time.now() - last_time) <= hold_time:
-                self._robot.exec_position_cmd2(np.zeros(self._robot._nu))
+                self._robot.exec_position_cmd_delta(np.zeros(self._robot._nu))
