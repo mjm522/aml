@@ -2,7 +2,7 @@ import rospy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from aml_lfd.utilities.utilities import js_inverse_dynamics
+from aml_lfd.utilities.utilities import js_inverse_dynamics, get_sampling_rate
 
 
 def plot_id(torques):
@@ -21,16 +21,22 @@ def plot_id(torques):
 
 def main(robot_interface, load_from_demo, demo_idx):
 
-    # torques    = js_inverse_dynamics(limb_name=limb, demo_idx=demo_idx, h_component=True)
-    torques    = js_inverse_dynamics(limb_name=limb, demo_idx=demo_idx, h_component=False)
+    torques    = js_inverse_dynamics(limb_name=robot_interface._limb, demo_idx=demo_idx, h_component=False)
 
-    rate = rospy.Rate(50)
+    sampling_rate = get_sampling_rate(limb_name=robot_interface._limb, demo_idx=demo_idx)
+
+    plot_id(torques)
+
+    rate = rospy.Rate(sampling_rate)
 
     for tau in torques:
 
         robot_interface.exec_torque_cmd(tau)
 
         rate.sleep()
+
+    #to reload the position controllers, else the arms will drift
+    robot_interface.exec_position_cmd_delta(np.zeros(7))
 
 if __name__ == '__main__':
 
@@ -42,7 +48,7 @@ if __name__ == '__main__':
     
     arm = BaxterArm(limb)
 
-    # arm.untuck_arm()
+    arm.untuck_arm()
 
     demo_idx = 0
 

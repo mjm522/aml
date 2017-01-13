@@ -17,7 +17,8 @@ class MujocoRobot():
         self._metadata = {'render.modes': ['human', 'rgb_array'],
             'video.frames_per_second' : int(np.round(1.0 / self._dt))}
 
-    def _configure(self, model, on_state_callback):
+    def _configure(self, viewer, on_state_callback):
+        
         self._state = None
 
         if on_state_callback:
@@ -27,15 +28,13 @@ class MujocoRobot():
 
         self._kinematics = None
 
-        self._ik_baxter = None
-
         self._pub_rate = None
 
         # self.set_sampling_rate()
 
         # self.set_command_timeout(0.2)
 
-        self._camera = camera_sensor.CameraSensor()
+        self._camera = viewer
     
     def _update_state(self):
 
@@ -47,8 +46,8 @@ class MujocoRobot():
         state['effort']          = self._model.data.qfrc_inverse[0:self._nu]
         state['jacobian']        = self._model.jacSite('ee_site')
         state['inertia']         = self._model.fullM()
-        state['rgb_image']       = self._camera.curr_rgb_image
-        state['depth_image']     = self._camera.curr_depth_image
+        state['rgb_image']       = self._camera.get_image()[0]
+        # state['depth_image']     = self._camera.curr_depth_image
         state['gravity_comp']    = self._model.data.qfrc_bias[0:self._nu] + self._model.data.qfrc_passive[0:self._nu]
 
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }

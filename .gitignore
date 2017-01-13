@@ -6,3 +6,8 @@ checkpoints
 
 *.pkl
 
+MUJOCO_LOG.TXT
+
+*.gitignore*
+
+*.py*

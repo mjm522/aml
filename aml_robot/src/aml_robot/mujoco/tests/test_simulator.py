@@ -47,26 +47,30 @@ def main():
 
     model_folder_path = dirname(dirname(abspath(__file__))) + '/models/'
 
-    model_name = 'four_two_link_arms_obj.xml'
+    # model_name = 'four_two_link_arms_obj.xml'
 
     # model_name = 'table_setup.xml'
 
     # model_name = 'four_link_arm.xml'
 
+    model_name = '/baxter/baxter.xml'
+
     robot      = MujocoRobot(xml_path=model_folder_path+model_name)
 
-    simulate   = MujocoViewer(mujoco_robot=robot)
+    viewer   = MujocoViewer(mujoco_robot=robot)
 
-    simulate.configure()
+    robot._configure(viewer=viewer, on_state_callback=True)
+
+    viewer.configure()
 
     while not rospy.is_shutdown():
 
 
-        update_control(robot)
+        # update_control(robot)
 
         # update_magic_forces(robot)
 
-        simulate.viewer_render()
+        viewer.viewer_render()
 
 
 if __name__ == '__main__':

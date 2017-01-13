@@ -229,7 +229,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self.set_joint_positions(joint_command)
 
-    def exec_position_cmd2(self,cmd):
+    def exec_position_cmd_delta(self,cmd):
         curr_q = self.joint_angles()
         joint_names = self.joint_names()
         joint_command = dict([(joint, curr_q[joint] + cmd[i]) for i, joint in enumerate(joint_names)])

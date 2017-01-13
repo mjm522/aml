@@ -33,11 +33,14 @@ def load_demo_data(limb_name, demo_idx, debug=False):
 
     return demo_data
 
+def get_sampling_rate(limb_name, demo_idx):
+    demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
+    return demo_data['sampling_rate']
+
 def js_inverse_dynamics(limb_name, demo_idx, h_component=True):
 
     demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
     js_pos_traj, js_vel_traj, js_acc_traj = get_js_traj(limb_name=limb_name, demo_idx=demo_idx)
-
     tau = np.zeros_like(js_acc_traj)
     
     for k in range(len(js_pos_traj)):
@@ -104,6 +107,7 @@ def get_os_traj(limb_name, demo_idx, debug=False):
 def get_js_traj(limb_name, demo_idx):
     #this function takes the position and velocity of a demonstrated data
     demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=False)
+    sampling_rate = get_sampling_rate(limb_name=limb_name, demo_idx=demo_idx)
     js_pos_traj = []
     js_vel_traj = []
 
@@ -115,14 +119,10 @@ def get_js_traj(limb_name, demo_idx):
     js_vel_traj =  np.asarray(js_vel_traj).squeeze()
     #acceleration trajectory using finite differences
     js_acc_traj =  np.diff(js_vel_traj, axis=0)
-    js_acc_traj =  np.vstack([np.zeros_like(js_acc_traj[0]), js_acc_traj])
+    js_acc_traj =  np.vstack([np.zeros_like(js_acc_traj[0]), js_acc_traj])*sampling_rate
 
     return js_pos_traj, js_vel_traj, js_acc_traj
 
-
-def get_sampling_rate(limb_name, demo_idx):
-    demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
-    return demo_data['sampling_rate']
 
 def plot_demo_data(limb_name, demo_idx):
 
