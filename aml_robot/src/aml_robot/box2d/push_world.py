@@ -9,6 +9,8 @@ import Box2D  # The main library
 # Box2D.b2 maps Box2D.b2Vec2 to vec2 (and so on)
 from Box2D.b2 import (world, polygonShape, staticBody, dynamicBody)
 
+import pickle
+
 from config import config
 from pygame_viewer import PyGameViewer
 
@@ -36,7 +38,7 @@ class PushWorld(object):
         self._world = world(gravity=(0, 0), doSleep=True)
 
         # Create a dynamic body
-        self._dynamic_body = self._world.CreateDynamicBody(position=(10, 15), angle=0)
+        self._dynamic_body = self._world.CreateDynamicBody(position=(32, 24), angle=0)
 
         self._dynamic_body.awake = True
 
@@ -53,9 +55,13 @@ class PushWorld(object):
         self._change_after = 60
         self._push_counter = 0
         self._next_idx = 0
-        self._push_idx = 0
+        self._sample_idx = 0
+
 
         self._current_state = STATE['RESET']
+        self._new_sample = {}
+
+        self._samples = []
 
         pygame.font.init()
         self._text_font = pygame.font.SysFont("monospace", 15)
@@ -127,10 +133,26 @@ class PushWorld(object):
     def reset_box(self):
         body = self._dynamic_body
 
-        body.position = (15,15)
+        body.position = (16, 12)
         body.angle = 0
         body.linearVelocity = (0,0)
         body.angularVelocity = 0
+
+    def get_box_state(self,body):
+
+        (px,py) = body.position
+        angle = body.angle
+        (vx,vy) = body.linearVelocity
+        omega = body.angularVelocity
+
+        state = {
+            'position': np.array([px,py]),
+            'angle': angle,
+            'linear_velocity': np.array([vx,vy]),
+            'angular_velocity': omega
+        }
+
+        return state
 
 
     def get_vertices(self):
@@ -199,23 +221,44 @@ class PushWorld(object):
             self.reset_box()
 
             next_state = STATE['SAVE_DATA']
+            self._new_sample = {}
 
         elif self._current_state == STATE['SAVE_DATA']:
             # Current state of the box (position,linear and angular velocities)
             # Final state of the box 
             # Current image
             # Last image
-            sample = {}
-
-
-
-            image_file = "img%d.png"%(self._next_idx,)
-            self.save_screen(self._viewer._last_screen,image_file)
-            self._next_idx+=1
+            
+            # image_file = "img%d.png"%(self._next_idx,)
+            # self.save_screen(self._viewer._last_screen,image_file)
+            # self._next_idx += 1
 
             if self._push_counter > 0:
                 next_state = STATE['RESET']
+
+                state = self.get_box_state(body)
+
+                # self._new_sample['image_rgb_end_file'] = image_file
+                self._new_sample['image_rgb_end'] = self._viewer._last_screen
+                self._new_sample['state_end'] = state
+
+                self._new_sample['sample_id'] = self._sample_idx
+
+                self._samples.append(self._new_sample)
+
+                self._sample_idx += 1
+
             else:
+
+                state = self.get_box_state(body)
+
+                # self._new_sample['image_rgb_start_file'] = image_file
+                self._new_sample['image_rgb_start'] = self._viewer._last_screen
+                self._new_sample['state_start'] = state
+                self._new_sample['push_action'] = np.array([self._last_push])
+
+
+                
                 next_state = STATE['APPLY_PUSH']
 
         elif self._current_state == STATE['APPLY_PUSH']:
@@ -237,6 +280,15 @@ class PushWorld(object):
 
         return next_state
 
+    def save_samples(self,filename):
+
+        output = open(filename, 'wb')
+
+
+        pickle.dump(self._samples, output)
+
+
+        output.close()
 
 
     def loop(self):
@@ -265,3 +317,5 @@ viewer = PyGameViewer(config = config)
 push_world = PushWorld(viewer, config = config)
 
 push_world.loop()
+
+push_world.save_samples('data_test.pkl')
