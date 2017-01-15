@@ -10,4 +10,4 @@ MUJOCO_LOG.TXT
 
 *.gitignore*
 
-*.py*
+*.pyc
