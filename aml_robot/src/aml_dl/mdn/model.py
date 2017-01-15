@@ -73,25 +73,3 @@ def simple_mdn_model(dim_input = 1):
   return out_pi, out_sigma, out_mu, loss, x, y
 
 
-# def simple_mdn_model(dim_input = 1, n_hidden = 2, n_kernels = 2):
-
-#   # 3 parameters: pi, mu, stdev
-#   params_out = n_kernels*3
-
-#   x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
-#   y = tf.placeholder(dtype=tf.float32, shape=[None,1], name="y")
-
-#   Wh = tf.Variable(tf.random_normal([dim_input,n_hidden], stddev=STDEV, dtype=tf.float32))
-#   bh = tf.Variable(tf.random_normal([1,n_hidden], stddev=STDEV, dtype=tf.float32))
-
-#   Wo = tf.Variable(tf.random_normal([n_hidden,NOUT], stddev=STDEV, dtype=tf.float32))
-#   bo = tf.Variable(tf.random_normal([1,NOUT], stddev=STDEV, dtype=tf.float32))
-
-#   hidden_layer = tf.nn.tanh(tf.matmul(x, Wh) + bh)
-#   output = tf.matmul(hidden_layer,Wo) + bo
-
-#   out_pi, out_sigma, out_mu = get_mixture_coef(output)
-
-#   loss = get_loss(out_pi, out_sigma, out_mu,y)
-
-#   return out_pi, out_sigma, out_mu, loss, x, y
