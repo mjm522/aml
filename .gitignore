@@ -16,3 +16,5 @@ MUJOCO_LOG.TXT
 *.jpg
 
 *.ckpt*
+
+tf_model_delme.py
