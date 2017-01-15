@@ -34,8 +34,23 @@ def load_demo_data(limb_name, demo_idx, debug=False):
     return demo_data
 
 def get_sampling_rate(limb_name, demo_idx):
+    
     demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
     return demo_data['sampling_rate']
+
+
+def get_effort_sequence_of_demo(limb_name, demo_idx):
+    
+    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
+
+    jnt_effort_sequence = []
+
+    for arm_data in demo_data['state']:
+        
+        jnt_effort_sequence.append(arm_data['effort']-arm_data['gravity_comp'])
+  
+    return np.asarray(jnt_effort_sequence).squeeze()
+
 
 def js_inverse_dynamics(limb_name, demo_idx, h_component=True):
 

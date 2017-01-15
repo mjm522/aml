@@ -18,8 +18,9 @@ def get_mixture_coef(output, n_kernels = KMIX):
   out_pi = tf.sub(out_pi, max_pi)
 
   out_pi = tf.exp(out_pi)
+
+  normalize_pi = 1./(tf.reduce_sum(out_pi, 1, keep_dims=True))
   
-  normalize_pi = tf.inv(tf.reduce_sum(out_pi, 1, keep_dims=True))
   out_pi = tf.mul(normalize_pi, out_pi)
 
   out_sigma = tf.exp(out_sigma)
@@ -31,9 +32,9 @@ def tf_normal(y, mu, sigma):
 
   oneDivSqrtTwoPI = 1 / math.sqrt(2*math.pi) # normalisation factor for gaussian, not needed.
   result = tf.sub(y, mu)
-  result = tf.mul(result,tf.inv(sigma))
+  result = tf.mul(result,1./(sigma))
   result = -tf.square(result)/2
-  return tf.mul(tf.exp(result),tf.inv(sigma))*oneDivSqrtTwoPI
+  return tf.mul(tf.exp(result),1./(sigma))*oneDivSqrtTwoPI
 
 def get_loss(out_pi, out_sigma, out_mu, y):
 

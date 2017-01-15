@@ -66,6 +66,8 @@ def main():
     while not rospy.is_shutdown():
 
 
+        # 
+
         # update_control(robot)
 
         # update_magic_forces(robot)

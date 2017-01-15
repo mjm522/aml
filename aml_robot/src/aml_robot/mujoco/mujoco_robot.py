@@ -17,6 +17,9 @@ class MujocoRobot():
         self._metadata = {'render.modes': ['human', 'rgb_array'],
             'video.frames_per_second' : int(np.round(1.0 / self._dt))}
 
+        self._nu = self._model.nu
+        
+
     def _configure(self, viewer, on_state_callback):
         
         self._state = None
@@ -64,13 +67,17 @@ class MujocoRobot():
 
         return state
 
-    def get_ee_pose():
+    def get_ee_pose(self):
         
         ee_pose = self._model.site_pose('ee_site')
 
         return ee_pose[0], np.quaternion(ee_pose[1][0],ee_pose[1][1],ee_pose[1][2],ee_pose[1][3])
 
-    def get_ee_velocity():
+    def get_compensation_forces(self):
+
+        return self._model.data.qfrc_bias[0:self._nu] + self._model.data.qfrc_passive[0:self._nu]
+
+    def get_ee_velocity(self):
 
         time_now = rospy.Time.now()
 
