@@ -229,17 +229,17 @@ class PushWorld(object):
             # Current image
             # Last image
             
-            # image_file = "img%d.png"%(self._next_idx,)
-            # self.save_screen(self._viewer._last_screen,image_file)
-            # self._next_idx += 1
+            image_file = "images/img%d.png"%(self._next_idx,)
+            self.save_screen(self._viewer._last_screen,image_file)
+            self._next_idx += 1
 
             if self._push_counter > 0:
                 next_state = STATE['RESET']
 
                 state = self.get_box_state(body)
 
-                # self._new_sample['image_rgb_end_file'] = image_file
-                self._new_sample['image_rgb_end'] = self._viewer._last_screen
+                self._new_sample['image_rgb_end_file'] = image_file
+                # self._new_sample['image_rgb_end'] = self._viewer._last_screen
                 self._new_sample['state_end'] = state
 
                 self._new_sample['sample_id'] = self._sample_idx
@@ -252,8 +252,8 @@ class PushWorld(object):
 
                 state = self.get_box_state(body)
 
-                # self._new_sample['image_rgb_start_file'] = image_file
-                self._new_sample['image_rgb_start'] = self._viewer._last_screen
+                self._new_sample['image_rgb_start_file'] = image_file
+                # self._new_sample['image_rgb_start'] = self._viewer._last_screen
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
 
