@@ -52,7 +52,7 @@ class PushWorld(object):
 
         self._last_push = [0,0,0,0,0]
 
-        self._change_after = 60
+        self._change_after = 50
         self._push_counter = 0
         self._next_idx = 0
         self._sample_idx = 0
@@ -167,7 +167,7 @@ class PushWorld(object):
         # factor.
         vertices = [(body.transform * v) for v in shape.vertices]
 
-        print vertices
+        # print vertices
 
         return vertices
 
@@ -187,7 +187,7 @@ class PushWorld(object):
 
         self._push_counter += 1
 
-        print self._push_counter
+        # print self._push_counter
         return 0.0, 0.0, theta#px, py, theta
 
     def to_vec(self,theta):
@@ -244,6 +244,8 @@ class PushWorld(object):
 
                 self._new_sample['sample_id'] = self._sample_idx
 
+                print "SAMPLE_ID:", self._sample_idx
+
                 self._samples.append(self._new_sample)
 
                 self._sample_idx += 1
@@ -276,7 +278,7 @@ class PushWorld(object):
 
                 next_state = STATE['SAVE_DATA']
 
-        print "CURRENT STATE:", self._current_state, " NEXT_STATE: ", next_state
+        # print "CURRENT STATE:", self._current_state, " NEXT_STATE: ", next_state
 
         return next_state
 
@@ -309,6 +311,9 @@ class PushWorld(object):
             self.step()
 
             self._viewer.flip()
+
+            if self._sample_idx >= 2000:
+                self._viewer._running = False
 
 
 
