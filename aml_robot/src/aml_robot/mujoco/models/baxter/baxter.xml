@@ -45,6 +45,11 @@
         <map fogstart="1.5" fogend="3"/>
 		<quality shadowsize="2048"/>
 	</visual>
+
+    <option timestep="0.01"
+        gravity="0 0 0"
+        viscosity="0"
+        iterations="20"/>
 	
    <default>
 		<geom margin="0.001"/>
@@ -335,7 +340,7 @@
 
 
         <!--  ================= OBJECT ================= /-->
-         <body name="object" pos="0.25 0.1 .10" quat=".866 -.5 0 0">
+         <body name="object" pos="0.25 0.1 .10" quat="1 0 0 0">
             <geom type="box" name="target_obj" size="0.15 0.15 0.15" pos="0.65 0.0 -0.199" rgba="0.5 0.6 0.8 1" user="1" contype="1" conaffinity="1"/>
             <joint name="fr" type="free" limited='false' damping="0" armature="0" user="010"/>
             <site name="c1" type="sphere" size="0.01" rgba="0.0 0.9 0.0 1" pos="0.8    -0.15   -0.049" />
