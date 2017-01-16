@@ -8,4 +8,11 @@ Active Manipulation Learning (AML)
 * BaxterSDK - http://sdk.rethinkrobotics.com/wiki/Hello_Baxter
 * Baxter Simulator - http://sdk.rethinkrobotics.com/wiki/Simulator_Installation
 
+### Python Libraries
+
+
+* numpy
+* https://pypi.python.org/pypi/numpy-quaternion
+
+
 
