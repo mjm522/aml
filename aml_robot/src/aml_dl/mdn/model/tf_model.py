@@ -20,6 +20,7 @@ def get_mixture_coef(output, n_kernels = KMIX):
   out_pi = tf.exp(out_pi)
 
   normalize_pi = 1./(tf.reduce_sum(out_pi, 1, keep_dims=True))
+  
   out_pi = tf.mul(normalize_pi, out_pi)
 
   out_sigma = tf.exp(out_sigma)

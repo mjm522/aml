@@ -61,7 +61,7 @@ def generate_y_test(session, net):
 
 def plot_training_data(session, net):
 
-    data_manager = DataManager.from_file('/home/mjm/gitlibs/aml_data/aml_dl/sim_push_data_test/sim_push_data_test.pkl')
+    data_manager = DataManager.from_file('tests/data_test.pkl')
     data_x = data_manager.pack_data_x(['state_start','state_end'])
     data_y = data_manager.pack_data_y()
     h = session.run(net['z_hidden'],feed_dict={net['x']: data_x})
@@ -71,22 +71,22 @@ def plot_training_data(session, net):
 
 def main():
     
-    check_point_name = check_point_path + 'push_model_ckpt'
+    check_point_name = check_point_path + 'push_model.ckpt'
 
-    
+    sess = tf.Session()
     
 
     net = tf_pushing_model(dim_input= network_params['dim_input'], 
                            n_hidden = network_params['n_hidden'], 
                            n_kernels = network_params['KMIX'])
 
-    sess = tf.Session()
-
+    
+    sess.run(tf.initialize_all_variables())
     
 
     load_tf_check_point(session=sess, filename=check_point_name)
 
-    sess.run(tf.global_variables_initializer())
+    
 
     plot_training_data(session=sess, net=net)
 
