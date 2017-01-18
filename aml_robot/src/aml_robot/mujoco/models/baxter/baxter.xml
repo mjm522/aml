@@ -47,9 +47,8 @@
 	</visual>
 
     <option timestep="0.01"
-        gravity="0 0 0"
-        viscosity="0"
-        iterations="20"/>
+            gravity="0 0 0"
+            viscosity="0"/>
 	
    <default>
 		<geom margin="0.001"/>
@@ -77,7 +76,10 @@
     <worldbody>
         <light directional="false" cutoff="90" exponent="1" diffuse="1 1 1" specular="0 0 0" pos="1 0 1.5" dir="-1 0 -2.5"/>
         <geom name="ground" type="plane" pos="0 0 -0.925" size="4 4 .05" rgba="0.7 0.6 0.5 1"/>
+        
+        <!--
         <geom name="tableTop" material="MatGnd" type="plane" pos="0.95 0.0 -0.2" size="0.75 0.95 0.5" rgba=".6 .6 .5 1" contype="1" conaffinity="1"/>
+        -->
 		
         <body name="base" pos="0 0 0">
             <inertial pos="0 0 0" mass="10" diaginertia="0.001 0.001 0.001" />
@@ -340,6 +342,8 @@
 
 
         <!--  ================= OBJECT ================= /-->
+
+    <!--
          <body name="object" pos="0.25 0.1 .10" quat="1 0 0 0">
             <geom type="box" name="target_obj" size="0.15 0.15 0.15" pos="0.65 0.0 -0.199" rgba="0.5 0.6 0.8 1" user="1" contype="1" conaffinity="1"/>
             <joint name="fr" type="free" limited='false' damping="0" armature="0" user="010"/>
@@ -371,56 +375,69 @@
             <site name="f6" type="sphere" size="0.01" rgba="0.0 0.9 0.9 1" pos="0.65    0.00   -0.3490" />
         </body>
 
+    -->
+
 
     </worldbody>
     <actuator>
         <!--  ================= Torque actuators ================= /-->
-        <!--
-        <motor joint='head_pan'                     name='As_head_pan'                      gear="100"/>
         
-        <motor joint='right_s0'                     name='As_right_s0'                      gear="100"/>
-        <motor joint='right_s1'                     name='As_right_s1'                      gear="100"/>
-        <motor joint='right_e0'                     name='As_right_e0'                      gear="100"/>
-        <motor joint='right_e1'                     name='As_right_e1'                      gear="100"/>
-        <motor joint='right_w0'                     name='As_right_w0'                      gear="100"/>
-        <motor joint='right_w1'                     name='As_right_w1'                      gear="100"/>
-        <motor joint='right_w2'                     name='As_right_w2'                      gear="100"/>
-        <motor joint='r_gripper_l_finger_joint'     name='As_r_gripper_l_finger_joint'      gear="100"/>
-        <motor joint='r_gripper_r_finger_joint'     name='As_r_gripper_r_finger_joint'      gear="100"/>
+        <motor joint='head_pan'                     name='As_head_pan'                      gear="1"/>
         
-        <motor joint='left_s0'                      name='As_left_s0'                       gear="100"/>
-        <motor joint='left_s1'                      name='As_left_s1'                       gear="100"/>
-        <motor joint='left_e0'                      name='As_left_e0'                       gear="100"/>
-        <motor joint='left_e1'                      name='As_left_e1'                       gear="100"/>
-        <motor joint='left_w0'                      name='As_left_w0'                       gear="100"/>
-        <motor joint='left_w1'                      name='As_left_w1'                       gear="100"/>
-        <motor joint='left_w2'                      name='As_left_w2'                       gear="100"/>
-        <motor joint='l_gripper_l_finger_joint'     name='As_l_gripper_l_finger_joint'      gear="100"/>
-        <motor joint='l_gripper_r_finger_joint'     name='As_l_gripper_r_finger_joint'      gear="100"/>
-         -->
+        <motor joint='right_s0'                     name='As_right_s0'                      gear="1"/>
+        <motor joint='right_s1'                     name='As_right_s1'                      gear="1"/>
+        <motor joint='right_e0'                     name='As_right_e0'                      gear="1"/>
+        <motor joint='right_e1'                     name='As_right_e1'                      gear="1"/>
+        <motor joint='right_w0'                     name='As_right_w0'                      gear="1"/>
+        <motor joint='right_w1'                     name='As_right_w1'                      gear="1"/>
+        <motor joint='right_w2'                     name='As_right_w2'                      gear="1"/>
+        <motor joint='r_gripper_l_finger_joint'     name='As_r_gripper_l_finger_joint'      gear="1"/>
+        <motor joint='r_gripper_r_finger_joint'     name='As_r_gripper_r_finger_joint'      gear="1"/>
+        
+        <motor joint='left_s0'                      name='As_left_s0'                       
+        gear=" .000000000000000000000000028921213"/>
+        <motor joint='left_s1'                      name='As_left_s1'                       
+        gear=".0000000000000000000000000016372317"/>
+        <motor joint='left_e0'                      name='As_left_e0'                       
+        gear=".0000000000000000000000000021877109"/>
+        <motor joint='left_e1'                      name='As_left_e1'                       
+        gear=".0000000000000000000000000010512884"/>
+        <motor joint='left_w0'                      name='As_left_w0'                       
+        gear=".00011398217"/>
+        <motor joint='left_w1'                      name='As_left_w1'                       
+        gear=".0008167386"/>
+        <motor joint='left_w2'                      name='As_left_w2'                       
+        gear=" .0002750874"/>
+        <motor joint='l_gripper_l_finger_joint'     name='As_l_gripper_l_finger_joint'      
+        gear=".01"/>
+        <motor joint='l_gripper_r_finger_joint'     name='As_l_gripper_r_finger_joint'     
+        gear=".01"/>
+         
         
         <!--  ================= Position actuators ================= /-->
+        <!--
+
+        <position joint='head_pan'                     name='As_head_pan'                     ctrlrange='-1.5708 1.5708'/>
         
-        <motor joint='head_pan'                     name='As_head_pan'                     ctrlrange='-1.5708 1.5708'/>
+        <position joint='right_s0'                     name='As_right_s0'                     ctrlrange='-1.70168 1.70168'/>
+        <position joint='right_s1'                     name='As_right_s1'                     ctrlrange='-2.147 1.047'/>
+        <position joint='right_e0'                     name='As_right_e0'                     ctrlrange='-3.05418 3.05418'/>
+        <position joint='right_e1'                     name='As_right_e1'                     ctrlrange='-0.05 2.618'/>
+        <position joint='right_w0'                     name='As_right_w0'                     ctrlrange='-3.059 3.059'/>
+        <position joint='right_w1'                     name='As_right_w1'                     ctrlrange='-1.5708 2.094'/>
+        <position joint='right_w2'                     name='As_right_w2'                     ctrlrange='-3.059 3.059'/>
+        <position joint='r_gripper_l_finger_joint'     name='As_r_gripper_l_finger_joint'     ctrlrange='0.0 0.020833'/>
+        <position joint='r_gripper_r_finger_joint'     name='As_r_gripper_r_finger_joint'     ctrlrange='-0.020833 0.0'/>
         
-        <motor joint='right_s0'                     name='As_right_s0'                     ctrlrange='-1.70168 1.70168'/>
-        <motor joint='right_s1'                     name='As_right_s1'                     ctrlrange='-2.147 1.047'/>
-        <motor joint='right_e0'                     name='As_right_e0'                     ctrlrange='-3.05418 3.05418'/>
-        <motor joint='right_e1'                     name='As_right_e1'                     ctrlrange='-0.05 2.618'/>
-        <motor joint='right_w0'                     name='As_right_w0'                     ctrlrange='-3.059 3.059'/>
-        <motor joint='right_w1'                     name='As_right_w1'                     ctrlrange='-1.5708 2.094'/>
-        <motor joint='right_w2'                     name='As_right_w2'                     ctrlrange='-3.059 3.059'/>
-        <motor joint='r_gripper_l_finger_joint'     name='As_r_gripper_l_finger_joint'     ctrlrange='0.0 0.020833'/>
-        <motor joint='r_gripper_r_finger_joint'     name='As_r_gripper_r_finger_joint'     ctrlrange='-0.020833 0.0'/>
-        
-        <motor joint='left_s0'                      name='As_left_s0'                      ctrlrange='-1.70168 1.70168'/>
-        <motor joint='left_s1'                      name='As_left_s1'                      ctrlrange='-2.147 1.047'/>
-        <motor joint='left_e0'                      name='As_left_e0'                      ctrlrange='-3.05418 3.05418'/>
-        <motor joint='left_e1'                      name='As_left_e1'                      ctrlrange='-0.05 2.618'/>
-        <motor joint='left_w0'                      name='As_left_w0'                      ctrlrange='-3.059 3.059'/>
-        <motor joint='left_w1'                      name='As_left_w1'                      ctrlrange='-1.5708 2.094'/>
-        <motor joint='left_w2'                      name='As_left_w2'                      ctrlrange='-3.059 3.059'/>
-        <motor joint='l_gripper_l_finger_joint'     name='As_l_gripper_l_finger_joint'     ctrlrange='0.0 0.020833'/>
-        <motor joint='l_gripper_r_finger_joint'     name='As_l_gripper_r_finger_joint'     ctrlrange='-0.020833 0.0'/>   
+        <position joint='left_s0'                      name='As_left_s0'                      ctrlrange='-1.70168 1.70168'/>
+        <position joint='left_s1'                      name='As_left_s1'                      ctrlrange='-2.147 1.047'/>
+        <position joint='left_e0'                      name='As_left_e0'                      ctrlrange='-3.05418 3.05418'/>
+        <position joint='left_e1'                      name='As_left_e1'                      ctrlrange='-0.05 2.618'/>
+        <position joint='left_w0'                      name='As_left_w0'                      ctrlrange='-3.059 3.059'/>
+        <position joint='left_w1'                      name='As_left_w1'                      ctrlrange='-1.5708 2.094'/>
+        <position joint='left_w2'                      name='As_left_w2'                      ctrlrange='-3.059 3.059'/>
+        <position joint='l_gripper_l_finger_joint'     name='As_l_gripper_l_finger_joint'     ctrlrange='0.0 0.020833'/>
+        <position joint='l_gripper_r_finger_joint'     name='As_l_gripper_r_finger_joint'     ctrlrange='-0.020833 0.0'/> 
+        -->  
     </actuator>
 </mujoco>

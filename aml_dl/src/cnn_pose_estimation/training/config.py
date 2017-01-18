@@ -1,0 +1,37 @@
+IMAGE_WIDTH = 224
+IMAGE_HEIGHT = 224
+IMAGE_CHANNELS = 3
+NUM_FP = 4
+
+JOINT_ANGLES = 0
+JOINT_VELOCITIES = 1
+END_EFFECTOR_POINTS = 2
+END_EFFECTOR_POINT_VELOCITIES = 3
+RGB_IMAGE = 4
+IMAGE_FEAT = 5
+ACTION = 6
+RGB_IMAGE_SIZE = 7
+
+SENSOR_DIMS = {
+    JOINT_ANGLES: 7,
+    JOINT_VELOCITIES: 7,
+    END_EFFECTOR_POINTS: 9,
+    END_EFFECTOR_POINT_VELOCITIES: 9,
+    ACTION: 7,
+    RGB_IMAGE: IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
+    RGB_IMAGE_SIZE: 3,
+    IMAGE_FEAT: NUM_FP * 2,  # affected by num_filters set below.
+}
+
+network_params = {
+    'num_filters': [5, 5, NUM_FP],
+    'obs_include': [JOINT_ANGLES, JOINT_VELOCITIES,RGB_IMAGE], 
+    'obs_vector_data': [JOINT_ANGLES, JOINT_VELOCITIES,RGB_IMAGE],
+    'obs_image_data': [RGB_IMAGE],
+    'batch_size': 25,
+    'image_width': IMAGE_WIDTH,
+    'image_height': IMAGE_HEIGHT,
+    'image_channels': IMAGE_CHANNELS,
+    'sensor_dims': SENSOR_DIMS,
+    'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS
+}
