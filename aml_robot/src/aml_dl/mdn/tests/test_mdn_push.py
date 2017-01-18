@@ -74,7 +74,6 @@ def main():
     check_point_name = check_point_path + 'push_model.ckpt'
 
     sess = tf.Session()
-    
 
     net = tf_pushing_model(dim_input= network_params['dim_input'], 
                            n_hidden = network_params['n_hidden'], 
