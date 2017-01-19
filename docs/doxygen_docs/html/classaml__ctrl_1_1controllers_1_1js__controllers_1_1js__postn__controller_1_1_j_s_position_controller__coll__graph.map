@@ -1,0 +1,4 @@
+<map id="aml_ctrl.controllers.js_controllers.js_postn_controller.JSPositionController" name="aml_ctrl.controllers.js_controllers.js_postn_controller.JSPositionController">
+<area shape="rect" id="node2" href="$classaml__ctrl_1_1controllers_1_1js__controller_1_1_j_s_controller.html" title="{aml_ctrl.controllers.js\l_controller.JSController\n||+ __init__()\l+ type()\l+ set_goal()\l+ wait_until_goal_reached()\l}" alt="" coords="16,328,202,455"/>
+<area shape="rect" id="node3" href="$classaml__ctrl_1_1controller_1_1_controller.html" title="{aml_ctrl.controller.Controller\n||+ __init__()\l+ compute_cmd()\l+ update()\l+ wait_until_goal_reached()\l+ send_cmd()\l+ sleep()\l+ set_active()\l}" alt="" coords="15,127,203,280"/>
+</map>

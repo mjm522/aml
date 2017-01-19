@@ -26,6 +26,15 @@ Collaboration diagram for aml\+\_\+robot.\+baxter\+\_\+robot.\+Baxter\+Arm\+:
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a72a5c161c29bd536c6a8727d3138643a}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a72a5c161c29bd536c6a8727d3138643a} 
 def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, limb, on\+\_\+state\+\_\+callback=None)
 \item 
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ab8c5985c2c013d2da84e7415f2480f35}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ab8c5985c2c013d2da84e7415f2480f35} 
+def {\bfseries cuff\+\_\+cb} (self, value)
+\item 
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a08034a334645d8504b391a313add1cc7}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a08034a334645d8504b391a313add1cc7} 
+def {\bfseries get\+\_\+lfd\+\_\+status} (self)
+\item 
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a1f1b2c10d8e309c0cce60a971f5355b4}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a1f1b2c10d8e309c0cce60a971f5355b4} 
+def {\bfseries set\+\_\+sampling\+\_\+rate} (self, sampling\+\_\+rate=100)
+\item 
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_add8768944b81542e122c676f2b38c075}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_add8768944b81542e122c676f2b38c075} 
 def {\bfseries tuck\+\_\+arm} (self)
 \item 
@@ -44,8 +53,8 @@ def {\bfseries get\+\_\+base\+\_\+link\+\_\+name} (self)
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_aa8fb038222939675c5038f546d0e2627}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_aa8fb038222939675c5038f546d0e2627} 
 def {\bfseries exec\+\_\+position\+\_\+cmd} (self, cmd)
 \item 
-\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a292dff991a17cfdee36c6b07ed5b769c}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a292dff991a17cfdee36c6b07ed5b769c} 
-def {\bfseries exec\+\_\+position\+\_\+cmd2} (self, cmd)
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a7231f60bcd22ea25ee84d5c3269e82ae}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a7231f60bcd22ea25ee84d5c3269e82ae} 
+def {\bfseries exec\+\_\+position\+\_\+cmd\+\_\+delta} (self, cmd)
 \item 
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ad4c0f6a22d0cb23f411d50e8f661bcbb}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ad4c0f6a22d0cb23f411d50e8f661bcbb} 
 def {\bfseries move\+\_\+to\+\_\+joint\+\_\+pos\+\_\+delta} (self, cmd)
@@ -65,8 +74,11 @@ def {\bfseries move\+\_\+to\+\_\+joint\+\_\+position} (self, joint\+\_\+angles)
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ac353cdab96098923a40efd30f17f4e7a}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ac353cdab96098923a40efd30f17f4e7a} 
 def {\bfseries get\+\_\+ee\+\_\+pose} (self)
 \item 
-\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ab6c7fe72a54012c2081f943d378096b0}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ab6c7fe72a54012c2081f943d378096b0} 
-def {\bfseries get\+\_\+ee\+\_\+velocity} (self)
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a9dcc207d5f7703f7f9f69bb54c1ee7b3}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a9dcc207d5f7703f7f9f69bb54c1ee7b3} 
+def {\bfseries get\+\_\+time\+\_\+in\+\_\+seconds} (self)
+\item 
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a411092f179a7420d38625063c27b237e}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a411092f179a7420d38625063c27b237e} 
+def {\bfseries get\+\_\+ee\+\_\+velocity} (self, real\+\_\+robot=True)
 \item 
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a9ce9c74c445092b5f9bd26793366c8de}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a9ce9c74c445092b5f9bd26793366c8de} 
 def {\bfseries get\+\_\+cartesian\+\_\+pos\+\_\+from\+\_\+joints} (self, joint\+\_\+angles=None)
@@ -79,6 +91,9 @@ def {\bfseries get\+\_\+jacobian\+\_\+from\+\_\+joints} (self, joint\+\_\+angles
 \item 
 \hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ae3980ca9408490d07b4460e6d7fc2eb2}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_ae3980ca9408490d07b4460e6d7fc2eb2} 
 def {\bfseries get\+\_\+arm\+\_\+inertia} (self, joint\+\_\+angles=None)
+\item 
+\hypertarget{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a5ce4a9920b76e223e375755faaef7cf5}{}\label{classaml__robot_1_1baxter__robot_1_1_baxter_arm_a5ce4a9920b76e223e375755faaef7cf5} 
+def {\bfseries ik} (self, pos, ori=None)
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
