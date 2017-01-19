@@ -323,4 +323,4 @@ push_world = PushWorld(viewer, config = config)
 
 push_world.loop()
 
-push_world.save_samples('data_test.pkl')
+push_world.save_samples(config['training_data_file'])

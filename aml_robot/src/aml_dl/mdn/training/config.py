@@ -18,5 +18,7 @@ network_params = {
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'image_channels': IMAGE_CHANNELS,
-    'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS
+    'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
+    'load_saved_model': True,
+    'model_path': check_point_path + 'push_model.ckpt',
 }

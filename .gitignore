@@ -18,3 +18,5 @@ MUJOCO_LOG.TXT
 *.ckpt*
 
 tf_model_delme.py
+
+.ipynb_checkpoints
