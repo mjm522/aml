@@ -1,14 +1,12 @@
 import numpy as np
 import quaternion
 from aml_io.io_tools import load_data
-from os.path import dirname, abspath
+from os.path import join, dirname, abspath
 
 def load_demo_data(limb_name, demo_idx, debug=False):
 
-    #get the parent folder
-    data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
-
-    print data_folder_path
+    #get the folder that contains the demos
+    data_folder_path = '/'.join(dirname(dirname(abspath(__file__))).split('/')[:-2]) + '/data/'
 
     if debug:
         #for debugging purposes, load a known trajectory
