@@ -1,6 +1,6 @@
 import numpy as np
 import quaternion
-from aml_io.io import load_data
+from aml_io.io_tools import load_data
 from os.path import dirname, abspath
 
 def load_demo_data(limb_name, demo_idx, debug=False):

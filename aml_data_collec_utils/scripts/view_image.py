@@ -4,7 +4,7 @@ import cv2
 
 import aml_robot
 
-from aml_io.io import save_data, load_data
+from aml_io.io_tools import save_data, load_data
 
 data = load_data('data.pkl')
 print data

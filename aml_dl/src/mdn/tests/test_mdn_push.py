@@ -2,7 +2,7 @@ import numpy as np
 
 import tensorflow as tf
 
-from aml_io.io import load_tf_check_point
+from aml_io.io_tools import load_tf_check_point
 
 from aml_robot.box2d.data_manager import DataManager
 

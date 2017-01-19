@@ -16,7 +16,7 @@ from config import config
 from tf import TransformListener
 from record_sample import RecordSample
 from aml_perception import camera_sensor
-from aml_io.io import save_data, load_data
+from aml_io.io_tools import save_data, load_data
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
 class BoxObject(object):

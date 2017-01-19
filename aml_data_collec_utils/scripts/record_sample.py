@@ -4,7 +4,7 @@ import quaternion
 from os.path import dirname, abspath
 
 from functools import partial
-from aml_io.io import save_data, load_data
+from aml_io.io_tools import save_data, load_data
 
 class Sample():
 

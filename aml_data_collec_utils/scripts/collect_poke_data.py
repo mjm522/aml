@@ -18,7 +18,7 @@ from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 from aml_ctrl.utilities.lin_interp import LinInterp
 from config import BOX_TYPE_1
-from aml_io.io import save_data, load_data
+from aml_io.io_tools import save_data, load_data
 from aml_perception import camera_sensor
 import aml_calib
 import camera_calib
