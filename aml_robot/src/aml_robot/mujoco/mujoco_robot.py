@@ -91,15 +91,30 @@ class MujocoRobot():
         return ee_vel, ee_omg
 
 
-    def move_to_joint_pos(self, cmd):
-        self._model.data.qpos = cmd
+    def set_qpos(self, qpos):
+        self._model.data.qpos = qpos
         self._model._compute_subtree() 
         self._model.forward()
     
-    def exec_velocity_cmd(self, cmd):
-        self._model.data.qvel = cmd
+    def set_qvel(self, qvel):
+        self._model.data.qvel = qvel
         self._model._compute_subtree() 
         self._model.forward()
+
+    def set_qacc(self, qacc):
+        self._model.data.qacc = qacc
+        self._model._compute_subtree() 
+        self._model.forward()
+
+    def inv_dyn(self, qpos, qvel, qacc):
+        self._model.data.qpos = qpos
+        self._model.data.qvel = qvel
+        self._model.data.qacc = qacc
+        self._model._compute_subtree()
+        self._model.forward()
+        self._model.step()
+        self._model.inverse()
+        return self._model.data.qfrc_inverse
         
     def exec_torque_cmd(self, cmd):
         self._model.data.ctrl = cmd

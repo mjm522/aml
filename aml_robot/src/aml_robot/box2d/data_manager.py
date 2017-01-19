@@ -1,6 +1,6 @@
 import matplotlib.image as mpimg
 
-from aml_io.io import load_data, save_data
+from aml_io.io_tools import load_data, save_data
 
 import numpy as np
 
