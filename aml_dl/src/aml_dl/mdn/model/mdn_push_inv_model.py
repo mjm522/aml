@@ -56,8 +56,13 @@ class MDNPushInverseModel(object):
 
         samples = self._generate_mixture_samples(out_pi, out_mu, out_sigma,m_samples)
 
-
         return samples
+
+    def expected_out(self, x_input, m_samples = 10):
+
+        samples = self.sample_out(x_input,m_samples)[0]
+
+        return np.mean(samples)
 
     def run_op(self, op_name, x_input):
 

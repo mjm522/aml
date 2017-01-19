@@ -230,7 +230,9 @@ class PushWorld(object):
             # Last image
             
             image_file = "images/img%d.png"%(self._next_idx,)
-            self.save_screen(self._viewer._last_screen,image_file)
+            if self._config['record_training_data']:
+                self.save_screen(self._viewer._last_screen,image_file)
+
             self._next_idx += 1
 
             if self._push_counter > 0:
@@ -246,7 +248,8 @@ class PushWorld(object):
 
                 print "SAMPLE_ID:", self._sample_idx
 
-                self._samples.append(self._new_sample)
+                if self._config['record_training_data']:
+                    self._samples.append(self._new_sample)
 
                 self._sample_idx += 1
 
@@ -267,10 +270,7 @@ class PushWorld(object):
 
             px, py, ix, iy, theta = self._last_push
 
-            px_world, py_world = self.get_point(body,(px,py))
-            ix, iy = self.to_vec(theta)
-
-            body.ApplyLinearImpulse(impulse=(ix,iy), point=(px_world,py_world), wake=True)
+            self.applyPush(body, px, py, ix, iy, theta)
 
             self._push_counter += 1
 
@@ -281,6 +281,14 @@ class PushWorld(object):
         # print "CURRENT STATE:", self._current_state, " NEXT_STATE: ", next_state
 
         return next_state
+
+    def applyPush(self,body, px, py, ix, iy, theta):
+
+        px_world, py_world = self.get_point(body,(px,py))
+        ix, iy = self.to_vec(theta)
+
+        body.ApplyLinearImpulse(impulse=(ix,iy), point=(px_world,py_world), wake=True)
+
 
     def save_samples(self,filename):
 
@@ -315,12 +323,16 @@ class PushWorld(object):
             if self._sample_idx >= 2000:
                 self._viewer._running = False
 
+def main():
+    viewer = PyGameViewer(config = config)
+    push_world = PushWorld(viewer, config = config)
+
+    push_world.loop()
+
+    push_world.save_samples(config['training_data_file'])
 
 
+if __name__ == "__main__":
+    main()
 
-viewer = PyGameViewer(config = config)
-push_world = PushWorld(viewer, config = config)
 
-push_world.loop()
-
-push_world.save_samples(config['training_data_file'])

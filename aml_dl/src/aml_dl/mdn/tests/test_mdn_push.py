@@ -6,8 +6,6 @@ from aml_robot.box2d.data_manager import DataManager
 
 import matplotlib.pyplot as plt
 
-from aml_dl.mdn.model.tf_model import tf_pushing_model
-
 from aml_dl.mdn.training.config import network_params
 
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
@@ -59,16 +57,16 @@ def main():
     inverse_model.init_model()
     
 
-    plot_training_data(inverse_model=inverse_model)
+    # plot_training_data(inverse_model=inverse_model)
 
-    generate_y_test(inverse_model=inverse_model)
+    # generate_y_test(inverse_model=inverse_model)
     quit = False
 
     while not quit:
 
         avg_angle = 0.0
         avg_push = 0.0
-        N_SAMPLES = 500
+        N_SAMPLES = 100
         tgt = np.random.randn(2)
 
         v0 = np.zeros(2)#np.random.randn(2)
@@ -82,16 +80,18 @@ def main():
         ax.arrow(0, 0, v0[0]/np.linalg.norm(v0), v0[1]/np.linalg.norm(v0), head_width=0.06, head_length=0.15, fc='g', ec='g')
         ax.arrow(0, 0, tgt[0]/np.linalg.norm(tgt), tgt[1]/np.linalg.norm(tgt), head_width=0.06, head_length=0.15, fc='b', ec='b')
 
+
+        input_x = np.expand_dims(np.r_[v0,tgt],0)
+        theta = inverse_model.sample_out(input_x,N_SAMPLES)[0]
+        print "Theta:", theta
+        mean_theta = np.mean(theta)
+
         for i in range(0,N_SAMPLES):
             
-            input_x = np.expand_dims(np.r_[v0,tgt],0)
-            theta = inverse_model.sample_out(input_x,1)[0][0]
-            print "Theta:", theta
+            
 
-            push_direction = np.array([np.cos(theta),np.sin(theta)])
+            push_direction = np.array([np.cos(theta[i]),np.sin(theta[i])])
 
-            angle = np.dot(tgt,push_direction)
-            avg_angle += angle
             avg_push += push_direction
 
             
@@ -102,7 +102,7 @@ def main():
             
             
 
-            print "Tgt: ", tgt, " PushDir:", push_direction, " Angle:", angle
+            print "Tgt: ", tgt, " PushDir:", push_direction, " Angle:", theta[i]
 
             
             plt.show(block=False)
@@ -113,7 +113,7 @@ def main():
         avg_push = avg_push/np.linalg.norm(avg_push)
         
 
-        print "AVG_ANGLE: ", avg_angle/N_SAMPLES
+        print "AVG_ANGLE: ", mean_theta
 
         ax.arrow(0, 0, v0[0]/np.linalg.norm(v0), v0[1]/np.linalg.norm(v0), head_width=0.06, head_length=0.15, fc='g', ec='g')
         ax.arrow(0, 0, tgt[0]/np.linalg.norm(tgt), tgt[1]/np.linalg.norm(tgt), head_width=0.06, head_length=0.15, fc='b', ec='b')    
