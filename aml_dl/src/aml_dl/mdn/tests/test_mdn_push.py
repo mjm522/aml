@@ -48,6 +48,12 @@ def plot_training_data(inverse_model):
     plt.plot(h, data_y,'ro', alpha=0.3)
     plt.show()
 
+
+def plot_arrow(ax,v, head_width=0.06, head_length=0.15, fc='g', ec='g'):
+
+    ax.arrow(0, 0, v[0]/np.linalg.norm(v), v[1]/np.linalg.norm(v), head_width=head_width, head_length=head_length, fc=fc, ec=ec)
+
+
 def main():
 
 
@@ -77,8 +83,9 @@ def main():
         ax = plt.axes()
 
 
-        ax.arrow(0, 0, v0[0]/np.linalg.norm(v0), v0[1]/np.linalg.norm(v0), head_width=0.06, head_length=0.15, fc='g', ec='g')
-        ax.arrow(0, 0, tgt[0]/np.linalg.norm(tgt), tgt[1]/np.linalg.norm(tgt), head_width=0.06, head_length=0.15, fc='b', ec='b')
+        plot_arrow(ax,v0,head_width=0.06, head_length=0.15, fc='g', ec='g')
+ 
+        plot_arrow(ax,tgt,head_width=0.06, head_length=0.15, fc='b', ec='b')
 
 
         input_x = np.expand_dims(np.r_[v0,tgt],0)
@@ -97,11 +104,11 @@ def main():
             
             ax.set_ylim([-2,2])
             ax.set_xlim([-2,2])
-            ax.arrow(0, 0, push_direction[0], push_direction[1], head_width=0.05, head_length=0.1, fc='k', ec='k')
+
+            plot_arrow(ax,push_direction, head_width=0.05, head_length=0.1, fc='k', ec='k')
 
             
             
-
             print "Tgt: ", tgt, " PushDir:", push_direction, " Angle:", theta[i]
 
             
@@ -109,15 +116,16 @@ def main():
             plt.draw()
 
         avg_push = avg_push/N_SAMPLES
-
-        avg_push = avg_push/np.linalg.norm(avg_push)
         
 
         print "AVG_ANGLE: ", mean_theta
 
-        ax.arrow(0, 0, v0[0]/np.linalg.norm(v0), v0[1]/np.linalg.norm(v0), head_width=0.06, head_length=0.15, fc='g', ec='g')
-        ax.arrow(0, 0, tgt[0]/np.linalg.norm(tgt), tgt[1]/np.linalg.norm(tgt), head_width=0.06, head_length=0.15, fc='b', ec='b')    
-        ax.arrow(0, 0, avg_push[0], avg_push[1], head_width=0.05, head_length=0.1, fc='r', ec='r')
+        plot_arrow(ax,v0,head_width=0.06, head_length=0.15, fc='g', ec='g')
+ 
+        plot_arrow(ax,tgt,head_width=0.06, head_length=0.15, fc='b', ec='b')
+
+        plot_arrow(ax,avg_push,head_width=0.05, head_length=0.1, fc='r', ec='r')
+
 
         plt.show()
 

@@ -64,6 +64,22 @@ class MDNPushInverseModel(object):
 
         return np.mean(samples)
 
+
+    def expected_out2(self, x_input, m_samples = 10):
+
+        samples = self.sample_out(x_input,m_samples)[0]
+
+        out = np.zeros(2)
+
+        for i in range(m_samples):
+            out += np.array([np.cos(samples[i]),np.sin(samples[i])])
+        
+        out /= m_samples
+
+        out /= np.linalg.norm(out)
+
+        return out
+
     def run_op(self, op_name, x_input):
 
         op = self._net_ops[op_name]

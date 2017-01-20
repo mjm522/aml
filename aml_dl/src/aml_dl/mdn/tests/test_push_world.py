@@ -35,12 +35,18 @@ class TestModelPushWorld(PushWorld):
 
         body = self._dynamic_body
 
-        input_x = np.expand_dims(np.r_[np.zeros(2),self._box_state['linear_velocity']],0)
+        tgt = np.random.randn(2)
+         # px, py, tgt_x, tgt_y, theta = self._last_push
+        # input_x = np.expand_dims(np.r_[np.zeros(2),self._box_state['linear_velocity']],0)
+        input_x = np.expand_dims(np.r_[np.zeros(2),tgt],0)
 
-        theta = self._inverse_model.expected_out(input_x,200)
+
+        theta = self._inverse_model.expected_out(input_x,5)
 
         ix = np.cos(theta)
-        iy = -np.sin(theta)
+        iy = np.sin(theta)
+
+        # ix, iy = self._inverse_model.expected_out2(input_x,1000)
 
         print "IXIY:", ix, iy
 
