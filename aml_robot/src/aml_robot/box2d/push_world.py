@@ -1,8 +1,11 @@
 import numpy as np
 import pygame
 
-import matplotlib.pyplot as plt
+
 import matplotlib
+matplotlib.use("Qt4Agg") # For using matplotlib with pygame
+import matplotlib.pyplot as plt
+
 import threading
 
 import Box2D  # The main library
@@ -13,6 +16,9 @@ import pickle
 
 from config import config
 from pygame_viewer import PyGameViewer
+
+
+from data_manager import DataManager
 
 STATE = {
     'RESET': 0,
@@ -53,13 +59,12 @@ class PushWorld(object):
         self._change_after = 50
         self._push_counter = 0
         self._next_idx = 0
-        self._sample_idx = 0
-
 
         self._current_state = STATE['RESET']
-        self._new_sample = {}
+        
+        self._data_manager = DataManager()
+        self._new_sample = self._data_manager.create_sample()
 
-        self._samples = []
 
         pygame.font.init()
         self._text_font = pygame.font.SysFont("monospace", 15)
@@ -132,18 +137,30 @@ class PushWorld(object):
         body.linearVelocity = (0,0)
         body.angularVelocity = 0
 
-    def get_box_state(self,body):
+    def get_box_state(self,body, viewer = None):
 
         (px,py) = body.position
         angle = body.angle
         (vx,vy) = body.linearVelocity
         omega = body.angularVelocity
 
+        image_file = None
+        if viewer is not None:
+            image_file = "images/img%d.png"%(self._next_idx,)
+            if self._config['record_training_data']:
+                self.save_screen(viewer._last_screen,image_file)
+            
+            self._next_idx += 1
+
+        # Current state of the box (position,linear and angular velocities, image_rgb)
+        # Final state of the box 
+
         state = {
             'position': np.array([px,py]),
             'angle': angle,
             'linear_velocity': np.array([vx,vy]),
-            'angular_velocity': omega
+            'angular_velocity': omega,
+            'image_rgb': image_file,
         }
 
         return state
@@ -195,6 +212,17 @@ class PushWorld(object):
         if img is not None:
             matplotlib.image.imsave(filename, img)
 
+
+    def add_sample(self, new_sample):
+
+        new_sample['filled'] = True
+        new_sample['stale'] = False
+
+        if self._config['record_training_data']:
+
+            self._data_manager.add(new_sample)
+
+
     def update(self, viewer):
 
         next_state = self._current_state
@@ -211,51 +239,35 @@ class PushWorld(object):
             self.reset_box()
 
             next_state = STATE['SAVE_DATA']
-            self._new_sample = {'filled': False}
+            self._new_sample = self._data_manager.create_sample()
 
         elif self._current_state == STATE['SAVE_DATA']:
-            # Current state of the box (position,linear and angular velocities)
+
+            # Current state of the box (position,linear and angular velocities, image_rgb)
             # Final state of the box 
             # Current image
             # Last image
-            
-            image_file = "images/img%d.png"%(self._next_idx,)
-            if self._config['record_training_data']:
-                self.save_screen(viewer._last_screen,image_file)
-
-            self._next_idx += 1
 
             if self._push_counter > 0:
                 next_state = STATE['RESET']
 
-                state = self.get_box_state(body)
+                state = self.get_box_state(body, viewer)
 
-                self._new_sample['image_rgb_end_file'] = image_file
                 # self._new_sample['image_rgb_end'] = self._viewer._last_screen
                 self._new_sample['state_end'] = state
 
-                self._new_sample['sample_id'] = self._sample_idx
+                print "SAMPLE_ID:", self._data_manager._next_sample_id
 
-                print "SAMPLE_ID:", self._sample_idx
-
-                self._new_sample['filled'] = True
-
-                if self._config['record_training_data']:
-                    self._samples.append(self._new_sample)
-
-                self._sample_idx += 1
+                self.add_sample(self._new_sample)
 
             else:
 
-                state = self.get_box_state(body)
+                state = self.get_box_state(body, viewer)
 
-                self._new_sample['image_rgb_start_file'] = image_file
                 # self._new_sample['image_rgb_start'] = self._viewer._last_screen
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
 
-
-                
                 next_state = STATE['APPLY_PUSH']
 
         elif self._current_state == STATE['APPLY_PUSH']:
@@ -287,13 +299,7 @@ class PushWorld(object):
 
     def save_samples(self,filename):
 
-        output = open(filename, 'wb')
-
-
-        pickle.dump(self._samples, output)
-
-
-        output.close()
+        self._data_manager.save(filename)
 
 
 def main():

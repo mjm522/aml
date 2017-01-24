@@ -10,14 +10,24 @@ from aml_dl.mdn.training.config import network_params
 import tensorflow as tf
 import numpy as np
 
+# import matplotlib.backends.backend_agg as agg
+
+
+
+# import pylab
+
 import pygame
 
+import matplotlib.pyplot as plt
+
 config['record_training_data'] = True
+network_params['load_saved_model'] = False
 
 
 class TestModelPushWorld(PushWorld):
 
     def __init__(self, config):
+
         PushWorld.__init__(self,config)
         
         self._box_state = self.get_box_state(self._dynamic_body)
@@ -29,6 +39,8 @@ class TestModelPushWorld(PushWorld):
         self._inverse_model.init_model()
 
         self._change_after = 100
+
+        self._loss = []
 
 
     def draw(self, screen):
@@ -60,12 +72,56 @@ class TestModelPushWorld(PushWorld):
         endpoint = (int(p[0]+ix*25),int(p[1]-iy*25))
         # print "DIR: ", direction
         pygame.draw.line(screen,(255,127,127,255),p,endpoint)
-        
+
+
+    def is_time_to_train(self, sample):
+
+        return self._data_manager.size() > 1 and sample is not None and not sample['stale'] and sample['sample_id']%10 == 0
+    
+
+    def plot(self):
+        # fig = pylab.figure(figsize=[4, 4], # Inches
+        #            dpi=100,        # 100 dots per inch, so the resulting buffer is 400x400 pixels
+        #            )
+        # ax = fig.gca()
+        # ax.plot([1, 2, 4])
+         
+        # canvas = agg.FigureCanvasAgg(fig)
+        # canvas.draw()
+        # renderer = canvas.get_renderer()
+        # raw_data = renderer.tostring_rgb()
+
+        # plt.show(block=False)
+        pass
+ 
     def update(self, viewer):
 
         next_state = PushWorld.update(self, viewer)
 
         self._box_state = self.get_box_state(self._dynamic_body)
+
+        latest_sample = self._data_manager.get_last()
+        if self.is_time_to_train(latest_sample):
+            latest_sample['stale'] = True
+
+            batch_ids = self._data_manager.get_last_ids(10)
+            data_x, data_y = self._data_manager.pack_data(['state_start','state_end'],batch_ids)
+
+
+            # print "DATA_X: ", data_x
+            # print "DATA_Y: ", data_y
+            self._loss = np.r_[self._loss,self._inverse_model.train(data_x, data_y, epochs=100)]
+
+
+            # print "SHOULD TRAIN!!!"
+            # plt.ion()
+            plt.plot(self._loss)
+            # plt.plot(range(len(self._loss)),self._loss)
+            plt.show(block=False)
+            plt.draw()
+
+
+        # self.plot()
 
         return next_state
 
@@ -73,5 +129,6 @@ class TestModelPushWorld(PushWorld):
 
 push_world = TestModelPushWorld(config = config)
 viewer = PyGameViewer(push_world, config = config)
+
 
 viewer.loop()
