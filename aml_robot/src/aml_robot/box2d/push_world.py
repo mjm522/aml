@@ -25,9 +25,7 @@ STATE = {
 
 class PushWorld(object):
 
-    def __init__(self,viewer,config):
-
-        self._viewer = viewer
+    def __init__(self,config):
 
         self._config = config
         self._ppm = self._config['pixels_per_meter']
@@ -85,12 +83,8 @@ class PushWorld(object):
                 # factor.
                 vertices = [(body.transform * v) * self._ppm for v in shape.vertices]
 
-                # But wait! It's upside-down! Pygame and Box2D orient their
-                # axes in different ways. Box2D is just like how you learned
-                # in high school, with positive x and y directions going
-                # right and up. Pygame, on the other hand, increases in the
-                # right and downward directions. This means we must flip
-                # the y components.
+                # Box2d uses cannonical axis, we need to convert to match the screen axis convention
+                # (-y) 
                 vertices = [(v[0], self._config['image_height'] - v[1]) for v in vertices]
 
 
@@ -161,10 +155,6 @@ class PushWorld(object):
 
         shape = body.fixtures[0].shape
 
-        # Naively assume that this is a polygon shape. (not good normally!)
-        # We take the body's transform and multiply it with each
-        # vertex, and then convert from meters to pixels with the scale
-        # factor.
         vertices = [(body.transform * v) for v in shape.vertices]
 
         # print vertices
@@ -205,7 +195,7 @@ class PushWorld(object):
         if img is not None:
             matplotlib.image.imsave(filename, img)
 
-    def update(self):
+    def update(self, viewer):
 
         next_state = self._current_state
 
@@ -221,7 +211,7 @@ class PushWorld(object):
             self.reset_box()
 
             next_state = STATE['SAVE_DATA']
-            self._new_sample = {}
+            self._new_sample = {'filled': False}
 
         elif self._current_state == STATE['SAVE_DATA']:
             # Current state of the box (position,linear and angular velocities)
@@ -231,7 +221,7 @@ class PushWorld(object):
             
             image_file = "images/img%d.png"%(self._next_idx,)
             if self._config['record_training_data']:
-                self.save_screen(self._viewer._last_screen,image_file)
+                self.save_screen(viewer._last_screen,image_file)
 
             self._next_idx += 1
 
@@ -247,6 +237,8 @@ class PushWorld(object):
                 self._new_sample['sample_id'] = self._sample_idx
 
                 print "SAMPLE_ID:", self._sample_idx
+
+                self._new_sample['filled'] = True
 
                 if self._config['record_training_data']:
                     self._samples.append(self._new_sample)
@@ -280,7 +272,10 @@ class PushWorld(object):
 
         # print "CURRENT STATE:", self._current_state, " NEXT_STATE: ", next_state
 
-        return next_state
+        # Updating next state
+        self._current_state = next_state
+
+        return self._current_state 
 
     def applyPush(self,body, px, py, ix, iy, theta):
 
@@ -301,33 +296,13 @@ class PushWorld(object):
         output.close()
 
 
-    def loop(self):
-
-        # --- main game loop ---
-        while self._viewer._running:
-
-            self._viewer.handle_events()
-
-            self._viewer.clear_screen()
-
-            self._current_state = self.update()
-
-            # Draw the world
-            self.draw(self._viewer._screen)
-            # self.save_screen()
-
-            self.step()
-
-            self._viewer.flip()
-
-            if self._sample_idx >= 2000:
-                self._viewer._running = False
-
 def main():
-    viewer = PyGameViewer(config = config)
-    push_world = PushWorld(viewer, config = config)
+    
+    push_world = PushWorld(config = config)
 
-    push_world.loop()
+    viewer = PyGameViewer(push_world, config = config)
+
+    viewer.loop()
 
     push_world.save_samples(config['training_data_file'])
 

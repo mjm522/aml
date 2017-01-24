@@ -2,6 +2,8 @@ from aml_robot.box2d.push_world import PushWorld
 from aml_robot.box2d.pygame_viewer import PyGameViewer
 from aml_robot.box2d.config import config
 
+from aml_robot.box2d.data_manager import DataManager
+
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 from aml_dl.mdn.training.config import network_params
 
@@ -10,13 +12,13 @@ import numpy as np
 
 import pygame
 
-config['record_training_data'] = False
+config['record_training_data'] = True
 
 
 class TestModelPushWorld(PushWorld):
 
-    def __init__(self, viewer, config):
-        PushWorld.__init__(self,viewer,config)
+    def __init__(self, config):
+        PushWorld.__init__(self,config)
         
         self._box_state = self.get_box_state(self._dynamic_body)
 
@@ -35,20 +37,20 @@ class TestModelPushWorld(PushWorld):
 
         body = self._dynamic_body
 
-        tgt = np.random.randn(2)
-         # px, py, tgt_x, tgt_y, theta = self._last_push
-        # input_x = np.expand_dims(np.r_[np.zeros(2),self._box_state['linear_velocity']],0)
-        input_x = np.expand_dims(np.r_[np.zeros(2),tgt],0)
+        # tgt = np.random.randn(2)
+        state = self._box_state['linear_velocity']
+        # px, py, tgt_x, tgt_y, theta = self._last_push
+        input_x = np.expand_dims(np.r_[np.zeros(2), state],0)
 
 
-        theta = self._inverse_model.expected_out(input_x,5)
+        # theta = self._inverse_model.expected_out(input_x,1)
 
-        ix = np.cos(theta)
-        iy = np.sin(theta)
+        # ix = np.cos(theta)
+        # iy = np.sin(theta)
 
-        # ix, iy = self._inverse_model.expected_out2(input_x,1000)
+        ix, iy = self._inverse_model.expected_out2(input_x,5)
 
-        print "IXIY:", ix, iy
+        # print "IXIY:", ix, iy
 
         px, py = self._box_state['position']
 
@@ -59,16 +61,17 @@ class TestModelPushWorld(PushWorld):
         # print "DIR: ", direction
         pygame.draw.line(screen,(255,127,127,255),p,endpoint)
         
-    def update(self):
+    def update(self, viewer):
 
-        next_state = PushWorld.update(self)
+        next_state = PushWorld.update(self, viewer)
 
         self._box_state = self.get_box_state(self._dynamic_body)
 
         return next_state
 
 
-viewer = PyGameViewer(config = config)
-push_world = TestModelPushWorld(viewer, config = config)
 
-push_world.loop()
+push_world = TestModelPushWorld(config = config)
+viewer = PyGameViewer(push_world, config = config)
+
+viewer.loop()

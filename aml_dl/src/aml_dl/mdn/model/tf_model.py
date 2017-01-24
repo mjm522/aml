@@ -7,7 +7,7 @@ KMIX = 24 # number of mixtures
 NOUT = KMIX * 3 # pi, mu, stdev
 
 
-def get_mixture_coef(output, n_kernels = KMIX):
+def get_mixture_parameters(output, n_kernels = KMIX):
   out_pi = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels], name="mixparam")
   out_sigma = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels], name="mixparam")
   out_mu = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels], name="mixparam")
@@ -53,28 +53,28 @@ def get_train(loss_op):
   return train_op
 
 
-def tf_simple_mdn_model(dim_input = 1):
+def tf_simple_mdn_model(dim_input = 1, dim_output = NOUT, stddev = 0.5, n_hidden = 24):
 
   x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
   y = tf.placeholder(dtype=tf.float32, shape=[None,1], name="y")
 
-  Wh = tf.Variable(tf.random_normal([dim_input,NHIDDEN], stddev=STDEV, dtype=tf.float32))
-  bh = tf.Variable(tf.random_normal([1,NHIDDEN], stddev=STDEV, dtype=tf.float32))
+  Wh = tf.Variable(tf.random_normal([dim_input,n_hidden], stddev=stddev, dtype=tf.float32))
+  bh = tf.Variable(tf.random_normal([1,n_hidden], stddev=stddev, dtype=tf.float32))
 
-  Wo = tf.Variable(tf.random_normal([NHIDDEN,NOUT], stddev=STDEV, dtype=tf.float32))
-  bo = tf.Variable(tf.random_normal([1,NOUT], stddev=STDEV, dtype=tf.float32))
+  Wo = tf.Variable(tf.random_normal([n_hidden,dim_output], stddev=stddev, dtype=tf.float32))
+  bo = tf.Variable(tf.random_normal([1,dim_output], stddev=stddev, dtype=tf.float32))
 
   hidden_layer = tf.nn.tanh(tf.matmul(x, Wh) + bh)
   output = tf.matmul(hidden_layer,Wo) + bo
 
-  out_pi, out_sigma, out_mu = get_mixture_coef(output)
+  out_pi, out_sigma, out_mu = get_mixture_parameters(output)
 
   loss = get_loss(out_pi, out_sigma, out_mu,y)
 
   return out_pi, out_sigma, out_mu, loss, x, y
 
 
-def tf_pushing_model(dim_input = 12, n_hidden = 1, n_kernels = 2):
+def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
 
   # 3 parameters: pi, mu, stdev
   n_params_out = n_kernels*3
@@ -82,16 +82,16 @@ def tf_pushing_model(dim_input = 12, n_hidden = 1, n_kernels = 2):
   x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
   y = tf.placeholder(dtype=tf.float32, shape=[None,1], name="y")
 
-  Wh = tf.Variable(tf.random_normal([dim_input,n_hidden], stddev=STDEV, dtype=tf.float32))
-  bh = tf.Variable(tf.random_normal([1,n_hidden], stddev=STDEV, dtype=tf.float32))
+  Wh = tf.Variable(tf.random_normal([dim_input,n_hidden], stddev=stddev, dtype=tf.float32))
+  bh = tf.Variable(tf.random_normal([1,n_hidden], stddev=stddev, dtype=tf.float32))
 
-  Wo = tf.Variable(tf.random_normal([n_hidden,n_params_out], stddev=STDEV, dtype=tf.float32))
-  bo = tf.Variable(tf.random_normal([1,n_params_out], stddev=STDEV, dtype=tf.float32))
+  Wo = tf.Variable(tf.random_normal([n_hidden,n_params_out], stddev=stddev, dtype=tf.float32))
+  bo = tf.Variable(tf.random_normal([1,n_params_out], stddev=stddev, dtype=tf.float32))
 
   hidden_layer = tf.nn.tanh(tf.matmul(x, Wh) + bh)
   output = tf.matmul(hidden_layer,Wo) + bo
 
-  out_pi, out_sigma, out_mu = get_mixture_coef(output,n_kernels)
+  out_pi, out_sigma, out_mu = get_mixture_parameters(output,n_kernels)
 
   loss = get_loss(out_pi, out_sigma, out_mu, y)
 

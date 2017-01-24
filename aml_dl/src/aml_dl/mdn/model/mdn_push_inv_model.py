@@ -14,80 +14,89 @@ class MDNPushInverseModel(object):
 
         self._params = network_params
 
-        self._net_ops = tf_pushing_model(dim_input= network_params['dim_input'], 
-                           n_hidden = network_params['n_hidden'], 
-                           n_kernels = network_params['KMIX'])
+        self._device = self._params['device']
 
-        self._init_op = tf.initialize_all_variables()
+        with tf.device(self._device):
+            self._net_ops = tf_pushing_model(dim_input= network_params['dim_input'], 
+                               n_hidden = network_params['n_hidden'], 
+                               n_kernels = network_params['k_mixtures'])
 
+            self._init_op = tf.initialize_all_variables()
+
+            self._saver = tf.train.Saver()
 
 
     def init_model(self):
 
-        self._sess.run(self._init_op)
+        with tf.device(self._device):
+            self._sess.run(self._init_op)
 
-        if self._params['load_saved_model']:
-            self.load_model()
+            if self._params['load_saved_model']:
+                self.load_model()
 
 
     def load_model(self):
 
         load_tf_check_point(session=self._sess, filename=self._params['model_path'])
 
+    def save_model(self):
+        save_path = saver.save(sess, self._params['model_path'])
+        print("Model saved in file: %s" % save_path)
+
 
     def train(self, x_data, y_data, epochs = 10000):
+        with tf.device(self._device):
+            # Keeping track of loss progress as we train
+            loss = np.zeros(epochs) 
 
-        # Keeping track of loss progress as we train
-        loss = np.zeros(epochs) 
+            train_op = self._net_ops['train']
+            loss_op = self._net_ops['loss']
 
-        train_op = self._net_ops['train']
-        loss_op = self._net_ops['loss']
+            for i in range(epochs):
+              _, loss[i] = self._sess.run([train_op, loss_op],feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
 
-        for i in range(epochs):
-          _, loss[i] = sess.run([train_op, loss_op],feed_dict={x: x_data, y: y_data})
-
-        return loss
+            return loss
 
 
     def sample_out(self, x_input, m_samples = 10):
 
-        out_pi, out_mu, out_sigma = self._sess.run([self._net_ops['pi'], self._net_ops['mu'], self._net_ops['sigma']], feed_dict={self._net_ops['x']: x_input})
+        with tf.device(self._device):
+            out_pi, out_mu, out_sigma = self._sess.run([self._net_ops['pi'], self._net_ops['mu'], self._net_ops['sigma']], feed_dict={self._net_ops['x']: x_input})
 
 
-        samples = self._generate_mixture_samples(out_pi, out_mu, out_sigma,m_samples)
+            samples = self._generate_mixture_samples(out_pi, out_mu, out_sigma,m_samples)
 
-        return samples
+            return samples
 
     def expected_out(self, x_input, m_samples = 10):
+        with tf.device(self._device):
+            samples = self.sample_out(x_input,m_samples)[0]
 
-        samples = self.sample_out(x_input,m_samples)[0]
-
-        return np.mean(samples)
+            return np.mean(samples)
 
 
     def expected_out2(self, x_input, m_samples = 10):
+        with tf.device(self._device):
+            samples = self.sample_out(x_input,m_samples)[0]
 
-        samples = self.sample_out(x_input,m_samples)[0]
+            out = np.zeros(2)
 
-        out = np.zeros(2)
+            for i in range(m_samples):
+                out += np.array([np.cos(samples[i]),np.sin(samples[i])])
+            
+            out /= m_samples
 
-        for i in range(m_samples):
-            out += np.array([np.cos(samples[i]),np.sin(samples[i])])
-        
-        out /= m_samples
+            out /= np.linalg.norm(out)
 
-        out /= np.linalg.norm(out)
-
-        return out
+            return out
 
     def run_op(self, op_name, x_input):
+        with tf.device(self._device):
+            op = self._net_ops[op_name]
 
-        op = self._net_ops[op_name]
+            out = self._sess.run(op, feed_dict={self._net_ops['x']: x_input})
 
-        out = self._sess.run(op, feed_dict={self._net_ops['x']: x_input})
-
-        return out
-
+            return out
 
 
     def _sample_pi_idx(self, x, pdf):
@@ -130,7 +139,32 @@ class MDNPushInverseModel(object):
 
 
 
+# def get_pi_idx(x, pdf):
+#   N = pdf.size
+#   accumulate = 0
+#   for i in range(0, N):
+#     accumulate += pdf[i]
+#     if (accumulate >= x):
+#       return i
+#   print 'error with sampling ensemble'
+#   return -1
 
+# def generate_ensemble(out_pi, out_mu, out_sigma, M = 10):
+#   NTEST = h_test.size
+#   result = np.random.rand(NTEST, M) # initially random [0, 1]
+#   rn = np.random.randn(NTEST, M) # normal random matrix (0.0, 1.0)
+#   mu = 0
+#   std = 0
+#   idx = 0
+
+#   # transforms result into random ensembles
+#   for j in range(0, M):
+#     for i in range(0, NTEST):
+#       idx = get_pi_idx(result[i, j], out_pi[i])
+#       mu = out_mu[i, idx]
+#       std = out_sigma[i, idx]
+#       result[i, j] = mu + rn[i, j]*std
+#   return result
 
 
 
