@@ -11,5 +11,6 @@ config = {
 	'box_dim': (2,1),
 	'record_training_data': True,
 	'training_data_file': 'data_test.pkl',
+	'steps_per_frame': 5,
 
 }

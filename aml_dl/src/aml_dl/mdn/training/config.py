@@ -11,9 +11,9 @@ IMAGE_CHANNELS = 3
 
 network_params = {
     'num_filters': [5, 5, NUM_FP],
-    'dim_input':4, 
+    'dim_input': 4, 
     'n_hidden': 1,
-    'KMIX':2,
+    'k_mixtures': 2,
     'batch_size': 25,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
@@ -21,4 +21,5 @@ network_params = {
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': True,
     'model_path': check_point_path + 'push_model.ckpt',
+    'device': '/cpu:0',
 }

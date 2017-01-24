@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 import pygame
-from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE)
+from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN)
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -17,9 +17,14 @@ from config import config
 
 class PyGameViewer(object):
 
-    def __init__(self,config):
+    def __init__(self, world, config):
 
         self._config = config
+
+        self._steps_per_frame = self._config['steps_per_frame']
+
+        self._world = world
+
         # --- pygame setup ---
         self._screen = pygame.display.set_mode((config['image_width'], config['image_height']), 0, 32)
         pygame.display.set_caption(config['window_caption'])
@@ -47,6 +52,14 @@ class PyGameViewer(object):
                 # The user closed the window or pressed escape
                 self._running = False
 
+            elif  (event.type == KEYDOWN and event.key == K_UP):
+                self._steps_per_frame += 1
+                print "simulation steps per frame", self._steps_per_frame
+            elif  (event.type == KEYDOWN and event.key == K_DOWN):
+                self._steps_per_frame -= 1
+                print "simulation steps per frame", self._steps_per_frame
+
+
     def clear_screen(self):
         self._screen.fill((0, 0, 0, 0))
 
@@ -63,6 +76,28 @@ class PyGameViewer(object):
     def quit(self):
 
         pygame.quit()
+
+
+    def loop(self):
+
+        # --- main game loop ---
+        while self._running:
+
+            self.handle_events()
+
+            self.clear_screen()
+
+            for i in range(self._steps_per_frame):
+                self._world.update(self)
+                self._world.step()
+
+
+            # Draw the world
+            self._world.draw(self._screen)
+            # self.save_screen()
+
+            
+            self.flip()
 
             
 
