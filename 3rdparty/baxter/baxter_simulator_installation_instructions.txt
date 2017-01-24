@@ -10,3 +10,6 @@ $ wstool init .
 $ wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty)
 baxter_simulator.rosinstall
 $ wstool update
+
+#run all other dependencies, run this line from ws folder
+rosdep install --from-path . --ignore-src --rosdistro indigo -y -r
