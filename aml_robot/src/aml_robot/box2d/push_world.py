@@ -103,8 +103,11 @@ class PushWorld(object):
                 pygame.draw.circle(screen, (127,255,127,255), p, 5,0)
 
                 center = self.get_point(body,(0,0))
+
+                vel = body.linearVelocity
+                ang_vel = body.angularVelocity
                 # render text
-                label = self._text_font.render("Push angle %0.2f, (%0.2f,%0.2f), "%(theta*180/np.pi,center[0],center[1]), 1, (255,255,0))
+                label = self._text_font.render("Push angle %0.2f, Pos (%0.2f,%0.2f), Vel(%0.2f,%0.2f) AngVel %0.2f"%(theta*180/np.pi,center[0],center[1],vel[0],vel[1],ang_vel), 1, (255,255,0))
                 screen.blit(label, (0, 10))
 
                 
@@ -186,7 +189,7 @@ class PushWorld(object):
 
         px, py = np.multiply(np.random.rand(2),[2*box_w,2*box_h]) - np.array([box_w,box_h])
 
-        theta = np.random.rand()*(2*np.pi)
+        theta = np.random.rand()*np.pi*0.5#(2*np.pi)
 
         # self.get_vertices()
 
@@ -274,7 +277,7 @@ class PushWorld(object):
 
             px, py, ix, iy, theta = self._last_push
 
-            self.applyPush(body, px, py, ix, iy, theta)
+            self.apply_push(body, px, py, ix, iy, theta)
 
             self._push_counter += 1
 
@@ -289,7 +292,7 @@ class PushWorld(object):
 
         return self._current_state 
 
-    def applyPush(self,body, px, py, ix, iy, theta):
+    def apply_push(self,body, px, py, ix, iy, theta):
 
         px_world, py_world = self.get_point(body,(px,py))
         ix, iy = self.to_vec(theta)

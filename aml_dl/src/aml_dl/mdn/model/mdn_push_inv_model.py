@@ -40,7 +40,7 @@ class MDNPushInverseModel(object):
         load_tf_check_point(session=self._sess, filename=self._params['model_path'])
 
     def save_model(self):
-        save_path = saver.save(sess, self._params['model_path'])
+        save_path = self._saver.save(self._sess, self._params['model_path'])
         print("Model saved in file: %s" % save_path)
 
 

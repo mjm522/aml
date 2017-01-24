@@ -5,7 +5,7 @@ from aml_robot.box2d.config import config
 from aml_robot.box2d.data_manager import DataManager
 
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config import network_params
+from aml_dl.mdn.training.config import network_params, check_point_path
 
 import tensorflow as tf
 import numpy as np
@@ -21,7 +21,10 @@ import pygame
 import matplotlib.pyplot as plt
 
 config['record_training_data'] = True
-network_params['load_saved_model'] = False
+network_params['load_saved_model'] = True
+network_params['model_path'] = check_point_path + 'push_model_pi_div_two.ckpt'
+
+train_on_fly = False
 
 
 class TestModelPushWorld(PushWorld):
@@ -76,7 +79,7 @@ class TestModelPushWorld(PushWorld):
 
     def is_time_to_train(self, sample):
 
-        return self._data_manager.size() > 1 and sample is not None and not sample['stale'] and sample['sample_id']%10 == 0
+        return train_on_fly and self._data_manager.size() > 1 and sample is not None and not sample['stale'] and sample['sample_id']%100 == 0
     
 
     def plot(self):
@@ -104,7 +107,7 @@ class TestModelPushWorld(PushWorld):
         if self.is_time_to_train(latest_sample):
             latest_sample['stale'] = True
 
-            batch_ids = self._data_manager.get_last_ids(10)
+            batch_ids = self._data_manager.get_last_ids(100)
             data_x, data_y = self._data_manager.pack_data(['state_start','state_end'],batch_ids)
 
 
@@ -132,3 +135,7 @@ viewer = PyGameViewer(push_world, config = config)
 
 
 viewer.loop()
+
+
+push_world._inverse_model.save_model()
+push_world.save_samples('data_test_pi_div_2.pkl')

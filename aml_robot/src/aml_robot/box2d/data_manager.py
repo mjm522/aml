@@ -19,12 +19,12 @@ class DataManager(object):
         return cls(load_data(filename))
 
 
-    def save(filename):
+    def save(self, filename):
 
         output = open(filename, 'wb')
 
 
-        pickle.dump(self._samples, output)
+        pickle.dump(self._data, output)
 
 
         output.close()
