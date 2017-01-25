@@ -74,7 +74,7 @@ class TestModelPushWorld(PushWorld):
 
         endpoint = (int(p[0]+ix*25),int(p[1]-iy*25))
         # print "DIR: ", direction
-        pygame.draw.line(screen,(255,127,127,255),p,endpoint)
+        pygame.draw.line(screen,(255,127,127,255),p,endpoint, 4)
 
 
     def is_time_to_train(self, sample):

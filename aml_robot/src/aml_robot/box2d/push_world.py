@@ -99,7 +99,7 @@ class PushWorld(object):
                 p = self.get_screen_point2(body,(px,py))
                 p = (int(p[0]),int(p[1]))
                 
-                pygame.draw.line(screen,(127,255,127,255),(p[0],p[1]),(int(p[0]+ix*20),int(p[1]-iy*20)))
+                pygame.draw.line(screen,(127,255,127,255),(p[0],p[1]),(int(p[0]+ix*20),int(p[1]-iy*20)), 5)
                 pygame.draw.circle(screen, (127,255,127,255), p, 5,0)
 
                 center = self.get_point(body,(0,0))
