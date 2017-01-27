@@ -115,14 +115,14 @@ def main():
 
                 update_control(robot, None, torque)
         
-                viewer.viewer_render()
+                viewer.loop()
 
                 # rate.sleep()
             update_control(robot, None, None)
             print "Done"
             completed = True
 
-        viewer.viewer_render()
+        viewer.loop()
 
 
 if __name__ == '__main__':

@@ -91,28 +91,26 @@ class MujocoRobot():
         return ee_vel, ee_omg
 
 
+    def reset_model(self):
+        self._model.resetData()
+
+
     def set_qpos(self, qpos):
         self._model.data.qpos = qpos
-        self._model._compute_subtree() 
-        self._model.forward()
+
     
     def set_qvel(self, qvel):
         self._model.data.qvel = qvel
-        self._model._compute_subtree() 
-        self._model.forward()
+
 
     def set_qacc(self, qacc):
         self._model.data.qacc = qacc
-        self._model._compute_subtree() 
-        self._model.forward()
+
 
     def inv_dyn(self, qpos, qvel, qacc):
         self._model.data.qpos = qpos
         self._model.data.qvel = qvel
         self._model.data.qacc = qacc
-        self._model._compute_subtree()
-        self._model.forward()
-        self._model.step()
         self._model.inverse()
         return self._model.data.qfrc_inverse
         

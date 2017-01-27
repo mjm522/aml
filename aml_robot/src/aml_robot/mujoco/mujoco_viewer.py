@@ -9,61 +9,57 @@ import random
 import time
 
 class MujocoViewer():      
-    def __init__(self, mujoco_robot, update_rate=100):  
+    def __init__(self, mujoco_robot, width=640, height=480, update_rate=100):  
         
         self._robot = mujoco_robot
         self._update_rate = update_rate
         self._inited = False
+        self._width  = width
+        self._height = height
 
-    def viewer_setup(self):
-        self._width = 640
-        self._height = 480
+    def viewer_setup(self, cam_pos=None):
+        
         self._viewer = mjviewer.MjViewer(visible=True, init_width=self._width, init_height=self._height)
-        self._viewer.cam.distance = self._robot._model.stat.extent * 0.75
-        self._viewer.cam.lookat[0] = 0 #0.8
-        self._viewer.cam.lookat[1] = 0.5 #0.8
-        self._viewer.cam.lookat[2] = 0.1 #0.8
-        self._viewer.cam.elevation = 160
-        self._viewer.cam.azimuth = 100
-        self._viewer.cam.camid = -3
         self._viewer.start()
         self._viewer.set_model(self._robot._model)
-        #(data, width, height) = self.viewer.get_image()
+
+        if cam_pos is not None:
+            for i in range(3):
+                self._viewer.cam.lookat[i] = cam_pos[i]
+            self._viewer.cam.distance = cam_pos[3]
+            self._viewer.cam.elevation = cam_pos[4]
+            self._viewer.cam.azimuth = cam_pos[5]
+            self._viewer.cam.trackbodyid = -1
+    
 
     def viewer_end(self):
-        self._viewer.finish()
-        self._viewer = None
+        if self._viewer is not None:
+            self._viewer.finish()
+            self._viewer = None
 
     def viewer_start(self):
         if self._viewer is None:
             self.viewerSetup()
-        return self._viewer       
+        return self._viewer   
 
-    def viewer_render(self, mode='human', close=False):
-        if close:
-            if self._viewer is not None:
-                self.viewer_start().finish()
-                self._viewer = None
-            return
-        if mode == 'rgb_array':
-            self.viewer_start().render()
-            self.viewer_start().set_model(self._robot._model)
-            data, width, height = self.viewer_start().get_image()
-            return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
-        elif mode == 'human':
-            self.viewer_start().loop_once()
+    def get_image(self):
+        data, width, height = self.viewer_start().get_image()
+        return data
+
+    def loop(self):
+        self.viewer_start().loop_once()
                                                
     def reset_model(self):
-        mjlib.mj_resetData(self._robot._model.ptr, self._robot._model.data.ptr)
+        self._robot.resetData()
         ob = self.reset_model()
         if self._viewer is not None:
             self._viewer.autoscale()
             self.viewer_setup()
         return ob
 
-    def configure(self):
+    def configure(self, cam_pos=None):
 
-        self.viewer_setup()
+        self.viewer_setup(cam_pos=cam_pos)
         
         self._viewer = self.viewer_start()
 
@@ -71,8 +67,6 @@ class MujocoViewer():
         
         rospy.Timer(update_period, self.update)
 
-
-        
     def update(self,event):
 
         self._robot._model.step()
