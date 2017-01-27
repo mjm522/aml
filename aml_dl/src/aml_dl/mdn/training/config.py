@@ -12,6 +12,7 @@ IMAGE_CHANNELS = 3
 network_params = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 4, 
+    'dim_output': 1,
     'n_hidden': 1,
     'k_mixtures': 2,
     'batch_size': 25,
