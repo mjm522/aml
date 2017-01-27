@@ -72,7 +72,7 @@ def main():
 
         # update_magic_forces(robot)
 
-        viewer.viewer_render()
+        viewer.loop()
 
 
 if __name__ == '__main__':
