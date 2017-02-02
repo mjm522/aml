@@ -246,7 +246,10 @@ class PushWorld(object):
         qfrc_target = body.applyFT(point=np.array([px, py, pz]), 
                                    force=np.array([ix, iy, iz]), 
                                    torque=np.zeros(3), body_name='Box')
-        body.data.qfrc_applied = qfrc_target;
+
+        print "qfrc target \t", np.round(qfrc_target.flatten(), 3)
+
+        body.data.qfrc_applied = qfrc_target
 
 
     def save_samples(self,filename):
