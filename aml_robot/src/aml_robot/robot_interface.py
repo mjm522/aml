@@ -36,43 +36,12 @@ class RobotInterface(object):
     def set_sampling_rate(self, sampling_rate=100):
         pass
 
-    def _configure(self, limb, on_state_callback):
-
-    	self._state = None
-
-        if on_state_callback:
-            self._on_state_callback = on_state_callback
-        else:
-            self._on_state_callback = lambda m: None
-
-            
-        pass
-
-    def _gravity_comp_callback(self, msg):
-    	pass
-
     def _update_state(self):
     	pass
 
     def angles(self):
     	pass
 
-    # should update robot state and call registered on_state_callback
-    def _on_joint_states(self, msg):
-
-        if self._ready:
-            self._state = self._update_state()
-            self._on_state_callback(self._state)
-
-
-    def get_end_effector_link_name(self):
-        pass
-
-    
-    def get_base_link_name(self):
-        pass
-
-    
     def exec_position_cmd(self, cmd):
     	pass
 
@@ -103,7 +72,6 @@ class RobotInterface(object):
     def get_ee_velocity(self, real_robot=True):
         pass
 
-
     def get_cartesian_pos_from_joints(self, joint_angles=None):
         pass
 
@@ -114,7 +82,6 @@ class RobotInterface(object):
     def get_jacobian_from_joints(self, joint_angles=None):
         
         pass
-
 
     def get_arm_inertia(self, joint_angles=None):
         pass
