@@ -21,11 +21,12 @@ from functools import partial
 
 
 import numpy as np
+import quaternion
 
 def callback(agent,msg):
 	pass
 	# print(agent.c)
-	print("Hello!")
+	# print("Hello!")
 
 
 class SomeObj:
@@ -40,11 +41,19 @@ _rs.enable()
 
 obj = SomeObj()
 
-left_limb = baxter_robot.BaxterArm('left',partial(callback,obj))
+limb = baxter_robot.BaxterArm('right',partial(callback,obj))
+start_pos, start_ori = limb.get_ee_pose()
 
-rate = rospy.Rate(10) # 10hz
+goal_pos = np.array([0.95,-0.08,-0.11])
+goal_ori = quaternion.as_float_array(start_ori)[0]
+print "GOALORI: ", goal_ori
+
+rate = rospy.Rate(5) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
+	print(limb.ik(start_pos))
 	rate.sleep()
+
+	
 	
 
