@@ -21,7 +21,7 @@ def transform_to_pq(transform):
 
     p = tf.transformations.translation_from_matrix(transform)
     q = tf.transformations.quaternion_from_matrix(transform)
-
+    
     return p, q
 
 def pq_to_transform(tf_listener,p,q):
