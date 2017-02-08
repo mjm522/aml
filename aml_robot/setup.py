@@ -3,7 +3,7 @@ from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup()
-d['packages'] = ['aml_robot', 'aml_ctrl','aml_perception', 'aml_io', 'aml_lfd', 'aml_dl']
+d['packages'] = ['aml_robot']
 d['package_dir'] = {'': 'src'}
 
 setup(**d)

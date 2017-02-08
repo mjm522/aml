@@ -1,0 +1,4 @@
+<map id="aml_ctrl.controllers.os_controllers.os_bi_arm_controller.OSBiArmController" name="aml_ctrl.controllers.os_controllers.os_bi_arm_controller.OSBiArmController">
+<area shape="rect" id="node2" href="$classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller.html" title="{aml_ctrl.controllers.os\l_controller.OSController\n||+ __init__()\l+ type()\l+ set_goal()\l+ wait_until_goal_reached()\l}" alt="" coords="13,328,198,455"/>
+<area shape="rect" id="node3" href="$classaml__ctrl_1_1controller_1_1_controller.html" title="{aml_ctrl.controller.Controller\n||+ __init__()\l+ compute_cmd()\l+ update()\l+ wait_until_goal_reached()\l+ send_cmd()\l+ sleep()\l+ set_active()\l}" alt="" coords="12,127,199,280"/>
+</map>

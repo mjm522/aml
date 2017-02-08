@@ -1,0 +1,5 @@
+<map id="aml_ctrl.controllers.js_controller.JSController" name="aml_ctrl.controllers.js_controller.JSController">
+<area shape="rect" id="node4" href="$classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html" title="{aml_ctrl.controllers.js\l_controllers.js_postn\l_controller.JSPositionController\n||+ __init__()\l+ compute_cmd()\l+ send_cmd()\l+ set_active()\l}" alt="" coords="5,503,213,643"/>
+<area shape="rect" id="node5" href="$classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html" title="{aml_ctrl.controllers.js\l_controllers.js_torque\l_controller.JSTorqueController\n||+ __init__()\l+ compute_cmd()\l+ send_cmd()\l+ set_active()\l}" alt="" coords="237,503,437,643"/>
+<area shape="rect" id="node2" href="$classaml__ctrl_1_1controller_1_1_controller.html" title="{aml_ctrl.controller.Controller\n||+ __init__()\l+ compute_cmd()\l+ update()\l+ wait_until_goal_reached()\l+ send_cmd()\l+ sleep()\l+ set_active()\l}" alt="" coords="129,127,316,280"/>
+</map>

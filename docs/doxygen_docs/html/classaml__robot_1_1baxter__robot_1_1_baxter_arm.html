@@ -107,6 +107,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a72a5c161c29bd536c6a8727d3138643a"><td class="memItemLeft" align="right" valign="top"><a id="a72a5c161c29bd536c6a8727d3138643a"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, limb, on_state_callback=None)</td></tr>
 <tr class="separator:a72a5c161c29bd536c6a8727d3138643a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8c5985c2c013d2da84e7415f2480f35"><td class="memItemLeft" align="right" valign="top"><a id="ab8c5985c2c013d2da84e7415f2480f35"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>cuff_cb</b> (self, value)</td></tr>
+<tr class="separator:ab8c5985c2c013d2da84e7415f2480f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08034a334645d8504b391a313add1cc7"><td class="memItemLeft" align="right" valign="top"><a id="a08034a334645d8504b391a313add1cc7"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>get_lfd_status</b> (self)</td></tr>
+<tr class="separator:a08034a334645d8504b391a313add1cc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f1b2c10d8e309c0cce60a971f5355b4"><td class="memItemLeft" align="right" valign="top"><a id="a1f1b2c10d8e309c0cce60a971f5355b4"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>set_sampling_rate</b> (self, sampling_rate=100)</td></tr>
+<tr class="separator:a1f1b2c10d8e309c0cce60a971f5355b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add8768944b81542e122c676f2b38c075"><td class="memItemLeft" align="right" valign="top"><a id="add8768944b81542e122c676f2b38c075"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>tuck_arm</b> (self)</td></tr>
 <tr class="separator:add8768944b81542e122c676f2b38c075"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,9 +134,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>get_base_link_name</b>
 <tr class="memitem:aa8fb038222939675c5038f546d0e2627"><td class="memItemLeft" align="right" valign="top"><a id="aa8fb038222939675c5038f546d0e2627"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>exec_position_cmd</b> (self, cmd)</td></tr>
 <tr class="separator:aa8fb038222939675c5038f546d0e2627"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a292dff991a17cfdee36c6b07ed5b769c"><td class="memItemLeft" align="right" valign="top"><a id="a292dff991a17cfdee36c6b07ed5b769c"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>exec_position_cmd2</b> (self, cmd)</td></tr>
-<tr class="separator:a292dff991a17cfdee36c6b07ed5b769c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7231f60bcd22ea25ee84d5c3269e82ae"><td class="memItemLeft" align="right" valign="top"><a id="a7231f60bcd22ea25ee84d5c3269e82ae"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>exec_position_cmd_delta</b> (self, cmd)</td></tr>
+<tr class="separator:a7231f60bcd22ea25ee84d5c3269e82ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4c0f6a22d0cb23f411d50e8f661bcbb"><td class="memItemLeft" align="right" valign="top"><a id="ad4c0f6a22d0cb23f411d50e8f661bcbb"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>move_to_joint_pos_delta</b> (self, cmd)</td></tr>
 <tr class="separator:ad4c0f6a22d0cb23f411d50e8f661bcbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,9 +155,12 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>move_to_joint_position
 <tr class="memitem:ac353cdab96098923a40efd30f17f4e7a"><td class="memItemLeft" align="right" valign="top"><a id="ac353cdab96098923a40efd30f17f4e7a"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_ee_pose</b> (self)</td></tr>
 <tr class="separator:ac353cdab96098923a40efd30f17f4e7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6c7fe72a54012c2081f943d378096b0"><td class="memItemLeft" align="right" valign="top"><a id="ab6c7fe72a54012c2081f943d378096b0"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>get_ee_velocity</b> (self)</td></tr>
-<tr class="separator:ab6c7fe72a54012c2081f943d378096b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dcc207d5f7703f7f9f69bb54c1ee7b3"><td class="memItemLeft" align="right" valign="top"><a id="a9dcc207d5f7703f7f9f69bb54c1ee7b3"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>get_time_in_seconds</b> (self)</td></tr>
+<tr class="separator:a9dcc207d5f7703f7f9f69bb54c1ee7b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a411092f179a7420d38625063c27b237e"><td class="memItemLeft" align="right" valign="top"><a id="a411092f179a7420d38625063c27b237e"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>get_ee_velocity</b> (self, real_robot=True)</td></tr>
+<tr class="separator:a411092f179a7420d38625063c27b237e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ce9c74c445092b5f9bd26793366c8de"><td class="memItemLeft" align="right" valign="top"><a id="a9ce9c74c445092b5f9bd26793366c8de"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_cartesian_pos_from_joints</b> (self, joint_angles=None)</td></tr>
 <tr class="separator:a9ce9c74c445092b5f9bd26793366c8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,6 +173,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>get_jacobian_from_join
 <tr class="memitem:ae3980ca9408490d07b4460e6d7fc2eb2"><td class="memItemLeft" align="right" valign="top"><a id="ae3980ca9408490d07b4460e6d7fc2eb2"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_arm_inertia</b> (self, joint_angles=None)</td></tr>
 <tr class="separator:ae3980ca9408490d07b4460e6d7fc2eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ce4a9920b76e223e375755faaef7cf5"><td class="memItemLeft" align="right" valign="top"><a id="a5ce4a9920b76e223e375755faaef7cf5"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>ik</b> (self, pos, ori=None)</td></tr>
+<tr class="separator:a5ce4a9920b76e223e375755faaef7cf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>

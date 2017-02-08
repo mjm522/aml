@@ -6,3 +6,17 @@ checkpoints
 
 *.pkl
 
+MUJOCO_LOG.TXT
+
+*.gitignore*
+
+*.pyc
+*.png
+*.jpeg
+*.jpg
+
+*.ckpt*
+
+tf_model_delme.py
+
+.ipynb_checkpoints
