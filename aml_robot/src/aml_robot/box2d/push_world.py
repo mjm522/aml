@@ -44,6 +44,9 @@ class PushWorld(object):
         # Create a dynamic body
         self._dynamic_body = self._world.CreateDynamicBody(position=(32, 24), angle=0)
 
+        self._dynamic_body.linearDamping = 0.6
+        self._dynamic_body.angularDamping = 0.05
+
         self._dynamic_body.awake = True
 
         # And add a box fixture onto it (with a nonzero density, so it will move)
@@ -203,7 +206,7 @@ class PushWorld(object):
         self._push_counter += 1
 
         # print self._push_counter
-        return 0.0, 0.0, theta#px, py, theta
+        return 0.0, 0.0, theta
 
     def to_vec(self,theta):
 
@@ -265,7 +268,9 @@ class PushWorld(object):
                 # self._new_sample['image_rgb_end'] = self._viewer._last_screen
                 self._new_sample['state_end'] = state
 
+                print "END: ", state['position'], state['angle']
                 print "SAMPLE_ID:", self._data_manager._next_sample_id
+
 
                 self.add_sample(self._new_sample)
 
@@ -276,6 +281,8 @@ class PushWorld(object):
                 # self._new_sample['image_rgb_start'] = self._viewer._last_screen
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
+
+                print "START: ", state['position'], state['angle']
 
                 next_state = STATE['APPLY_PUSH']
 

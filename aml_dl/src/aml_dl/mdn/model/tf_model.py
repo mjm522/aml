@@ -75,7 +75,7 @@ def tf_simple_mdn_model(dim_input = 1, dim_output = NOUT, stddev = 0.5, n_hidden
   return out_pi, out_sigma, out_mu, loss, x, y
 
 
-def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = np.pi/2):
+def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
 
   # 3 parameters: pi, mu, stdev
   n_params_out = n_kernels*3 #*dim_output
