@@ -62,13 +62,17 @@ class CameraSensor(object):
       image_msg = self.bridge.cv2_to_imgmsg(self.curr_rgb_image, "bgr8")
       self.rgb_image_pub.publish(image_msg)
     except CvBridgeError as e:
-      print(e)
+      print("camera_sensor: cv_bridge error. Unable to publish rgb_image")
+    except Exception as e:
+      print("camera_sensor: other error. Unable to publish rgb_image")
 
   def _on_depth_image(self,data):
     try:
         cv_image = self.bridge.imgmsg_to_cv2(data, desired_encoding='passthrough')
     except CvBridgeError as e:
-        print(e)
+      print("camera_sensor: unable to publish depth_image")
+    except Exception as e:
+      print("camera_sensor: other error. Unable to publish rgb_image")
     
     depth_array = np.array(cv_image,dtype=np.float32)
     depth_array[np.isnan(depth_array)] = 0
