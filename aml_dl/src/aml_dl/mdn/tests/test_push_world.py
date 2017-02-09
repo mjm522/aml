@@ -11,7 +11,7 @@ import tensorflow as tf
 import numpy as np
 
 from pygame.locals import (KEYDOWN, K_m)
-
+import math
 # import matplotlib.backends.backend_agg as agg
 
 
@@ -27,12 +27,13 @@ import matplotlib.pyplot as plt
 config['record_training_data'] = True
 config['steps_per_frame'] = 1
 
-network_params['load_saved_model'] = False
-network_params['model_path'] = check_point_path + 'push_model_k15.ckpt'
-network_params['dim_input'] = 4
-network_params['k_mixtures'] = 15
+network_params['load_saved_model'] = True
+network_params['model_path'] = check_point_path + 'push_model_k5_h10_360_damp.ckpt'
+network_params['dim_input'] = 6
+network_params['k_mixtures'] = 5
+network_params['n_hidden'] = 10
 
-train_on_fly = True
+train_on_fly = False
 
 show_mixture = True
 
@@ -69,9 +70,9 @@ class TestModelPushWorld(PushWorld):
         pygame.draw.line(screen, colour,p, endpoint, 6)
 
         if not draw_at_circle_endpoint:
-            pygame.draw.circle(screen, (127,255,255,255), p, int(sigma*sigma_scale+2),2)
+            pygame.draw.circle(screen, (127,255,255,255), p, min(int(sigma*sigma_scale+2),50),2)
         else:
-            pygame.draw.circle(screen, (127,255,255,255), endpoint, int(sigma*sigma_scale+2),2)
+            pygame.draw.circle(screen, (127,255,255,255), endpoint, min(int(sigma*sigma_scale+2),50),2)
 
     def draw(self, viewer):
 
@@ -85,10 +86,11 @@ class TestModelPushWorld(PushWorld):
         # tgt = np.random.randn(2)
         curr_vel = self._box_state['linear_velocity']
         curr_pos = self._box_state['position']
+        curr_ang = self._box_state['angle']
         # px, py, tgt_x, tgt_y, theta = self._last_push
-        input_x = np.expand_dims(np.r_[np.zeros(2), curr_vel],0)
+        input_x = np.expand_dims(np.r_[np.zeros(3), np.multiply(curr_pos - np.array([16.0,12.0]),[1./32.0,1./24.0]), curr_ang],0)
 
-
+        print "INPUT_X: ", input_x
         # theta = self._inverse_model.expected_out(input_x,1)
 
         # ix = np.cos(theta)
@@ -194,5 +196,5 @@ viewer = PyGameViewer(push_world, config = config)
 viewer.loop()
 
 
-push_world._inverse_model.save_model()
+# push_world._inverse_model.save_model()
 # push_world.save_samples('data_test_pi_div_2.pkl')
