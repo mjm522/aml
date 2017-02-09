@@ -33,7 +33,7 @@ class Sample():
         #this could be set from a hyper param file
         if data_folder_path is None:
             
-            self._data_folder_path = dirname(dirname(abspath(__file__))) + '/aml_data_collec_utils/data/'
+            self._data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
 
         else:
             
@@ -51,7 +51,7 @@ class Sample():
 
         data_file = self._data_folder_path + self._sample_name_prefix + ('_sample_%02d.pkl' % self._sample_id)
 
-        save_data(data=self._data, filename=data_file)
+        save_data(data=self._data, filename=data_file, append_to_file = True)
 
     def get_sample(self, sample_id):
 
@@ -86,7 +86,7 @@ class RecordSample():
 
         self._data_folder_path = data_folder_path
 
-    def configure(self, task_action):
+    def configure_sample(self):
 
         if self._sample_idx is None:
 
@@ -97,6 +97,11 @@ class RecordSample():
                                 sampling_rate=self._record_rate,
                                 data_folder_path=self._data_folder_path, 
                                 sample_name_prefix=self._sample_name_prefix)
+
+
+    def configure(self, task_action):
+
+        self.configure_sample()
 
         #create a sample record callback on an 
         #independent thread and record the data 
@@ -128,6 +133,14 @@ class RecordSample():
 
             self._sample.write_sample()
 
+    def save_sample_ckpt(self, task_status):
+
+        #update the task status was a success and fail
+        self._sample._data['task_status'] = task_status
+
+        self._sample.write_sample()
+
+
     def check_sample(self, time_stamp):
 
         if self._old_time_stamp is None:
@@ -146,6 +159,28 @@ class RecordSample():
         else:
 
             return False
+
+    def record_once(self, task_action):
+
+
+
+        data = self._robot._state
+
+        if self.check_sample(data['timestamp']):
+
+            #np.quaternion causes problem, hence convert to array
+            if isinstance(data['ee_ori'], np.quaternion):
+
+                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+
+            else:
+
+                print type(data['ee_ori'])
+
+            self._sample._data['state'].append(data)
+            self._sample._data['task_action'].append(task_action)
+            self._sample._data['task_effect'].append(self._task.get_status())
+
 
     def record_sample(self, task_action, event):
 

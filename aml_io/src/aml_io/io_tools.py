@@ -1,8 +1,9 @@
 import pickle
 
 
-def save_data(data, filename):
+def save_data(data, filename, append_to_file = False):
 
+    file_opt = 'wb' if not append_to_file else 'ab'
     output = open(filename, 'wb')
 
     # Pickle dictionary using protocol 0.
