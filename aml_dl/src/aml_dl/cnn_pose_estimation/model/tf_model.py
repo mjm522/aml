@@ -361,7 +361,7 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     loss_action = euclidean_loss_layer(a=action, b=fc_action_output, precision=precision, batch_size=batch_size)
 
     loss_pose = euclidean_loss(a=pose, b=fc_pose_output, batch_size=batch_size)
-    # nnet = TfMap.init_from_lists([nn_input, action, precision], [fc_output], [loss_action], fp=fp)
+
     last_conv_vars = fc_action_input
 
     net_dict = {'nn_input': nn_input, 
@@ -379,5 +379,3 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     
 
     return net_dict
-
-    # return nnet, fc_action_vars, last_conv_vars

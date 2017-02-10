@@ -91,9 +91,9 @@ class DataManager(object):
         for datum in data:
             x = []
             for key in keys:
-                if key in ['state_start','state_end']:
-                    x = np.r_[x,datum[key]['linear_velocity']]
-                    # datum[key]['position'], .., datum[key]['angle'],datum[key]['angular_velocity']
+                
+                x = np.r_[x,np.multiply(datum[key]['position']- np.array([16.0,12.0]),[1./32.0,1./24.0]),datum[key]['angle']]
+                    # datum[key]['position'], .., datum[key]['angle'],datum[key]['angular_velocity'], datum[key]['linear_velocity']
 
             data_x.append(x)
 

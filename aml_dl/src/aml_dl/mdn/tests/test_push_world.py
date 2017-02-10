@@ -10,6 +10,8 @@ from aml_dl.mdn.training.config import network_params, check_point_path
 import tensorflow as tf
 import numpy as np
 
+from pygame.locals import (KEYDOWN, K_m)
+import math
 # import matplotlib.backends.backend_agg as agg
 
 
@@ -20,11 +22,21 @@ import pygame
 
 import matplotlib.pyplot as plt
 
+
+
 config['record_training_data'] = True
+config['steps_per_frame'] = 1
+
 network_params['load_saved_model'] = True
-network_params['model_path'] = check_point_path + 'push_model_pi_div_two.ckpt'
+network_params['model_path'] = check_point_path + 'push_model_k5_h10_360_damp.ckpt'
+network_params['dim_input'] = 6
+network_params['k_mixtures'] = 5
+network_params['n_hidden'] = 10
 
 train_on_fly = False
+
+show_mixture = True
+
 
 
 class TestModelPushWorld(PushWorld):
@@ -46,35 +58,82 @@ class TestModelPushWorld(PushWorld):
         self._loss = []
 
 
-    def draw(self, screen):
-        PushWorld.draw(self,screen)
+    def draw_prediction(self, screen, box_center, theta, sigma = 1, colour = (255,127,127,255), radius = 25, sigma_scale = 100, draw_at_circle_endpoint = False):
 
+        ix, iy = self.to_vec(theta)
+
+        p = self.get_screen_point(box_center)
+        p = (int(p[0]),int(p[1]))
+
+        endpoint = (int(p[0]+ix*radius),int(p[1]-iy*radius))
+
+        pygame.draw.line(screen, colour,p, endpoint, 6)
+
+        if not draw_at_circle_endpoint:
+            pygame.draw.circle(screen, (127,255,255,255), p, min(int(sigma*sigma_scale+2),50),2)
+        else:
+            pygame.draw.circle(screen, (127,255,255,255), endpoint, min(int(sigma*sigma_scale+2),50),2)
+
+    def draw(self, viewer):
+
+
+        PushWorld.draw(self,viewer)
+
+        screen = viewer._screen
 
         body = self._dynamic_body
 
         # tgt = np.random.randn(2)
-        state = self._box_state['linear_velocity']
+        curr_vel = self._box_state['linear_velocity']
+        curr_pos = self._box_state['position']
+        curr_ang = self._box_state['angle']
         # px, py, tgt_x, tgt_y, theta = self._last_push
-        input_x = np.expand_dims(np.r_[np.zeros(2), state],0)
+        input_x = np.expand_dims(np.r_[np.zeros(3), np.multiply(curr_pos - np.array([16.0,12.0]),[1./32.0,1./24.0]), curr_ang],0)
 
-
+        print "INPUT_X: ", input_x
         # theta = self._inverse_model.expected_out(input_x,1)
 
         # ix = np.cos(theta)
         # iy = np.sin(theta)
 
-        ix, iy = self._inverse_model.expected_out2(input_x,5)
+        ix, iy = self._inverse_model.expected_max_pi_out2(input_x,20)
+        theta = np.arctan2(iy,ix)
 
-        # print "IXIY:", ix, iy
+        mus = self._inverse_model.run_op('mu', input_x)[0]
+        sigmas = self._inverse_model.run_op('sigma', input_x)[0]
+        pis = self._inverse_model.run_op('pi', input_x)[0]
+        
+        if show_mixture:
+            for i in range(len(pis)):
+                self.draw_prediction(screen, curr_pos, mus[i], sigmas[i], (255,255,127,10), 80, sigma_scale = 20, draw_at_circle_endpoint = True)
 
-        px, py = self._box_state['position']
 
-        p = self.get_screen_point((px,py))
-        p = (int(p[0]),int(p[1]))
+        max_idx = np.argmax(pis)
+        sigma = sigmas[max_idx]
+        
+        gt_px, gt_py, gt_ix, gt_iy, gt_theta = self._last_push
 
-        endpoint = (int(p[0]+ix*25),int(p[1]-iy*25))
-        # print "DIR: ", direction
-        pygame.draw.line(screen,(255,127,127,255),p,endpoint, 4)
+        
+        self.draw_prediction(screen, curr_pos, theta, sigma, colour = (255,127,127,255), radius = 60, sigma_scale = 20)
+
+        p = self.get_screen_point2(body,(gt_px,gt_py))
+        self.draw_prediction(screen, p, gt_theta, 1, colour = (127,255,127,255), radius = 60, sigma_scale = 20)
+        
+        
+
+        _, _, _, _, theta_gt = self._last_push
+        label = viewer.create_text_surface("Predicted angle %0.2f uncertainty %0.2f error %0.2f"%(theta*180/np.pi, sigma, (theta-theta_gt)*180/np.pi))
+        
+        screen.blit(label, (0, 30))
+
+
+    def handle_event(self,event):
+        PushWorld.handle_event(self,event)
+        global show_mixture
+
+        if (event.type == KEYDOWN and event.key == K_m):
+            show_mixture = not show_mixture
+
 
 
     def is_time_to_train(self, sample):
@@ -137,5 +196,5 @@ viewer = PyGameViewer(push_world, config = config)
 viewer.loop()
 
 
-push_world._inverse_model.save_model()
-push_world.save_samples('data_test_pi_div_2.pkl')
+# push_world._inverse_model.save_model()
+# push_world.save_samples('data_test_pi_div_2.pkl')

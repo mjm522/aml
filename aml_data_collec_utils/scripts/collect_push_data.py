@@ -107,6 +107,22 @@ class BoxObject(object):
             print "Error on update frames", e
             pass
 
+    def get_box_pose(self, time = None):
+
+        if time is None:
+            time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
+
+        box_pos = box_q = None
+        # Getting box center (adding center offset to retrieved pose)
+        pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
+        box_center_offset = config['box_center_offset']
+        box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
+        _, box_q = transform_to_pq(pose)
+        pose = pq_to_transform(self._tf,box_pos,box_q)
+
+
+        return pose, box_pos, box_q
+
     # Computes a list of "pushes", a push contains a pre-push pose, 
     # a push action (goal position a push starting from a pre-push pose) 
     # and its respective name
@@ -117,21 +133,12 @@ class BoxObject(object):
         max_trials = 200
         trial_count = 0
 
-        pos = pose = time = ee_pose = None
-
-        box_pos = q = None
+        pos = pose = time = ee_pose = box_q = box_pos =  None
 
         while trial_count < max_trials and not success:
 
             try:
-                time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
-
-                # Getting box center (adding center offset to retrieved pose)
-                pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
-                box_center_offset = config['box_center_offset']
-                box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
-                _, q = transform_to_pq(pose)
-                pose = pq_to_transform(self._tf,box_pos,q)
+                pose, box_pos, box_q = self.get_box_pose()
 
                 time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
                 ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
@@ -168,7 +175,7 @@ class BoxObject(object):
                     pre_push_pos0 = ee_pos + pre_push_dir0
 
                     push_action = np.asarray(np.dot(pose,np.array([0, pre_push_offset[1], 0, 1]))).ravel()[:3]
-                    pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': q}, {'pos': pre_push_pos1, 'ori': q}], 'push_action': push_action, 'name' : 'pre_push%d'%(count,)})
+                    pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'name' : 'pre_push%d'%(count,)})
 
                     count += 1
 
@@ -284,9 +291,13 @@ class PushMachine(object):
         goal = goals[len(goals)-1]
         if record and push:
             print "Gonna push the box ..."
-            self._record_sample.start_record(push)
+            # self._record_sample.start_record(push)
+            self._record_sample.configure_sample()
+            self._record_sample.record_once(push)
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
-            self._record_sample.stop_record(success)
+            self._record_sample.record_once(push)
+            self._record_sample.save_sample_ckpt(success)
+            # self._record_sample.stop_record(success)
 
 
         return success

@@ -1,0 +1,11 @@
+<launch>
+
+    
+    <node pkg="aml_calib" type="camera_calib.py" name="camera_calib" output="screen">
+    </node>
+
+    <include file="$(find aml_calib)/launch/marker_odometry.launch">
+    </include>
+
+</launch>
+

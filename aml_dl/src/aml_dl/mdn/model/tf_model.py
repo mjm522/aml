@@ -1,5 +1,6 @@
 import tensorflow as tf
 import math
+import numpy as np
 
 NHIDDEN = 24
 STDEV = 0.5
@@ -48,7 +49,7 @@ def get_loss(out_pi, out_sigma, out_mu, y):
 
 def get_train(loss_op):
 
-  train_op = tf.train.AdamOptimizer().minimize(loss_op)
+  train_op = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss_op)
 
   return train_op
 
@@ -77,7 +78,7 @@ def tf_simple_mdn_model(dim_input = 1, dim_output = NOUT, stddev = 0.5, n_hidden
 def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
 
   # 3 parameters: pi, mu, stdev
-  n_params_out = n_kernels*3
+  n_params_out = n_kernels*3 #*dim_output
 
   x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
   y = tf.placeholder(dtype=tf.float32, shape=[None,1], name="y")
