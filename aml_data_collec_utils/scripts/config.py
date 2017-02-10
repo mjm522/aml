@@ -40,10 +40,10 @@ config_white_rectangular_box = {
 
 config_cubic_box = {
     #-0.11549958
-    'reset_spot_offset': [-0.06049958, -0.0023311, -0.00379943], # w.r.t to box frame
+    'reset_spot_offset': [0.0, 0.0, 0.0], # w.r.t to box frame
     'box_center_offset': [0.0,0.0,0.0],
     'end_effector_tip_offset': [0.0, 0.16090282, 0.0], # w.r.t to box #[0.0, 0.16090282, 0.0]
-    'pre_push_offsets': [0.25, 0.12, 0.25], # w.r.t to box frame before: 0.096
+    'pre_push_offsets': [0.15, 0.12, 0.15], # w.r.t to box frame before: 0.096
     'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
     'box_type': BOX_TYPE_3,
 }
