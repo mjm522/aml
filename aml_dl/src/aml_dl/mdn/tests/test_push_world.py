@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 config['record_training_data'] = True
 config['steps_per_frame'] = 1
 
-network_params['load_saved_model'] = True
+network_params['load_saved_model'] = False
 network_params['model_path'] = check_point_path + 'push_model_k5_h10_360_damp.ckpt'
 network_params['dim_input'] = 6
 network_params['k_mixtures'] = 5

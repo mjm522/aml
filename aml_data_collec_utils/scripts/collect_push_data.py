@@ -7,6 +7,7 @@ import rospy
 import argparse
 
 import numpy as np
+import random
 import quaternion
 
 import aml_calib
@@ -34,6 +35,8 @@ class BoxObject(object):
 
         self._box_reset_pos0 = None
 
+        self._last_pushes = None
+
 
         # Publish
         self._br = tf.TransformBroadcaster()
@@ -42,15 +45,9 @@ class BoxObject(object):
         update_period = rospy.Duration(1.0/update_rate)
         rospy.Timer(update_period, self.update_frames)
 
-    def get_pose(self):
-
-        time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
-
-        return get_pose(self._tf,self._base_frame_name,self._frame_name, time)
-
     #this is a util that makes the data in storing form
     def get_status(self):
-        pose   = self.get_pose()
+        pose, _, _   = self.get_pose()
         p, q   = transform_to_pq(pose)
         status = {}
         status['pos'] = p
@@ -77,7 +74,8 @@ class BoxObject(object):
 
         time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
 
-        pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
+        # Box pose
+        pose, _, _ = self.get_pose()
 
         p, q = transform_to_pq(pose)
 
@@ -92,22 +90,23 @@ class BoxObject(object):
 
         try:
 
-            pushes, _, _ = self.get_pushes()
-            count = 0
-            for push in pushes:
+            if self._last_pushes is not None:
+                pushes = self._last_pushes
+                count = 0
+                for push in pushes:
 
-                now = rospy.Time.now()
-                for pose in push['poses']:
+                    now = rospy.Time.now()
+                    for pose in push['poses']:
 
-                    self._br.sendTransform(pose['pos'], pose['ori'], now, "%s%d"%(push['name'],count), 'base')
-                    count += 1
+                        self._br.sendTransform(pose['pos'], pose['ori'], now, "%s%d"%(push['name'],count), 'base')
+                        count += 1
 
 
         except Exception as e:
             print "Error on update frames", e
             pass
 
-    def get_box_pose(self, time = None):
+    def get_pose(self, time = None):
 
         if time is None:
             time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
@@ -138,7 +137,7 @@ class BoxObject(object):
         while trial_count < max_trials and not success:
 
             try:
-                pose, box_pos, box_q = self.get_box_pose()
+                pose, box_pos, box_q = self.get_pose()
 
                 time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
                 ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
@@ -156,28 +155,44 @@ class BoxObject(object):
         
         if success:
             pre_push_offset = config['pre_push_offsets']
-            positions = np.array([[pre_push_offset[0], pre_push_offset[1], 0,                  1],
-                                  [0                 , pre_push_offset[1], pre_push_offset[2], 1]])
-            signs = [1,-1]
+
+            length_div2 = config['box_type']['length']/2.0
+            breadth_div2 = config['box_type']['breadth']/2.0
+            
+            x_box = random.uniform(-length_div2,length_div2)
+            z_box = random.uniform(-breadth_div2,breadth_div2)
+
+            pre_positions = np.array([[pre_push_offset[0]    , pre_push_offset[1],  z_box,               1], # right-side of the object
+                                  [-pre_push_offset[0]   , pre_push_offset[1],  z_box,               1], # lef-side of the object
+                                  [x_box                 , pre_push_offset[1],  pre_push_offset[2],  1], # front of the object
+                                  [x_box                 , pre_push_offset[1], -pre_push_offset[2],  1]])  # back of the object
+
+            push_locations = np.array([[0    , pre_push_offset[1],  z_box,               1], # right-side of the object
+                                       [0   , pre_push_offset[1],  z_box,               1], # lef-side of the object
+                                       [x_box                 , pre_push_offset[1],  0,  1], # front of the object
+                                       [x_box                 , pre_push_offset[1],  0,  1]])  # back of the object
 
 
             pushes = []
             count = 0
-            for position in positions:
-                for s in signs:
+            for pos_idx in range(len(pre_positions)):
 
-                    # position relative to the box        
-                    pos_rel_box = np.multiply(position,np.array([s,1,s,1]))
-                    pre_push_pos1 = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
+                pre_position = pre_positions[pos_idx] # w.r.t to box
+                push_position = push_locations[pos_idx] # w.r.t to box
 
-                    pre_push_dir0 = pre_push_pos1 - ee_pos
-                    pre_push_dir0[2] = 0
-                    pre_push_pos0 = ee_pos + pre_push_dir0
+                # "position" is relative to the box        
+                pre_push_pos1 = np.asarray(np.dot(pose,pre_position)).ravel()[:3]
+                pre_push_dir0 = pre_push_pos1 - ee_pos
+                pre_push_dir0[2] = 0
+                pre_push_pos0 = ee_pos + pre_push_dir0
 
-                    push_action = np.asarray(np.dot(pose,np.array([0, pre_push_offset[1], 0, 1]))).ravel()[:3]
-                    pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'name' : 'pre_push%d'%(count,)})
+                # Pushing towards the center of the box
+                push_action = np.asarray(np.dot(pose,push_position)).ravel()[:3] # w.r.t to base frame now
 
-                    count += 1
+                push_xz = np.array(push_position[0],push_position[2])
+                pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'push_xz': push_xz, 'name' : 'pre_push%d'%(count,)})
+
+                count += 1
 
 
             if self._box_reset_pos0 is None:
@@ -292,6 +307,7 @@ class PushMachine(object):
         if record and push:
             print "Gonna push the box ..."
             # self._record_sample.start_record(push)
+            
             self._record_sample.configure_sample()
             self._record_sample.record_once(push)
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
@@ -325,6 +341,7 @@ class PushMachine(object):
 
             
             pushes, box_pose, reset_push = self._box.get_pushes()
+            self._box._last_pushes = pushes
 
             if pushes:
 
