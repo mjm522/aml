@@ -137,8 +137,8 @@ class BaxterEyeHandCalib():
 
     def self_calibrate(self):
         calib_data = self.load_calib_data()
-        # self.left_arm.move_to_joint_position(calib_data['left_arm_calib_angle'])
-        # self.right_arm.move_to_joint_position(calib_data['right_arm_calib_angle'])
+        self.left_arm.move_to_joint_position(calib_data['left_arm_calib_angle'])
+        self.right_arm.move_to_joint_position(calib_data['right_arm_calib_angle'])
         calib_data, calib_success = self.save_calib_data()
 
         if calib_success:
