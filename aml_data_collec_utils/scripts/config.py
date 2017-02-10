@@ -14,6 +14,13 @@ BOX_TYPE_2 = {
     'height':0.27,
 }
 
+#cubic box
+BOX_TYPE_3 = {
+    'length': 0.124,
+    'breadth':0.124,
+    'height':0.091,
+}
+
 #the white table
 TABLE = {
     'length': 1.795,
@@ -21,7 +28,7 @@ TABLE = {
     'height':0.72,
 }
 
-config = {
+config_white_rectangular_box = {
     #-0.11549958
     'reset_spot_offset': [-0.06049958, -0.0023311, -0.00379943], # w.r.t to box frame
     'box_center_offset': [-0.055,0.0,0.0],
@@ -30,3 +37,16 @@ config = {
     'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
     'box_type': BOX_TYPE_1,
 }
+
+config_cubic_box = {
+    #-0.11549958
+    'reset_spot_offset': [-0.06049958, -0.0023311, -0.00379943], # w.r.t to box frame
+    'box_center_offset': [0.0,0.0,0.0],
+    'end_effector_tip_offset': [0.0, 0.16090282, 0.0], # w.r.t to box #[0.0, 0.16090282, 0.0]
+    'pre_push_offsets': [0.25, 0.12, 0.25], # w.r.t to box frame before: 0.096
+    'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
+    'box_type': BOX_TYPE_2,
+}
+
+
+config = config_cubic_box

@@ -1,48 +1,11 @@
 <launch>
 
-    <!-- give a defulat value to arg -->
-    <arg name="ext_cam" default="1" />
-
-    <!-- to launch openni2 launch file from here -->
-    <group if="$(arg ext_cam)">
-        <include file="$(find openni2_launch)/launch/openni2.launch">
-        </include>
-    </group>
-
-    <arg name="left_hand_markerId"        default="26"/>
-    <arg name="box_markerId"              default="582"/>
-    <arg name="left_hand_markerSize"      default="0.141"/>    <!-- in m -->
-    <!-- TODO:: how to give to different marker sizes ??-->
-    <arg name="box_markerSize"            default="0.122"/>    <!-- in m (old: 0.141)-->
-    <arg name="marker_frame"              default="camera_link"/> <!-- camera_rgb_optical_frame -->
-    <arg name="ref_frame"                 default="marker"/>  <!-- leave empty and the pose will be published wrt param parent_name -->
-    <!-- camera_rgb_optical_frame -->
-
-    <!--<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.24 0 0 0 0 0 left_gripper_base marker 30" />-->
-
-    <!-- <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0.323 -0.141 -1.261 1.579 -0.804 -1.573 left_gripper_base base 10" /> -->
-
-
     
     <node pkg="aml_calib" type="camera_calib.py" name="camera_calib" output="screen">
     </node>
 
-    <node pkg="aml_calib" type="aml_marker_odometry_node" name="aml_marker_odometry" output="screen">
-        <remap from="/right_hand_camera_info" to="/cameras/right_hand_camera/camera_info" /> <!-- "/stereo/$(arg eye)/camera_info -->
-        <remap from="/right_hand_image" to="/cameras/right_hand_camera/image"/>   <!--"/stereo/$(arg eye)/image_rect_color"-->
-        
-        <remap from="/openni_rgb_camera_info" to="/camera/rgb/camera_info" />
-        <remap from="/openni_rgb_rect_image" to="/camera/rgb/image_rect_color"/>
-
-        <param name="image_is_rectified" value="True"/>
-        <param name="left_hand_marker_size"        value="$(arg left_hand_markerSize)"/>
-        <param name="left_hand_marker_id"          value="$(arg left_hand_markerId)"/>
-        <param name="box_marker_size"              value="$(arg box_markerSize)"/>
-        <param name="box_marker_id"                value="$(arg box_markerId)"/>
-        <param name="reference_frame"              value="$(arg ref_frame)"/>   <!-- frame in which the marker pose will be refered -->
-        <param name="camera_frame"                 value="camera_rgb_optical_frame"/>
-        <param name="marker_frame"                 value="$(arg marker_frame)" />
-    </node>
+    <include file="$(find aml_calib)/launch/marker_odometry.launch">
+    </include>
 
 </launch>
 
