@@ -1,3 +1,4 @@
+import os
 import rospy
 import numpy as np
 import quaternion
@@ -8,7 +9,7 @@ from aml_io.io_tools import save_data, load_data
 
 class Sample():
 
-    def __init__(self, sample_id=None, sampling_rate=None, data_folder_path=None, sample_name_prefix=None):
+    def __init__(self, sample_id=None, data_folder_path=None, sample_name_prefix=None):
 
         self._data                = {}
 
@@ -19,8 +20,6 @@ class Sample():
         if sampling_rate is None:
 
             print "WARNING: Sampling rate not stored, pass it if you want to store it."
-
-        self._data['sampling_rate'] = sampling_rate
 
         self._data['state']       = []
 
@@ -64,33 +63,56 @@ class Sample():
 
 class RecordSample():
 
-    def __init__(self, robot_interface, task_interface, record_rate=30, data_folder_path=None, sample_start_index=None, sample_name_prefix=None):
+    def __init__(self, robot_interface, task_interface, data_folder_path=None,  
+                       sample_name_prefix=None, num_samples_per_file=1000):
 
         self._robot          = robot_interface
 
         self._task           = task_interface
-        
-        self._record         = False
-
-        self._record_rate    = record_rate
-
-        self._record_period  = rospy.Duration(1.0/record_rate)
-
-        self._sample_idx     = sample_start_index
 
         self._old_time_stamp = None
-
-        self._callback       = None
 
         self._sample_name_prefix = sample_name_prefix
 
         self._data_folder_path = data_folder_path
 
-    def configure_sample(self):
+        sample_names = []
+
+        #read files in the folder that starts with self._sample_name_prefix name
+        if any(file.startswith(self._sample_name_prefix) for file in os.listdir(self._data_folder_path)):
+            
+            sample_names.append(file)
+
+        #check if list is empty
+        if not sample_names:
+
+            self._sample_idx     = 1
+
+        else:
+
+            #read the last file of the folder
+            existing_sample = self._data_folder_path + sample_names[-1]
+
+            if not os.access(existing_sample, os.R_OK):
+                
+                rospy.logerr("Cannot read file at '%s'" % (args.file,))
+            
+            else:
+
+                #load the pkl file and get the id
+                old_sample = load_data(existing_sample)
+
+                #read the file, and take the sample_id of the last sample_id
+                self._sample_idx = old_sample['sample_id'][-1]
+
+        #this is the threshold, when 1000 
+        self._num_samples_per_file = num_samples_per_file
+
+    def configure(self):
 
         if self._sample_idx is None:
 
-            self._sample_idx  = 0
+            self._sample_idx  = 1
             
         #configure the sample
         self._sample   = Sample(sample_id=self._sample_idx,
@@ -99,47 +121,22 @@ class RecordSample():
                                 sample_name_prefix=self._sample_name_prefix)
 
 
-    def configure(self, task_action):
-
-        self.configure_sample()
-
-        #create a sample record callback on an 
-        #independent thread and record the data 
-        self._callback = rospy.Timer(self._record_period, partial(self.record_sample,task_action))
-
-        #increment the sample count
-        self._sample_idx += 1
-    
-    def start_record(self, task_action):
-        
-        self._record = True
-        
-        self.configure(task_action)
-
-    def stop_record(self, task_status):
-        
-        self._record = False
-        
-        if self._callback is None:
-            
-            print "Nothing to kill, since the recorder was not started ..."
-        
-        else:
-            
-            self._callback.shutdown()
-
-            #update the task status was a success and fail
-            self._sample._data['task_status'] = task_status
-
-            self._sample.write_sample()
-
     def save_sample_ckpt(self, task_status):
 
         #update the task status was a success and fail
         self._sample._data['task_status'] = task_status
 
-        self._sample.write_sample()
+        #did we reach a limit?
+        limit = (self._sample_idx%self._num_samples_per_file) == 0
 
+        #did we reach limit or was the task_status = None ; meaning it was killed
+        if  limit or task_status is None:
+            
+            self._sample.write_sample()
+
+        else:
+
+            self._sample_idx += 1
 
     def check_sample(self, time_stamp):
 
@@ -162,8 +159,6 @@ class RecordSample():
 
     def record_once(self, task_action):
 
-
-
         data = self._robot._state
 
         if self.check_sample(data['timestamp']):
@@ -180,28 +175,3 @@ class RecordSample():
             self._sample._data['state'].append(data)
             self._sample._data['task_action'].append(task_action)
             self._sample._data['task_effect'].append(self._task.get_status())
-
-
-    def record_sample(self, task_action, event):
-
-        if self._record:
-
-            data = self._robot._state
-
-        if self.check_sample(data['timestamp']):
-
-            #np.quaternion causes problem, hence convert to array
-            if isinstance(data['ee_ori'], np.quaternion):
-
-                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
-
-            else:
-
-                print type(data['ee_ori'])
-
-            self._sample._data['state'].append(data)
-            self._sample._data['task_action'].append(task_action)
-            self._sample._data['task_effect'].append(self._task.get_status())
-
-            
-

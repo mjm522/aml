@@ -230,10 +230,9 @@ class PushMachine(object):
 
         self._record_sample = RecordSample(robot_interface=robot_interface, 
                                            task_interface=BoxObject(),
-                                           record_rate=15,
                                            data_folder_path=None,
-                                           sample_start_index=sample_start_index,
-                                           sample_name_prefix='push_data')
+                                           sample_name_prefix='push_data',
+                                           num_samples_per_file=1000)
 
 
     def compute_next_state(self,idx):
@@ -308,12 +307,10 @@ class PushMachine(object):
             print "Gonna push the box ..."
             # self._record_sample.start_record(push)
             
-            self._record_sample.configure_sample()
             self._record_sample.record_once(push)
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
             self._record_sample.record_once(push)
-            self._record_sample.save_sample_ckpt(success)
-            # self._record_sample.stop_record(success)
+            self._record_sample.save_sample_ckpt(task_status=success)
 
 
         return success
@@ -330,6 +327,9 @@ class PushMachine(object):
         rate = rospy.Rate(10)
 
         idx = 0
+
+        self._record_sample.configure()
+
         while not rospy.is_shutdown():# and not finished:
 
             pushes = None
@@ -350,6 +350,9 @@ class PushMachine(object):
                 idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
 
             rate.sleep()
+
+        #this if for saving files in case keyboard interrupt happens
+        self._record_sample.save_sample_ckpt(task_status=None)
 
     def goto_pose(self,goal_pos, goal_ori): 
 
@@ -399,6 +402,7 @@ if __name__ == "__main__":
     push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index)
 
     print "calling run"
+
     push_machine.run()
    
     
