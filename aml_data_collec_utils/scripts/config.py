@@ -45,7 +45,7 @@ config_cubic_box = {
     'end_effector_tip_offset': [0.0, 0.16090282, 0.0], # w.r.t to box #[0.0, 0.16090282, 0.0]
     'pre_push_offsets': [0.25, 0.12, 0.25], # w.r.t to box frame before: 0.096
     'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
-    'box_type': BOX_TYPE_2,
+    'box_type': BOX_TYPE_3,
 }
 
 
