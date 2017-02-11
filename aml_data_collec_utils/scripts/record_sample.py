@@ -7,27 +7,10 @@ from os.path import dirname, abspath
 from functools import partial
 from aml_io.io_tools import save_data, load_data
 
-class Sample():
 
-    def __init__(self, sample_id=None, data_folder_path=None, sample_name_prefix=None):
+class DataManager():
 
-        self._data                = {}
-
-        self._sample_id           = sample_id
-
-        self._data['sample_id']   = sample_id
-
-        if sampling_rate is None:
-
-            print "WARNING: Sampling rate not stored, pass it if you want to store it."
-
-        self._data['state']       = []
-
-        self._data['task_action'] = []
-
-        self._data['task_effect'] = []
-
-        self._data['task_status'] = False
+    def __init__(self, append_to_last_file=True, data_folder_path=None, data_name_prefix=None, num_samples_per_file=1000):
 
         #this could be set from a hyper param file
         if data_folder_path is None:
@@ -38,105 +21,173 @@ class Sample():
             
             self._data_folder_path = data_folder_path
 
-        if sample_name_prefix is None:
+        if data_name_prefix is None:
 
-            self._sample_name_prefix = 'unknown_task_name'
+            self._data_name_prefix = 'data'
 
         else:
 
-            self._sample_name_prefix = sample_name_prefix
+            self._data_name_prefix = data_name_prefix
 
-    def write_sample(self):
 
-        data_file = self._data_folder_path + self._sample_name_prefix + ('_sample_%02d.pkl' % self._sample_id)
+        create_new_data = False
 
-        save_data(data=self._data, filename=data_file, append_to_file = True)
+        data_names = []
 
-    def get_sample(self, sample_id):
+        #read files in the folder that starts with self._sample_name_prefix name
+        if any(file.startswith(self._data_name_prefix) for file in os.listdir(self._data_folder_path)):
+            
+            data_names.append(file)
 
-        data_file = self._data_folder_path + self._sample_name_prefix +  ('_sample_%02d.pkl' % sample_id)
+        #if append to last file is true and if the data_names are non-empty then add to existing sample,
+        #else create a new data sample!
+        if append_to_last_file and data_names:
 
-        data = load_data(data_file)
+            self._data_idx = len(data_names)
 
-        return data
+            self._data     = self.read_data(self._data_idx)
+
+            #this case is to check in case you have given keyboard interrupt in the middle of recording
+            #and you have an incomplete sample, so we will replace it.
+
+            if self._data:
+                if self.check_sample(self._data[-1]):
+
+                    self._last_sample_idx = self._data[-1]._contents['sample_id']
+                
+                else:
+
+                    self._last_sample_idx = self._data[-1]._contents['sample_id'] - 1
+
+                if self._last_sample_idx >= self._num_samples_per_file:
+                    print "WARNING: Max number of samples per file in place, saving as a new sample..."
+                    create_new_data = True
+            else:
+                create_new_data = True
+                self._data_idx  = 0
+
+
+        else:
+            create_new_data = True
+            self._data_idx  = 0
+
+        if create_new_data:
+
+            self.create_new_data()
+
+        self._num_samples_per_file = num_samples_per_file
+
+
+    def check_sample(self, sample):
+
+        bad_sample =  (sample._contents['state_before'] is None or sample._contents['state_after'] is None or sample._contents['task_action'] is None/
+            sample._contents['task_before'] is None or sample._contents['task_after'] is None or sample._contents['task_status'] is None)
+
+        return not bad_sample
+
+            
+    def create_new_data(self):
+    
+        self._data_idx = self._data_idx + 1
+        self._data     = []
+        self._last_sample_idx = 1
+
+
+    def append_data(self, sample):
+
+        #if more number of samples came in, then make a new sample, else append to existing sample
+        if sample._contents['sample_id'] >= self._num_samples_per_file:
+
+            self.write_data()
+
+            self.create_new_data()
+
+            self._data.append(sample)
+
+        else:
+        
+            self._data.append(sample)
+
+    def write_data(self):
+
+        data_file = self._data_folder_path + self._data_name_prefix + ('_data_%02d.pkl' % self._data_idx)
+
+        save_data(self._data, data_file)
+
+        self._data_idx += 1
+
+
+    def read_data(self, data_idx):
+
+        data_file = self._data_folder_path + self._data_name_prefix +  ('_data_%02d.pkl' % data_idx)
+
+        if not os.access(data_file, os.R_OK):
+                
+            rospy.logerr("Cannot read file at '%s'" % (args.file,))
+
+            return None
+
+        else:
+
+            return load_data(data_file)
+
+    def get_specific_sample(self, data_idx, sample_idx):
+
+        return read_data(data_idx)[sample_idx]
+
+
+class Sample():
+
+    def __init__(self, sample_id):
+
+        self._contents                = {}
+
+        self._contents['sample_id']    = sample_id
+
+        self._contents['state_before'] = None
+
+        self._contents['state_after']  = None
+
+        self._contents['task_action']  = None
+
+        self._contents['task_before']  = None
+
+        self._contents['task_after']   = None
+
+        self._contents['task_status']  = None
 
 
 class RecordSample():
 
     def __init__(self, robot_interface, task_interface, data_folder_path=None,  
-                       sample_name_prefix=None, num_samples_per_file=1000):
+                       data_name_prefix=None, num_samples_per_file=1000):
 
-        self._robot          = robot_interface
+        self._robot            = robot_interface
 
-        self._task           = task_interface
+        self._task             = task_interface
 
-        self._old_time_stamp = None
+        self._old_time_stamp   = None
 
-        self._sample_name_prefix = sample_name_prefix
+        self._data_name_prefix = data_name_prefix
 
         self._data_folder_path = data_folder_path
 
-        sample_names = []
+        self._data_man = DataManager(append_to_last_file=True, 
+                                     data_folder_path=data_folder_path, 
+                                     data_name_prefix=data_name_prefix,
+                                     num_samples_per_file=num_samples_per_file)
 
-        #read files in the folder that starts with self._sample_name_prefix name
-        if any(file.startswith(self._sample_name_prefix) for file in os.listdir(self._data_folder_path)):
+        self._sample_idx     = self._data_man._last_sample_idx + 1
+
+        self._sample    = Sample(self._sample_idx)
+
+
+    def save_sample(self):
+
+        self._data_man.append_data(self._sample)
+
+        self._sample_idx += 1
             
-            sample_names.append(file)
-
-        #check if list is empty
-        if not sample_names:
-
-            self._sample_idx     = 1
-
-        else:
-
-            #read the last file of the folder
-            existing_sample = self._data_folder_path + sample_names[-1]
-
-            if not os.access(existing_sample, os.R_OK):
-                
-                rospy.logerr("Cannot read file at '%s'" % (args.file,))
-            
-            else:
-
-                #load the pkl file and get the id
-                old_sample = load_data(existing_sample)
-
-                #read the file, and take the sample_id of the last sample_id
-                self._sample_idx = old_sample['sample_id'][-1]
-
-        #this is the threshold, when 1000 
-        self._num_samples_per_file = num_samples_per_file
-
-    def configure(self):
-
-        if self._sample_idx is None:
-
-            self._sample_idx  = 1
-            
-        #configure the sample
-        self._sample   = Sample(sample_id=self._sample_idx,
-                                sampling_rate=self._record_rate,
-                                data_folder_path=self._data_folder_path, 
-                                sample_name_prefix=self._sample_name_prefix)
-
-
-    def save_sample_ckpt(self, task_status):
-
-        #update the task status was a success and fail
-        self._sample._data['task_status'] = task_status
-
-        #did we reach a limit?
-        limit = (self._sample_idx%self._num_samples_per_file) == 0
-
-        #did we reach limit or was the task_status = None ; meaning it was killed
-        if  limit or task_status is None:
-            
-            self._sample.write_sample()
-
-        else:
-
-            self._sample_idx += 1
 
     def check_sample(self, time_stamp):
 
@@ -157,21 +208,38 @@ class RecordSample():
 
             return False
 
-    def record_once(self, task_action):
+    def record_once(self, task_action=None, task_status=False):
 
-        data = self._robot._state
+        robot_state = self._robot._state
+        task_state  = self._task.get_effect()
 
-        if self.check_sample(data['timestamp']):
+        if self.check_sample(robot_state['timestamp']):
 
             #np.quaternion causes problem, hence convert to array
-            if isinstance(data['ee_ori'], np.quaternion):
+            if isinstance(robot_state['ee_ori'], np.quaternion):
 
-                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+                robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+
+
+            #if task action is none, that means there is no task execution.
+            if task_action is None:
+
+                self._sample._contents['state_after'] = robot_state
+
+                self._sample._contents['task_after'] = task_state
+
+                self._sample._contents['task_status'] = task_status
+
+                self.save_sample()
 
             else:
 
-                print type(data['ee_ori'])
+                self._sample._contents['task_action'] = task_action
 
-            self._sample._data['state'].append(data)
-            self._sample._data['task_action'].append(task_action)
-            self._sample._data['task_effect'].append(self._task.get_status())
+                self._sample._contents['state_before'] = robot_state
+                
+                self._sample._contents['task_before'] = task_state
+
+    def save_data_now(self):
+
+        self._data_man.write_data()
