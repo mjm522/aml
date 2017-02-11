@@ -46,7 +46,7 @@ class BoxObject(object):
         rospy.Timer(update_period, self.update_frames)
 
     #this is a util that makes the data in storing form
-    def get_status(self):
+    def get_effect(self):
         pose, _, _   = self.get_pose()
         p, q   = transform_to_pq(pose)
         status = {}
@@ -352,7 +352,7 @@ class PushMachine(object):
             rate.sleep()
 
         #this if for saving files in case keyboard interrupt happens
-        self._record_sample.save_sample_ckpt(task_status=None)
+        self._record_sample.save_data_now()
 
     def goto_pose(self,goal_pos, goal_ori): 
 
