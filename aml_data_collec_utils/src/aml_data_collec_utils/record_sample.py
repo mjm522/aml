@@ -41,7 +41,7 @@ class DataManager():
 
         #read files in the folder that starts with self._sample_name_prefix name
         for file in os.listdir(self._data_folder_path):
-            
+
             if file.startswith(self._data_name_prefix):
             
                 data_names.append(file)
@@ -99,8 +99,6 @@ class DataManager():
 
 
     def check_sample(self, sample):
-
-        print sample
 
         bad_sample =  (sample['state_before'] is None or sample['state_after'] is None or sample['task_action'] is None\
             or sample['task_before'] is None or sample['task_after'] is None or sample['task_status'] is None)
