@@ -2,7 +2,8 @@ import os
 import rospy
 import numpy as np
 import quaternion
-from os.path import dirname, abspath
+
+from aml_data_collec_utils.config import config
 
 from functools import partial
 from aml_io.io_tools import save_data, load_data
@@ -15,7 +16,7 @@ class DataManager():
         #this could be set from a hyper param file
         if data_folder_path is None:
             
-            self._data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
+            self._data_folder_path = config['data_folder_path']
 
         else:
             

@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('visualization_marker_tutorials')
+import roslib; 
+roslib.load_manifest('visualization_marker_tutorials')
+roslib.load_manifest('aml_data_collec_utils')
+
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
 import rospy
 import tf
 from tf import TransformListener
 
-from config import config
+from aml_data_collec_utils.config import config
 
 topic = 'visualization_marker_array'
 publisher = rospy.Publisher(topic, MarkerArray)

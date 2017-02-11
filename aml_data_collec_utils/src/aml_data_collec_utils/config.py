@@ -1,4 +1,6 @@
 
+from os.path import dirname, abspath, join
+
 #all measurements in meters
 #the white box
 BOX_TYPE_1 = {
@@ -49,4 +51,8 @@ config_cubic_box = {
 }
 
 
-config = config_cubic_box
+config = {
+    'data_folder_path': join(abspath(join(dirname(abspath(__file__)),'../','../')),'data'),
+}
+
+config.update(config_cubic_box)
