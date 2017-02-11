@@ -105,6 +105,8 @@ class DataManager():
             self._data.append(sample)
 
         else:
+
+            print "New sample added..."
         
             self._data.append(sample)
 
@@ -123,7 +125,7 @@ class DataManager():
 
         if not os.access(data_file, os.R_OK):
                 
-            rospy.logerr("Cannot read file at '%s'" % (args.file,))
+            rospy.logerr("Cannot read file at '%s'" % (data_file))
 
             return None
 
