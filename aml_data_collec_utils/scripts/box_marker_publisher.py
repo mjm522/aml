@@ -7,7 +7,7 @@ import rospy
 import tf
 from tf import TransformListener
 
-from config import BOX_TYPE_1
+from config import config
 
 topic = 'visualization_marker_array'
 publisher = rospy.Publisher(topic, MarkerArray)
@@ -18,9 +18,9 @@ rospy.init_node('various_markers')
 box_tf = TransformListener()
 flag_box = False
 
-box_length  = BOX_TYPE_1['length']
-box_breadth = BOX_TYPE_1['breadth']
-box_height  = BOX_TYPE_1['height']
+box_length  = config['box_type']['length']
+box_breadth = config['box_type']['breadth']
+box_height  = config['box_type']['height']
 
 rate = rospy.Rate(30)
 

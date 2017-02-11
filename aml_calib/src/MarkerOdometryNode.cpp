@@ -171,14 +171,14 @@ public:
             tf::StampedTransform handCameraToBase;
 
             getTransform("base",
-                         "left_hand_camera",
+                         hand_frame,
                            handCameraToBase);
 
             transformHandMarkerToBase = (static_cast<tf::Transform>(handCameraToBase)*transformMarkerToHandCam);
  
             //this would be only transmitted once.
             tf::StampedTransform stampedTransform(transformHandMarkerToBase, curr_stamp,
-                                                  "base", "leftHandMarker");
+                                                  "base", "calibration_marker");
             br.sendTransform(stampedTransform);
 
 
@@ -205,30 +205,30 @@ public:
         }
 
         //draw a 3d cube in each marker if there is 3d info
-        if(hand_camParam.isValid() && hand_marker_size!=-1)
-        {
-          //CvDrawingUtils::draw3dAxis(inImage, hand_markers[0], hand_camParam);
-        }
+        // if(hand_camParam.isValid() && hand_marker_size!=-1)
+        // {
+        //   //CvDrawingUtils::draw3dAxis(inImage, hand_markers[0], hand_camParam);
+        // }
 
-        if(image_pub.getNumSubscribers() > 0)
-        {
-          //show input with augmented information
-          cv_bridge::CvImage out_msg;
-          out_msg.header.stamp = curr_stamp;
-          out_msg.encoding = sensor_msgs::image_encodings::RGB8;
-          out_msg.image = inImage;
-          image_pub.publish(out_msg.toImageMsg());
-        }
+        // if(image_pub.getNumSubscribers() > 0)
+        // {
+        //   //show input with augmented information
+        //   cv_bridge::CvImage out_msg;
+        //   out_msg.header.stamp = curr_stamp;
+        //   out_msg.encoding = sensor_msgs::image_encodings::RGB8;
+        //   out_msg.image = inImage;
+        //   image_pub.publish(out_msg.toImageMsg());
+        // }
 
-        if(debug_pub.getNumSubscribers() > 0)
-        {
-          //show also the internal image resulting from the threshold operation
-          cv_bridge::CvImage debug_msg;
-          debug_msg.header.stamp = curr_stamp;
-          debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
-          debug_msg.image = hand_mDetector.getThresholdedImage();
-          debug_pub.publish(debug_msg.toImageMsg());
-        }
+        // if(debug_pub.getNumSubscribers() > 0)
+        // {
+        //   //show also the internal image resulting from the threshold operation
+        //   cv_bridge::CvImage debug_msg;
+        //   debug_msg.header.stamp = curr_stamp;
+        //   debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
+        //   debug_msg.image = hand_mDetector.getThresholdedImage();
+        //   debug_pub.publish(debug_msg.toImageMsg());
+        // }
 
       }
       catch (cv_bridge::Exception& e)
@@ -278,13 +278,13 @@ public:
           {
            
             tf::Transform transformMarkerToOpenni = aruco_utils::arucoMarker2Tf(openni_rgb_markers[i]);
-            tf::StampedTransform leftHandMarkerToBase;
+            tf::StampedTransform calibrationMarkerToBase;
 
             getTransform("base",
-                         "leftHandMarker",
-                         leftHandMarkerToBase);  
+                         "calibration_marker",
+                         calibrationMarkerToBase);  
 
-            transformOpenniToBase = (static_cast<tf::Transform>(leftHandMarkerToBase)*transformMarkerToOpenni.inverse());
+            transformOpenniToBase = (static_cast<tf::Transform>(calibrationMarkerToBase)*transformMarkerToOpenni.inverse());
 
             calibrated = true;
 
@@ -308,8 +308,8 @@ public:
             //draw a 3d cube in each marker if there is 3d info
             if(openni_rgb_camParam.isValid() && box_marker_size != -1)
             {
-              //CvDrawingUtils::draw3dAxis(inImage, openni_rgb_markers[i], openni_rgb_camParam);
-              //CvDrawingUtils::draw3dCube(inImage, markers[i], openni_rgb_camParam);
+              CvDrawingUtils::draw3dAxis(inImage, openni_rgb_markers[i], openni_rgb_camParam);
+              //CvDrawingUtils::draw3dCube(inImage, openni_rgb_markers[i], openni_rgb_camParam);
             }
 
           }
@@ -327,15 +327,15 @@ public:
         }
 
 
-        // if(image_pub.getNumSubscribers() > 0)
-        // {
-        //   //show input with augmented information
-        //   cv_bridge::CvImage out_msg;
-        //   out_msg.header.stamp = curr_stamp;
-        //   out_msg.encoding = sensor_msgs::image_encodings::RGB8;
-        //   out_msg.image = inImage;
-        //   image_pub.publish(out_msg.toImageMsg());
-        // }
+        if(image_pub.getNumSubscribers() > 0)
+        {
+          //show input with augmented information
+          cv_bridge::CvImage out_msg;
+          out_msg.header.stamp = curr_stamp;
+          out_msg.encoding = sensor_msgs::image_encodings::RGB8;
+          out_msg.image = inImage;
+          image_pub.publish(out_msg.toImageMsg());
+        }
 
       }
       catch (cv_bridge::Exception& e)
