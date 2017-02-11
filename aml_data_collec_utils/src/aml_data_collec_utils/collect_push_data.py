@@ -189,7 +189,7 @@ class BoxObject(object):
                 # Pushing towards the center of the box
                 push_action = np.asarray(np.dot(pose,push_position)).ravel()[:3] # w.r.t to base frame now
 
-                push_xz = np.array(push_position[0],push_position[2])
+                push_xz = np.array([push_position[0],push_position[2]])
                 pushes.append({'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'push_xz': push_xz, 'name' : 'pre_push%d'%(count,)})
 
                 count += 1
@@ -260,10 +260,16 @@ class PushMachine(object):
             # There might be a sequence of positions prior to a push action
             goals = self.pack_push_goals(pushes[idx])
 
+            self._record_sample.record_once(task_action=pushes[idx])
+
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
             goals.reverse()
             success = self.goto_goals(goals[1:])
+
+            self._robot.untuck_arm()
+
+            self._record_sample.record_once(task_action=None, task_status=success)
 
             if success:
                 self._push_counter += 1
@@ -306,15 +312,17 @@ class PushMachine(object):
         if record and push:
             print "Gonna push the box ..."
             # self._record_sample.start_record(push)
-            
-            self._record_sample.record_once(task_action=push)
+        
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
-            self._record_sample.record_once(task_action=None, task_status=success)
+            
 
 
         return success
 
+    def on_shutdown(self):
 
+        #this if for saving files in case keyboard interrupt happens
+        self._record_sample.save_data_now()
 
     def run(self):
 
@@ -327,6 +335,11 @@ class PushMachine(object):
 
         idx = 0
 
+        self._robot.untuck_arm()
+
+        rospy.on_shutdown(self.on_shutdown)
+
+
         while not rospy.is_shutdown():# and not finished:
 
             pushes = None
@@ -334,7 +347,7 @@ class PushMachine(object):
 
             print "Moving to neutral position ..."
                         
-            self._robot.untuck_arm()
+            
 
             
             pushes, box_pose, reset_push = self._box.get_pushes()
@@ -348,8 +361,7 @@ class PushMachine(object):
 
             rate.sleep()
 
-        #this if for saving files in case keyboard interrupt happens
-        self._record_sample.save_data_now()
+        
 
     def goto_pose(self,goal_pos, goal_ori): 
 

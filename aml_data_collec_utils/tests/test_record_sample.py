@@ -6,34 +6,29 @@ from aml_data_collec_utils.record_sample import DataManager
 
 data_man = DataManager(data_name_prefix='push_data')
 
-data = data_man.read_data(1)
+# data = data_man.read_data(1)
 
-print type(data)
+# print type(data)
 
-for sample in data:
+# for sample in data:
 
-    print "##########################################################################################################"
+#     print "##########################################################################################################"
 
-    keys = sample.keys()
+#     keys = sample.keys()
 
-    for key in sample:
+#     for key in sample:
 
-        print "****************************************************************************************************"
-        print "Key \t", key
-        print "Value \t", sample[key]
-        print "****************************************************************************************************"
-
-
-
-
-
-
+#         print "****************************************************************************************************"
+#         print "Key \t", key
+#         print "Value \t", sample[key]
+#         print "****************************************************************************************************"
 
 quit = False
 
 key = 0
 
-data = data_man.read_data(1)
+data = data_man.read_data(3)
+
 sample_idx = 0
 
 while not quit:
@@ -47,11 +42,23 @@ while not quit:
     image = sample['state_after']['rgb_image']
     cv2.imshow("RGB Image After", image)
 
-    print "SAMPLE_ID: ", sample['sample_id'], "SAMPLE_IDX: ", sample_idx
+    print "SAMPLE_ID: \t", sample['sample_id']
+
+    print "STATUS: \t", sample['task_status']
+
+    print "Start location of the box \n", sample['task_before']
+
+    print "Push action \n", sample['task_action']
+
+    print "End location of the box \n", sample['task_after']
 
     key = cv2.waitKey(0)
 
-    sample_idx += 1
+    print key
+    if key == 65363:
+    	sample_idx += 1
+    elif key == 65361:
+    	sample_idx = max(0,sample_idx-1)
 
     if key == 27 or sample_idx >= len(data):
         quit = True
