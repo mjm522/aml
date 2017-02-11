@@ -96,7 +96,9 @@ class DataManager():
     def append_data(self, sample):
 
         #if more number of samples came in, then make a new sample, else append to existing sample
-        if sample._contents['sample_id'] >= self._num_samples_per_file:
+        if len(self._data) >= self._num_samples_per_file:
+
+            print "Inside HERE *************************************************"
 
             self.write_data()
 

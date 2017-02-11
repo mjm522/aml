@@ -232,7 +232,7 @@ class PushMachine(object):
                                            task_interface=BoxObject(),
                                            data_folder_path=None,
                                            data_name_prefix='push_data',
-                                           num_samples_per_file=1000)
+                                           num_samples_per_file=2)
 
 
     def compute_next_state(self,idx):
