@@ -156,11 +156,11 @@ class BoxObject(object):
         if success:
             pre_push_offset = config['pre_push_offsets']
 
-            length_div2 = config['box_type']['length']/2.0
-            breadth_div2 = config['box_type']['breadth']/2.0
+            length_div2 = config['box_type']['length']/2
+            breadth_div2 = config['box_type']['breadth']/2
             
-            x_box = random.uniform(-length_div2,length_div2)
-            z_box = random.uniform(-breadth_div2,breadth_div2)
+            x_box = random.uniform(-length_div2,length_div2) # w.r.t box frame
+            z_box = random.uniform(-breadth_div2,breadth_div2) # w.r.t box frame
 
             pre_positions = np.array([[pre_push_offset[0]    , pre_push_offset[1],  z_box,               1], # right-side of the object
                                   [-pre_push_offset[0]   , pre_push_offset[1],  z_box,               1], # lef-side of the object
