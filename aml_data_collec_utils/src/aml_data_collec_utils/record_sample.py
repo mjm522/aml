@@ -132,7 +132,7 @@ class DataManager():
 
         if not os.access(data_file, os.R_OK):
                 
-            rospy.logerr("Cannot read file at '%s'" % (data_file))
+            rospy.loginfo("Cannot read file at '%s'" % (data_file))
 
             return None
 
@@ -186,9 +186,9 @@ class RecordSample():
                                      data_name_prefix=data_name_prefix,
                                      num_samples_per_file=num_samples_per_file)
 
-        self._sample_idx     = self._data_man._last_sample_idx + 1
+        self._sample_idx  = self._data_man._last_sample_idx + 1
 
-        self._sample    = Sample(self._sample_idx)
+        self._sample      = Sample(self._sample_idx)
 
 
     def save_sample(self):
@@ -222,32 +222,32 @@ class RecordSample():
         robot_state = self._robot._state
         task_state  = self._task.get_effect()
 
-        if self.check_sample(robot_state['timestamp']):
+        #np.quaternion causes problem, hence convert to array
+        if isinstance(robot_state['ee_ori'], np.quaternion):
 
-            #np.quaternion causes problem, hence convert to array
-            if isinstance(robot_state['ee_ori'], np.quaternion):
-
-                robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
 
 
-            #if task action is none, that means there is no task execution.
-            if task_action is None:
+        #if task action is none, that means there is no task execution.
+        if task_action is None:
 
-                self._sample._contents['state_after'] = robot_state
+            self._sample._contents['state_after'] = robot_state
 
-                self._sample._contents['task_after'] = task_state
+            self._sample._contents['task_after'] = task_state
 
-                self._sample._contents['task_status'] = task_status
+            self._sample._contents['task_status'] = task_status
 
-                self.save_sample()
+            self.save_sample()
 
-            else:
+            self._sample_idx += 1
 
-                self._sample._contents['task_action'] = task_action
+        else:
 
-                self._sample._contents['state_before'] = robot_state
-                
-                self._sample._contents['task_before'] = task_state
+            self._sample._contents['task_action'] = task_action
+
+            self._sample._contents['state_before'] = robot_state
+            
+            self._sample._contents['task_before'] = task_state
 
     def save_data_now(self):
 
