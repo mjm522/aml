@@ -43,42 +43,52 @@ class DataManager():
         #else create a new data sample!
         if append_to_last_file and data_names:
 
-            self._data_idx = len(data_names)+1
+            self._data_idx = len(data_names)
 
             self._data     = self.read_data(self._data_idx)
 
             #this case is to check in case you have given keyboard interrupt in the middle of recording
             #and you have an incomplete sample, so we will replace it.
-            if self.check_sample(self._data[-1]):
 
-                self._last_sample_idx = self._data[-1]['sample_id']
-            
+            if self._data:
+                if self.check_sample(self._data[-1]):
+
+                    self._last_sample_idx = self._data[-1]._contents['sample_id']
+                
+                else:
+
+                    self._last_sample_idx = self._data[-1]._contents['sample_id'] - 1
+
+                if self._last_sample_idx >= self._num_samples_per_file:
+                    print "WARNING: Max number of samples per file in place, saving as a new sample..."
+                    create_new_data = True
             else:
-
-                self._last_sample_idx = self._data[-1]['sample_id'] - 1
-
-            if self._last_sample_idx >= self._num_samples_per_file:
-                print "WARNING: Max number of samples per file in place, saving as a new sample..."
                 create_new_data = True
+                self._data_idx  = 0
+
+
         else:
             create_new_data = True
+            self._data_idx  = 0
 
         if create_new_data:
 
             self.create_new_data()
 
+        self._num_samples_per_file = num_samples_per_file
+
 
     def check_sample(self, sample):
 
-        bad_sample =  (sample['state_before'] is None or sample['state_after'] is None or sample['task_action'] is None/
-            sample['task_before'] is None or sample['task_after'] is None or sample['task_status'] is None)
+        bad_sample =  (sample._contents['state_before'] is None or sample._contents['state_after'] is None or sample._contents['task_action'] is None/
+            sample._contents['task_before'] is None or sample._contents['task_after'] is None or sample._contents['task_status'] is None)
 
         return not bad_sample
 
             
     def create_new_data(self):
-
-        self._data_idx = len(data_names) + 1
+    
+        self._data_idx = self._data_idx + 1
         self._data     = []
         self._last_sample_idx = 1
 
@@ -86,7 +96,7 @@ class DataManager():
     def append_data(self, sample):
 
         #if more number of samples came in, then make a new sample, else append to existing sample
-        if sample['sample_id'] >= self._num_samples_per_file:
+        if sample._contents['sample_id'] >= self._num_samples_per_file:
 
             self.write_data()
 
@@ -102,7 +112,7 @@ class DataManager():
 
         data_file = self._data_folder_path + self._data_name_prefix + ('_data_%02d.pkl' % self._data_idx)
 
-        save_data(data_file)
+        save_data(self._data, data_file)
 
         self._data_idx += 1
 
@@ -130,21 +140,21 @@ class Sample():
 
     def __init__(self, sample_id):
 
-        self._sample                 = {}
+        self._contents                = {}
 
-        self._sample['sample_id']    = sample_id
+        self._contents['sample_id']    = sample_id
 
-        self._sample['state_before'] = None
+        self._contents['state_before'] = None
 
-        self._sample['state_after']  = None
+        self._contents['state_after']  = None
 
-        self._sample['task_action']  = None
+        self._contents['task_action']  = None
 
-        self._sample['task_before']  = None
+        self._contents['task_before']  = None
 
-        self._sample['task_after']   = None
+        self._contents['task_after']   = None
 
-        self._sample['task_status']  = None
+        self._contents['task_status']  = None
 
 
 class RecordSample():
@@ -203,7 +213,7 @@ class RecordSample():
         robot_state = self._robot._state
         task_state  = self._task.get_effect()
 
-        if self.check_sample(data['timestamp']):
+        if self.check_sample(robot_state['timestamp']):
 
             #np.quaternion causes problem, hence convert to array
             if isinstance(robot_state['ee_ori'], np.quaternion):
@@ -214,21 +224,21 @@ class RecordSample():
             #if task action is none, that means there is no task execution.
             if task_action is None:
 
-                self._sample['state_after'] = robot_state
+                self._sample._contents['state_after'] = robot_state
 
-                self._sample['task_after'] = task_state
+                self._sample._contents['task_after'] = task_state
 
-                self._sample['task_status'] = task_status
+                self._sample._contents['task_status'] = task_status
 
-                self.save_sample():
+                self.save_sample()
 
             else:
 
-                self._sample['task_action'] = task_action
+                self._sample._contents['task_action'] = task_action
 
-                self._sample['state_before'] = robot_state
+                self._sample._contents['state_before'] = robot_state
                 
-                self._sample['task_before'] = task_state
+                self._sample._contents['task_before'] = task_state
 
     def save_data_now(self):
 
