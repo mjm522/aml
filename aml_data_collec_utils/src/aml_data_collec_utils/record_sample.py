@@ -13,6 +13,7 @@ class DataManager():
 
     def __init__(self, append_to_last_file=True, data_folder_path=None, data_name_prefix=None, num_samples_per_file=1000):
 
+    
         #this could be set from a hyper param file
         if data_folder_path is None:
             
@@ -21,6 +22,9 @@ class DataManager():
         else:
             
             self._data_folder_path = data_folder_path
+
+        #maximum number of samples that is allowed per file
+        self._num_samples_per_file = num_samples_per_file
 
         if data_name_prefix is None:
 
@@ -54,11 +58,11 @@ class DataManager():
             if self._data:
                 if self.check_sample(self._data[-1]):
 
-                    self._last_sample_idx = self._data[-1]._contents['sample_id']
+                    self._last_sample_idx = self._data[-1]['sample_id']
                 
                 else:
 
-                    self._last_sample_idx = self._data[-1]._contents['sample_id'] - 1
+                    self._last_sample_idx = self._data[-1]['sample_id'] - 1
 
                 if self._last_sample_idx >= self._num_samples_per_file:
                     print "WARNING: Max number of samples per file in place, saving as a new sample..."
@@ -76,20 +80,22 @@ class DataManager():
 
             self.create_new_data()
 
-        self._num_samples_per_file = num_samples_per_file
+        
 
 
     def check_sample(self, sample):
 
-        bad_sample =  (sample._contents['state_before'] is None or sample._contents['state_after'] is None or sample._contents['task_action'] is None/
-            sample._contents['task_before'] is None or sample._contents['task_after'] is None or sample._contents['task_status'] is None)
+        print sample
+
+        bad_sample =  (sample['state_before'] is None or sample['state_after'] is None or sample['task_action'] is None\
+            or sample['task_before'] is None or sample['task_after'] is None or sample['task_status'] is None)
 
         return not bad_sample
 
             
     def create_new_data(self):
     
-        self._data_idx = self._data_idx + 1
+        self._data_idx += 1
         self._data     = []
         self._last_sample_idx = 1
 
@@ -99,32 +105,30 @@ class DataManager():
         #if more number of samples came in, then make a new sample, else append to existing sample
         if len(self._data) >= self._num_samples_per_file:
 
-            print "Inside HERE *************************************************"
+            print "Saving the data file ..."
 
             self.write_data()
 
-            self.create_new_data()
-
-            self._data.append(sample)
+            self._data.append(sample._contents)
 
         else:
 
             print "New sample added..."
         
-            self._data.append(sample)
+            self._data.append(sample._contents)
 
     def write_data(self):
 
-        data_file = self._data_folder_path + self._data_name_prefix + ('_data_%02d.pkl' % self._data_idx)
+        data_file = self._data_folder_path + self._data_name_prefix + ('_%02d.pkl' % self._data_idx)
 
         save_data(self._data, data_file)
 
-        self._data_idx += 1
+        self.create_new_data()
 
 
     def read_data(self, data_idx):
 
-        data_file = self._data_folder_path + self._data_name_prefix +  ('_data_%02d.pkl' % data_idx)
+        data_file = self._data_folder_path + self._data_name_prefix +  ('_%02d.pkl' % data_idx)
 
         if not os.access(data_file, os.R_OK):
                 

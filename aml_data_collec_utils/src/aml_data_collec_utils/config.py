@@ -52,7 +52,7 @@ config_cubic_box = {
 
 
 config = {
-    'data_folder_path': join(abspath(join(dirname(abspath(__file__)),'../','../')),'data'),
+    'data_folder_path': join(abspath(join(dirname(abspath(__file__)),'../','../')),'data/'),
 }
 
 config.update(config_cubic_box)
