@@ -27,7 +27,7 @@ quit = False
 
 key = 0
 
-data = data_man.read_data(3)
+data = data_man.read_data(5)
 
 sample_idx = 0
 
