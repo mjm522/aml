@@ -264,7 +264,7 @@ class RecordSample():
 
         else:
 
-            #all thes stuff before a push is being done.
+            #all the stuff before a push is being done.
 
             self._sample._contents['task_action'] = task_action
 
