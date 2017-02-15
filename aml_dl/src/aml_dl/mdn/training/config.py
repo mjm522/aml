@@ -4,6 +4,10 @@ from aml_io.io_tools import get_aml_package_path
 check_point_path   = get_aml_package_path('aml_dl') + '/src/aml_dl/mdn/training/tf_check_points/'
 training_data_path = get_aml_package_path('aml_data_collec_utils') + '/data/'
 
+if not os.path.exists(training_data_path):
+    print "Training data folder does not exist..."
+    raise ValueError
+
 
 NUM_FP         = 10 #this is not the right value?
 IMAGE_WIDTH    = config['image_width']

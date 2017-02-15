@@ -1,7 +1,12 @@
+import os.path
+from aml_io.io_tools import get_aml_package_path
 
-from os.path import dirname, abspath
-model_folder_path = dirname(dirname(abspath(__file__))) + '/models/'
+model_folder_path  = get_aml_package_path('aml_robot') + '/src/aml_robot/mujoco/models/'
+data_storage_path  = get_aml_package_path('aml_data_collec_utils') + '/data/simulation/'
 
+
+if not os.path.exists(data_storage_path):
+    os.makedirs(data_storage_path)
 
 BOX_TYPE_1 = {
 	'length':0.3,
@@ -18,6 +23,7 @@ config_push_world = {
 	'fps': 60,
 	'box_dim':(0.15, 0.15, 0.15),
 	'model_name':model_folder_path+'/box_poke_setup.xml',
+	'data_folder_path':data_storage_path,
 	'dt': 0.0167,
 	'window_caption': 'MujocoWorld',
 	'record_training_data': True,

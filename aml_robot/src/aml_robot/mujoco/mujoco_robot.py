@@ -27,7 +27,7 @@ class MujocoRobot():
         self._reset_qpos = copy.deepcopy(self._model.data.qpos)
 
         
-    def _configure(self, viewer, on_state_callback=None):
+    def _configure(self, viewer, p_start_idx=None, p_end_idx=None, v_start_idx=None, v_end_idx=None, on_state_callback=None):
         
         self._state = None
 
@@ -42,9 +42,11 @@ class MujocoRobot():
 
         self.set_sampling_rate()
 
+        self.robot_state_set_start_end_index(p_start_idx, p_end_idx, v_start_idx, v_end_idx)
+
         # self.set_command_timeout(0.2)
 
-        self._camera = viewer
+        self._viewer = viewer
 
         _update_period = rospy.Duration(1.0/self._sampling_rate)
 
@@ -52,22 +54,45 @@ class MujocoRobot():
 
 
     def set_sampling_rate(self, rate=100):
+        
         self._sampling_rate = rate
+
+    def robot_state_set_start_end_index(self, p_start_idx, p_end_idx, v_start_idx, v_end_idx):
+
+        '''
+        since mujoco provides a single array of all states of all objects in the scene, it becomes essential
+        to give a start index and end index in that array which corresponds to the robot
+        if the input arguments are none, then all values are returned
+        '''
+
+        if p_start_idx is None:
+            p_start_idx = 0
+        if p_end_idx is None:
+            p_end_idx = self._nv
+        if v_start_idx is None:
+            v_start_idx = 0
+        if v_end_idx is None:
+            v_end_idx = self._nv
+        
+        self._p_start_idx = p_start_idx
+        self._p_end_idx   = p_end_idx
+        self._v_start_idx = v_start_idx
+        self._v_end_idx = v_end_idx
 
 
     def _update_state(self, event):
 
-        now                 = rospy.Time.now()
+        now                      = rospy.Time.now()
 
         state = {}
-        state['position']        = self._model.data.qpos[0:self._nv].flat
-        state['velocity']        = self._model.data.qvel[0:self._nv].flat
-        state['effort']          = self._model.data.qfrc_inverse[0:self._nv]
+        state['position']        = self._model.data.qpos[self._p_start_idx:self._p_end_idx].flatten()
+        state['velocity']        = self._model.data.qvel[self._p_start_idx:self._p_end_idx].flatten()
+        state['effort']          = self._model.data.qfrc_inverse[self._p_start_idx:self._p_end_idx]
         state['jacobian']        = self._model.jacSite('ee_site')
         state['inertia']         = self._model.fullM()
-        state['rgb_image']       = self._camera.get_image()[0]
+        state['rgb_image']       = self._viewer.get_image()[0]
         # state['depth_image']     = self._camera.curr_depth_image
-        state['gravity_comp']    = self._model.data.qfrc_bias[0:self._nv] + self._model.data.qfrc_passive[0:self._nv]
+        state['gravity_comp']    = self._model.data.qfrc_bias[self._p_start_idx:self._p_end_idx] + self._model.data.qfrc_passive[self._p_start_idx:self._p_end_idx]
 
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
@@ -88,7 +113,7 @@ class MujocoRobot():
         
         ee_pose = self._model.site_pose('ee_site')
 
-        return ee_pose[0], np.quaternion(ee_pose[1][0],ee_pose[1][1],ee_pose[1][2],ee_pose[1][3])
+        return ee_pose[0], np.quaternion(ee_pose[1][3],ee_pose[1][0],ee_pose[1][1],ee_pose[1][2])
 
     def get_compensation_forces(self):
 
@@ -96,7 +121,7 @@ class MujocoRobot():
 
     def get_ee_velocity(self):
 
-        vel = self._model.data.qvel[6:].flat().copy()
+        vel = self._model.data.qvel[self._v_start_idx:self._v_end_idx].flatten().copy()
 
         ee_vel = vel[:3]
 
@@ -114,7 +139,7 @@ class MujocoRobot():
 
         qpos = self._model.data.qpos.copy()
 
-        qpos[7:] = self._reset_qpos[7:]
+        qpos[self._p_start_idx:] = self._reset_qpos[self._p_start_idx:]
 
         self.set_qpos(qpos)
 

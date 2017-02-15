@@ -1,11 +1,9 @@
-
+import os
 import rospy
 import random
 import numpy as np
 import quaternion
-
 from config import config_push_world
-
 from aml_robot.mujoco.mujoco_robot import MujocoRobot
 from aml_robot.mujoco.mujoco_viewer   import  MujocoViewer
 from aml_data_collec_utils.record_sample import RecordSample
@@ -92,7 +90,7 @@ class BoxObject():
 
         # box_pos = box_q = None
 
-        box_pose = self._robot._model.data.qpos
+        box_pose = self._robot._model.data.qpos[:7].flatten()
 
         box_pos = box_pose[:3]
 
@@ -100,7 +98,7 @@ class BoxObject():
 
         rot = quaternion.as_rotation_matrix(np.quaternion(box_q[3], box_q[0], box_q[1], box_q[2]))
 
-        pose = np.vstack([np.hstack([rot, box_pos]),np.array([0.,0.,0.,1.])])
+        pose = np.vstack([np.hstack([rot, box_pos[:,None]]),np.array([0.,0.,0.,1.])])
 
         # Getting box center (adding center offset to retrieved pose)
         # pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
@@ -110,7 +108,7 @@ class BoxObject():
         # pose = pq_to_transform(self._tf,box_pos,box_q)
 
 
-        return pose, box_pos.flat, box_q
+        return pose, box_pos.flatten(), box_q
 
     # Computes a list of "pushes", a push contains a pre-push pose, 
     # a push action (goal position a push starting from a pre-push pose) 
@@ -228,9 +226,9 @@ class PushMachine(object):
 
         self._record_sample = RecordSample(robot_interface=robot_interface, 
                                            task_interface=BoxObject(robot_interface=robot_interface),
-                                           data_folder_path=None,
-                                           data_name_prefix='push_data',
-                                           num_samples_per_file=5)
+                                           data_folder_path=config_push_world['data_folder_path'],
+                                           data_name_prefix='sim_push_data',
+                                           num_samples_per_file=500)
 
 
     def compute_next_state(self,idx):
@@ -247,10 +245,11 @@ class PushMachine(object):
 
         # Take machine to next state
         if self._state == self._states['RESET']:
-            print "RESETING WITH NEW POSE"
-            #success = self.reset_box(reset_push)
-            os.system("spd-say 'Please reset the box, Much appreciated dear human'")
-            raw_input("Press enter to continue...")
+            # print "RESETING WITH NEW POSE"
+            # #success = self.reset_box(reset_push)
+            # os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+            # raw_input("Press enter to continue...")
+            pass
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -341,37 +340,50 @@ class PushMachine(object):
 
         while not rospy.is_shutdown():# and not finished:
 
+            self._robot._viewer.loop()
+
             pushes = None
             box_pose = None
 
             print "Moving to neutral position ..."
             
             pushes, box_pose, reset_push = self._box.get_pushes()
+            
             self._box._last_pushes = pushes
 
             if pushes:
 
                 self.compute_next_state(idx)
 
-                idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
+                if self._robot._state:
+
+                    idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
 
             rate.sleep()
 
         
 
-    def goto_pose(self,goal_pos, goal_ori): 
+    def goto_pose(self, goal_pos, goal_ori): 
 
         start_pos, start_ori = self._robot.get_ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
+        goal_ori    = quaternion.as_float_array(goal_ori)[0]
 
-        success, js_pos = self._robot.ik(goal_pos, goal_ori)
+        js_pos      = np.zeros((7,1))
+
+        js_pos[:3]  = goal_pos[:,None]
+
+        js_pos[3:6] = goal_ori[1:][:,None]
+
+        js_pos[6]   = goal_ori[0]
+
+        success     = True
 
         if success:
-            self._robot.move_to_joint_position(js_pos)
+            self._robot.set_qpos(np.vstack([self._robot._model.data.qpos[0:7], js_pos]))
         else:
             print "Couldnt find a solution"
 
@@ -402,13 +414,7 @@ if __name__ == "__main__":
 
     viewer.configure(cam_pos=config_push_world['camera_pos'])
 
-    robot_interface._configure(viewer=viewer)
-
-    # while not rospy.is_shutdown():
-        
-    #     print robot_interface._state
-        
-    #     viewer.loop()
+    robot_interface._configure(viewer=viewer, p_start_idx=7, p_end_idx=14, v_start_idx=6, v_end_idx=12)
     
     push_machine = PushMachine(robot_interface=robot_interface)
 
