@@ -1,3 +1,6 @@
+
+import os.path
+
 from aml_robot.box2d.config import config
 from aml_io.io_tools import get_aml_package_path
 
