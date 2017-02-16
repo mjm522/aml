@@ -19,6 +19,7 @@ from record_sample import RecordSample
 from aml_perception import camera_sensor
 from aml_io.io_tools import save_data, load_data
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
+from aml_robot.baxter_robot import BaxterArm
 
 class BoxObject(object):
 
@@ -404,7 +405,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     rospy.init_node('poke_box', anonymous=True)
-    from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
     
