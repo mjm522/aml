@@ -60,6 +60,11 @@ class PushMachine():
 
         pb.stepSimulation()
 
+    def on_shutdown(self):
+
+        #this if for saving files in case keyboard interrupt happens
+        self._record_sample.save_data_now()
+
 
     def set_pre_push_location(self):
 
@@ -226,6 +231,12 @@ class PushMachine():
         self.rate = rospy.Rate(100)
 
         pb.setRealTimeSimulation(0)
+
+        import time
+
+        time.sleep(1)
+
+        rospy.on_shutdown(self.on_shutdown)
 
         while not rospy.is_shutdown():
 
