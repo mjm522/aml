@@ -207,6 +207,9 @@ class RecordSample():
 
         self._sample      = Sample(self._sample_idx)
 
+        self._callback = None
+
+    
 
     def save_sample(self):
 
@@ -276,3 +279,53 @@ class RecordSample():
     def save_data_now(self):
 
         self._data_man.write_data()
+
+
+
+    def record_sample(self, task_action, event):
+
+        if self._record:
+
+            data = self._robot._state
+
+        if self.check_sample(data['timestamp']):
+
+            #np.quaternion causes problem, hence convert to array
+            if isinstance(data['ee_ori'], np.quaternion):
+
+                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+
+            else:
+
+                print type(data['ee_ori'])
+
+            self._sample._data['state'].append(data)
+            self._sample._data['task_action'].append(task_action)
+
+
+            self._sample._data['task_effect'].append(self._task.get_status())
+
+    def start_record(self, task_action):
+        
+        self._record = True
+        
+        self.configure(task_action)
+
+        self._callback = rospy.Timer(self._record_period, partial(self.record_sample,task_action))
+
+    def stop_record(self, task_status):
+        
+        self._record = False
+        
+        if self._callback is None:
+            
+            print "Nothing to kill, since the recorder was not started ..."
+        
+        else:
+            
+            self._callback.shutdown()
+
+            #update the task status was a success and fail
+            self._sample._data['task_status'] = task_status
+
+            self._sample.write_sample()
