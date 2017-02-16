@@ -54,6 +54,8 @@ class DataManager():
 
             #this is in case if the current data is empty
             #so this shouldn't be the case when data_idx is 1
+            print max(1, self._data_idx -1)
+
             _prev_data      = self.read_data(max(1, self._data_idx -1))
 
             self._data      = self.read_data(self._data_idx)
@@ -155,7 +157,15 @@ class DataManager():
 
         else:
 
-            return load_data(data_file)
+            try:
+                data = load_data(data_file)
+            except Exception as e:
+                print "Unable to load data, file corrupted, creating new data file"
+                os.remove(data_file)
+                self._data_idx -= 1
+                self.create_new_data()
+
+            return 
 
     def get_specific_sample(self, data_idx, sample_idx):
 
@@ -247,6 +257,7 @@ class RecordSample():
         task_state  = self._task.get_effect()
 
         #np.quaternion causes problem, hence convert to array
+
         if isinstance(robot_state['ee_ori'], np.quaternion):
 
             robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]

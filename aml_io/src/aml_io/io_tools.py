@@ -1,5 +1,20 @@
 import pickle
 
+from os.path import join, dirname, abspath
+
+def get_aml_package_path(aml_package_name=None):
+
+    #if the package name is none, it returns path to aml folder
+    if aml_package_name is None:
+
+        aml_package_path = '/'.join(dirname(dirname(abspath(__file__))).split('/')[:-2])
+
+    else:
+
+        aml_package_path = '/'.join(dirname(dirname(abspath(__file__))).split('/')[:-2]) + '/' + aml_package_name
+
+    return aml_package_path
+
 
 def save_data(data, filename, append_to_file = False):
 

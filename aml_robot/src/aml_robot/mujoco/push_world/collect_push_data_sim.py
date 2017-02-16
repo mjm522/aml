@@ -1,29 +1,17 @@
-#!/usr/bin/env python
-
-# A simply python controller for Baxter compatible with GPS (TODO)
-import tf
 import os
 import rospy
-import argparse
-
-import numpy as np
 import random
+import numpy as np
 import quaternion
+from config import config_push_world
+from aml_robot.mujoco.mujoco_robot import MujocoRobot
+from aml_robot.mujoco.mujoco_viewer   import  MujocoViewer
+from aml_data_collec_utils.record_sample import RecordSample
 
-import aml_calib
-import camera_calib
 
-from config import config
-from tf import TransformListener
-from record_sample import RecordSample
-from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
-from aml_robot.baxter_robot import BaxterArm
+class BoxObject():
 
-class BoxObject(object):
-
-    def __init__(self):
-
-        self._tf              = TransformListener()
+    def __init__(self, robot_interface=None, config=config_push_world):
 
         self._dimensions      = np.array([config['box_type']['length'], config['box_type']['height'], config['box_type']['breadth']])
 
@@ -31,23 +19,19 @@ class BoxObject(object):
 
         self._base_frame_name = 'base'
 
-
         self._box_reset_pos0 = None
 
         self._last_pushes = None
 
-
-        # Publish
-        self._br = tf.TransformBroadcaster()
+        self._robot = robot_interface
 
         update_rate = 30.0
         update_period = rospy.Duration(1.0/update_rate)
-        rospy.Timer(update_period, self.update_frames)
+        # rospy.Timer(update_period, self.update_frames)
 
     #this is a util that makes the data in storing form
     def get_effect(self):
-        pose, _, _   = self.get_pose()
-        p, q   = transform_to_pq(pose)
+        pose, p, q   = self.get_pose()
         status = {}
         status['pos'] = p
         #all the files in package follows np.quaternion convention, that is
@@ -71,17 +55,11 @@ class BoxObject(object):
 
     def get_reset_pose(self):
 
-        time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
-
         # Box pose
-        pose, _, _ = self.get_pose()
+        pose = self._robot._reset_qpos[7:]
 
-        p, q = transform_to_pq(pose)
-
-        reset_offset = config['reset_spot_offset']
-        tip_offset = config['end_effector_tip_offset']
-        pos_rel_box = np.array([reset_offset[0],reset_offset[1]+tip_offset[1],reset_offset[2],1])
-        pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
+        pos = pose[:3]
+        q   = pose[3:]
 
         return pos, q
 
@@ -107,19 +85,30 @@ class BoxObject(object):
 
     def get_pose(self, time = None):
 
-        if time is None:
-            time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
+        # if time is None:
+        #     time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
 
-        box_pos = box_q = None
+        # box_pos = box_q = None
+
+        box_pose = self._robot._model.data.qpos[:7].flatten()
+
+        box_pos = box_pose[:3]
+
+        box_q = box_pose[3:]
+
+        rot = quaternion.as_rotation_matrix(np.quaternion(box_q[3], box_q[0], box_q[1], box_q[2]))
+
+        pose = np.vstack([np.hstack([rot, box_pos[:,None]]),np.array([0.,0.,0.,1.])])
+
         # Getting box center (adding center offset to retrieved pose)
-        pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
-        box_center_offset = config['box_center_offset']
-        box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
-        _, box_q = transform_to_pq(pose)
-        pose = pq_to_transform(self._tf,box_pos,box_q)
+        # pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
+        # box_center_offset = config_push_world['box_center_offset']
+        # box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
+        # _, box_q = transform_to_pq(pose)
+        # pose = pq_to_transform(self._tf,box_pos,box_q)
 
 
-        return pose, box_pos, box_q
+        return pose, box_pos.flatten(), box_q
 
     # Computes a list of "pushes", a push contains a pre-push pose, 
     # a push action (goal position a push starting from a pre-push pose) 
@@ -133,30 +122,38 @@ class BoxObject(object):
 
         pos = pose = time = ee_pose = box_q = box_pos =  None
 
-        while trial_count < max_trials and not success:
+        ee_pos, q_ee = self._robot.get_ee_pose()
 
-            try:
-                pose, box_pos, box_q = self.get_pose()
+        reset_pos, reset_q = self.get_reset_pose()
 
-                time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
-                ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
+        success = True
 
-                ee_pos, q_ee = transform_to_pq(ee_pose)
+        pose, box_pos, box_q = self.get_pose()
 
-                reset_pos, reset_q = self.get_reset_pose()
+        # while trial_count < max_trials and not success:
 
-                success = True
-            except Exception as e:
-                print "Failed to get required transforms", e
-                trial_count += 1
+        #     try:
+        #         pose, box_pos, box_q = self.get_pose()
+
+        #         time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
+        #         ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
+
+        #         ee_pos, q_ee = transform_to_pq(ee_pose)
+
+        #         reset_pos, reset_q = self.get_reset_pose()
+
+        #         success = True
+        #     except Exception as e:
+        #         print "Failed to get required transforms", e
+        #         trial_count += 1
 
 
         
         if success:
-            pre_push_offset = config['pre_push_offsets']
+            pre_push_offset = config_push_world['pre_push_offsets']
 
-            length_div2 = config['box_type']['length']/2
-            breadth_div2 = config['box_type']['breadth']/2
+            length_div2 = config_push_world['box_type']['length']/2
+            breadth_div2 = config_push_world['box_type']['breadth']/2
             
             x_box = random.uniform(-length_div2,length_div2) # w.r.t box frame
             z_box = random.uniform(-breadth_div2,breadth_div2) # w.r.t box frame
@@ -199,8 +196,8 @@ class BoxObject(object):
 
             # Reset push is a special kind of push
             
-            reset_offset = config['reset_spot_offset']
-            pre_reset_offset = config['pre_reset_offsets']
+            reset_offset = config_push_world['reset_spot_offset']
+            pre_reset_offset = config_push_world['pre_reset_offsets']
             pos_rel_box = np.array([reset_offset[0],reset_offset[1]+pre_reset_offset[1],reset_offset[2],1])
             pre_reset_pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
 
@@ -221,17 +218,17 @@ class PushMachine(object):
     def __init__(self, robot_interface, sample_start_index=None):
 
         self._push_counter = 0
-        self._box = BoxObject()
+        self._box = BoxObject(robot_interface=robot_interface)
         self._robot = robot_interface
 
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
         self._record_sample = RecordSample(robot_interface=robot_interface, 
-                                           task_interface=BoxObject(),
-                                           data_folder_path=None,
-                                           data_name_prefix='push_data',
-                                           num_samples_per_file=5)
+                                           task_interface=BoxObject(robot_interface=robot_interface),
+                                           data_folder_path=config_push_world['data_folder_path'],
+                                           data_name_prefix='sim_push_data',
+                                           num_samples_per_file=500)
 
 
     def compute_next_state(self,idx):
@@ -248,10 +245,11 @@ class PushMachine(object):
 
         # Take machine to next state
         if self._state == self._states['RESET']:
-            print "RESETING WITH NEW POSE"
-            #success = self.reset_box(reset_push)
-            os.system("spd-say 'Please reset the box, Much appreciated dear human'")
-            raw_input("Press enter to continue...")
+            # print "RESETING WITH NEW POSE"
+            # #success = self.reset_box(reset_push)
+            # os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+            # raw_input("Press enter to continue...")
+            pass
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -264,6 +262,7 @@ class PushMachine(object):
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
             goals.reverse()
+
             success = self.goto_goals(goals[1:])
 
             self._robot.untuck_arm()
@@ -341,39 +340,50 @@ class PushMachine(object):
 
         while not rospy.is_shutdown():# and not finished:
 
+            self._robot._viewer.loop()
+
             pushes = None
             box_pose = None
 
             print "Moving to neutral position ..."
-                        
-            
-
             
             pushes, box_pose, reset_push = self._box.get_pushes()
+            
             self._box._last_pushes = pushes
 
             if pushes:
 
                 self.compute_next_state(idx)
 
-                idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
+                if self._robot._state:
+
+                    idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
 
             rate.sleep()
 
         
 
-    def goto_pose(self,goal_pos, goal_ori): 
+    def goto_pose(self, goal_pos, goal_ori): 
 
         start_pos, start_ori = self._robot.get_ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
-        success, js_pos = self._robot.ik(goal_pos,goal_ori)
+        goal_ori    = quaternion.as_float_array(goal_ori)[0]
+
+        js_pos      = np.zeros((7,1))
+
+        js_pos[:3]  = goal_pos[:,None]
+
+        js_pos[3:6] = goal_ori[1:][:,None]
+
+        js_pos[6]   = goal_ori[0]
+
+        success     = True
 
         if success:
-            self._robot.move_to_joint_position(js_pos)
+            self._robot.set_qpos(np.vstack([self._robot._model.data.qpos[0:7], js_pos]))
         else:
             print "Couldnt find a solution"
 
@@ -396,23 +406,16 @@ class PushMachine(object):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='Data collection for push manipulation')
-    
-    parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
-    
-    args = parser.parse_args()
-
     rospy.init_node('poke_box', anonymous=True)
-    limb = 'left'
-    arm = BaxterArm(limb)
-    
-    push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index)
 
-    print "calling run"
+    robot_interface = MujocoRobot(xml_path=config_push_world['model_name'])
+
+    viewer = MujocoViewer(mujoco_robot=robot_interface, width=config_push_world['image_width'], height=config_push_world['image_height'])
+
+    viewer.configure(cam_pos=config_push_world['camera_pos'])
+
+    robot_interface._configure(viewer=viewer, p_start_idx=7, p_end_idx=14, v_start_idx=6, v_end_idx=12)
+    
+    push_machine = PushMachine(robot_interface=robot_interface)
 
     push_machine.run()
-   
-    
-
-    
-
