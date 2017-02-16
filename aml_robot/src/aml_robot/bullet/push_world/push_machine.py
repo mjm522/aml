@@ -34,13 +34,21 @@ class PushMachine():
 
         self._world_id = world_id
 
+        pb.resetBasePositionAndOrientation(self._world_id, np.array([0., 0., -0.5]), np.array([0.,0.,0.,1]))
+
         self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=-1, config=config_push_world)
+
+        self._box.configure_default_pos(np.array([0., 0., 0.]), np.array([0.,0.,0.,1]))
+
+        self._robot.configure_default_pos(np.array([1.25, 0.,0.]),  np.array([0.,0.,0.,1]))
 
         self._config   = config
 
         self._fsm = ['pre_push', 'push']
 
         self._fsm_state = 0
+
+        self._force_mag = self._config['push_force_magnitude']
 
         self._record_sample = RecordSample(robot_interface=self._robot, 
                                           task_interface=self._box,
@@ -78,47 +86,28 @@ class PushMachine():
 
         box_pos, box_ori = self._box.get_pos_ori()
 
-        rbt_pos, rbt_ori = self._robot.get_pos_ori()
-
         rot = np.asarray(pb.getMatrixFromQuaternion(box_ori)).reshape(3,3)
 
-        pre_push_wrt_box = np.array([0.,-1.25, 0.])
-
-        push_location_wrt_world =  box_pos + np.dot(rot, pre_push_wrt_box)
-
-        # push_location_wrt_world = np.array([0.,-1.25, rbt_pos[2]])
+        push_location_wrt_world =  box_pos + pre_push_wrt_box
 
         self._robot.set_pos_ori(push_location_wrt_world, box_ori)
 
-        return pre_push_wrt_box
+        push_info = {'push_xy':pre_push_wrt_box}
+
+        return push_info
 
 
-    def push_box(self, force_mag=40.):
+    def push_box(self):
 
         box_pos, box_ori = self._box.get_pos_ori()
 
         rbt_pos, rbt_ori = self._robot.get_pos_ori()
 
-        # box_pos[2] = 0
-        # rbt_pos[2] = 0
-
         rot = np.asarray(pb.getMatrixFromQuaternion(box_ori)).reshape(3,3)
 
-        force_dir = box_pos-rbt_pos
+        force_dir = np.dot(rot.T,(box_pos-rbt_pos))
 
-        force =  force_mag*force_dir/np.linalg.norm(force_dir)
-
-        # force[0] = 0.
-
-        # force = np.array([-40.,0.,0.])
-
-        # force = np.dot(rot.T, np.array([-40.,0.,0.]))
-
-        # force = force_mag*(box_pos-rbt_pos)/np.linalg.norm(box_pos-rbt_pos)
-
-        # print force
-
-        # print "force \t", force
+        force =  self._force_mag*force_dir/np.linalg.norm(force_dir)
 
         self._robot.apply_external_force(link_idx=-1, force=force, point=[0.,0.,0.], local=True)
 
@@ -170,9 +159,11 @@ class PushMachine():
 
             print "Going to pre-push location ..."
 
-            pre_push_wrt_box = self.set_pre_push_location()
+            push_info = self.set_pre_push_location()
 
-            self._record_sample.record_once(task_action=pre_push_wrt_box)
+            self._record_sample.record_once(task_action=push_info)
+
+            # raw_input()
 
             self._fsm_state = 1
 
@@ -205,8 +196,6 @@ class PushMachine():
                 #try to be in contact with the box for some time.
                 while count < 10:
 
-                    print "HERE"
-
                     self.push_box()
                     
                     self.step()
@@ -216,7 +205,7 @@ class PushMachine():
                     if check_contact_with_box():
 
                         count += 1
-                        print count
+                        # print count
 
                     self.check_within_limits()
 

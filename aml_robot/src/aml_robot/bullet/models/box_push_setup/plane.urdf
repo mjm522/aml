@@ -10,7 +10,7 @@
        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
     </inertial>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 -0.5"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
 				<mesh filename="plane.obj" scale="1 1 1"/>
       </geometry>
@@ -19,9 +19,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 -5"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-	 	     <box size="30 30 10"/>
+	 	     <box size="30 30 0.01"/>
       </geometry>
     </collision>
   </link>

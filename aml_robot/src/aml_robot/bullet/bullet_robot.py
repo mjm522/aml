@@ -22,7 +22,12 @@ class BulletRobot(object):
 
         rospy.Timer(_update_period, self._update_state)
 
-        self._default_pos, self._default_ori = self.get_pos_ori()
+        
+    def configure_default_pos(self, pos, ori):
+
+        self._default_pos = pos
+        self._default_ori = ori
+        self.set_default_pos_ori()
 
 
     def configure_camera(self):
@@ -119,7 +124,7 @@ class BulletRobot(object):
         return contact_info
 
     def set_default_pos_ori(self):
-        
+
         self.set_pos_ori(self._default_pos, self._default_ori)
 
     def set_pos_ori(self, pos, ori):
