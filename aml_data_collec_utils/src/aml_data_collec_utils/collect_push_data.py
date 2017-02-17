@@ -248,6 +248,9 @@ class PushMachine(object):
                                            num_samples_per_file=5)
 
 
+    def send_left_arm_away(self):
+        self._robot.move_to_joint_position(np.array([-0.08091749, -0.99747101, -1.1896021 ,  1.94201968,  0.678403, 1.02661664, -0.51004861]))
+
     def compute_next_state(self,idx):
 
         # Decide next state
@@ -264,6 +267,8 @@ class PushMachine(object):
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
             #success = self.reset_box(reset_push)
+
+            self.send_left_arm_away()
             os.system("spd-say 'Please reset the box, Much appreciated dear human'")
             raw_input("Press enter to continue...")
 
