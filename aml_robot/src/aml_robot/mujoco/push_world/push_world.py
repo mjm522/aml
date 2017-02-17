@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 import pickle
 
-from config import config
+from config import config_push_world
 
 from aml_robot.box2d.data_manager import DataManager
 
@@ -27,12 +27,12 @@ class PushWorld(object):
 
     def __init__(self, config):
 
-        self._config = config
+        self._config = config_push_world
         self._ppm = self._config['pixels_per_meter']
 
         # Create a dynamic body using mujoco
     
-        self._box = MujocoRobot(xml_path=config['model_name'])
+        self._box = MujocoRobot(xml_path=self._config['model_name'])
 
         self._dynamic_body = self._box._model 
 
@@ -77,7 +77,6 @@ class PushWorld(object):
     def reset_box(self):
 
         # self._box.reset_model()
-        print "HERE"
         self._dynamic_body.data.qpos = np.array([0., 0., 0., 1, 0, 0, 0])
         self._dynamic_body.data.qvel = np.zeros(6)
         self._dynamic_body.data.qacc = np.zeros(6)
@@ -100,6 +99,10 @@ class PushWorld(object):
 
         # Current state of the box (position,linear and angular velocities, image_rgb)
         # Final state of the box 
+
+
+        print qpos
+        print qvel
 
         state = {
             'position': np.array([qpos[0], qpos[1], qpos[2]]),
@@ -131,6 +134,9 @@ class PushWorld(object):
         px, py, pz = np.multiply(np.random.rand(3),[2*box_l, 2*box_w, 2*box_h]) - np.array([box_l, box_w, box_h])
 
         theta = np.random.rand()*np.pi*0.5#(2*np.pi)
+
+
+
 
         # self.get_vertices()
 
@@ -258,17 +264,17 @@ class PushWorld(object):
 
 def main():
     
-    push_world = PushWorld(config = config)
+    push_world = PushWorld(config = config_push_world)
 
-    viewer = MujocoViewer(mujoco_robot=push_world._box, width=config['image_width'], height=config['image_height'])
+    viewer = MujocoViewer(mujoco_robot=push_world._box, width=config_push_world['image_width'], height=config_push_world['image_height'])
 
-    viewer.configure(cam_pos=config['camera_pos'])
+    viewer.configure(cam_pos=config_push_world['camera_pos'])
 
     while not rospy.is_shutdown():
         push_world.update(viewer=viewer)
         viewer.loop()
 
-    push_world.save_samples(config['training_data_file'])
+    push_world.save_samples(config_push_world['training_data_file'])
 
 if __name__ == "__main__":
 

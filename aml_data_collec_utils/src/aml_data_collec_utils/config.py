@@ -1,5 +1,10 @@
+import os.path
+from aml_io.io_tools import get_aml_package_path
 
-from os.path import dirname, abspath, join
+data_storage_path  = get_aml_package_path('aml_data_collec_utils') + '/data/'
+
+if not os.path.exists(data_storage_path):
+    os.makedirs(data_storage_path)
 
 #all measurements in meters
 #the white box
@@ -53,7 +58,7 @@ config_cubic_box = {
 
 
 config = {
-    'data_folder_path': join(abspath(join(dirname(abspath(__file__)),'../','../')),'data/'),
+    'data_folder_path': data_storage_path,
 }
 
 config.update(config_cubic_box)

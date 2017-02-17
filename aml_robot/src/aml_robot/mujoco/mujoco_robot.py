@@ -1,8 +1,11 @@
+
+import rospy
 import mujoco_py
 from mujoco_py import mjcore
 from mujoco_py import mjtypes
 import numpy as np
 import quaternion
+import copy
 
 from aml_lfd.utilities.utilities import compute_omg
 from aml_robot.utilities.utilities import convert_rospy_time2sec
@@ -18,9 +21,13 @@ class MujocoRobot():
             'video.frames_per_second' : int(np.round(1.0 / self._dt))}
 
         self._nu = self._model.nu
-        
 
-    def _configure(self, viewer, on_state_callback):
+        self._nv = self._model.nv
+
+        self._reset_qpos = copy.deepcopy(self._model.data.qpos)
+
+        
+    def _configure(self, viewer, p_start_idx=None, p_end_idx=None, v_start_idx=None, v_end_idx=None, on_state_callback=None):
         
         self._state = None
 
@@ -33,25 +40,59 @@ class MujocoRobot():
 
         self._pub_rate = None
 
-        # self.set_sampling_rate()
+        self.set_sampling_rate()
+
+        self.robot_state_set_start_end_index(p_start_idx, p_end_idx, v_start_idx, v_end_idx)
 
         # self.set_command_timeout(0.2)
 
-        self._camera = viewer
-    
-    def _update_state(self):
+        self._viewer = viewer
 
-        now                 = rospy.Time.now()
+        _update_period = rospy.Duration(1.0/self._sampling_rate)
+
+        rospy.Timer(_update_period, self._update_state)
+
+
+    def set_sampling_rate(self, rate=100):
+        
+        self._sampling_rate = rate
+
+    def robot_state_set_start_end_index(self, p_start_idx, p_end_idx, v_start_idx, v_end_idx):
+
+        '''
+        since mujoco provides a single array of all states of all objects in the scene, it becomes essential
+        to give a start index and end index in that array which corresponds to the robot
+        if the input arguments are none, then all values are returned
+        '''
+
+        if p_start_idx is None:
+            p_start_idx = 0
+        if p_end_idx is None:
+            p_end_idx = self._nv
+        if v_start_idx is None:
+            v_start_idx = 0
+        if v_end_idx is None:
+            v_end_idx = self._nv
+        
+        self._p_start_idx = p_start_idx
+        self._p_end_idx   = p_end_idx
+        self._v_start_idx = v_start_idx
+        self._v_end_idx = v_end_idx
+
+
+    def _update_state(self, event):
+
+        now                      = rospy.Time.now()
 
         state = {}
-        state['position']        = self._model.data.qpos[0:self._nu].flat
-        state['velocity']        = self._model.data.qvel[0:self._nu].flat
-        state['effort']          = self._model.data.qfrc_inverse[0:self._nu]
+        state['position']        = self._model.data.qpos[self._p_start_idx:self._p_end_idx].flatten()
+        state['velocity']        = self._model.data.qvel[self._p_start_idx:self._p_end_idx].flatten()
+        state['effort']          = self._model.data.qfrc_inverse[self._p_start_idx:self._p_end_idx]
         state['jacobian']        = self._model.jacSite('ee_site')
         state['inertia']         = self._model.fullM()
-        state['rgb_image']       = self._camera.get_image()[0]
+        state['rgb_image']       = self._viewer.get_image()[0]
         # state['depth_image']     = self._camera.curr_depth_image
-        state['gravity_comp']    = self._model.data.qfrc_bias[0:self._nu] + self._model.data.qfrc_passive[0:self._nu]
+        state['gravity_comp']    = self._model.data.qfrc_bias[self._p_start_idx:self._p_end_idx] + self._model.data.qfrc_passive[self._p_start_idx:self._p_end_idx]
 
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
@@ -65,13 +106,14 @@ class MujocoRobot():
         except:
             pass
 
-        return state
+        self._state = state
+
 
     def get_ee_pose(self):
         
         ee_pose = self._model.site_pose('ee_site')
 
-        return ee_pose[0], np.quaternion(ee_pose[1][0],ee_pose[1][1],ee_pose[1][2],ee_pose[1][3])
+        return ee_pose[0], np.quaternion(ee_pose[1][3],ee_pose[1][0],ee_pose[1][1],ee_pose[1][2])
 
     def get_compensation_forces(self):
 
@@ -79,20 +121,27 @@ class MujocoRobot():
 
     def get_ee_velocity(self):
 
-        time_now = rospy.Time.now()
+        vel = self._model.data.qvel[self._v_start_idx:self._v_end_idx].flatten().copy()
 
-        ee_point, ee_ori  = self.get_ee_pose()
+        ee_vel = vel[:3]
 
-        ee_vel = (ee_point - self._state['ee_point'])/(convert_rospy_time2sec(self._state(timestamp))-\
-                                           convert_rospy_time2sec(time_now))
-
-        ee_omg = compute_omg(self._state['ee_ori'], ee_ori)
+        ee_omg = vel[3:]
 
         return ee_vel, ee_omg
 
 
     def reset_model(self):
         self._model.resetData()
+
+
+    #mimicking the untuck arm of baxter_robot
+    def untuck_arm(self):
+
+        qpos = self._model.data.qpos.copy()
+
+        qpos[self._p_start_idx:] = self._reset_qpos[self._p_start_idx:]
+
+        self.set_qpos(qpos)
 
 
     def set_qpos(self, qpos):
