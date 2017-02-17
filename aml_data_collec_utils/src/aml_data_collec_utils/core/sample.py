@@ -62,7 +62,7 @@ class Sample(object):
 
     def set(self, idx, key, value):
 
-        assert( idx < len(self._contents))
+        assert( idx < len(self._contents) and len(self._contents) > 0 )
 
         data = self._contents[idx]
 
@@ -71,6 +71,14 @@ class Sample(object):
         data[key] = value
 
         return data[key]
+
+
+    def get_keys(self):
+
+        assert( len(self._contents) > 0 )
+
+
+        return self._contents[0].keys()
 
 
     def set_valid(self, valid):

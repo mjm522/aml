@@ -90,6 +90,7 @@ class DataRecorder(object):
         data.update(robot_state)
         data.update(task_state)
         data.update({'task_action': task_action, 'terminal' : terminal})
+
         self._sample.add(data)
 
         # aml_logging.info("Sample size: %d"%(self._sample.size(),))

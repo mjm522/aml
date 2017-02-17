@@ -56,17 +56,17 @@ class BoxObject(object):
             pose, _, _   = self.get_pose()
             p, q   = transform_to_pq(pose)
             
-            status['pos'] = p
+            status['box_pos'] = p
             #all the files in package follows np.quaternion convention, that is
             # w,x,y,z while ros follows x,y,z,w convention
-            status['ori'] = np.array([q[3],q[0],q[1],q[2]])
+            status['box_ori'] = np.array([q[3],q[0],q[1],q[2]])
 
-            status['tracking_good'] = True
+            status['box_tracking_good'] = True
         except:
             print "tracking failed"
-            status['pos'] = np.zeros(3)
-            status['ori'] = np.zeros(3)
-            status['tracking_good'] = False
+            status['box_pos'] = np.zeros(3)
+            status['box_ori'] = np.zeros(3)
+            status['box_tracking_good'] = False
 
         return status
 

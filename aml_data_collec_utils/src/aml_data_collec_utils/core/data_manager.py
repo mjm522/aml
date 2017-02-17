@@ -136,6 +136,7 @@ class DataManager(object):
 
         else:
 
+            data = None
             try:
                 data = load_data(data_file)
 
