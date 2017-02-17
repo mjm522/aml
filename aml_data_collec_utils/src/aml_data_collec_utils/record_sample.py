@@ -232,24 +232,9 @@ class RecordSample():
             
 
     #this piece of funtion is useful only in case of continous recording
-    def check_sample(self, time_stamp):
+    def check_sample(self, sample):
 
-        if self._old_time_stamp is None:
-
-            self._old_time_stamp = time_stamp
-
-        #a small function to compute time from timestamps
-        def time_compute(time_stamp):
-
-            return time_stamp['secs']  + 1e-9*time_stamp['nsecs']
-        
-        if time_compute(time_stamp) >= time_compute(self._old_time_stamp):
-
-            return True
-
-        else:
-
-            return False
+        return True
 
     def record_once(self, task_action, task_status=False):
 
@@ -319,8 +304,6 @@ class RecordSample():
     def start_record(self, task_action):
         
         self._record = True
-        
-        self.configure(task_action)
 
         self._callback = rospy.Timer(self._record_period, partial(self.record_sample,task_action))
 
