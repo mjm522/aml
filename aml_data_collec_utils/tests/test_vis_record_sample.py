@@ -60,8 +60,8 @@ while not quit:
 
     print "SAMPLE_ID: \t", sample._id
     print "STATUS: \t", sample._is_valid
-    print "START STATE ", sample.get_keys()
-    print "FINAL STATE ", sample.get_keys()
+    print "START STATE ", sample._contents[0]
+    print "FINAL STATE ", sample._contents[-1]
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Push action \n", sample.get(0,['task_action'])
