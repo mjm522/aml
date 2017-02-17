@@ -30,7 +30,7 @@ quit = False
 
 key = 0
 
-data = data_man.read_data(6)
+data = data_man.read_data(1)
 
 
 print data
@@ -60,8 +60,8 @@ while not quit:
 
     print "SAMPLE_ID: \t", sample._id
     print "STATUS: \t", sample._is_valid
-    print "START STATE ", sample.get_keys()
-    print "FINAL STATE ", sample.get_keys()
+    print "START STATE ", sample._contents[0]
+    print "FINAL STATE ", sample._contents[-1]
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Push action \n", sample.get(0,['task_action'])
@@ -77,9 +77,9 @@ while not quit:
     key = cv2.waitKey(0)
 
     print key
-    if key == 65363:
+    if key == 65363 or key == 1113939:
     	sample_idx += 1
-    elif key == 65361:
+    elif key == 65361 or key == 1113937:
     	sample_idx = max(0,sample_idx-1)
 
     if key == 27 or sample_idx >= len(data):
