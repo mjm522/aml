@@ -6,8 +6,8 @@ import argparse
 import numpy as np
 import quaternion
 from tf import TransformListener
-from os.path import dirname, abspath
-from aml_data_collec_utils.record_sample import Sample, RecordSample
+from aml_io.io_tools import get_aml_package_path
+from aml_data_collec_utils.core.data_recorder import DataRecorder
 
 
 class Task():
@@ -19,9 +19,15 @@ class Task():
 
         return True
 
+    def get_effect(self):
+
+        dummy_task = {}
+
+        return dummy_task
+
 class StoreDemonstration():
 
-    def __init__(self, robot_interface, demo_idx, sampling_rate=100):
+    def __init__(self, robot_interface, demo_idx, data_folder_path=None, data_name_prefix=None, sampling_rate=100):
 
         self._robot = robot_interface
         #this will be rate at which data will be read from the arm
@@ -31,14 +37,21 @@ class StoreDemonstration():
 
         self._demo_idx = demo_idx
 
-        self._data_folder_path = dirname(dirname(abspath(__file__))) + '/data/'
+        if data_folder_path is None:
+            data_folder_path = get_aml_package_path('aml_lfd') + '/data/'
 
-        self._record_sample = RecordSample(robot_interface=robot_interface, 
+        if data_name_prefix is None:
+            data_name_prefix = robot_interface._limb + '_demo_data'
+        else:
+            data_name_prefix = robot_interface._limb + '_' + data_name_prefix
+
+
+        self._record_sample = DataRecorder(robot_interface=robot_interface, 
                                            task_interface=Task(),
-                                           record_rate=100,
-                                           data_folder_path=self._data_folder_path,
-                                           sample_start_index=self._demo_idx,
-                                           sample_name_prefix=robot_interface._limb + '_demo_data')
+                                           data_folder_path=data_folder_path,
+                                           data_name_prefix=data_name_prefix,
+                                           num_samples_per_file=1, 
+                                           record_rate = 30)
 
         self._start_record = False
 
@@ -46,7 +59,7 @@ class StoreDemonstration():
 
     def save_demo_data(self):
 
-        while not self._finish_demo:
+        while (not self._finish_demo) and (not rospy.is_shutdown()):
 
             print "Robot cuff state \t", self._robot.get_lfd_status
 
@@ -56,7 +69,11 @@ class StoreDemonstration():
 
                 self._start_record = True
 
-                self._record_sample.start_record(self._robot._limb)
+                # self._record_sample.start_record(self._robot._limb)
+
+                dummy_task = {}
+
+                self._record_sample.start_record(task_action=dummy_task)
                 
             elif not self._robot.get_lfd_status and self._start_record:
 
@@ -64,7 +81,8 @@ class StoreDemonstration():
 
                 self._start_record = False
 
-                self._record_sample.stop_record(True)
+                # self._record_sample.stop_record(True)
+                self._record_sample.stop_record(task_status=True)
                 
                 self._finish_demo  = True
                 
@@ -75,12 +93,18 @@ class StoreDemonstration():
                 if option == 'y':
                     self._finish_demo  = False
                     self._demo_idx     += 1
+                else:
+                    self.save_now()
 
             else:
 
                 #self._robot.get_cuff_state is True or None, don't do anything.
 
                 pass
+
+    def save_now(self):
+        self._record_sample.save_data_now()
+
 
 def main(robot_interface, demo_idx):
 
