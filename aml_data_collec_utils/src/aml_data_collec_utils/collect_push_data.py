@@ -13,10 +13,14 @@ import quaternion
 import aml_calib
 import camera_calib
 
-from config import config
 from tf import TransformListener
-from record_sample import RecordSample
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
+from aml_robot.baxter_robot import BaxterArm
+
+from aml_data_collec_utils.core.sample import Sample
+from aml_data_collec_utils.core.data_manager import DataManager
+from aml_data_collec_utils.core.data_recorder import DataRecorder
+from aml_data_collec_utils.config import config
 
 class BoxObject(object):
 
@@ -45,13 +49,24 @@ class BoxObject(object):
 
     #this is a util that makes the data in storing form
     def get_effect(self):
-        pose, _, _   = self.get_pose()
-        p, q   = transform_to_pq(pose)
+
         status = {}
-        status['pos'] = p
-        #all the files in package follows np.quaternion convention, that is
-        # w,x,y,z while ros follows x,y,z,w convention
-        status['ori'] = np.array([q[3],q[0],q[1],q[2]])
+
+        try:
+            pose, _, _   = self.get_pose()
+            p, q   = transform_to_pq(pose)
+            
+            status['box_pos'] = p
+            #all the files in package follows np.quaternion convention, that is
+            # w,x,y,z while ros follows x,y,z,w convention
+            status['box_ori'] = np.array([q[3],q[0],q[1],q[2]])
+
+            status['box_tracking_good'] = True
+        except:
+            print "tracking failed"
+            status['box_pos'] = np.zeros(3)
+            status['box_ori'] = np.zeros(3)
+            status['box_tracking_good'] = False
 
         return status
 
@@ -226,10 +241,10 @@ class PushMachine(object):
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
 
-        self._record_sample = RecordSample(robot_interface=robot_interface, 
-                                           task_interface=BoxObject(),
-                                           data_folder_path=None,
-                                           data_name_prefix='push_data',
+        self._sample_recorder = DataRecorder(robot_interface=self._robot, 
+                                           task_interface=self._box,
+                                           data_folder_path=config['data_folder_path'],
+                                           data_name_prefix='test_push_data',
                                            num_samples_per_file=5)
 
 
@@ -258,7 +273,9 @@ class PushMachine(object):
             # There might be a sequence of positions prior to a push action
             goals = self.pack_push_goals(pushes[idx])
 
-            self._record_sample.record_once(task_action=pushes[idx])
+            start = rospy.Time.now()
+
+            self._sample_recorder.start_record(task_action=pushes[idx])
 
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
@@ -267,8 +284,12 @@ class PushMachine(object):
 
             self._robot.untuck_arm()
 
-            self._record_sample.record_once(task_action=None, task_status=success)
+            self._sample_recorder.stop_record(task_status=True)
 
+            timeelapsed = rospy.Time.now() - start
+
+            print "TIME ELAPSED: ", timeelapsed.to_sec()
+        
             if success:
                 self._push_counter += 1
             
@@ -318,9 +339,9 @@ class PushMachine(object):
         return success
 
     def on_shutdown(self):
-
+        pass
         #this if for saving files in case keyboard interrupt happens
-        self._record_sample.save_data_now()
+        # self._record_sample.save_data_now()
 
     def run(self):
 
@@ -402,7 +423,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     rospy.init_node('poke_box', anonymous=True)
-    from aml_robot.baxter_robot import BaxterArm
     limb = 'left'
     arm = BaxterArm(limb)
     
