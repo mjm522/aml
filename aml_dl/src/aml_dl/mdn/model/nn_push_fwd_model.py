@@ -66,4 +66,11 @@ class NNPushForwardModel(object):
 
             return out
 
+    def sample_out(self, x_input, m_samples = 10):
+
+        with tf.device(self._device):
+            samples = self._sess.run([self._net_ops['output']], feed_dict={self._net_ops['x']: x_input})
+
+            return samples
+
 

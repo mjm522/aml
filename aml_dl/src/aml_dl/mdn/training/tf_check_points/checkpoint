@@ -1,2 +1,2 @@
-model_checkpoint_path: "/Users/ermanoarruda/Projects/ros_ws/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_pi_div_two.ckpt"
-all_model_checkpoint_paths: "/Users/ermanoarruda/Projects/ros_ws/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_pi_div_two.ckpt"
+model_checkpoint_path: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/sim_push_model_fwd.ckpt"
+all_model_checkpoint_paths: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/sim_push_model_fwd.ckpt"
