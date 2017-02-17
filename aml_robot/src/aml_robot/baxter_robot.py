@@ -171,8 +171,8 @@ class BaxterArm(baxter_interface.limb.Limb):
         state['effort']          = np.array(to_list(joint_efforts))
         state['jacobian']        = self.get_jacobian_from_joints(None)
         state['inertia']         = self.get_arm_inertia(None)
-        state['rgb_image']       = self._camera.curr_rgb_image
-        state['depth_image']     = self._camera.curr_depth_image
+        state['rgb_image']       = self._camera._curr_rgb_image
+        state['depth_image']     = self._camera._curr_depth_image
         state['gravity_comp']    = np.array(self._h)
 
 
