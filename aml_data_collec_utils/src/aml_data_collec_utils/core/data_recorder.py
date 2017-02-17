@@ -143,6 +143,10 @@ class DataRecorder(object):
             self._sample.set_valid(task_status)
 
             # Setting last data point as terminal
-            self._sample.set(-1,'terminal', True)
 
-            self.save_sample()
+
+            if self._sample.size() > 0:
+                self._sample.set(-1,'terminal', True)
+                self.save_sample()
+            else:
+                self._sample = Sample()
