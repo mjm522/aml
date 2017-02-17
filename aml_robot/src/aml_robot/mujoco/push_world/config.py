@@ -32,7 +32,7 @@ config_push_world = {
 	'camera_pos': [0.0, 0.0, 1.65, 1., -90., 90.],
 	'reset_spot_offset':[0.,0.,0.],
 	'end_effector_tip_offset':[0.,0.,0.],
-	'pre_push_offsets':[0.05, 0.05, 0.],
+	'pre_push_offsets':[0.40, 0.40, 0.],
 	'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
 	'reset_spot_offset': [0.0, 0.0, 0.0], # w.r.t to box frame
 	'box_center_offset':[0.,0.,0.],

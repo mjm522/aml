@@ -130,7 +130,7 @@ class DataManager():
 
         else:
 
-            print "New sample added..."
+            print "New sample (no:%d) added..."%(sample._contents['sample_id'],)
         
             self._data.append(sample._contents)
 
