@@ -20,7 +20,13 @@ class JSTrajGenerator(TrajGenerator):
 
     def get_demo_traj(self):
 
-        js_pos, js_vel, js_acc = get_js_traj(limb_name=self._limb_name, demo_idx=self._demo_idx)
+        if self._demo_path is not None:
+
+            js_pos, js_vel, js_acc = get_js_traj(limb_name=self._limb_name, demo_path=self._demo_path)
+
+        else:
+
+            js_pos, js_vel, js_acc = get_js_traj(limb_name=self._limb_name, demo_idx=self._demo_idx)
 
         self._timesteps = len(js_pos)
 

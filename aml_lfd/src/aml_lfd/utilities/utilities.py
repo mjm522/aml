@@ -33,10 +33,28 @@ def load_demo_data(limb_name, demo_idx, debug=False):
 
     return demo_data
 
-def get_sampling_rate(limb_name, demo_idx):
+def get_sampling_rate(limb_name, demo_idx=None, demo_path=None):
+
+    if demo_path is not None:
+
+        demo_data = load_data(demo_path)
     
-    demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
-    return demo_data['sampling_rate']
+    else:
+
+        demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
+
+    sampling_rate = demo_data[0].get(0,['sampling_rate'])
+    
+    if not sampling_rate:
+
+        sampling_rate = 1.
+
+    else:
+
+        sampling_rate = sampling_rate[0]
+
+
+    return sampling_rate
 
 
 def get_effort_sequence_of_demo(limb_name, demo_idx):
@@ -73,6 +91,8 @@ def js_inverse_dynamics(limb_name, demo_idx, h_component=True):
     return tau
 
 def get_os_traj(limb_name, demo_idx, debug=False):
+
+    #NOT COMPATABLE WITH THE NEW DATA RECORDER, CHANGE THIS FUNCTION
     
     demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=debug)
     #the limb on which demo was taken
@@ -119,16 +139,23 @@ def get_os_traj(limb_name, demo_idx, debug=False):
 
     return ee_pos_traj, ee_ori_traj, ee_vel_traj, ee_omg_traj, ee_acc_traj, ee_ang_traj
 
-def get_js_traj(limb_name, demo_idx):
+def get_js_traj(limb_name, demo_idx=None, demo_path=None):
     #this function takes the position and velocity of a demonstrated data
-    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=False)
-    sampling_rate = get_sampling_rate(limb_name=limb_name, demo_idx=demo_idx)
+
+    if demo_path is not None:
+        demo_data = load_data(demo_path)
+    else:
+        demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=False)
+    
+    sampling_rate = get_sampling_rate(limb_name=limb_name, demo_path=demo_path)
+    
     js_pos_traj = []
     js_vel_traj = []
-
-    for arm_data in demo_data['state']:
-        js_pos_traj.append(arm_data['position'])
-        js_vel_traj.append(arm_data['velocity'])
+    
+    for k in range(demo_data[0].size()):
+        
+        js_pos_traj.append(demo_data[0].get(k,['position']))
+        js_vel_traj.append(demo_data[0].get(k,['velocity']))
 
     js_pos_traj =  np.asarray(js_pos_traj).squeeze()
     js_vel_traj =  np.asarray(js_vel_traj).squeeze()

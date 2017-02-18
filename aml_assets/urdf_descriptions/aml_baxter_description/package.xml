@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>aml_baxter_description</name>
+  <version>1.1.1</version>
+  <description>
+    Description of Baxter Research Robot from Rethink Robotics.
+    This package contains the URDF and meshes describing Baxter.
+  </description>
+
+  <maintainer email="exa371@bham.ac.uk">Ermano Arruda</maintainer>
+  <maintainer email="mjm522@bham.ac.uk">Michael Jacob</maintainer>
+  <license>BSD</license>
+
+  <author>Rethink Robotics Inc.</author>
+  <author>Dave Coleman</author>
+  <author>Michael Jacob</author>
+  <author>Ermano Arruda</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+ 
+   <build_depend>rospy</build_depend>
+   <build_depend>xacro</build_depend>
+   <build_depend>baxter_core_msgs</build_depend>
+ 
+   <run_depend>rospy</run_depend>
+   <run_depend>xacro</run_depend>
+   <run_depend>baxter_core_msgs</run_depend>
+
+</package>

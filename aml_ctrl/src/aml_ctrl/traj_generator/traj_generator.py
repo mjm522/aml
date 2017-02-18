@@ -30,7 +30,12 @@ class TrajGenerator(object):
 
         if kwargs.has_key('demo_idx'):
 
-            self._demo_idx = kwargs['demo_idx']
+            self._demo_idx  = kwargs['demo_idx']
+            self._limb_name = kwargs['limb_name']
+
+        elif kwargs.has_key('path_to_demo'):
+
+            self._demo_path = kwargs['path_to_demo']
             self._limb_name = kwargs['limb_name']
 
         else:

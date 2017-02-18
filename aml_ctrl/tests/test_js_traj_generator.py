@@ -1,5 +1,5 @@
 from aml_ctrl.traj_generator.os_traj_generator import JSTrajGenerator
-
+from aml_ctrl.traj_player.traj_player import TrajPlayer
 
 import rospy
 import numpy as np
@@ -14,9 +14,9 @@ def main(robot_interface):
 
     kwargs['goal_ori'] = kwargs['start_ori'] 
 
-    os_traj = JSTrajGenerator(load_from_demo=False, **kwargs)
+    js_traj = JSTrajGenerator(load_from_demo=False, **kwargs)
 
-    traj_player = TrajPlayer(robot_interface=robot_interface, controller=OSPositionController, trajectory=os_traj.generate_traj())
+    traj_player = TrajPlayer(robot_interface=robot_interface, controller=OSPositionController, trajectory=js_traj.generate_traj())
 
     traj_player.player()
 
