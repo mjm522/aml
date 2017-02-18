@@ -9,23 +9,6 @@ data_man = DataManager(data_name_prefix='test_push_data')
 
 from aml_io.convert_tools import image2string, string2image
 
-# data = data_man.read_data(1)
-
-# print type(data)
-
-# for sample in data:
-
-#     print "##########################################################################################################"
-
-#     keys = sample.keys()
-
-#     for key in sample:
-
-#         print "****************************************************************************************************"
-#         print "Key \t", key
-#         print "Value \t", sample[key]
-#         print "****************************************************************************************************"
-
 quit = False
 
 key = 0
