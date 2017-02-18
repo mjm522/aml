@@ -21,6 +21,7 @@ from aml_data_collec_utils.core.sample import Sample
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_data_collec_utils.core.data_recorder import DataRecorder
 from aml_data_collec_utils.config import config
+from aml_data_collec_utils.baxter_reset_box import fsm_reset
 
 class BoxObject(object):
 
@@ -237,6 +238,7 @@ class PushMachine(object):
         self._push_counter = 0
         self._box = BoxObject()
         self._robot = robot_interface
+        self._right_arm = BaxterArm('right')
 
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
@@ -249,7 +251,7 @@ class PushMachine(object):
 
 
     def send_left_arm_away(self):
-        self._robot.move_to_joint_position(np.array([-0.08091749, -0.99747101, -1.1896021 ,  1.94201968,  0.678403, 1.02661664, -0.51004861]))
+        self._robot.move_to_joint_position(np.array([ 0.21935925, -0.80380593,  0.06902914,  0.837937  ,  0.00421845, 1.34721863,  0.4314321 ]))
 
     def compute_next_state(self,idx):
 
@@ -269,8 +271,14 @@ class PushMachine(object):
             #success = self.reset_box(reset_push)
 
             self.send_left_arm_away()
-            os.system("spd-say 'Please reset the box, Much appreciated dear human'")
-            raw_input("Press enter to continue...")
+
+            order_of_sweep = ['left', 'back', 'front', 'right']
+            fsm_reset(self._right_arm, order_of_sweep, rate=10)
+
+            self._robot.untuck_arm()
+            os.system("spd-say 'Reseting box without human supervision'")
+            #os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+            #raw_input("Press enter to continue...")
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."

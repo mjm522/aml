@@ -184,7 +184,7 @@ def fsm_reset(baxter_arm, order_of_sweep, rate=10):
 
          reset_traj = reset_traj + tmp_goto + tmp_sweep + tmp_sweep_ + tmp_goto_
 
-    rate= rospy.Rate(10)
+    rate= rospy.Rate(rate)
     for pos_cmd in reset_traj:
         baxter_arm.exec_position_cmd(pos_cmd)
         rate.sleep()
