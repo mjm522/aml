@@ -42,6 +42,11 @@ def main():
 
     face_names = get_face_names()
 
+    # file = faces_folder_path + 'SillyNEWhite.jpg'
+
+    # while not rospy.is_shutdown():
+    #     send_image(file)
+
     for face in face_names:
 
         file = faces_folder_path + face
