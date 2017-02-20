@@ -137,7 +137,7 @@ def check_sweep_demo(baxter_arm):
     goto_js_traj.generate_traj()
     sweep_js_traj.generate_traj()
 
-    rate= rospy.Rate(10)
+    rate = rospy.Rate(10)
 
     for pos_cmd in goto_js_traj._traj['pos_traj']:
         baxter_arm.exec_position_cmd(pos_cmd)
@@ -164,7 +164,7 @@ def check_sweep_demo(baxter_arm):
     print "I should have reached the default pose now"
 
 
-def fsm_reset(baxter_arm, order_of_sweep, rate=10):
+def fsm_reset(baxter_arm, order_of_sweep, rate=15):
 
     reset_traj = []
 
@@ -245,7 +245,7 @@ def main():
         elif args.input=='fsm':
 
             order_of_sweep = ['left', 'back', 'front', 'right']
-            fsm_reset(arm, order_of_sweep, rate=10)
+            fsm_reset(arm, order_of_sweep)
 
         else:
             print "For help, press -h"

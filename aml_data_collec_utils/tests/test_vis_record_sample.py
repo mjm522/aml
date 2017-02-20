@@ -9,6 +9,8 @@ data_man = DataManager(data_name_prefix='test_push_data')
 
 from aml_io.convert_tools import image2string, string2image
 
+import sys
+
 # data = data_man.read_data(1)
 
 # print type(data)
@@ -26,16 +28,24 @@ from aml_io.convert_tools import image2string, string2image
 #         print "Value \t", sample[key]
 #         print "****************************************************************************************************"
 
+
+if len(sys.argv) < 2:
+    print "missing data index, e.g. python test_vis_sample 1"
+    sys.exit(1)
+
+data_idx = int(sys.argv[1])
+
 quit = False
 
 key = 0
 
-data = data_man.read_data(1)
+data = data_man.read_data(data_idx)
 
 
 print data
 
 sample_idx = 0
+sample_data_point_idx = 0
 
 print "NUMBER OF SAMPLES: ", len(data)
 
@@ -60,17 +70,18 @@ while not quit:
 
     print "SAMPLE_ID: \t", sample._id
     print "STATUS: \t", sample._is_valid
-    print "START STATE ", sample._contents[0]
-    print "FINAL STATE ", sample._contents[-1]
+    print "SAMPLE KEYS ", sample.get_keys()
+    # print "START STATE ", sample._contents[0]
+    # print "FINAL STATE ", sample._contents[-1]
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Start location of the box \n", sample.get(0,['task_state'])
     print "Push action \n", sample.get(0,['task_action'])
     print "End location of the box \n", sample.get(-1,['task_state'])
 
-    for i in range(sample.size()):
-        cv2.imshow("Image sequence",  string2image(sample.get(i,['rgb_image'])[0]))
-        print "Image sequence index ", i, " sample id ", sample.get_id()
-        cv2.waitKey(0)
+    # for i in range(sample.size()):
+    cv2.imshow("Image sequence",  string2image(sample.get(sample_data_point_idx,['rgb_image'])[0]))
+    print "Image sequence index ", sample_data_point_idx, " sample id ", sample.get_id()
+    cv2.waitKey(0)
 
     
 
@@ -78,11 +89,19 @@ while not quit:
 
     print key
     if key == 65363 or key == 1113939:
-    	sample_idx += 1
+        sample_idx = (sample_idx + 1)%len(data)
+        sample_data_point_idx = 0
     elif key == 65361 or key == 1113937:
-    	sample_idx = max(0,sample_idx-1)
+        sample_idx = max(0,sample_idx-1)
+        sample_data_point_idx = 0
+    elif key == 1048678:
+        sample_data_point_idx = (sample_data_point_idx + 1)%sample.size()
 
-    if key == 27 or sample_idx >= len(data):
+
+
+
+
+    if key == 27 or key == 1048603 or sample_idx >= len(data):
         quit = True
 
 
