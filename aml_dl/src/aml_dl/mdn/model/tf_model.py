@@ -154,6 +154,6 @@ def tf_fwd_pushing_model(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_
 
   train_op = get_train(loss)
 
-  output_ops = {'output' : output, 'loss': loss, 'z_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
+  output_ops = {'output' : output, 'loss': loss, 'last_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
 
   return output_ops

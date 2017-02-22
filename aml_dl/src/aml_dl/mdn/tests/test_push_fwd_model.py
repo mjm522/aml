@@ -43,7 +43,7 @@ def test_fwd_model():
     forward_model = NNPushForwardModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
 
-    prediction = forward_model.run_op('z_hidden', test_data_x)
+    prediction = forward_model.run_op('output', test_data_x)
 
     num_outputs = network_params_fwd['dim_output']
     output_vars = network_params_fwd['output_order']
@@ -59,6 +59,7 @@ def test_fwd_model():
     fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)  # create some space below the plots by increasing the bottom-value
     axlist.flatten()[-2].legend(loc='upper center', bbox_to_anchor=(0.5, -1.35), ncol=3)
     plt.suptitle('Prediction - True',size=16)
+    fig.subplots_adjust(hspace=.5)
     plt.show()
 
     
@@ -73,7 +74,7 @@ def train_fwd_model():
 
     train_data_x, train_data_y = get_data('train')
     
-    # h = forward_model.run_op('z_hidden',data_x)
+    # h = forward_model.run_op('last_hidden',data_x)
 
     # plt.figure(figsize=(8, 8))
     # plt.plot(h, data_y,'ro', alpha=0.3)

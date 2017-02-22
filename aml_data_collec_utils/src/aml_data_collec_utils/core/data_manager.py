@@ -269,7 +269,6 @@ class DataManager(object):
         just_before argument is to be passed if only the starting data point is required.
         fundamentally this is a redundant function!
         '''
-
         if just_before:
             sample_points = [0]
         else:

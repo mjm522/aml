@@ -34,15 +34,15 @@ network_params = {
 }
 
 train_file_indices = range(1,260)
-test_file_indices  = range(200,240)
+test_file_indices  = range(261,290)
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 9, 
     'dim_output': 7,
-    'output_order':['x','y','z','qt_w','qt_x','qt_y','qt_z'],
+    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'n_hidden_layers': 2, #including the input layer excluding the output layer
-    'units_in_hidden_layers':[9,7],#pass none is all layers have equal to input
+    'units_in_hidden_layers':[9,9],#pass none is all layers have equal to input
     'batch_size': 25,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
