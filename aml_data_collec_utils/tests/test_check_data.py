@@ -20,7 +20,6 @@ from cv_bridge import CvBridge, CvBridgeError
 #         print(e)
 
 
-
 def show_image(image):
 
     cv2.imshow("RGB Image window", image)

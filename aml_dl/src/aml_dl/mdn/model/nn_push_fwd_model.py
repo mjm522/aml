@@ -1,8 +1,7 @@
-import tensorflow as tf
 import numpy as np
-
-from aml_dl.mdn.model.tf_model import tf_fwd_pushing_model
+import tensorflow as tf
 from aml_io.tf_io import load_tf_check_point
+from aml_dl.mdn.model.tf_model import tf_fwd_pushing_model
 
 
 class NNPushForwardModel(object):

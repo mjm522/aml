@@ -39,7 +39,7 @@ class Sample(object):
 
         return self._contents
 
-
+    @property
     def size(self):
         return len(self._contents)
 
@@ -47,7 +47,7 @@ class Sample(object):
     idx: index for data
     keys: keys in data
     """
-    def get(self, idx, keys = None):
+    def get(self, idx, keys=None):
 
         assert( idx < len(self._contents) )
 

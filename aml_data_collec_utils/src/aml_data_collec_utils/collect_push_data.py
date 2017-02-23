@@ -273,7 +273,7 @@ class PushMachine(object):
             self.send_left_arm_away()
 
             order_of_sweep = ['left', 'back', 'front', 'right']
-            fsm_reset(self._right_arm, order_of_sweep, rate=10)
+            fsm_reset(self._right_arm, order_of_sweep, rate=15)
 
             self._robot.untuck_arm()
             os.system("spd-say 'Reseting box without human supervision'")
