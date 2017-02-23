@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>aml_drivers</name>
+  <version>0.0.1</version>
+  <description>
+    drivers to various robots that where played around
+  </description>
+
+  <license>GPLv2</license>
+
+  <maintainer email="bootifulrobotics@gmail.com">Bootiful Robotics</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+
+</package>
