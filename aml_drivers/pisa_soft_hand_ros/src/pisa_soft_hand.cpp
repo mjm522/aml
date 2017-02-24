@@ -7,7 +7,7 @@
 // ROS headers
 #include <ros/ros.h>
 #include <ros/console.h>
-#include <std_msgs/Int32.h>
+#include <std_msgs/Float32.h>
 #include <std_msgs/Duration.h>
 #include <controller_manager/controller_manager.h>
 
@@ -43,8 +43,8 @@ class PisaSoftHand
     int port_selection(const int id, char* my_port);
     int open_port(char*);
     void set_input(short int);
-    void pos_cmd_callback(const std_msgs::Int32::ConstPtr& msg);
-    void read_status_callback(const std_msgs::Int32::ConstPtr& msg);
+    void pos_cmd_callback(const std_msgs::Float32::ConstPtr& msg);
+    void read_status_callback(const std_msgs::Float32::ConstPtr& msg);
 
   private:
 
@@ -217,7 +217,7 @@ class PisaSoftHand
     return;
   }
 
-  void PisaSoftHand::pos_cmd_callback(const std_msgs::Int32::ConstPtr& msg)
+  void PisaSoftHand::pos_cmd_callback(const std_msgs::Float32::ConstPtr& msg)
   {
     if (!everything_ok)
     {
@@ -225,29 +225,28 @@ class PisaSoftHand
       return;
     }
 
-    int cmd = msg->data;
+    float cmd = msg->data;
     short int pos;
     ROS_INFO("Received command %d", cmd);
 
-    switch(cmd)
+    if (cmd < 0.)
     {
-      case 1:
-      {
-        pos = (short int)(17000.0*1);
-        set_input(pos);
-        break;
-      }
-      case 2:
-      {
-        pos = (short int)(17000.0*-1);
-        set_input(pos);
-        break;
-      }
+      cmd = 0.;
     }
+    else if(cmd > 1.)
+    {
+      cmd = 1.;
+    }
+
+    pos = (short int)(17000.0*cmd);
+
+    ROS_DEBUG_STREAM("The commanded value: " << pos);
+
+    set_input(pos);
 
   }
 
-  void PisaSoftHand::read_status_callback(const std_msgs::Int32::ConstPtr& msg)
+  void PisaSoftHand::read_status_callback(const std_msgs::Float32::ConstPtr& msg)
   {
     if (!everything_ok)
     {
