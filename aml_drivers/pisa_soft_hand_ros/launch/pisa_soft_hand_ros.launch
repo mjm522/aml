@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- LAUNCH INTERFACE -->
+	<arg name="hand_id" default="1"/>
+
+	<!-- LAUNCH IMPLEMENTATION -->
+	<param name="device_id" value="$(arg hand_id)"/>
+	<node name="soft_hand_HW" pkg="pisa_soft_hand_ros" type="pisa_soft_hand" respawn="false" output="screen"/>
+
+</launch>

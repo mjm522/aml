@@ -3,7 +3,6 @@ roslib.load_manifest('aml_robot')
 
 import rospy
 
-
 import baxter_interface
 import baxter_external_devices
 
@@ -21,13 +20,18 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 
-from aml_perception import camera_sensor   
+from aml_perception import camera_sensor 
+
+#for computation of angular velocity
+from aml_lfd.utilities.utilities import compute_omg
+
+from aml_robot.baxter_ik import IKBaxter
 
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 class BaxterArm(baxter_interface.limb.Limb):
 
-    def __init__(self,limb,on_state_callback=None):
+    def __init__(self, limb, on_state_callback=None):
 
         self._ready = False
 
@@ -40,31 +44,68 @@ class BaxterArm(baxter_interface.limb.Limb):
         #number of control commads
         self._nu = 7
 
+        self._limb = limb
+
+        #these values are from the baxter urdf file
+        self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
+                            {'lower':-2.147,          'upper':1.047},
+                            {'lower':-3.05417993878,  'upper':3.05417993878},
+                            {'lower':-0.05,           'upper':2.618},
+                            {'lower':-3.059,          'upper':3.059},
+                            {'lower':-1.57079632679,  'upper':2.094},
+                            {'lower':-3.059,          'upper':3.059}]
+
         if limb == 'left':
             #secondary goal for the manipulator
-            self.q_mean  = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
-            self._tuck   = np.array([-1.0, -2.07,  3.0, 2.55,  0.0, 0.01,  0.0])
-            self._untuck = np.array([-0.08, -1.0, -1.19, 1.94,  0.67, 1.03, -0.50])
+            self._limb_group = 0
+            self.q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
+            self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
+            self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
+        
         elif limb == 'right':
-            self.q_mean  = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
-            self._tuck   = np.array([1.0, -2.07, -3.0, 2.55, -0.0, 0.01,  0.0])
-            self._untuck = np.array([0.08, -1.0,  1.19, 1.94, -0.67, 1.03,  0.50])
+            self._limb_group = 1
+            self.q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
+            self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
+            self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
+                                                            
         else:
             print "Unknown limb idex"
             raise ValueError
+
+        self._cuff = baxter_interface.DigitalIO('%s_lower_cuff' % (limb,))
+        
+        self._cuff.state_changed.connect(self.cuff_cb)
+
+        self._cuff_state = None
             
         baxter_interface.RobotEnable(CHECK_VERSION).enable()
+
+        #this will be useful to compute ee_velocity using finite differences
+        self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
+        self._time_now_old = self.get_time_in_seconds()
+
+    def cuff_cb(self, value):
+        self._cuff_state = value
+
+    #this function returns self._cuff_state to be true
+    #when arm is moved by a demonstrator, the moment arm stops 
+    #moving, the status returns to false
+    #initial value of the cuff is None, it is made False by pressing the
+    #cuff button once
+    @property
+    def get_lfd_status(self):
+        return self._cuff_state
 
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)
 
     def tuck_arm(self):
-        self.move_to_joint_position(self._tuck)
+        self.move_to_joint_pos(self._tuck)
 
     def untuck_arm(self):
-        self.move_to_joint_position(self._untuck)
+        self.move_to_joint_pos(self._untuck)
 
-    def _configure(self,limb, on_state_callback):
+    def _configure(self, limb, on_state_callback):
         self._state = None
 
         if on_state_callback:
@@ -77,10 +118,14 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self._kinematics = baxter_kinematics(self)
 
+        self._ik_baxter = IKBaxter(limb=self)
+
+        self._ik_baxter.configure_ik_service()
+
         self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
                                          UInt16, queue_size=10)
 
-        self._gravity_comp = rospy.Subscriber('robot/limb/' + limb +'/gravity_compensation_torques', 
+        self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', 
                                                SEAJointState, self._gravity_comp_callback)
         #gravity + feed forward torques
         self._h = [0. for _ in range(7)]
@@ -93,6 +138,19 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def _gravity_comp_callback(self, msg):
         self._h = msg.gravity_model_effort
+        # print "commanded_effort \n",   msg.commanded_effort
+        # print "commanded_velocity \n", msg.commanded_velocity
+        # print "commanded_position \n", msg.commanded_position
+        # print "actual_position \n", msg.actual_position
+        # print "actual_velocity \n", msg.actual_velocity
+        # print "actual_effort \n", msg.actual_effort
+        # print "gravity_model_effort \n", msg.gravity_model_effort
+        # print "hysteresis_model_effort \n", msg.hysteresis_model_effort
+        # print "crosstalk_model_effort \n", msg.crosstalk_model_effort
+        # print "difference effort \n", np.array(msg.commanded_effort) - np.array(msg.actual_effort)
+        # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
+        # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
+
 
     def _update_state(self):
 
@@ -113,8 +171,8 @@ class BaxterArm(baxter_interface.limb.Limb):
         state['effort']          = np.array(to_list(joint_efforts))
         state['jacobian']        = self.get_jacobian_from_joints(None)
         state['inertia']         = self.get_arm_inertia(None)
-        state['rgb_image']       = self._camera.curr_rgb_image
-        state['depth_image']     = self._camera.curr_depth_image
+        state['rgb_image']       = self._camera._curr_rgb_image
+        state['depth_image']     = self._camera._curr_depth_image
         state['gravity_comp']    = np.array(self._h)
 
 
@@ -122,6 +180,11 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         try:
             state['ee_point'], state['ee_ori']  = self.get_ee_pose()
+        except:
+            pass
+
+        try:
+            state['ee_vel'],   state['ee_omg']  = self.get_ee_velocity()
         except:
             pass
 
@@ -157,13 +220,16 @@ class BaxterArm(baxter_interface.limb.Limb):
         return self._kinematics._base_link
 
     
-    def exec_position_cmd(self,cmd):
+    def exec_position_cmd(self, cmd):
+        #there is some issue with this function ... move_to_joint_pos works far better.
+        
+        curr_q = self._state['position']
 
         joint_command = dict(zip(self.joint_names(), cmd))
 
         self.set_joint_positions(joint_command)
 
-    def exec_position_cmd2(self,cmd):
+    def exec_position_cmd_delta(self,cmd):
         curr_q = self.joint_angles()
         joint_names = self.joint_names()
         joint_command = dict([(joint, curr_q[joint] + cmd[i]) for i, joint in enumerate(joint_names)])
@@ -215,12 +281,40 @@ class BaxterArm(baxter_interface.limb.Limb):
         
         return ee_point, ee_ori
 
-    def get_ee_velocity(self):
+    def get_time_in_seconds(self):
+        time_now =  rospy.Time.now()
+        return time_now.secs + time_now.nsecs*1e-9
+
+    def get_ee_velocity(self, real_robot=True):
+        #this is a simple finite difference based velocity computation
+        #please note that this might produce a bug since self._goal_ori_old gets 
+        #updated only if get_ee_vel is called. 
+        #TODO : to update in get_ee_pose or find a better way to compute velocity
         
-        ee_velocity     = self.endpoint_velocity()['linear']
-        ee_velocity     = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
+        if real_robot:
+            
+            ee_velocity = self.endpoint_velocity()['linear']
+            ee_vel      = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
+            ee_omega    = self.endpoint_velocity()['angular']
+            ee_omg      = np.array([ee_omega.x, ee_omega.y, ee_omega.z])
+
+        else:
+
+            time_now_new = self.get_time_in_seconds()
+            
+            ee_pos_new, ee_ori_new = self.get_ee_pose()  
+
+            dt = time_now_new-self._time_now_old
+
+            ee_vel = (ee_pos_new - self._ee_pos_old)/dt
+
+            ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
+
+            self._goal_ori_old = ee_ori_new
+            self._goal_pos_old = ee_pos_new
+            self._time_now_old = time_now_new
         
-        return ee_velocity
+        return ee_vel, ee_omg
 
 
     def get_cartesian_pos_from_joints(self, joint_angles=None):
@@ -281,8 +375,15 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return np.array(self._kinematics.inertia(argument))
 
+    def ik(self, pos, ori=None):
+
+        success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+
+        return success, soln
+
 
 class BaxterButtonStatus():
+    
     def __init__(self):
         self.left_cuff_btn   = baxter_interface.DigitalIO('left_lower_cuff')
         self.left_dash_btn   = baxter_interface.DigitalIO('left_upper_button')

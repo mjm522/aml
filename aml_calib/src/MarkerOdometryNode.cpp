@@ -17,13 +17,13 @@ class MarkerOdometry
 {
 private:
   cv::Mat inImage;
-  aruco::CameraParameters right_hand_camParam, openni_rgb_camParam;
+  aruco::CameraParameters hand_camParam, openni_rgb_camParam;
 
   bool useRectifiedImages;
-  MarkerDetector right_hand_mDetector, openni_rgb_mDetector;
-  vector<Marker> right_hand_markers, openni_rgb_markers;
-  ros::Subscriber right_hand_cam_info_sub, openni_rgb_cam_info_sub;
-  bool right_hand_cam_info_received, openni_rgb_cam_info_received, calibrated, computedMarkerToBase;
+  MarkerDetector hand_mDetector, openni_rgb_mDetector;
+  vector<Marker> hand_markers, openni_rgb_markers;
+  ros::Subscriber hand_cam_info_sub, openni_rgb_cam_info_sub;
+  bool hand_cam_info_received, openni_rgb_cam_info_received, calibrated, computedMarkerToBase;
   image_transport::Publisher image_pub;
   image_transport::Publisher debug_pub;
   ros::Publisher pose_pub;
@@ -32,28 +32,44 @@ private:
   std::string marker_frame;
   std::string camera_frame;
   std::string reference_frame;
-  tf::Transform transformOpenniToBase, transformLeftHandMarkerToBase, transformBoxToBase;
+  tf::Transform transformOpenniToBase, transformHandMarkerToBase, transformBoxToBase;
 
-  double left_hand_marker_size, box_marker_size;
-  int left_hand_marker_id, box_marker_id;
+  double hand_marker_size, box_marker_size;
+  int hand_marker_id, box_marker_id;
+  std::string hand_camera_info_topic, hand_image_topic;
+  std::string hand_frame;
 
   ros::NodeHandle nh;
   image_transport::ImageTransport it;
-  image_transport::Subscriber right_hand_image_sub, openni_rgb_image_sub;
+  image_transport::Subscriber hand_image_sub, openni_rgb_image_sub;
 
   tf::TransformListener _tfListener;
   tf::TransformBroadcaster br;
 
 public:
   MarkerOdometry()
-    : right_hand_cam_info_received(false), openni_rgb_cam_info_received(false), calibrated(false),
+    : hand_cam_info_received(false), openni_rgb_cam_info_received(false), calibrated(false),
       nh("~"), computedMarkerToBase(false),
       it(nh)
   {
+
+
+    nh.param<double>("hand_marker_size", hand_marker_size, 0.05);
+    nh.param<double>("box_marker_size", box_marker_size, 0.05);
+    nh.param<int>("hand_marker_id", hand_marker_id, 300);
+    nh.param<int>("box_marker_id", box_marker_id, 300);
+    nh.param<std::string>("reference_frame", reference_frame, "");
+    nh.param<std::string>("camera_frame", camera_frame, "");
+    nh.param<std::string>("marker_frame", marker_frame, "");
+    nh.param<bool>("image_is_rectified", useRectifiedImages, true);
+
+    nh.param<std::string>("hand_camera_info_topic", hand_camera_info_topic, "/left_hand_camera_info");
+    nh.param<std::string>("hand_image_topic", hand_image_topic, "/left_hand_image");
+    nh.param<std::string>("hand_frame", hand_frame, "left_hand_camera");
   
-    right_hand_cam_info_sub = nh.subscribe("/right_hand_camera_info", 1, &MarkerOdometry::right_hand_cam_info_callback, this);
-    right_hand_image_sub = it.subscribe("/right_hand_image", 1, &MarkerOdometry::right_hand_image_callback, this);
-    
+    hand_cam_info_sub = nh.subscribe(hand_camera_info_topic, 1, &MarkerOdometry::hand_cam_info_callback, this);
+    hand_image_sub = it.subscribe(hand_image_topic, 1, &MarkerOdometry::hand_image_callback, this);
+
     openni_rgb_cam_info_sub = nh.subscribe("/openni_rgb_camera_info", 1, &MarkerOdometry::openni_rgb_cam_info_callback, this);
     openni_rgb_image_sub = it.subscribe("/openni_rgb_rect_image", 1, &MarkerOdometry::openni_rgb_image_callback, this);
     
@@ -63,14 +79,7 @@ public:
     transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
     position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
 
-    nh.param<double>("left_hand_marker_size", left_hand_marker_size, 0.05);
-    nh.param<double>("box_marker_size", box_marker_size, 0.05);
-    nh.param<int>("left_hand_marker_id", left_hand_marker_id, 300);
-    nh.param<int>("box_marker_id", box_marker_id, 300);
-    nh.param<std::string>("reference_frame", reference_frame, "");
-    nh.param<std::string>("camera_frame", camera_frame, "");
-    nh.param<std::string>("marker_frame", marker_frame, "");
-    nh.param<bool>("image_is_rectified", useRectifiedImages, true);
+    
 
 
     ROS_ASSERT(camera_frame != "" && marker_frame != "");
@@ -79,7 +88,7 @@ public:
       reference_frame = camera_frame;
 
     ROS_INFO("Aruco node started with marker size of %f m and marker id to track: %d",
-             left_hand_marker_size, left_hand_marker_id);
+             hand_marker_size, hand_marker_id);
     ROS_INFO("Aruco node started with marker size of %f m and marker id to track: %d",
              box_marker_size, box_marker_id);
     ROS_INFO("Aruco node will publish pose to TF with %s as parent and %s as child.",
@@ -122,7 +131,7 @@ public:
   }
 
 
-  void right_hand_image_callback(const sensor_msgs::ImageConstPtr& msg)
+  void hand_image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
     
 
@@ -130,14 +139,14 @@ public:
     // {
     //   //this makes sure that right_hand_image_callback is only called till 
     //   // the left hand marker to base is calculated.
-    //   //right_hand_image_sub.shutdown();
-    //    tf::StampedTransform stampedTransform(transformLeftHandMarkerToBase, curr_stamp,
+    //   //hand_image_sub.shutdown();
+    //    tf::StampedTransform stampedTransform(transformHandMarkerToBase, curr_stamp,
     //                                               "base", "leftHandMarker");
     //    br.sendTransform(stampedTransform);
     //   return;
     // }
     
-    if(right_hand_cam_info_received)
+    if(hand_cam_info_received)
     {
       ros::Time curr_stamp(ros::Time::now());
       
@@ -148,33 +157,33 @@ public:
         inImage = cv_ptr->image;
 
         //detection results will go into "markers"
-        right_hand_markers.clear();
+        hand_markers.clear();
         //Ok, let's detect
-        right_hand_mDetector.detect(inImage, right_hand_markers, right_hand_camParam, left_hand_marker_size, false);
+        hand_mDetector.detect(inImage, hand_markers, hand_camParam, hand_marker_size, false);
         //for each marker, draw info and its boundaries in the image
-        for(size_t i=0; i<right_hand_markers.size(); ++i)
+        for(size_t i=0; i<hand_markers.size(); ++i)
         {
           // only publishing the selected marker
-          if(right_hand_markers[i].id == left_hand_marker_id)
+          if(hand_markers[i].id == hand_marker_id)
           {
 
-            tf::Transform transformMarkerToRightHandCam = aruco_utils::arucoMarker2Tf(right_hand_markers[i]);
-            tf::StampedTransform rightHandCameraToBase;
+            tf::Transform transformMarkerToHandCam = aruco_utils::arucoMarker2Tf(hand_markers[i]);
+            tf::StampedTransform handCameraToBase;
 
             getTransform("base",
-                         "right_hand_camera",
-                           rightHandCameraToBase);
+                         hand_frame,
+                           handCameraToBase);
 
-            transformLeftHandMarkerToBase = (static_cast<tf::Transform>(rightHandCameraToBase)*transformMarkerToRightHandCam);
+            transformHandMarkerToBase = (static_cast<tf::Transform>(handCameraToBase)*transformMarkerToHandCam);
  
             //this would be only transmitted once.
-            tf::StampedTransform stampedTransform(transformLeftHandMarkerToBase, curr_stamp,
-                                                  "base", "leftHandMarker");
+            tf::StampedTransform stampedTransform(transformHandMarkerToBase, curr_stamp,
+                                                  "base", "calibration_marker");
             br.sendTransform(stampedTransform);
 
 
             geometry_msgs::PoseStamped poseMsg;
-            tf::poseTFToMsg(transformMarkerToRightHandCam, poseMsg.pose);
+            tf::poseTFToMsg(transformMarkerToHandCam, poseMsg.pose);
             poseMsg.header.frame_id = reference_frame;
             poseMsg.header.stamp = curr_stamp;
             pose_pub.publish(poseMsg);
@@ -192,34 +201,34 @@ public:
           }
 
           // but drawing all the detected markers
-          //right_hand_markers[i].draw(inImage,cv::Scalar(0,0,255),2);
+          //hand_markers[i].draw(inImage,cv::Scalar(0,0,255),2);
         }
 
         //draw a 3d cube in each marker if there is 3d info
-        if(right_hand_camParam.isValid() && left_hand_marker_size!=-1)
-        {
-          //CvDrawingUtils::draw3dAxis(inImage, right_hand_markers[0], right_hand_camParam);
-        }
+        // if(hand_camParam.isValid() && hand_marker_size!=-1)
+        // {
+        //   //CvDrawingUtils::draw3dAxis(inImage, hand_markers[0], hand_camParam);
+        // }
 
-        if(image_pub.getNumSubscribers() > 0)
-        {
-          //show input with augmented information
-          cv_bridge::CvImage out_msg;
-          out_msg.header.stamp = curr_stamp;
-          out_msg.encoding = sensor_msgs::image_encodings::RGB8;
-          out_msg.image = inImage;
-          image_pub.publish(out_msg.toImageMsg());
-        }
+        // if(image_pub.getNumSubscribers() > 0)
+        // {
+        //   //show input with augmented information
+        //   cv_bridge::CvImage out_msg;
+        //   out_msg.header.stamp = curr_stamp;
+        //   out_msg.encoding = sensor_msgs::image_encodings::RGB8;
+        //   out_msg.image = inImage;
+        //   image_pub.publish(out_msg.toImageMsg());
+        // }
 
-        if(debug_pub.getNumSubscribers() > 0)
-        {
-          //show also the internal image resulting from the threshold operation
-          cv_bridge::CvImage debug_msg;
-          debug_msg.header.stamp = curr_stamp;
-          debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
-          debug_msg.image = right_hand_mDetector.getThresholdedImage();
-          debug_pub.publish(debug_msg.toImageMsg());
-        }
+        // if(debug_pub.getNumSubscribers() > 0)
+        // {
+        //   //show also the internal image resulting from the threshold operation
+        //   cv_bridge::CvImage debug_msg;
+        //   debug_msg.header.stamp = curr_stamp;
+        //   debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
+        //   debug_msg.image = hand_mDetector.getThresholdedImage();
+        //   debug_pub.publish(debug_msg.toImageMsg());
+        // }
 
       }
       catch (cv_bridge::Exception& e)
@@ -258,24 +267,24 @@ public:
         }
         else
         {
-          openni_rgb_mDetector.detect(inImage, openni_rgb_markers, openni_rgb_camParam, left_hand_marker_size, false);
+          openni_rgb_mDetector.detect(inImage, openni_rgb_markers, openni_rgb_camParam, hand_marker_size, false);
         }
         
         //for each marker, draw info and its boundaries in the image
         for(size_t i=0; i<openni_rgb_markers.size(); ++i)
         {
           //for left hand marker, called till calibrated
-          if((openni_rgb_markers[i].id == left_hand_marker_id) && (!calibrated)) //
+          if((openni_rgb_markers[i].id == hand_marker_id) && (!calibrated)) //
           {
            
             tf::Transform transformMarkerToOpenni = aruco_utils::arucoMarker2Tf(openni_rgb_markers[i]);
-            tf::StampedTransform leftHandMarkerToBase;
+            tf::StampedTransform calibrationMarkerToBase;
 
             getTransform("base",
-                         "leftHandMarker",
-                         leftHandMarkerToBase);  
+                         "calibration_marker",
+                         calibrationMarkerToBase);  
 
-            transformOpenniToBase = (static_cast<tf::Transform>(leftHandMarkerToBase)*transformMarkerToOpenni.inverse());
+            transformOpenniToBase = (static_cast<tf::Transform>(calibrationMarkerToBase)*transformMarkerToOpenni.inverse());
 
             calibrated = true;
 
@@ -299,8 +308,8 @@ public:
             //draw a 3d cube in each marker if there is 3d info
             if(openni_rgb_camParam.isValid() && box_marker_size != -1)
             {
-              //CvDrawingUtils::draw3dAxis(inImage, openni_rgb_markers[i], openni_rgb_camParam);
-              //CvDrawingUtils::draw3dCube(inImage, markers[i], openni_rgb_camParam);
+              CvDrawingUtils::draw3dAxis(inImage, openni_rgb_markers[i], openni_rgb_camParam);
+              //CvDrawingUtils::draw3dCube(inImage, openni_rgb_markers[i], openni_rgb_camParam);
             }
 
           }
@@ -318,15 +327,15 @@ public:
         }
 
 
-        // if(image_pub.getNumSubscribers() > 0)
-        // {
-        //   //show input with augmented information
-        //   cv_bridge::CvImage out_msg;
-        //   out_msg.header.stamp = curr_stamp;
-        //   out_msg.encoding = sensor_msgs::image_encodings::RGB8;
-        //   out_msg.image = inImage;
-        //   image_pub.publish(out_msg.toImageMsg());
-        // }
+        if(image_pub.getNumSubscribers() > 0)
+        {
+          //show input with augmented information
+          cv_bridge::CvImage out_msg;
+          out_msg.header.stamp = curr_stamp;
+          out_msg.encoding = sensor_msgs::image_encodings::RGB8;
+          out_msg.image = inImage;
+          image_pub.publish(out_msg.toImageMsg());
+        }
 
       }
       catch (cv_bridge::Exception& e)
@@ -338,12 +347,12 @@ public:
   }
 
   // wait for one camerainfo, then shut down that subscriber
-  void right_hand_cam_info_callback(const sensor_msgs::CameraInfo &msg)
+  void hand_cam_info_callback(const sensor_msgs::CameraInfo &msg)
   {
-    right_hand_camParam = aruco_utils::rosCameraInfo2ArucoCamParams(msg, useRectifiedImages);
+    hand_camParam = aruco_utils::rosCameraInfo2ArucoCamParams(msg, useRectifiedImages);
 
-    right_hand_cam_info_received = true;
-    right_hand_cam_info_sub.shutdown();
+    hand_cam_info_received = true;
+    hand_cam_info_sub.shutdown();
   }
 
   void openni_rgb_cam_info_callback(const sensor_msgs::CameraInfo &msg)

@@ -126,7 +126,7 @@ class baxter_kinematics(object):
     def inverse_kinematics(self, position, orientation=None, seed=None):
         ik = PyKDL.ChainIkSolverVel_pinv(self._arm_chain)
         pos = PyKDL.Vector(position[0], position[1], position[2])
-        if orientation != None:
+        if orientation is not None:
             rot = PyKDL.Rotation()
             rot = rot.Quaternion(orientation[0], orientation[1],
                                  orientation[2], orientation[3])
@@ -140,7 +140,7 @@ class baxter_kinematics(object):
             seed_array = self.joints_to_kdl('positions')
 
         # Make IK Call
-        if orientation:
+        if orientation is not None:
             goal_pose = PyKDL.Frame(rot, pos)
         else:
             goal_pose = PyKDL.Frame(pos)

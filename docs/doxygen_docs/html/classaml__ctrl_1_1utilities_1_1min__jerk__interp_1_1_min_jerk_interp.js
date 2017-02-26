@@ -1,9 +1,8 @@
 var classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp =
 [
     [ "__init__", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#aadf63d0220915bfd457f26caaeedb52c", null ],
-    [ "compute_w", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a84ec24d901c9582b4151de75b9b02b83", null ],
     [ "configure", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#ad0948202cbfaeb4c69099e8ba32a5b09", null ],
-    [ "get_min_jerk_trajectory", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a06e9332a4367aa9db11f4d3557a203c9", null ],
+    [ "get_interpolated_trajectory", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a2235d073290589513793f2fc54fc6a92", null ],
     [ "min_jerk_step", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a5620dafe71bfe0d1908dd810d01e846d", null ],
     [ "min_jerk_step_pos", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a0c3279ef71e9e83355604f8c754ae5b7", null ],
     [ "min_jerk_step_qt", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html#a5888e83ccea393d6775a684f44104489", null ],

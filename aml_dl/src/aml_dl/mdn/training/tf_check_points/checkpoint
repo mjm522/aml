@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_fwd.ckpt"
+all_model_checkpoint_paths: "/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_fwd.ckpt"

@@ -1,0 +1,16 @@
+<launch>
+
+    <include file="$(find aml_calib)/launch/calibrate.launch">
+    </include>
+
+    <node pkg="aml_data_collec_utils" type="box_marker_publisher.py" name="box_marker_publisher" output="screen">
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" 
+    args="-d $(find aml_data_collec_utils)/rviz_configs/baxter_pushing.rviz"/>
+
+    <!--<node pkg="aml_data_collec_utils" type="collect_push_data.py" name="collect_push_data" output="screen">
+    </node>-->
+
+</launch>
+

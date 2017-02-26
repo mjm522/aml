@@ -1,0 +1,3 @@
+<map id="aml_ctrl.controllers.os_controller.OSController" name="aml_ctrl.controllers.os_controller.OSController">
+<area shape="rect" id="node2" href="$classaml__ctrl_1_1controller_1_1_controller.html" title="{aml_ctrl.controller.Controller\n||+ __init__()\l+ compute_cmd()\l+ update()\l+ wait_until_goal_reached()\l+ send_cmd()\l+ sleep()\l+ set_active()\l}" alt="" coords="5,127,193,280"/>
+</map>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package>
+  <name>aml_baxter_gazebo</name>
+  <version>0.9.1</version>
+  <description>
+    Baxter Gazebo plugins and launch files
+  </description>
+
+  <maintainer email="exa371@bham.ac.uk">Ermano Arruda</maintainer>
+  <maintainer email="mjm522@bham.ac.uk">Michael Jacob</maintainer>
+
+  <license>BSD</license>
+  
+  <author>Rethink Robotics Inc.</author>
+  <author>Dave Coleman</author>
+  <author>Michael Jacob</author>
+  <author>Ermano Arruda</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>baxter_core_msgs</build_depend>
+  <build_depend>gazebo_ros_control</build_depend>
+  <build_depend>controller_manager_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>baxter_core_msgs</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>controller_manager_msgs</run_depend>
+  <run_depend>baxter_sim_hardware</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>aml_baxter_description</run_depend>
+
+  <export>
+    <gazebo plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" />
+  </export>
+
+</package>

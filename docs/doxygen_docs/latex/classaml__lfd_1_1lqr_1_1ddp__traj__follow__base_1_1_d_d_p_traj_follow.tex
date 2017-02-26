@@ -1,0 +1,142 @@
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow}{}\section{aml\+\_\+lfd.\+lqr.\+ddp\+\_\+traj\+\_\+follow\+\_\+base.\+D\+D\+P\+Traj\+Follow Class Reference}
+\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow}\index{aml\+\_\+lfd.\+lqr.\+ddp\+\_\+traj\+\_\+follow\+\_\+base.\+D\+D\+P\+Traj\+Follow@{aml\+\_\+lfd.\+lqr.\+ddp\+\_\+traj\+\_\+follow\+\_\+base.\+D\+D\+P\+Traj\+Follow}}
+
+
+Collaboration diagram for aml\+\_\+lfd.\+lqr.\+ddp\+\_\+traj\+\_\+follow\+\_\+base.\+D\+D\+P\+Traj\+Follow\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3de96f0bfb74a5e25d4480a98cc52e01}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3de96f0bfb74a5e25d4480a98cc52e01} 
+def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, robot\+\_\+interface, idx, H, target\+\_\+traj, reward)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a59b2df263f660a988baacf2480d3f532}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a59b2df263f660a988baacf2480d3f532} 
+def {\bfseries configure} (self)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a948bcd5c5ce36cba1bd5b3ecaba22df4}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a948bcd5c5ce36cba1bd5b3ecaba22df4} 
+def {\bfseries compute\+\_\+dx} (self, xtarget, x)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a80a23176e5afd98d020249708be47571}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a80a23176e5afd98d020249708be47571} 
+def {\bfseries err\+\_\+simulate} (self, dx0, u0, xnom0, xnom1, sim\+\_\+time, magic\+\_\+factor=0, x1star=0)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a4a098a901151a3e0d17665ecc7578e41}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a4a098a901151a3e0d17665ecc7578e41} 
+def {\bfseries compose\+\_\+dx} (self, x0, dx)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a365a2a2035c47c8fc6db9a76ab8b7287}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a365a2a2035c47c8fc6db9a76ab8b7287} 
+def {\bfseries simulate\+\_\+f} (self, x0, delta\+\_\+u0, sim\+\_\+time, magic\+\_\+factor=0, x1\+\_\+star=0)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a80762be747063c04ce78f9f082bfd9bd}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a80762be747063c04ce78f9f082bfd9bd} 
+def {\bfseries linearized\+\_\+dynamics} (self, x0, u0, xt0, xt1, dt\+\_\+sim, magic\+\_\+factor, x1star)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a2d1424955071fed31760c8470e807443}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a2d1424955071fed31760c8470e807443} 
+def {\bfseries ddp\+\_\+for\+\_\+trajectory\+\_\+following} (self, start\+\_\+state)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3006461df332f39b6d308988731d7182}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3006461df332f39b6d308988731d7182} 
+def {\bfseries lqr\+\_\+backups\+\_\+for\+\_\+trajectory\+\_\+following} (self, nom\+\_\+traj, magic\+\_\+factor)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_adf71108af75c7ae1f0637fa37f7b6e4c}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_adf71108af75c7ae1f0637fa37f7b6e4c} 
+def {\bfseries lqr\+\_\+run\+\_\+controller\+\_\+in\+\_\+nonlinear\+\_\+sim} (self, start\+\_\+state, lqr\+\_\+traj, magic\+\_\+factor, open\+\_\+loop\+\_\+flag)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ad85bd52ed6c3718f4addcc61484442e3}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ad85bd52ed6c3718f4addcc61484442e3} 
+def {\bfseries score\+\_\+lqr\+\_\+trajectory} (self, traj)
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a5572963f6a3096cfdf13ede535d06b85}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a5572963f6a3096cfdf13ede535d06b85} 
+def {\bfseries get\+\_\+real\+\_\+state} (self, u\+\_\+old, u\+\_\+new)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_af0b6fbbc185f857a746ca2981001e4fa}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_af0b6fbbc185f857a746ca2981001e4fa} 
+{\bfseries idx}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_aec1df18773cc7d2f37d95e9408d4748f}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_aec1df18773cc7d2f37d95e9408d4748f} 
+{\bfseries H}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a03f52d1545917a8954bd837c9fc428f8}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a03f52d1545917a8954bd837c9fc428f8} 
+{\bfseries target\+\_\+traj}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1f8edf414c5f464fca690964c2a9bf7a}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1f8edf414c5f464fca690964c2a9bf7a} 
+{\bfseries reward}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a843d69188b565822569099d0832f2b60}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a843d69188b565822569099d0832f2b60} 
+{\bfseries cost}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a76562065147ed65895d58af5f78b9e3b}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a76562065147ed65895d58af5f78b9e3b} 
+{\bfseries magic\+\_\+factors}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3ff02e2708357534cb2af0d8a7e5560d}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a3ff02e2708357534cb2af0d8a7e5560d} 
+{\bfseries num\+\_\+states}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ac565b2592399d6c46eaa9603649e8bd1}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ac565b2592399d6c46eaa9603649e8bd1} 
+{\bfseries num\+\_\+ctrls}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a4cfe2bc27d78ce4dd4f96f591e812386}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a4cfe2bc27d78ce4dd4f96f591e812386} 
+{\bfseries num\+\_\+links}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a9bc25164edb2c2e29743ed1a8eb64488}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a9bc25164edb2c2e29743ed1a8eb64488} 
+{\bfseries robot}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ad7d04202fc2d76e5a955e5ffb71633cd}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ad7d04202fc2d76e5a955e5ffb71633cd} 
+{\bfseries A}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a63516b4578bc9ae85b609c7b1d8cc8db}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a63516b4578bc9ae85b609c7b1d8cc8db} 
+{\bfseries B}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a2dd2df27d2b4ea3cd0a91db3fda4427a}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a2dd2df27d2b4ea3cd0a91db3fda4427a} 
+{\bfseries Mq}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a0b0e42bc2ff3b66681542f8d8c38e100}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a0b0e42bc2ff3b66681542f8d8c38e100} 
+{\bfseries Cq}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1173c1b05d86aa568abcab18b7bd69ea}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1173c1b05d86aa568abcab18b7bd69ea} 
+{\bfseries Q}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_abf905d9982f96f9ed454961c42359f9f}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_abf905d9982f96f9ed454961c42359f9f} 
+{\bfseries Qf}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a70e3c8b1d5e33f94e5141075ebf02975}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a70e3c8b1d5e33f94e5141075ebf02975} 
+{\bfseries R}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a6c6bfb30d6a4c345412210240fb0e296}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a6c6bfb30d6a4c345412210240fb0e296} 
+{\bfseries Rf}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a577e00ce473a24465c4f0de0a146ef3e}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a577e00ce473a24465c4f0de0a146ef3e} 
+{\bfseries Alist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a5da728040bfb20c0144f91e4e3f8cb36}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a5da728040bfb20c0144f91e4e3f8cb36} 
+{\bfseries Blist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_aeee69abfc8dd387e0ef2b752be44f2f6}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_aeee69abfc8dd387e0ef2b752be44f2f6} 
+{\bfseries Qlist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ae4c9a614b6a275e49e6f39bcb76b27b6}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ae4c9a614b6a275e49e6f39bcb76b27b6} 
+{\bfseries Rlist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1fc53a0218dd657abe54fa4585c35cd1}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a1fc53a0218dd657abe54fa4585c35cd1} 
+{\bfseries Klist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ac8045400042e1740c62cd987a5bd78be}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_ac8045400042e1740c62cd987a5bd78be} 
+{\bfseries target\+\_\+xlist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_af8fb8b26f0014cc318a822a1ecce6859}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_af8fb8b26f0014cc318a822a1ecce6859} 
+{\bfseries target\+\_\+ulist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a6d2157818c66fe4ca6c57414262309a4}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a6d2157818c66fe4ca6c57414262309a4} 
+{\bfseries dxlist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a737296883bc4be3b617e584833125ed3}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a737296883bc4be3b617e584833125ed3} 
+{\bfseries xlist}
+\item 
+\hypertarget{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a23c501383ace126e72954a4e9e3138f1}{}\label{classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow_a23c501383ace126e72954a4e9e3138f1} 
+{\bfseries ulist}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+aml\+\_\+lfd/src/aml\+\_\+lfd/lqr/ddp\+\_\+traj\+\_\+follow\+\_\+base.\+py\end{DoxyCompactItemize}

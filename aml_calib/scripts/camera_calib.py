@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import numpy as np
 import quaternion
@@ -12,6 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 import tf
 from tf import TransformListener
+from os.path import dirname, abspath
 
 import sys
 sys.argv
@@ -41,6 +43,7 @@ class BaxterEyeHandCalib():
         self.tf = TransformListener()
         baxter = baxter_interface.RobotEnable(CHECK_VERSION)
 
+        self._calibration_successful = False
 
         self.br = tf.TransformBroadcaster()
         baxter.enable()
@@ -93,7 +96,7 @@ class BaxterEyeHandCalib():
         calib_data['right_arm_calib_angle'] = self.right_arm.angles()
         got_common_time = False
         max_attempts = 100
-        calibration_successful = False
+        self._calibration_successful = False
         counter = 0
         while got_common_time is False and counter < max_attempts:
             #some times the tf is busy that it fails to read the time and causes exception
@@ -111,16 +114,17 @@ class BaxterEyeHandCalib():
             calib_data['openni_rgb_camera_pos'] = translation
             calib_data['openni_rgb_camera_ori'] = rot
             np.save('calib_data.npy', calib_data)
-            calibration_successful = True
+            self._calibration_successful = True
         else:
             print("Failed to find transform from openni_rgb_camera to base")
 
-        return calib_data, calibration_successful
+        return calib_data, self._calibration_successful
 
     def load_calib_data(self):
         # Load
+        calib_data_folder_path = dirname(dirname(abspath(__file__))) + '/scripts/'
         try:
-            calib_data = np.load('calib_data.npy').item()
+            calib_data = np.load(calib_data_folder_path+'calib_data.npy').item()
         except Exception as e:
             print "Caliberation file cannot be loaded"
             raise e
@@ -146,7 +150,7 @@ class BaxterEyeHandCalib():
 
     def get_box_transform(self):
         flag = True
-        while True:
+        while not rospy.is_shutdown():
             #some times the tf is busy that it fails to read the time and causes exception
             # this simple hack waits till it reads it and saves it!!
             try:
@@ -170,7 +174,11 @@ def main():
 
     calib.self_calibrate()
 
-    calib.get_box_transform()
+    calib.left_arm._ready = False
+    calib.right_arm._ready = False
+    # calib.get_box_transform()
+
+    sys.exit(0)
 
 if __name__ == '__main__':
     rospy.init_node('baxter_eye_hand_calib_ros_node')

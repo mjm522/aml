@@ -1,0 +1,15 @@
+
+#Dependencies
+
+sudo apt-get install gazebo2 ros-indigo-qt-build ros-indigo-driver-common ros-indigo-gazebo-ros-control ros-indigo-gazebo-ros-pkgs ros-indigo-ros-control ros-indigo-control-toolbox ros-indigo-realtime-tools ros-indigo-ros-controllers ros-indigo-xacro python-wstool ros-indigo-tf-conversions ros-indigo-kdl-parser
+
+#
+
+$ cd ~/catkin_workspaces/baxter_ws/src
+$ wstool init .
+$ wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty)
+baxter_simulator.rosinstall
+$ wstool update
+
+#run all other dependencies, run this line from ws folder
+rosdep install --from-path . --ignore-src --rosdistro indigo -y -r
