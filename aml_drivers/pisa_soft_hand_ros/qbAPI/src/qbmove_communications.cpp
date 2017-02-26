@@ -38,7 +38,6 @@
 **/
 
 //=================================================================     includes
-
 #include "qbmove_communications.h"
 #include "commands.h"
 
@@ -148,8 +147,7 @@ void hexdump(void *mem, unsigned int len)
 
 int RS485listPorts( char list_of_ports[10][255] )
 {
-    
-    
+
     //////////////////////////////   WINDOWS   //////////////////////////////
     #if (defined(_WIN32) || defined(_WIN64))
     
@@ -235,6 +233,7 @@ void openRS485(comm_settings *comm_settings_t, const char *port_s)
 
 //==========================================     serial communication properties
 
+
     	dcb.DCBlength = sizeof (DCB); 
 
     	GetCommState(comm_settings_t->file_handle, &dcb);
@@ -291,6 +290,7 @@ void openRS485(comm_settings *comm_settings_t, const char *port_s)
         comm_settings_t->file_handle = 
             open(port_s, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
+        
         if(comm_settings_t->file_handle == -1)
         {
             goto error;

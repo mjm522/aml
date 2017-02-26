@@ -6,9 +6,10 @@
 
 // ROS headers
 #include <ros/ros.h>
-#include <controller_manager/controller_manager.h>
+#include <ros/console.h>
+#include <std_msgs/Float32.h>
 #include <std_msgs/Duration.h>
-
+#include <controller_manager/controller_manager.h>
 
 // qb tools
 #include <stdio.h>
@@ -16,50 +17,62 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
-#include <qbmoveAPI/qbmove_communications.h>
+#include "qbmove_communications.h"
+#include "definitions.h"
 
+///////////////////////////////////////////////////////////////
+/*
+The code might fail to open the port, this might due to the permission issues,
+run,  *******sudo chmod 0666 /dev/ttyUSB0********to enable anyone to read and write the port when the
+device is connected.
+*/
+///////////////////////////////////////////////////////////////
 
 class PisaSoftHand
-{
-private:
-	// Node handle
-    ros::NodeHandle nh_;
-	// QB tools Parameters
-    int device_id_;
-    comm_settings comm_settings_t_;
-	char port_[255];
-
-public:
-	bool start();
-	// from QBtools
+  {
+  public:
+    // from RobotHW
+    PisaSoftHand(ros::NodeHandle nh);
+    bool start();
+    void stop();
+    void reset();
+    bool read(ros::Time time,  ros::Duration period);
+    void write(ros::Time time, ros::Duration period);
+    // from QBtools
     // port selection by id
     int port_selection(const int id, char* my_port);
     int open_port(char*);
     void set_input(short int);
-protected:
-};
+    void pos_cmd_callback(const std_msgs::Float32::ConstPtr& msg);
+    void read_status_callback(const std_msgs::Float32::ConstPtr& msg);
 
- PisaSoftHand::PisaSoftHand(ros::NodeHandle nh) :
+  private:
+
+    // Node handle
+    ros::NodeHandle nh_;
+
+    // QB tools Parameters
+    int device_id_;
+    comm_settings comm_settings_t_;
+    char port_[255];
+    bool everything_ok;
+
+  protected:
+
+  };
+
+  PisaSoftHand::PisaSoftHand(ros::NodeHandle nh) :
     nh_(nh)
-  {}
-
-   bool PisaSoftHand::start()
   {
+    everything_ok = false;
+    if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
+    ros::console::notifyLoggerLevelsChanged();
+    //subsciber for sending position cmd
+  }
 
-    // construct a new lwr device (interface and state storage)
-    this->device_.reset( new PisaSoftHand::SHRDevice() );
-
-     nh_.param("device_id", device_id_, BROADCAST_ID);
-
-    // initialize and set to zero the state and command values
-    this->device_->init();
-    this->device_->reset();
-
-    ROS_INFO("Register state and position interfaces");
-
-    // register ros-controls interfaces
-    this->registerInterface(&state_interface_);
-    this->registerInterface(&position_interface_);
+  bool PisaSoftHand::start()
+  {
+    nh_.param("device_id", device_id_, BROADCAST_ID);
 
     // Finally, do the qb tools thing
     // get the port by id
@@ -81,6 +94,7 @@ protected:
         sleep( 4*((double) rand() / (RAND_MAX)) );
       }
     }
+
   }
 
   // port selection by id
@@ -162,10 +176,37 @@ protected:
     }
     usleep(500000);
     printf("Done.\n");
+    everything_ok = true;
     return 1;
   }
 
- void PisaSoftHand::set_input(short int pos)
+ bool PisaSoftHand::read(ros::Time time, ros::Duration period)
+  {
+      // read from hand
+      static short int inputs[2];
+      commGetMeasurements(&comm_settings_t_, device_id_, inputs);
+
+      static short int currents[2];
+      commGetCurrents(&comm_settings_t_, device_id_, currents);
+
+      ROS_INFO("The current reading is %d",currents[0]*1.0);
+
+      return true;
+  }
+
+  void PisaSoftHand::write(ros::Time time, ros::Duration period)
+  {
+      static int warning = 0;
+
+      // write to the hand
+      short int pos;
+      pos = (short int)(17000.0*1);
+      set_input(pos);
+
+      return;
+  }
+
+  void PisaSoftHand::set_input(short int pos)
   {
     static short int inputs[2];
 
@@ -176,24 +217,68 @@ protected:
     return;
   }
 
+  void PisaSoftHand::pos_cmd_callback(const std_msgs::Float32::ConstPtr& msg)
+  {
+    if (!everything_ok)
+    {
+      ROS_INFO("Something is wrong somewhere ...");
+      return;
+    }
 
- int main( int argc, char** argv )
+    float cmd = msg->data;
+    short int pos;
+    ROS_INFO("Received command %d", cmd);
+
+    if (cmd < 0.)
+    {
+      cmd = 0.;
+    }
+    else if(cmd > 1.)
+    {
+      cmd = 1.;
+    }
+
+    pos = (short int)(17000.0*cmd);
+
+    ROS_DEBUG_STREAM("The commanded value: " << pos);
+
+    set_input(pos);
+
+  }
+
+  void PisaSoftHand::read_status_callback(const std_msgs::Float32::ConstPtr& msg)
+  {
+    if (!everything_ok)
+    {
+      ROS_INFO("Something is wrong somewhere ...");
+      return;
+    }
+
+
+    if (msg->data == 3)
+    {
+      struct timespec ts = {0, 0};
+    
+      ros::Time now(ts.tv_sec, ts.tv_nsec);
+      ros::Duration period(1.0);
+
+      read(now, period);
+    }
+    
+  }
+
+int main( int argc, char** argv )
 {
   // initialize ROS
-  ros::init(argc, argv, "lwr_hw_interface", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "pisa_soft_hand", ros::init_options::NoSigintHandler);
 
   // ros spinner
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
-  // custom signal handlers
-  signal(SIGTERM, quitRequested);
-  signal(SIGINT, quitRequested);
-  signal(SIGHUP, quitRequested);
-
   // construct the lwr
   ros::NodeHandle sh_nh("");
-  soft_hand_hw::PisaSoftHand sh_robot(sh_nh);
+  PisaSoftHand sh_robot(sh_nh);
 
   // configuration routines
   sh_robot.start();
@@ -203,12 +288,13 @@ protected:
   ros::Time last(ts.tv_sec, ts.tv_nsec), now(ts.tv_sec, ts.tv_nsec);
   ros::Duration period(1.0);
 
-  //the controller manager
-  // controller_manager::ControllerManager manager(&sh_robot, sh_nh);
+  //start the subscriber
+  ros::Subscriber sh_pos_cmd = sh_nh.subscribe("soft_hand_pos_cmd", 1000, &PisaSoftHand::pos_cmd_callback, &sh_robot);
+  ros::Subscriber sh_read_status = sh_nh.subscribe("soft_hand_read_current", 1000, &PisaSoftHand::read_status_callback, &sh_robot);
 
-  // run as fast as possible
-  while( !g_quit ) 
+  while(ros::ok()) 
   {
+    
     // get the time / period
     if (!clock_gettime(CLOCK_REALTIME, &ts)) 
     {
@@ -221,29 +307,8 @@ protected:
     {
       ROS_FATAL("Failed to poll realtime clock!");
       break;
-    } 
-
-    // read the state from the soft hand
-    if(!sh_robot.read(now, period))
-    {
-      g_quit = true;
-      break;
     }
 
-    // update the controllers
-    // manager.update(now, period);
-
-    // write the command to the lwr
-    // sh_robot.write(now, period);
   }
-
-  std::cerr <<" Stopping spinner..." << std::endl;
-  spinner.stop();
-
-  std::cerr << "Stopping soft hand..." << std::endl;
-  sh_robot.stop();
-
-  std::cerr << "Done!" << std::endl;
-
   return 0;
 }

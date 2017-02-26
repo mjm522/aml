@@ -60,7 +60,7 @@ class DataManager(object):
 
             #this is in case if the current data is empty
             #so this shouldn't be the case when data_idx is 1
-            print max(1, self._data_idx -1)
+            # print max(1, self._data_idx -1)
 
             _prev_data      = self.read_data(max(1, self._data_idx -1))
 
@@ -222,46 +222,94 @@ class DataManager(object):
 
         return data
 
-    def pack_data_x(self, keys, ids = None):
 
-        data_x = []
+    def pack_data(self , keys, sub_keys=None, ids=None, sample_points=None):
+
+        #keys can be the key inside each data points, while sub_keys are keys inside each key
+        #important if a key in keys does not have a corresponding subkey, but other keys have a subkey,
+        #then you need to call it in this way
+        #keys=[key_1, key_2], sub_key_1 = [sub_key_1_1, sub_key_1_2], there are no subkeys for key_2
+        #subkeys=[sub_key_1, [None]]
+
+        data = []
+
+        if ids is None:
+            ids = [0]
         
-        data = self.select_data(ids)
+        data_list = self.select_data(ids)
 
-        for datum in data:
-            x = []
-            for key in keys:
-                
-                x = np.r_[x,datum[key]['position'],datum[key]['angle']]
-                    # datum[key]['position'], .., datum[key]['angle'],datum[key]['angular_velocity'], datum[key]['linear_velocity']
+        if sample_points is None:
+            sample_points  = range(data_list[0].size)
 
-            data_x.append(x)
+        if keys is None:
+            keys = data_list[0].get_keys()
+
+        for datum in data_list:
+            #a single datum consist of a single push which consists of several 
+            #recordings.
+            for sample_point in sample_points:
+                point = []
+                datum_contents = datum.get(sample_point, keys)
+                if sub_keys is not None:
+                    for k in range(len(sub_keys)):
+                        for sub_key in sub_keys[k]:
+                            if sub_key is not None:
+                                point = np.r_[point, datum_contents[k][sub_key]]
+                            else:
+                                point = np.r_[point, datum_contents[k]]
+                else:
+                    point =  datum_contents
+
+                data.append(point)
+
+        return data
+ 
+    def pack_data_x(self, keys, sub_keys=None, ids=None, just_before=False):
+        '''
+        just_before argument is to be passed if only the starting data point is required.
+        fundamentally this is a redundant function!
+        '''
+        if just_before:
+            sample_points = [0]
+        else:
+            sample_points = None
+
+        return self.pack_data(keys=keys, sub_keys=sub_keys, ids=ids, sample_points=sample_points)
 
 
-        return data_x
+    def pack_data_y(self, keys, sub_keys=None, ids=None, just_after=False):  
 
-    def pack_data_y(self, ids = None):
+        if just_after:
+            sample_points = [-1]
+        else:
+            sample_points = None
+
+        return self.pack_data(keys=keys, sub_keys=sub_keys, ids=ids, sample_points=sample_points)
+
+
+    def pack_data_in_range_xy(self, x_keys, y_keys, x_sub_keys=None, y_sub_keys=None, ids=None, before_after=False, data_file_range=None):
+        '''
+        This function is for getting a specific set of files from the hard disk
+        data_file_range reads the given number of files from the hard disk
+        if data_file_range argument is false, it will just read the penultimate file.
+        ids chooses the data ids within a sample contained in a datafile, usually there are 5 samples per data file
+        before_after argument if set true would read only first point in a sample and the last point in a sample
+        '''
+        if data_file_range is None:
+            data_file_range = [self._data_idx - 1]
 
         data_y = []
+        data_x = []
 
-        data = self.select_data(ids)
-
-        for datum in data:
-
-            data_y.append([datum['push_action'][0][4]])
-
-
-        return data_y
-
-
-    def pack_data(self, keys, ids = None):
-
-        data_x = self.pack_data_x(keys, ids)
-        data_y = self.pack_data_y(ids)
-
+        for data_file_idx in data_file_range:
+            self._data = self.read_data(data_file_idx)
+            if self._data is None:
+                print "WARNING: Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,)
+                continue
+            data_x +=  self.pack_data_x(keys=x_keys, sub_keys=x_sub_keys, ids=ids, just_before=before_after)
+            data_y +=  self.pack_data_y(keys=y_keys, sub_keys=y_sub_keys, ids=ids, just_after=before_after)
 
         return data_x, data_y
-
 
     def create_sample(self):
 
@@ -269,20 +317,5 @@ class DataManager(object):
 
 
     def size(self):
+
         return len(self._data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
