@@ -15,6 +15,11 @@ def get_mixture_parameters(output, dim_output = 1, n_kernels = KMIX):
   out_mu = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels*dim_output], name="mixparam")
 
   out_pi, out_sigma, out_mu = tf.split_v(output, [n_kernels,n_kernels,n_kernels*dim_output], 1)
+  out_mu = tf.reshape(out_mu,[-1,n_kernels, dim_output])
+
+  print "SIGMA", out_sigma.get_shape()
+  print "PI", out_pi.get_shape()
+  print "MU", out_mu
 
   max_pi = tf.reduce_max(out_pi, 1, keep_dims=True)
   out_pi = tf.sub(out_pi, max_pi)
@@ -58,7 +63,7 @@ def tf_general_mdn_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernel
   n_params_out = n_kernels*params_per_output_dim
 
   x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
-  y = tf.placeholder(dtype=tf.float32, shape=[None,1], name="y")
+  y = tf.placeholder(dtype=tf.float32, shape=[None,dim_output], name="y")
 
   Wh = tf.Variable(tf.random_normal([dim_input,n_hidden], stddev=stddev, dtype=tf.float32))
   bh = tf.Variable(tf.random_normal([1,n_hidden], stddev=stddev, dtype=tf.float32))
@@ -83,10 +88,14 @@ def tf_general_mdn_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernel
 
 def tf_normal(y, mu, sigma):
 
+  print "LOOK"
+  print y.get_shape()
+  print mu.get_shape()
   oneDivSqrtTwoPI = 1 / math.sqrt(2*math.pi) # normalisation factor for gaussian, not needed.
-  result = tf.sub(y, mu)
-  result = tf.mul(result,1./(sigma))
-  result = -tf.square(result)/2
+  result = tf.sub(y,mu)
+  result = tf.reduce_sum(tf.multiply(result,result))
+  result = -tf.mul(result,1./tf.square(sigma))
+
   return tf.mul(tf.exp(result),1./(sigma))*oneDivSqrtTwoPI
 
 def get_loss(out_pi, out_sigma, out_mu, y):
