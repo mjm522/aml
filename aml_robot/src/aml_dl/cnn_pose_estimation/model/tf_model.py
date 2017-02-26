@@ -9,13 +9,29 @@ def init_bias(shape, name=None):
     return tf.get_variable(name, initializer=tf.zeros(shape, dtype='float'))
 
 
-def euclidean_loss(a, b, batch_size):
+def euclidean_loss(a, b, batch_size, name='loss_out'):
     scale_factor = tf.constant(2*batch_size, dtype='float')
     squared_diff = tf.square(a-b)
 
-    cost = tf.reduce_sum(squared_diff)
+    cost = tf.div(tf.reduce_sum(squared_diff),scale_factor, name=name)
 
-    return cost/scale_factor
+    return cost
+
+def batched_matrix_vector_multiply(vector, matrix):
+    """ computes x^T A in mini-batches. """
+    vector_batch_as_matricies = tf.expand_dims(vector, [1])
+    mult_result = tf.batch_matmul(vector_batch_as_matricies, matrix)
+    squeezed_result = tf.squeeze(mult_result, [1])
+    return squeezed_result
+
+
+def euclidean_loss_layer(a, b, precision, batch_size):
+    """ Math:  out = (action - mlp_out)'*precision*(action-mlp_out)
+                    = (u-uhat)'*A*(u-uhat)"""
+    scale_factor = tf.constant(2*batch_size, dtype='float')
+    uP = batched_matrix_vector_multiply(a-b, precision)
+    uPu = tf.reduce_sum(uP*(a-b))  # this last dot product is then summed, so we just the sum all at once.
+    return uPu/scale_factor
 
 def get_input_layer(dim_input, dim_output):
     net_input = tf.placeholder("float", [None, dim_input], name='nn_input')
@@ -38,7 +54,7 @@ def get_mlp_layers(mlp_input, number_layers, dimension_hidden):
         weights.append(cur_weight)
         biases.append(cur_bias)
         if layer_step != number_layers-1:  # final layer has no RELU
-            cur_top = tf.nn.relu(tf.matmul(cur_top, cur_weight) + cur_bias)
+            cur_top = tf.nn.relu(tf.matmul(cur_top, cur_weight) + cur_bias, name='fc_out')
         else:
             cur_top = tf.matmul(cur_top, cur_weight) + cur_bias
 
@@ -97,7 +113,6 @@ def pose_estimation_network(dim_input=27, dim_output=3, batch_size=25, network_c
     conv_layer_1 = conv2d(img=conv_layer_0, w=weights['wc2'], b=biases['bc2'])
     conv_layer_2 = conv2d(img=conv_layer_1, w=weights['wc3'], b=biases['bc3'])
 
-
     _, num_rows, num_cols, num_fp = conv_layer_2.get_shape()
     num_rows, num_cols, num_fp = [int(x) for x in [num_rows, num_cols, num_fp]]
     x_map = np.empty([num_rows, num_cols], np.float32)
@@ -118,12 +133,9 @@ def pose_estimation_network(dim_input=27, dim_output=3, batch_size=25, network_c
     features = tf.reshape(tf.transpose(conv_layer_2, [0,3,1,2]),
                           [-1, num_rows*num_cols])
     softmax = tf.nn.softmax(features)
-
     fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
     fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
-
-    fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
-
+    fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2], name='features_out')
     fc_input = fp
 
     # _, num_rows, num_cols, num_fp = conv_layer_2.get_shape()
@@ -131,7 +143,6 @@ def pose_estimation_network(dim_input=27, dim_output=3, batch_size=25, network_c
     # conv_layer_2_size = (im_height*im_width*num_filters[2])/4
 
     # fc_input = tf.reshape(conv_layer_2, [-1,conv_layer_2_size])
-
     fc_output, _, _ = get_mlp_layers(fc_input, n_layers, dim_hidden)
 
     loss = euclidean_loss(a=position, b=fc_output, batch_size=batch_size)

@@ -23,7 +23,7 @@ nn = tf_model.pose_estimation_network(dim_input=network_params['image_size'],
                                       network_config=network_params)
 
 # Add ops to save and restore all the variables.
-saver = tf.train.Saver()
+
 
 fc_op = nn['fc_out']
 features_op = nn['features']
@@ -32,10 +32,12 @@ input_tensor = nn['input']
 position = nn['position']
 train_op = tf_model.train_adam_step(loss_op)
 
+saver = tf.train.Saver()
+
 
 # Initialialise session and variables
 
-init_op = tf.initialize_all_variables()
+init_op = tf.global_variables_initializer()
 
 sess = tf.Session()
 sess.run(init_op)
@@ -44,20 +46,26 @@ sess.run(init_op)
 image = fakeImageInput(network_params)
 
 ### Training ###
-
-for iteration in range(5000):
-    with tf.device("/gpu:0"):
-        loss = sess.run([loss_op,train_op],feed_dict={input_tensor: np.expand_dims(image,axis=0),
+input_image = np.expand_dims(image,axis=0)
+print input_image
+for iteration in range(4000):
+    with tf.device("/cpu:0"):
+        
+        loss = sess.run([loss_op,train_op,fc_op],feed_dict={input_tensor: input_image,
                                      position: np.expand_dims(np.ones(3),axis=0)
                                     })
 
         # print every 50 iters
-        if iteration%50 == 0:
+        if iteration%100 == 0:
             print "iteration %d loss: "%(iteration), loss
 
 
+
+
 ######## SAVING MODEL #######
-save_path = saver.save(sess, "model.ckpt")
+
+save_path = saver.save(sess, "./model.ckpt")
+# saver.export_meta_graph("./model.ckpt")
 print("Model saved in file: %s" % save_path)
     
 
