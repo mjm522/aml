@@ -7,11 +7,11 @@ from aml_robot.box2d.data_manager import DataManager
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
-from aml_dl.mdn.training.config import network_params, check_point_path
+from aml_dl.mdn.training.config import network_params_inv, check_point_path
 
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 
-network_params['model_path'] = check_point_path + 'push_model_pi_div_two.ckpt'
+network_params_inv['model_path'] = check_point_path + 'push_model_pi_div_two.ckpt'
 
 
 def generate_y_test(inverse_model):
@@ -60,7 +60,7 @@ def main():
 
     sess = tf.Session()
 
-    inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params)
+    inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
     inverse_model.init_model()
     
 

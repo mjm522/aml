@@ -17,7 +17,7 @@ IMAGE_WIDTH    = config['image_width']
 IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
-network_params = {
+network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 4, 
     'dim_output': 1,
