@@ -7,7 +7,7 @@ from aml_data_collec_utils.core.sample import Sample
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_io.log_utils import aml_logging
 
-from aml_io.convert_tools import image2string
+from aml_io.convert_tools import image2string, dimage2string
 
 import numpy as np
 import quaternion
@@ -27,7 +27,7 @@ class DataRecorder(object):
 
         self._old_time_stamp   = None
 
-        self._data_name_prefix = data_name_prefix
+        self._data_name_prefix = data_name_prefix+'check_depth_data'
 
         self._data_folder_path = data_folder_path
 
@@ -84,6 +84,7 @@ class DataRecorder(object):
         #compressing image
         if robot_state['rgb_image'] is not None:
             robot_state['rgb_image'] = image2string(image_in=robot_state['rgb_image'],fmt="jpeg")
+            # dimage2string(image_in=robot_state['depth_image'])
             robot_state['depth_image'] = None
 
         data = {}
@@ -93,7 +94,7 @@ class DataRecorder(object):
 
         self._sample.add(data)
 
-        # aml_logging.info("Sample size: %d"%(self._sample.size(),))
+        # aml_logging.info("Sample size: %d"%(self._sample.size,))
 
         if terminal:
             self.save_sample()
@@ -145,7 +146,7 @@ class DataRecorder(object):
             # Setting last data point as terminal
 
 
-            if self._sample.size() > 0:
+            if self._sample.size > 0:
                 self._sample.set(-1,'terminal', True)
                 self.save_sample()
             else:

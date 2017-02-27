@@ -16,6 +16,14 @@ def image2string(image_in, fmt = 'png'):
 
 	return out
 
+def dimage2string(image_in, fmt='tif'):
+	# print "***********************************HERE", type(image_in[0,0])
+	pil_img = Image.fromarray(image_in)
+	output = StringIO.StringIO()
+	# im = Image.fromstring('I;16',image_in.shape,image_in.tostring())
+	# im.save('test_16bit.tif')
+	pil_img.save('/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml/newimage.spi', format='SPIDER')
+
 def string2image(str_image_in):
     nparr = np.fromstring(str_image_in, np.uint8)
     out = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)

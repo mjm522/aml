@@ -32,7 +32,7 @@ class Sample(object):
 
         self._contents.append(data)
 
-        s = self.size()
+        s = self.size
         aml_logging.info("New data point %d"%(s,))
 
     def get_contents(self):
