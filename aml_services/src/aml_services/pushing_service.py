@@ -5,9 +5,9 @@ import numpy as np
 import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
-from aml_services.srv import PredictAction, PredictState
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
 from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
+from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
 
 def predict_next_state_from_learned_model(req):
 
@@ -17,9 +17,9 @@ def predict_next_state_from_learned_model(req):
     forward_model = NNPushForwardModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
 
-    prediction = forward_model.run_op('output', input_x)
+    next_state = forward_model.run_op('output', input_x)
 
-    return PredictStateResponse(prediction)
+    return PredictStateResponse(next_state.tolist()[0])
 
 
 def predict_action_from_learned_model(req):
@@ -38,9 +38,9 @@ def predict_action_from_learned_model(req):
     mu = mus[pi_idx]
     mean_theta = np.mean(theta)
 
-    actual_mu = np.sum(np.multiply(pis,mus))
+    action = np.sum(np.multiply(pis,mus))
 
-    return PredictActionResponse(actual_mu)
+    return PredictActionResponse(action.tolist()[0])
 
 
 def push_service_server():
