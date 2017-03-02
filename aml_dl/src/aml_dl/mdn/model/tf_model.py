@@ -8,7 +8,7 @@ KMIX = 24 # number of mixtures
 NOUT = KMIX * 3 # pi, mu, stdev
 
 
-def get_mixture_parameters(output, n_kernels = KMIX):
+def get_mixture_parameters(output, dim_output = 1, n_kernels = KMIX):
   
     out_pi = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels], name="mixparam")
     out_sigma = tf.placeholder(dtype=tf.float32, shape=[None,n_kernels], name="mixparam")
@@ -28,7 +28,6 @@ def get_mixture_parameters(output, n_kernels = KMIX):
     out_sigma = tf.exp(out_sigma)
 
     return out_pi, out_sigma, out_mu
-
 
 def tf_normal(y, mu, sigma):
 
@@ -54,7 +53,6 @@ def get_train(loss_op):
 
     return train_op
 
-
 def tf_simple_mdn_model(dim_input = 1, dim_output = NOUT, stddev = 0.5, n_hidden = 24):
 
     x = tf.placeholder(dtype=tf.float32, shape=[None,dim_input], name="x")
@@ -76,7 +74,7 @@ def tf_simple_mdn_model(dim_input = 1, dim_output = NOUT, stddev = 0.5, n_hidden
     return out_pi, out_sigma, out_mu, loss, x, y
 
 
-def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
+def tf_general_mdn_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
 
     # 3 parameters: pi, mu, stdev
     n_params_out = n_kernels*3 #*dim_output
@@ -93,7 +91,7 @@ def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 
     hidden_layer = tf.nn.tanh(tf.matmul(x, Wh) + bh)
     output = tf.matmul(hidden_layer,Wo) + bo
 
-    out_pi, out_sigma, out_mu = get_mixture_parameters(output,n_kernels)
+    out_pi, out_sigma, out_mu = get_mixture_parameters(output=output, dim_output = dim_output, n_kernels=n_kernels)
 
     loss = get_loss(out_pi, out_sigma, out_mu, y)
 
@@ -102,6 +100,14 @@ def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 
     output_ops = {'pi': out_pi, 'sigma': out_sigma, 'mu': out_mu, 
                 'loss': loss, 'z_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
 
+  return output_ops
+
+
+def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
+
+
+  output_ops = tf_general_mdn_model(dim_input = dim_input, dim_output = dim_output, 
+                                    n_hidden = n_hidden, n_kernels = n_kernels, stddev = stddev)
 
     return output_ops
 
