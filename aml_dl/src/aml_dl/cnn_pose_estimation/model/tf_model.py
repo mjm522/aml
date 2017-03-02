@@ -80,9 +80,6 @@ def get_loss_layer(mlp_out, position, batch_size):
     return euclidean_loss(a=position, b=mlp_out, batch_size=batch_size)
 
 
-
-
-
 def pose_estimation_network(dim_input=27, dim_output=9, batch_size=25, network_config=None):
     """
     An example a network in tf that has both state and image inputs.

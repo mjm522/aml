@@ -25,6 +25,9 @@ def dimage2string(image_in, fmt='tif'):
 	pil_img.save('/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml/newimage.spi', format='SPIDER')
 
 def string2image(str_image_in):
+    '''
+    expects a string array
+    '''
     nparr = np.fromstring(str_image_in, np.uint8)
     out = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
     out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
