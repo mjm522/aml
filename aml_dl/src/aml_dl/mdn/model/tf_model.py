@@ -100,13 +100,13 @@ def tf_general_mdn_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernel
     output_ops = {'pi': out_pi, 'sigma': out_sigma, 'mu': out_mu, 
                 'loss': loss, 'z_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
 
-  return output_ops
+    return output_ops
 
 
 def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 2, stddev = 0.5):
 
 
-  output_ops = tf_general_mdn_model(dim_input = dim_input, dim_output = dim_output, 
+    output_ops = tf_general_mdn_model(dim_input = dim_input, dim_output = dim_output, 
                                     n_hidden = n_hidden, n_kernels = n_kernels, stddev = stddev)
 
     return output_ops

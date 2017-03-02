@@ -1,9 +1,9 @@
 
 import tensorflow as tf
 import numpy as np
-
-from aml_dl.mdn.model.tf_model import tf_pushing_model
 from aml_io.tf_io import load_tf_check_point
+
+from tf_mdn_model import MixtureDensityNetwork
 
 class MDNPushInverseModel(object):
 
@@ -17,12 +17,17 @@ class MDNPushInverseModel(object):
         self._device = self._params['device']
 
         with tf.device(self._device):
-            self._net_ops = tf_pushing_model(dim_input= network_params['dim_input'],
-                               dim_output = network_params['dim_output'],
-                               n_hidden = network_params['n_hidden'], 
-                               n_kernels = network_params['k_mixtures'])
 
-            self._init_op = tf.initialize_all_variables()
+
+            self._mdn = MixtureDensityNetwork(network_params['dim_input'], 
+                                              network_params['dim_output'], 
+                                              network_params['k_mixtures'], 
+                                              network_params['n_hidden'])
+
+            self._mdn._init_model()
+            self._net_ops = self._mdn._ops
+
+            self._init_op = tf.global_variables_initializer()
 
             self._saver = tf.train.Saver()
 
