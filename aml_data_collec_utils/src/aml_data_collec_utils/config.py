@@ -1,7 +1,7 @@
-import os.path
+import os
 from aml_io.io_tools import get_aml_package_path
 
-data_storage_path  = get_aml_package_path('aml_data_collec_utils') + '/data/'
+data_storage_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
 
 if not os.path.exists(data_storage_path):
     os.makedirs(data_storage_path)

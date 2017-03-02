@@ -35,8 +35,8 @@ network_params_inv = {
     'device': '/cpu:0',
 }
 
-train_file_indices = range(1,5)
-test_file_indices  = range(41,49)
+train_file_indices = range(1,70)
+test_file_indices  = range(71,95)
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
@@ -74,6 +74,7 @@ network_params_cnn = {
     'num_conv_layers':num_conv_layers,
     'num_fc_layers':2,
     'num_units_in_fc':[128,7],
+    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'filter_sizes':filter_sizes_each_layer,
     'num_filters':num_filters_per_layer,
     'image_width': IMAGE_WIDTH,
@@ -83,6 +84,7 @@ network_params_cnn = {
     'max_pooling':{'x':2, 'y':2},
     'strides':[1,1,1,1],
     'padding':'SAME',
+    'img_resize':{'width':10,'height':10},
     'use_relu':True,
     'stddev':0.05,
     'load_saved_model': True,

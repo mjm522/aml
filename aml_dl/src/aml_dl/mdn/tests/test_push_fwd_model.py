@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import tensorflow as tf
-import matplotlib
 import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
