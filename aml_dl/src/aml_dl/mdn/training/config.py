@@ -3,11 +3,15 @@ from aml_robot.box2d.config import config
 from aml_io.io_tools import get_aml_package_path
 
 check_point_path   = get_aml_package_path('aml_dl') + '/src/aml_dl/mdn/training/tf_check_points/'
-training_data_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
+training_data_path = ''
+try:
+    training_data_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
+except:
+    print "AML_DATA environment variable is not set."
 
 if not os.path.exists(training_data_path):
     print "Training data folder does not exist..."
-    raise ValueError
+    #raise ValueError
 
 
 NUM_FP         = 10 #this is not the right value?
