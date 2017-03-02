@@ -112,43 +112,7 @@ def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 
     return output_ops
 
 
-def create_fc_layers(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_hidden_layers=None, stddev=0.5):
 
-    if units_in_hidden_layers is None:
-        units_in_hidden_layers = [dim_input for _ in range(n_hidden_layers)]
-        units_in_hidden_layers[n_hidden_layers-1] = dim_output
-
-    else:
-        if len(units_in_hidden_layers) != n_hidden_layers:
-          print "param: units_in_hidden_layers should be equal to param: n_hidden_layers"
-          raise ValueError
-
-    x = tf.placeholder(dtype=tf.float32, shape=[None, dim_input],  name="x")
-    y = tf.placeholder(dtype=tf.float32, shape=[None, dim_output], name="y")
-
-    for h in range(n_hidden_layers):
-
-        if h == 0:
-          #input layer
-          Wi = tf.Variable(tf.random_normal([dim_input, units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
-          bi = tf.Variable(tf.random_normal([1, units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
-
-          hidden_layer = tf.nn.tanh(tf.matmul(x, Wi) + bi)
-
-        else:
-          #all other hidden layers
-          Wh = tf.Variable(tf.random_normal([units_in_hidden_layers[h-1], units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
-          bh = tf.Variable(tf.random_normal([1,units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
-
-          hidden_layer = tf.nn.tanh(tf.matmul(hidden_layer, Wh) + bh)
-
-    #ouput layer
-    Wo = tf.Variable(tf.random_normal([units_in_hidden_layers[-1], dim_output], stddev=stddev, dtype=tf.float32))
-    bo = tf.Variable(tf.random_normal([1, dim_output], stddev=stddev, dtype=tf.float32))
-
-    output = tf.matmul(hidden_layer, Wo) + bo
-
-    return output
 
 
 def create_conv_layer(data_in, num_inp_channels, filter_size,  num_filters, strides=None, padding='SAME', stddev=0.05, max_pooling=None):
@@ -194,19 +158,51 @@ def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True
 def get_loss_fwd(output, target):
 
     return tf.sqrt(tf.reduce_mean(tf.square(tf.sub(target, output))))
-
+    
 
 def tf_fwd_pushing_model(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_hidden_layers=None, stddev=0.5):
-    fc_out = create_fc_layers(dim_input=dim_input, dim_output=dim_output, n_hidden_layers=n_hidden_layers, units_in_hidden_layers=units_in_hidden_layers, stddev=stddev)
 
-    loss = get_loss_fwd(fc_out, y)
+    if units_in_hidden_layers is None:
+        units_in_hidden_layers = [dim_input for _ in range(n_hidden_layers)]
+        units_in_hidden_layers[n_hidden_layers-1] = dim_output
+
+    else:
+        if len(units_in_hidden_layers) != n_hidden_layers:
+          print "param: units_in_hidden_layers should be equal to param: n_hidden_layers"
+          raise ValueError
+
+    x = tf.placeholder(dtype=tf.float32, shape=[None, dim_input],  name="x")
+    y = tf.placeholder(dtype=tf.float32, shape=[None, dim_output], name="y")
+
+    for h in range(n_hidden_layers):
+
+        if h == 0:
+          #input layer
+          Wi = tf.Variable(tf.random_normal([dim_input, units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
+          bi = tf.Variable(tf.random_normal([1, units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
+
+          hidden_layer = tf.nn.tanh(tf.matmul(x, Wi) + bi)
+
+        else:
+          #all other hidden layers
+          Wh = tf.Variable(tf.random_normal([units_in_hidden_layers[h-1], units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
+          bh = tf.Variable(tf.random_normal([1,units_in_hidden_layers[h]], stddev=stddev, dtype=tf.float32))
+
+          hidden_layer = tf.nn.tanh(tf.matmul(hidden_layer, Wh) + bh)
+
+    #ouput layer
+    Wo = tf.Variable(tf.random_normal([units_in_hidden_layers[-1], dim_output], stddev=stddev, dtype=tf.float32))
+    bo = tf.Variable(tf.random_normal([1, dim_output], stddev=stddev, dtype=tf.float32))
+
+    output = tf.matmul(hidden_layer, Wo) + bo
+
+    loss = get_loss_fwd(output, y)
 
     train_op = get_train(loss)
 
-    output_ops = {'output' : fc_out, 'loss': loss, 'last_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
+    output_ops = {'output' : output, 'loss': loss, 'last_hidden': hidden_layer, 'train': train_op, 'x': x, 'y': y}
 
     return output_ops
-
 
 ##############################################################CNN LAYERS##########################################
 

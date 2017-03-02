@@ -63,7 +63,7 @@ class MDNPushInverseModel(object):
 
             return loss
 
-
+    # TODO: Fix
     def sample_out(self, x_input, m_samples = 10):
 
         with tf.device(self._device):
@@ -73,7 +73,7 @@ class MDNPushInverseModel(object):
             samples = self._generate_mixture_samples(out_pi, out_mu, out_sigma,m_samples)
 
             return samples
-
+    # TODO: Fix
     def sample_out_max_pi(self, x_input, m_samples = 10):
 
         with tf.device(self._device):
@@ -83,14 +83,14 @@ class MDNPushInverseModel(object):
             samples = self._generate_mixture_samples_from_max_pi(out_pi, out_mu, out_sigma,m_samples)
 
             return samples
-
+    # TODO: Fix
     def expected_out(self, x_input, m_samples = 10):
         with tf.device(self._device):
             samples = self.sample_out(x_input,m_samples)[0]
 
             return np.mean(samples)
 
-
+    # TODO: Fix
     def expected_out2(self, x_input, m_samples = 10):
         with tf.device(self._device):
             samples = self.sample_out(x_input,m_samples)[0]
@@ -105,14 +105,14 @@ class MDNPushInverseModel(object):
             out /= np.linalg.norm(out)
 
             return out
-
+    # TODO: Fix
     def expected_max_pi_out(self, x_input, m_samples = 10):
         with tf.device(self._device):
             samples = self.sample_out_max_pi(x_input,m_samples)[0]
 
             return np.mean(samples)
 
-
+    # TODO: Fix
     def expected_max_pi_out2(self, x_input, m_samples = 10):
         with tf.device(self._device):
             samples = self.sample_out_max_pi(x_input,m_samples)[0]
@@ -136,7 +136,6 @@ class MDNPushInverseModel(object):
 
             return out
 
-
     def _sample_pi_idx(self, x, pdf):
         N = pdf.size
         acc = 0
@@ -154,11 +153,13 @@ class MDNPushInverseModel(object):
 
         return i
 
+    # TODO: Fix
     def _sample_gaussian(self, rn, mu, std):
 
         return mu + rn*std
 
 
+    # TODO: Fix
     def _generate_mixture_samples_from_max_pi(self, out_pi, out_mu, out_sigma, m_samples=10):
 
         # Number of test inputs
@@ -179,7 +180,7 @@ class MDNPushInverseModel(object):
 
         return result
 
-
+    # TODO: Fix
     def _generate_mixture_samples(self, out_pi, out_mu, out_sigma, m_samples=10):
 
         # Number of test inputs

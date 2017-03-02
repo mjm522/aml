@@ -6,6 +6,7 @@ import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
+from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
 
@@ -30,17 +31,21 @@ def predict_action_from_learned_model(req):
 
 
     input_x = np.expand_dims(np.r_[req.curr_state, req.tgt_state], 0)
-    theta = inverse_model.sample_out_max_pi(input_x, 1)[0]
-    pis = inverse_model.run_op('pi', input_x)[0]
-    pi_idx = np.argmax(pis)
-    sigma = inverse_model.run_op('sigma', input_x)[0][pi_idx]
     mus = inverse_model.run_op('mu', input_x)[0]
-    mu = mus[pi_idx]
-    mean_theta = np.mean(theta)
+    sigma = inverse_model.run_op('sigma', input_x)[0]
+    pis = inverse_model.run_op('pi', input_x)[0]
 
-    action = np.sum(np.multiply(pis,mus))
 
-    return PredictActionResponse(action.tolist()[0])
+    print "MUS: ", mus
+    print "SIGMA: ", sigma
+    print "PIs:", pis
+    #theta = inverse_model.sample_out_max_pi(input_x, 1)[0]
+    
+    pi_idx = inverse_model._max_pi_idx(pis)
+
+    action = mus[:,pi_idx]
+
+    return PredictActionResponse(action.tolist())
 
 
 def push_service_server():

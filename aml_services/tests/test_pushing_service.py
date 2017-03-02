@@ -27,11 +27,11 @@ def main():
     x_tgt    = np.random.randn(1,7).tolist()[0]
     u_action = np.random.randn(1,2).tolist()[0]
 
-    x_nxt = predict_state_client(x_curr, u_action)
-    # u_act = predict_action_client(x_curr, x_tgt)
+    #x_nxt = predict_state_client(x_curr, u_action)
+    u_act = predict_action_client(x_curr, x_tgt)
 
-    print "Next state predicted by state predictor service is \t", x_nxt
-    # print "Action predicted by action predictor service is \t", u_act
+    #print "Next state predicted by state predictor service is \t", x_nxt
+    print "Action predicted by action predictor service is \t", u_act
 
 
 if __name__ == '__main__':
