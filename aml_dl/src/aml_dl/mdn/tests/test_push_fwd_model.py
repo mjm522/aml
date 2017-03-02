@@ -5,7 +5,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
-from aml_dl.mdn.training.config import network_params_fwd, check_point_path
+from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
+from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
 
 
 def get_data(operation):

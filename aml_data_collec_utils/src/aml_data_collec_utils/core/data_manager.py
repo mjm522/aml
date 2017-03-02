@@ -166,7 +166,7 @@ class DataManager(object):
 
         else:
 
-            print "New sample added with size ", sample.size()
+            print "New sample added with size ", sample.size
         
             self._data.append(sample)
 

@@ -152,7 +152,7 @@ def get_js_traj(limb_name, demo_idx=None, demo_path=None):
     js_pos_traj = []
     js_vel_traj = []
     
-    for k in range(demo_data[0].size()):
+    for k in range(demo_data[0].size):
         
         js_pos_traj.append(demo_data[0].get(k,['position']))
         js_vel_traj.append(demo_data[0].get(k,['velocity']))
