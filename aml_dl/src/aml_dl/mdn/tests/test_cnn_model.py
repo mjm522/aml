@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.mdn.model.cnn_model import CNNModel
 from aml_io.visual_tools import show_image, continous_3D_plot
@@ -63,6 +64,9 @@ def train_cnn_model():
 
     cnn_model.save_model()
 
+    plt.figure(figsize=(8, 8))
+    plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
+    plt.show()
 
 
 def test_cnn_model():
@@ -76,6 +80,23 @@ def test_cnn_model():
     cnn_model.init_model()
 
     prediction = cnn_model.run_op('output', test_data_x)
+
+    num_outputs = network_params_cnn['dim_output']
+    output_vars = network_params_cnn['output_order']
+
+    fig, axlist = plt.subplots(num_outputs)
+    d = 0
+    for ax in axlist.flatten():
+        ax.set_title(output_vars[d])
+        h1 =  ax.plot(np.asarray(test_data_y)[:,d],    color='r', label='true')
+        h2 =  ax.plot(prediction[:,d],    color='g', label='pred')
+        d += 1
+
+    fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)  # create some space below the plots by increasing the bottom-value
+    axlist.flatten()[-2].legend(loc='upper center', bbox_to_anchor=(0.5, -1.35), ncol=3)
+    plt.suptitle('Prediction - True',size=16)
+    fig.subplots_adjust(hspace=.5)
+    plt.show()
 
 
 

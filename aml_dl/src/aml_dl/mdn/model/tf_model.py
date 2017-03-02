@@ -205,24 +205,25 @@ def tf_fwd_pushing_model(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_
 ##############################################################CNN LAYERS##########################################
 
 def get_loss_cnn(output, target):
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
-    cost = tf.reduce_mean(cross_entropy)
+    # cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
+    # cost = tf.reduce_mean(cross_entropy)
+    cost =  tf.sqrt(tf.reduce_mean(tf.square(tf.sub(target, output))))
     return cost
 
 
 def tf_cnn_model(num_conv_layers, num_filters, filter_size,
                  num_fc_layers, num_units_in_fc,  
-                 img_height, img_width, img_channels, dim_output, 
-                 strides=None,padding='SAME',
+                 img_height, img_width, img_channels, dim_output,
+                 img_resize=None, strides=None, padding='SAME',
                  stddev=0.05, max_pooling=None, use_relu=True):
     
     
     x = tf.placeholder(tf.float32, shape=[None, img_height*img_width*img_channels], name='x')
     x_image = tf.reshape(x, [-1, img_height, img_width, img_channels])
 
-    print "***************************************************"
-    print x_image
-    print "***************************************************"
+    if img_resize is not None:
+    #downsample the images
+        x_image = tf.image.resize_images(x_image, size=[img_resize['width'], img_resize['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
 
     y = tf.placeholder(dtype=tf.float32, shape=[None, dim_output], name="y")
 

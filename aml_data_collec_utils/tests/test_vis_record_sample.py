@@ -58,7 +58,7 @@ while not quit:
     image = string2image(sample.get(-1,['rgb_image'])[0])
 
     print "TERMINAL", sample.get(-1,['terminal'])
-    print "SAMPLE SIZE ", sample.size()
+    print "SAMPLE SIZE ", sample.size
 
     cv2.imshow("RGB Image After", image)
 
@@ -87,7 +87,7 @@ while not quit:
         sample_idx = max(0,sample_idx-1)
         sample_data_point_idx = 0
     elif key == 1048678:
-        sample_data_point_idx = (sample_data_point_idx + 1)%sample.size()
+        sample_data_point_idx = (sample_data_point_idx + 1)%sample.size
 
     if key == 27 or key == 1048603 or sample_idx >= len(data):
         quit = True

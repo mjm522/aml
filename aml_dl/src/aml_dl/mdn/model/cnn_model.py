@@ -24,6 +24,7 @@ class CNNModel(object):
                                          img_width=network_params['image_width'], 
                                          img_channels=network_params['image_channels'], 
                                          dim_output=network_params['dim_output'],
+                                         img_resize=network_params['img_resize'],
                                          strides=network_params['strides'],
                                          padding=network_params['padding'],
                                          stddev=network_params['stddev'], 
