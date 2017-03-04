@@ -28,12 +28,15 @@ class MixtureDensityNetwork(object):
     self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
 
 
-    self._ops = {'x': self._x, 'y': self._y, 'mu': self._mus_op, 'sigma': self._sigmas_op, 'pi': self._pis_op, 'loss': self._loss_op}
+    self._train_op = self._init_train(self._loss_op)
+
+
+    self._ops = {'x': self._x, 'y': self._y, 'mu': self._mus_op, 'sigma': self._sigmas_op, 'pi': self._pis_op, 'loss': self._loss_op, 'train': self._train_op}
 
 
 
 
-  def _init_fc_layer(self, input, stddev = 0.5):
+  def _init_fc_layer(self, input, stddev = 0.1):
 
     n_params_out = (self._dim_output + 2)*self._n_kernels
 
@@ -68,13 +71,20 @@ class MixtureDensityNetwork(object):
 
     kernels = self._kernels(mus, sigmas, ys)
 
-    result = tf.mul(kernels,tf.reshape(pis, [-1, 1, m]))
+    result = tf.multiply(kernels,tf.reshape(pis, [-1, 1, m]))
     result = tf.reduce_sum(result, 2, keep_dims=True)
 
-    result = -tf.log(result)
+    epsilon = 1e-20
+    result = -tf.log(tf.maximum(result,1e-20))
 
 
-    return tf.reduce_mean(-result, 0)[0]
+    return tf.reduce_mean(result, 0)
+
+  def _init_train(self,loss_op):
+
+    train_op = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss_op)
+
+    return train_op
 
 
   # Do the log trick here if it is not good enough the way it is now
@@ -86,17 +96,15 @@ class MixtureDensityNetwork(object):
     reshaped_sigmas = tf.reshape(sigmas, [-1, 1, m])
 
     diffs = tf.sub(mus, reshaped_ys) # broadcasting
-    expoents = tf.reduce_sum( tf.multiply(diffs, diffs), 1, keep_dims=True )
+    expoents = tf.reduce_sum( tf.multiply(diffs,diffs), 1, keep_dims=True )
 
     sigmacs = tf.pow(reshaped_sigmas,c)
 
-    expoents = tf.mul(-0.5*tf.reciprocal(sigmacs), expoents)
+    expoents = tf.multiply(-0.5,tf.multiply(tf.reciprocal(sigmacs), expoents))
 
-    one_div_sigmacs = tf.reciprocal(tf.pow(sigmas,c))
-
-    denominators = tf.reciprocal(tf.pow(np.pi,c/2)*tf.sqrt(sigmacs))
+    denominators = tf.pow(2*np.pi,c/2.0)*tf.sqrt(sigmacs)
     
-    out = tf.div(denominators,tf.exp(expoents))
+    out = tf.div(tf.exp(expoents),denominators)
 
     return out
 

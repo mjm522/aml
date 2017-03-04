@@ -44,7 +44,7 @@ def get_loss(out_pi, out_sigma, out_mu, y):
     result = tf.reduce_sum(result, 1, keep_dims=True)
     result = -tf.log(result)
 
-    return tf.reduce_mean(-result)
+    return tf.reduce_mean(result)
 
 
 def get_train(loss_op):
