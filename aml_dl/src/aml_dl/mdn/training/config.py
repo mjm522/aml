@@ -35,7 +35,7 @@ network_params_inv = {
     'device': '/cpu:0',
 }
 
-train_file_indices = range(1,70)
+train_file_indices = range(1,20)
 test_file_indices  = range(71,95)
 
 network_params_fwd = {

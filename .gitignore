@@ -20,3 +20,5 @@ MUJOCO_LOG.TXT
 tf_model_delme.py
 
 .ipynb_checkpoints
+
+set_env.bash

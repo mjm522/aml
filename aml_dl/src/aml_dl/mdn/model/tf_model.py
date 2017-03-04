@@ -111,46 +111,6 @@ def tf_pushing_model(dim_input = 12, dim_output = 1, n_hidden = 24, n_kernels = 
 
     return output_ops
 
-
-
-
-
-def create_conv_layer(data_in, num_inp_channels, filter_size,  num_filters, strides=None, padding='SAME', stddev=0.05, max_pooling=None):
-    # Shape of the filter-weights for the convolution.
-    shape    = [filter_size, filter_size, num_inp_channels, num_filters]
-    # Create new weights aka. filters with the given shape.
-    weights  = tf.Variable(tf.truncated_normal(shape, stddev=stddev))
-    # Create new biases, one for each filter.
-    biases   = tf.Variable(tf.constant(stddev, shape=[num_filters]))
-
-    if strides is None:
-        strides = [1,1,1,1]
-    # Create the TensorFlow operation for convolution.
-    layer    = tf.nn.conv2d(input=data_in, filter=weights, strides=strides, padding=padding)
-    # Add the biases to the results of the convolution.
-    layer   += biases
-
-    # Use pooling to down-sample the image resolution
-    if max_pooling is not None:
-      pool_ksize   = [1, max_pooling['x'], max_pooling['y'], 1]
-      pool_strides = [1, max_pooling['x'], max_pooling['y'], 1]
-      layer = tf.nn.max_pool(value=layer, ksize=pool_ksize, strides=pool_strides, padding=padding)
-
-    # Rectified Linear Unit (ReLU).
-    layer = tf.nn.relu(layer)
-
-    return layer, weights
-
-def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True):
-    # Create new weights and biases.
-    weights  = tf.Variable(tf.truncated_normal([num_inputs, num_outputs], stddev=stddev))
-    biases   = tf.Variable(tf.constant(stddev, shape=[num_outputs]))
-    # Calculate the layer 
-    layer = tf.matmul(data_in, weights) + biases
-    if use_relu:
-        layer = tf.nn.relu(layer)
-
-    return layer
     
 
 ########################################################FORWARD MODEL######################################
@@ -158,7 +118,7 @@ def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True
 def get_loss_fwd(output, target):
 
     return tf.sqrt(tf.reduce_mean(tf.square(tf.sub(target, output))))
-    
+
 
 def tf_fwd_pushing_model(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_hidden_layers=None, stddev=0.5):
 
@@ -206,10 +166,47 @@ def tf_fwd_pushing_model(dim_input=7, dim_output=7, n_hidden_layers=3, units_in_
 
 ##############################################################CNN LAYERS##########################################
 
+def create_conv_layer(data_in, num_inp_channels, filter_size,  num_filters, strides=None, padding='SAME', stddev=0.05, max_pooling=None):
+    # Shape of the filter-weights for the convolution.
+    shape    = [filter_size, filter_size, num_inp_channels, num_filters]
+    # Create new weights aka. filters with the given shape.
+    weights  = tf.Variable(tf.truncated_normal(shape, stddev=stddev))
+    # Create new biases, one for each filter.
+    biases   = tf.Variable(tf.constant(stddev, shape=[num_filters]))
+
+    if strides is None:
+        strides = [1,1,1,1]
+    # Create the TensorFlow operation for convolution.
+    layer    = tf.nn.conv2d(input=data_in, filter=weights, strides=strides, padding=padding)
+    # Add the biases to the results of the convolution.
+    layer   += biases
+
+    # Use pooling to down-sample the image resolution
+    if max_pooling is not None:
+      pool_ksize   = [1, max_pooling['x'], max_pooling['y'], 1]
+      pool_strides = [1, max_pooling['x'], max_pooling['y'], 1]
+      layer = tf.nn.max_pool(value=layer, ksize=pool_ksize, strides=pool_strides, padding=padding)
+
+    # Rectified Linear Unit (ReLU).
+    layer = tf.nn.relu(layer)
+
+    return layer, weights
+
+def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True):
+    # Create new weights and biases.
+    weights  = tf.Variable(tf.truncated_normal([num_inputs, num_outputs], stddev=stddev))
+    biases   = tf.Variable(tf.constant(stddev, shape=[num_outputs]))
+    # Calculate the layer 
+    layer = tf.matmul(data_in, weights) + biases
+    if use_relu:
+        layer = tf.nn.relu(layer)
+
+    return layer
+
 def get_loss_cnn(output, target):
     # cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
     # cost = tf.reduce_mean(cross_entropy)
-    cost =  tf.sqrt(tf.reduce_mean(tf.square(tf.sub(target, output))))
+    cost =  tf.reduce_ mean(tf.square(tf.sub(target, output)))
     return cost
 
 
