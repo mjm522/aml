@@ -19,6 +19,10 @@ IMAGE_WIDTH    = config['image_width']
 IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
+
+train_file_indices = range(1,20)
+test_file_indices  = range(71,95)
+
 network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 14, 
@@ -31,12 +35,14 @@ network_params_inv = {
     'image_channels': IMAGE_CHANNELS,
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': False,
-    'model_path': check_point_path + 'push_model.ckpt',
+    'model_path': check_point_path + 'push_model_inv.ckpt',
+    'train_file_indices':train_file_indices,
+    'test_file_indices':test_file_indices,
+    'training_data_path':training_data_path,
     'device': '/cpu:0',
 }
 
-train_file_indices = range(1,20)
-test_file_indices  = range(71,95)
+
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],

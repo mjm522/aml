@@ -28,12 +28,15 @@ class MixtureDensityNetwork(object):
     self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
 
 
-    self._ops = {'x': self._x, 'y': self._y, 'mu': self._mus_op, 'sigma': self._sigmas_op, 'pi': self._pis_op, 'loss': self._loss_op}
+    self._train_op = self._init_train(self._loss_op)
+
+
+    self._ops = {'x': self._x, 'y': self._y, 'mu': self._mus_op, 'sigma': self._sigmas_op, 'pi': self._pis_op, 'loss': self._loss_op, 'train': self._train_op}
 
 
 
 
-  def _init_fc_layer(self, input, stddev = 0.5):
+  def _init_fc_layer(self, input, stddev = 0.1):
 
     n_params_out = (self._dim_output + 2)*self._n_kernels
 
@@ -68,13 +71,20 @@ class MixtureDensityNetwork(object):
 
     kernels = self._kernels(mus, sigmas, ys)
 
-    result = tf.mul(kernels,tf.reshape(pis, [-1, 1, m]))
+    result = tf.multiply(kernels,tf.reshape(pis, [-1, 1, m]))
     result = tf.reduce_sum(result, 2, keep_dims=True)
 
-    result = -tf.log(result)
+    epsilon = 1e-20
+    result = -tf.log(tf.maximum(result,1e-20))
 
 
-    return tf.reduce_mean(-result, 0)[0]
+    return tf.reduce_mean(result, 0)
+
+  def _init_train(self,loss_op):
+
+    train_op = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss_op)
+
+    return train_op
 
 
   # Do the log trick here if it is not good enough the way it is now
@@ -86,17 +96,15 @@ class MixtureDensityNetwork(object):
     reshaped_sigmas = tf.reshape(sigmas, [-1, 1, m])
 
     diffs = tf.sub(mus, reshaped_ys) # broadcasting
-    expoents = tf.reduce_sum( tf.multiply(diffs, diffs), 1, keep_dims=True )
+    expoents = tf.reduce_sum( tf.multiply(diffs,diffs), 1, keep_dims=True )
 
     sigmacs = tf.pow(reshaped_sigmas,c)
 
-    expoents = tf.mul(-0.5*tf.reciprocal(sigmacs), expoents)
+    expoents = tf.multiply(-0.5,tf.multiply(tf.reciprocal(sigmacs), expoents))
 
-    one_div_sigmacs = tf.reciprocal(tf.pow(sigmas,c))
-
-    denominators = tf.reciprocal(tf.pow(np.pi,c/2)*tf.sqrt(sigmacs))
+    denominators = tf.pow(2*np.pi,c/2.0)*tf.sqrt(sigmacs)
     
-    out = tf.div(denominators,tf.exp(expoents))
+    out = tf.div(tf.exp(expoents),denominators)
 
     return out
 
@@ -126,83 +134,83 @@ class MixtureDensityNetwork(object):
 
 
 
-# class MixtureOfGaussians(object):
+class MixtureOfGaussians(object):
 
 
-#   def sample_pi_idx(self, x, pdf):
-#     N = pdf.size
-#     acc = 0
+  def sample_pi_idx(self, x, pdf):
+    N = pdf.size
+    acc = 0
 
-#     for i in range(0, N):
-#       acc += pdf[i]
-#       if (acc >= x):
-#         return i
+    for i in range(0, N):
+      acc += pdf[i]
+      if (acc >= x):
+        return i
 
-#         print 'failed to sample mixture weight index'
-
-
-#     return -1
+        print 'failed to sample mixture weight index'
 
 
-#   def max_pi_idx(self, pdf):
-
-#     i = np.argmax(pdf)
-
-#     return i
-
-#   def sample_gaussian(self, rn, mu, std):
+    return -1
 
 
-#     return mu + rn*std
+  def max_pi_idx(self, pdf):
 
-#   def generate_mixture_samples_from_max_pi(self, out_pi, out_mu, out_sigma, m_samples=10):
+    i = np.argmax(pdf)
 
+    return i
 
-#     # Number of test inputs
-
-#     N = out_mu.shape[0]
-
-#     M = m_samples
-
-#     result = np.random.rand(N, M)
-#     rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
-
-#     # Generates M samples from the mixture for each test input
-
-#     for j in range(M):
-#       for i in range(0, N):
-#         idx = self.max_pi_idx(out_pi[i])
-#         mu = out_mu[i, idx]
-#         std = out_sigma[i, idx]
-#         result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
+  def sample_gaussian(self, rn, mu, std):
 
 
-#     return result
+    return mu + rn*std
+
+  def generate_mixture_samples_from_max_pi(self, out_pi, out_mu, out_sigma, m_samples=10):
 
 
-#   def generate_mixture_samples(self, out_pi, out_mu, out_sigma, m_samples=10):
+    # Number of test inputs
+
+    N = out_mu.shape[0]
+
+    M = m_samples
+
+    result = np.random.rand(N, M)
+    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
+
+    # Generates M samples from the mixture for each test input
+
+    for j in range(M):
+      for i in range(0, N):
+        idx = self.max_pi_idx(out_pi[i])
+        mu = out_mu[i, idx]
+        std = out_sigma[i, idx]
+        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
 
 
-#     # Number of test inputs
-#     N = out_mu.shape[0]
-#     M = m_samples
-
-#     result = np.random.rand(N, M) # initially random [0, 1]
-#     rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
-#     mu  = 0
-#     std = 0
-#     idx = 0
-
-#     # Generates M samples from the mixture for each test input
-#     for j in range(M):
-#       for i in range(0, N):
-#         idx = self.sample_pi_idx(result[i, j], out_pi[i])
-#         mu = out_mu[i, idx]
-#         std = out_sigma[i, idx]
-#         result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
+    return result
 
 
-#     return result
+  def generate_mixture_samples(self, out_pi, out_mu, out_sigma, m_samples=10):
+
+
+    # Number of test inputs
+    N = out_mu.shape[0]
+    M = m_samples
+
+    result = np.random.rand(N, M) # initially random [0, 1]
+    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
+    mu  = 0
+    std = 0
+    idx = 0
+
+    # Generates M samples from the mixture for each test input
+    for j in range(M):
+      for i in range(0, N):
+        idx = self.sample_pi_idx(result[i, j], out_pi[i])
+        mu = out_mu[i, idx]
+        std = out_sigma[i, idx]
+        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
+
+
+    return result
 
 
 
