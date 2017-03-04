@@ -38,6 +38,7 @@ network_params_inv = {
     'model_path': check_point_path + 'push_model_inv.ckpt',
     'train_file_indices':train_file_indices,
     'test_file_indices':test_file_indices,
+    'training_data_path':training_data_path,
     'device': '/cpu:0',
 }
 
@@ -58,6 +59,8 @@ network_params_fwd = {
     'load_saved_model': True,
     'model_path': check_point_path+'push_model_fwd.ckpt',
     'training_data_path':training_data_path,
+    'train_file_indices':train_file_indices,
+    'test_file_indices':test_file_indices,
     'device': '/cpu:0',
 }
 
