@@ -4,10 +4,14 @@ import tf
 
 ##### UTILS #######
 
-def get_pose(tf_listener, target, source, time):
+def get_pose(tf_listener, target, source, time, time_out=4.0):
 
-    translation, rot = tf_listener.lookupTransform(target, source, time)
-
+    try:
+        tf_listener.waitForTransform(target, source, time, rospy.Duration(time_out))
+        translation, rot = tf_listener.lookupTransform(target, source, time)
+    except Exception as e:
+        return
+    
     transform = pq_to_transform(tf_listener,translation,rot)
 
     return transform

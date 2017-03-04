@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>pisa_soft_hand_ros</name>
+  <name>aml_pisa_hand</name>
   <version>0.0.0</version>
   <description>The soft_hand_ros_control package</description>
 

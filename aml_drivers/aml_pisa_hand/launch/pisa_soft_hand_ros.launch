@@ -5,6 +5,6 @@
 
 	<!-- LAUNCH IMPLEMENTATION -->
 	<param name="device_id" value="$(arg hand_id)"/>
-	<node name="soft_hand_HW" pkg="pisa_soft_hand_ros" type="pisa_soft_hand" respawn="false" output="screen"/>
+	<node name="soft_hand_HW" pkg="aml_pisa_hand" type="pisa_soft_hand" respawn="false" output="screen"/>
 
 </launch>

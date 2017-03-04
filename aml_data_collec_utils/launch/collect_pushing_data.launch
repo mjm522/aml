@@ -12,5 +12,15 @@
     <!--<node pkg="aml_data_collec_utils" type="collect_push_data.py" name="collect_push_data" output="screen">
     </node>-->
 
+    <!-- pisa soft hand interface -->
+	<arg name="hand_id" default="1"/>
+
+	<!-- pisa hand launch implementation -->
+	<param name="device_id" value="$(arg hand_id)"/>
+	<!--<node name="soft_hand_HW" pkg="pisa_soft_hand_ros" type="pisa_soft_hand" respawn="false" output="screen"/> -->
+
+    <!-- pisa hand service launch implementation -->
+    <node pkg="aml_services" type="pisa_hand_service.py" name="pisa_hand_service"/>
+
 </launch>
 

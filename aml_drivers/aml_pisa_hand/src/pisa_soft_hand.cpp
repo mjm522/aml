@@ -13,6 +13,7 @@
 
 // qb tools
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -103,6 +104,9 @@ class PisaSoftHand
     int num_ports = 0;
     char ports[10][255];
 
+    char system_cmd[80];
+    strcpy(system_cmd,"sudo chmod 0666 ");
+
     num_ports = RS485listPorts(ports);
 
     ROS_DEBUG_STREAM("Search id in " << num_ports << " serial ports available...");
@@ -112,6 +116,10 @@ class PisaSoftHand
       for(int i = 0; i < num_ports; i++)
       {
         ROS_DEBUG_STREAM("Checking port: " << ports[i]);
+
+        //TODO: how to run a sudo command from this file to open the port?
+        // strcat(system_cmd, ports[i]);
+        // std::system(system_cmd);
 
         int aux_int;
         comm_settings comm_settings_t;
