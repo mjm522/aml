@@ -120,7 +120,7 @@ class StochasticPushMachine(BoxObject):
             
         pre_pus_stage2 = pre_push_action.copy(); pre_pus_stage2[2] = 0.01 # to go down
         push_action[2] = 0.01 #push box
-        fsm_states = [pre_push_action, pre_pus_stage2, push_action, -pre_pus_stage2, -pre_push_action]
+        fsm_states = [pre_push_action, pre_pus_stage2, push_action, pre_pus_stage2, pre_push_action]
 
         for action in fsm_states:
             action_status = self.goto_pose(goal_pos=action, goal_ori=None)

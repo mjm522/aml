@@ -22,3 +22,5 @@ tf_model_delme.py
 .ipynb_checkpoints
 
 set_env.bash
+
+.mjm
