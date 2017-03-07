@@ -17,16 +17,16 @@ def get_data(operation):
     data_man = DataManager(data_folder_path=network_params_inv['training_data_path'], data_name_prefix='test_push_data')
 
     ids=range(0,5)
-    x_keys = ['box_pos', 'box_ori', 'task_action']
-    y_keys = ['box_pos', 'box_ori']
-    x_sub_keys = [[None],[None],['push_xz']]
-    y_sub_keys = [[None],[None]]
+    y_keys = ['task_action']
+    x_keys = ['box_pos', 'box_ori']
+    x_sub_keys = [[None],[None]]
+    y_sub_keys = [['push_xz']]
 
-    # data_x, data_y = data_man.pack_data_in_range_xy(x_keys=x_keys, y_keys=y_keys, 
-    #                                                 x_sub_keys=x_sub_keys, y_sub_keys=y_sub_keys, 
-    #                                                 ids=ids, 
-    #                                                 before_after=True, 
-    #                                                 data_file_range=data_file_indices)
+    data_x1 = data_man.pack_data_in_range(keys=x_keys, sub_keys=x_sub_keys, ids=ids, sample_points=[0], data_file_range=data_file_indices)
+    data_x2 = data_man.pack_data_in_range(keys=x_keys, sub_keys=x_sub_keys, ids=ids, sample_points=[-1], data_file_range=data_file_indices)
+    data_y  = data_man.pack_data_in_range(keys=y_keys, sub_keys=y_sub_keys, ids=ids,  sample_points=[0], data_file_range=data_file_indices)
+
+    data_x  = np.hstack([np.asarray(data_x1),np.asarray(data_x2)]).tolist()
 
     return data_x, data_y
                                          
@@ -42,17 +42,35 @@ def test_inv_model():
     inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
     inverse_model.init_model()
 
-    prediction = inverse_model.run_op('output', test_data_x)
+    mu_out = inverse_model.run_op('mu', test_data_x)
+    sigma_out = inverse_model.run_op('sigma', test_data_x)
+    pi_out = inverse_model.run_op('pi', test_data_x)
+
+
+    max_ids = map(inverse_model._max_pi_idx, pi_out)
+    
+    pred_mu = []
+    for i in range(len(max_ids)):
+        pred_mu.append(mu_out[i,:,max_ids[i]])
+
+
+    pred_sigma = [sigma_out[idx] for idx in max_ids]
+    
+
+    print len(max_ids)
+    print pred_mu[0].shape
+    print len(pred_sigma)
+
 
     num_outputs = network_params_inv['dim_output']
-    output_vars = network_params_inv['output_order']
+    output_vars = ['x','y']
 
     fig, axlist = plt.subplots(num_outputs)
     d = 0
     for ax in axlist.flatten():
         ax.set_title(output_vars[d])
         h1 =  ax.plot(np.asarray(test_data_y)[:,d],    color='r', label='true')
-        h2 =  ax.plot(prediction[:,d],    color='g', label='pred')
+        h2 =  ax.plot(np.asarray(pred_mu)[:,d],    color='g', label='pred')
         d += 1
 
     fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)  # create some space below the plots by increasing the bottom-value
@@ -82,6 +100,7 @@ def train_inv_model():
     print "Got the data, gonna train the model..."
 
     epochs = 10000#10000
+
     loss = inverse_model.train(train_data_x, train_data_y, epochs = epochs)
 
     inverse_model.save_model()

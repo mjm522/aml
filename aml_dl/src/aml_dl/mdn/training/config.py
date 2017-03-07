@@ -20,8 +20,8 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,20)
-test_file_indices  = range(71,95)
+train_file_indices = range(1,10)
+test_file_indices  = range(1,10)
 
 network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
@@ -87,7 +87,8 @@ network_params_cnn = {
     'image_height': IMAGE_HEIGHT,
     'image_channels': IMAGE_CHANNELS,
     'dim_output':7,
-    'max_pooling':{'x':2, 'y':2},
+    'max_pooling':None,#{'x':2, 'y':2},
+    'use_dropout':False,
     'strides':[1,1,1,1],
     'padding':'SAME',
     'img_resize':{'width':10,'height':10},
@@ -100,4 +101,51 @@ network_params_cnn = {
     'test_file_indices':test_file_indices,
     'device':'/cpu:0',
 
+}
+
+
+cnn_network_params = {
+'num_layers':2,
+'filter_sizes':[5, 5],
+'num_filters':[16,32],
+'layer_names':['cnn_layer1', 'cnn_layer2'],
+'layer_inputs':[300,128],
+'layer_outputs':[128,10],
+'image_width': IMAGE_WIDTH,
+'image_height': IMAGE_HEIGHT,
+'image_channels': IMAGE_CHANNELS,
+'max_pooling':None,#{'x':2, 'y':2},
+'use_dropout':[False, False],
+'strides':[[1,1,1,1],[1,1,1,1]],
+'activation':['relu', 'relu'],
+'padding':['SAME','SAME'],
+'img_resize':{'width':10,'height':10},
+'stddev':0.05,
+}
+
+fc_network_params = {
+'num_layers':2,
+'layer_names':['fc_layer1', 'fc_layer2'],
+'num_units_per_layer':[10,7],
+'layer_inputs':[10, 7],
+'layer_outputs':[7, 7],
+'use_dropout':[False, False],
+'activation':['idty', 'idty'],
+'stddev':0.05,  
+}
+
+network_params_cmbnd = {
+'cnn_params':cnn_network_params,
+'fc_params':fc_network_params,
+'learning_rate':0.01,
+'write_summary':True,
+'dim_input':300,
+'dim_output':7,
+'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
+'load_saved_model': True,
+'model_path': check_point_path+'push_model_cnn_100.ckpt',
+'training_data_path':training_data_path,
+'train_file_indices':train_file_indices,
+'test_file_indices':test_file_indices,
+'device':'/cpu:0',
 }
