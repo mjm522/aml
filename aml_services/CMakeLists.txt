@@ -19,7 +19,7 @@ catkin_python_setup()
 
 add_service_files(
   DIRECTORY srv 
-  FILES PredictState.srv PredictAction.srv
+  FILES PredictState.srv PredictAction.srv SendPisaHandCmd.srv ReadPisaHandCurr.srv
 )
 
 
