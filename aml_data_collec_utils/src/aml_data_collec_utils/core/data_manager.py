@@ -287,6 +287,23 @@ class DataManager(object):
         return self.pack_data(keys=keys, sub_keys=sub_keys, ids=ids, sample_points=sample_points)
 
 
+    def pack_data_in_range(self, keys, sub_keys=None, ids=None, sample_points=None, data_file_range=None):
+
+        if data_file_range is None:
+            data_file_range = [self._data_idx - 1]
+
+        data = []
+
+        for data_file_idx in data_file_range:
+            self._data = self.read_data(data_file_idx)
+            if self._data is None:
+                print "WARNING: Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,)
+                continue
+            data +=  self.pack_data(keys=keys, sub_keys=sub_keys, ids=ids, sample_points=sample_points)
+    
+        return data
+
+
     def pack_data_in_range_xy(self, x_keys, y_keys, x_sub_keys=None, y_sub_keys=None, ids=None, before_after=False, data_file_range=None):
         '''
         This function is for getting a specific set of files from the hard disk
