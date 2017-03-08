@@ -1,9 +1,10 @@
 import argparse
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
+from aml_visual_tools.visual_tools import visualize_2D_data_with_sigma
+from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 from aml_dl.mdn.training.config import network_params_inv, check_point_path
 
 
@@ -14,19 +15,7 @@ def get_data(operation):
     elif operation =='train':
         data_file_indices = network_params_inv['train_file_indices']
 
-    data_man = DataManager(data_folder_path=network_params_inv['training_data_path'], data_name_prefix='test_push_data')
-
-    ids=range(0,5)
-    y_keys = ['task_action']
-    x_keys = ['box_pos', 'box_ori']
-    x_sub_keys = [[None],[None]]
-    y_sub_keys = [['push_xz']]
-
-    data_x1 = data_man.pack_data_in_range(keys=x_keys, sub_keys=x_sub_keys, ids=ids, sample_points=[0], data_file_range=data_file_indices)
-    data_x2 = data_man.pack_data_in_range(keys=x_keys, sub_keys=x_sub_keys, ids=ids, sample_points=[-1], data_file_range=data_file_indices)
-    data_y  = data_man.pack_data_in_range(keys=y_keys, sub_keys=y_sub_keys, ids=ids,  sample_points=[0], data_file_range=data_file_indices)
-
-    data_x  = np.hstack([np.asarray(data_x1),np.asarray(data_x2)]).tolist()
+    data_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='inv')
 
     return data_x, data_y
                                          
@@ -56,28 +45,21 @@ def test_inv_model():
 
     pred_sigma = [sigma_out[idx] for idx in max_ids]
     
+    # print len(max_ids)
+    # print pred_mu[0].shape
+    # print len(pred_sigma)
 
-    print len(max_ids)
-    print pred_mu[0].shape
-    print len(pred_sigma)
-
+    test_data_y = np.asarray(test_data_y).T
+    pred_mu = np.asarray(pred_mu).T
+    #summing all varainces together!
+    pred_sigma = np.sum(np.asarray(pred_sigma), axis=1)
 
     num_outputs = network_params_inv['dim_output']
     output_vars = ['x','y']
 
-    fig, axlist = plt.subplots(num_outputs)
-    d = 0
-    for ax in axlist.flatten():
-        ax.set_title(output_vars[d])
-        h1 =  ax.plot(np.asarray(test_data_y)[:,d],    color='r', label='true')
-        h2 =  ax.plot(np.asarray(pred_mu)[:,d],    color='g', label='pred')
-        d += 1
 
-    fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)  # create some space below the plots by increasing the bottom-value
-    axlist.flatten()[-2].legend(loc='upper center', bbox_to_anchor=(0.5, -1.35), ncol=3)
-    plt.suptitle('Prediction - True',size=16)
-    fig.subplots_adjust(hspace=.5)
-    plt.show()
+    visualize_2D_data_with_sigma(data=test_data_y[0][None,:], sigma=pred_sigma)
+    visualize_2D_data_with_sigma(data=test_data_y[1][None,:], sigma=pred_sigma)
 
     
 def train_inv_model():

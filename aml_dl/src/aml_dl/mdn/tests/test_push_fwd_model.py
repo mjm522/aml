@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
+from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
-
 
 def get_data(operation):
 
@@ -15,19 +15,7 @@ def get_data(operation):
     elif operation =='train':
         data_file_indices = network_params_fwd['train_file_indices']
 
-    data_man = DataManager(data_folder_path=network_params_fwd['training_data_path'], data_name_prefix='test_push_data')
-
-    ids=range(0,5)
-    x_keys = ['box_pos', 'box_ori', 'task_action']
-    y_keys = ['box_pos', 'box_ori']
-    x_sub_keys = [[None],[None],['push_xz']]
-    y_sub_keys = [[None],[None]]
-
-    data_x, data_y = data_man.pack_data_in_range_xy(x_keys=x_keys, y_keys=y_keys, 
-                                                    x_sub_keys=x_sub_keys, y_sub_keys=y_sub_keys, 
-                                                    ids=ids, 
-                                                    before_after=True, 
-                                                    data_file_range=data_file_indices)
+    data_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='fwd')
 
     return data_x, data_y
                                          
