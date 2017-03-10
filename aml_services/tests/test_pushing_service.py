@@ -1,6 +1,7 @@
 import rospy
 import numpy as np
 from aml_services.srv import PredictAction, PredictState
+from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
 def predict_state_client(state, action):
     rospy.wait_for_service('predict_state')
@@ -23,14 +24,15 @@ def predict_action_client(curr_state, tgt_state):
 
 
 def main():
+
     x_curr   = np.random.randn(1,7).tolist()[0]
     x_tgt    = np.random.randn(1,7).tolist()[0]
     u_action = np.random.randn(1,2).tolist()[0]
 
-    #x_nxt = predict_state_client(x_curr, u_action)
+    x_nxt = predict_state_client(x_curr, u_action)
     u_act = predict_action_client(x_curr, x_tgt)
 
-    #print "Next state predicted by state predictor service is \t", x_nxt
+    print "Next state predicted by state predictor service is \t", x_nxt
     print "Action predicted by action predictor service is \t", u_act
 
 

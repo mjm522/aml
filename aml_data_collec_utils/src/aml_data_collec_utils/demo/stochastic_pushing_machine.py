@@ -7,6 +7,7 @@ from aml_robot.baxter_robot import BaxterArm
 from aml_data_collec_utils.config import config
 from aml_data_collec_utils.box_object import BoxObject
 from aml_services.srv import PredictAction, PredictState
+from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 from aml_data_collec_utils.ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
 
@@ -41,6 +42,7 @@ def predict_action_client(curr_state, tgt_state):
 class StochasticPushMachine(BoxObject):
 
     def __init__(self, robot_interface, pushing_limb_gripper='left_gripper', offset=10.):
+        
         self._robot = robot_interface
         self._push_gripper_name = pushing_limb_gripper
         BoxObject.__init__(self)
@@ -134,12 +136,17 @@ def main():
     limb = 'left'
     arm = BaxterArm(limb)
     spm = StochasticPushMachine(robot_interface=arm)
-    x_tgt_list    = np.random.randn(100,7).tolist()
+
+    data_file_indices = range(1,10)
+    fwd_data_x, fwd_data_y = get_data_from_files(data_file_range=data_file_indices, model_type='fwd')
+    inv_data_x, inv_data_y = get_data_from_files(data_file_range=data_file_indices, model_type='inv')
+
     while not rospy.is_shutdown():
-        for tgt_pose in x_tgt_list:
-            status = spm.push_box(tgt_pose)
+        for data_x in inv_data_x:
+            print "Trying to push box to target pose \t", np.round(data_x[7:],3)
+            status = spm.push_box(data_x[7:])
             if status is None:
-                print "Failed to go to the target pose \t", tgt_pose
+                print "Failed to go to the target pose \t", np.round(data_x[7:],3)
                 print "Trying the next one."
                 continue
 
