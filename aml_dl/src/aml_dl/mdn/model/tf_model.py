@@ -206,7 +206,7 @@ def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True
 def get_loss_cnn(output, target):
     # cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
     # cost = tf.reduce_mean(cross_entropy)
-    cost =  tf.reduce_ mean(tf.square(tf.sub(target, output)))
+    cost =  tf.reduce_mean(tf.square(tf.sub(target, output)))
     return cost
 
 
@@ -217,7 +217,10 @@ def tf_cnn_model(num_conv_layers, num_filters, filter_size,
                  stddev=0.05, max_pooling=None, use_relu=True):
     
     
+
     x = tf.placeholder(tf.float32, shape=[None, img_height*img_width*img_channels], name='x')
+    
+ 
     x_image = tf.reshape(x, [-1, img_height, img_width, img_channels])
 
     if img_resize is not None:
@@ -266,8 +269,3 @@ def tf_cnn_model(num_conv_layers, num_filters, filter_size,
     output_ops = {'output' : layer_fc, 'loss': loss, 'weights_of_cnn_layers': weights_of_cnn_layers, 'train': train_op, 'x': x, 'y': y}
 
     return output_ops
-
-
-
-
-

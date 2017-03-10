@@ -4,7 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.mdn.model.cnn_model import CNNModel
-from aml_io.visual_tools import show_image, continous_3D_plot
+from aml_visual_tools.visual_tools import show_image, continous_3D_plot
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.training.config import network_params_cnn, check_point_path
 
@@ -47,8 +47,12 @@ def visualize_data(data):
         fig = continous_3D_plot(y_data)
 
 
-def train_cnn_model():
-    sess = tf.Session()
+def train_cnn_model(debug=True):
+
+    if debug:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
     network_params_cnn['load_saved_model'] = False
 
