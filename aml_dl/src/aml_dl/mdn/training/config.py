@@ -20,7 +20,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,10)
+train_file_indices = range(1,380)
 test_file_indices  = range(1,10)
 
 network_params_inv = {
@@ -28,7 +28,7 @@ network_params_inv = {
     'dim_input': 14, 
     'dim_output': 2,
     'n_hidden': 24,
-    'k_mixtures': 5,
+    'k_mixtures': 60,
     'batch_size': 25,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,

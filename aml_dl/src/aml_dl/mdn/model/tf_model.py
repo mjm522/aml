@@ -206,7 +206,7 @@ def create_fc_layer(data_in, num_inputs, num_outputs, stddev=0.05, use_relu=True
 def get_loss_cnn(output, target):
     # cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
     # cost = tf.reduce_mean(cross_entropy)
-    cost =  tf.reduce_ mean(tf.square(tf.sub(target, output)))
+    cost =  tf.reduce_mean(tf.square(tf.sub(target, output)))
     return cost
 
 

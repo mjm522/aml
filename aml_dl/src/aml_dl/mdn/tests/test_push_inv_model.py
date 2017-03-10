@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 from aml_visual_tools.visual_tools import visualize_2D_data_with_sigma

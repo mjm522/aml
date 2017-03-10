@@ -36,16 +36,17 @@ def predict_action_from_learned_model(req):
     pis = inverse_model.run_op('pi', input_x)[0]
 
 
-    print "MUS: ", mus
-    print "SIGMA: ", sigma
-    print "PIs:", pis
+    # print "MUS: ", mus
+    # print "SIGMA: ", sigma
+    # print "PIs:", pis
     #theta = inverse_model.sample_out_max_pi(input_x, 1)[0]
     
     pi_idx = inverse_model._max_pi_idx(pis)
-
+    
+    # print "Sigma in prediction \t", sigma[pi_idx]
     action = mus[:,pi_idx]
 
-    return PredictActionResponse(action.tolist())
+    return PredictActionResponse(action.tolist(), sigma[pi_idx])
 
 
 def push_service_server():

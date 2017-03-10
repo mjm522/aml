@@ -2,3 +2,4 @@ float32[] curr_state
 float32[] tgt_state
 ---
 float32[] action
+float32 sigma
