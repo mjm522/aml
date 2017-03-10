@@ -80,6 +80,8 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     if data.shape[0] == 1:
         data = np.vstack([range(data.shape[1]), data])
 
+    print data.shape
+
     if color is None:
         color = 'g'
 
@@ -99,7 +101,7 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     ypl = data[1]-stddev*sigma
     yph = data[1]+stddev*sigma
 
-    ax.fill_between(x, ypl, yph, facecolor='grey', interpolate=True, alpha=0.5)
+    ax.fill_between(x.tolist(), ypl.tolist()[0], yph.tolist()[0], facecolor='grey', interpolate=True, alpha=0.5)
     ax.plot(x, data[1], color=color, label=label) 
     ax.legend(('mu','variance'))
     if axis_lim is not None:

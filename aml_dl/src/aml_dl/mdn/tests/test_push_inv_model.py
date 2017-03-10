@@ -42,8 +42,9 @@ def test_inv_model():
     for i in range(len(max_ids)):
         pred_mu.append(mu_out[i,:,max_ids[i]])
 
-
-    pred_sigma = [sigma_out[idx] for idx in max_ids]
+    pred_sigma = []
+    for i in range(len(max_ids)):
+        pred_sigma.append(sigma_out[i,max_ids[i]])
     
     # print len(max_ids)
     # print pred_mu[0].shape
@@ -52,7 +53,10 @@ def test_inv_model():
     test_data_y = np.asarray(test_data_y).T
     pred_mu = np.asarray(pred_mu).T
     #summing all varainces together!
-    pred_sigma = np.sum(np.asarray(pred_sigma), axis=1)
+    pred_sigma = np.asarray(pred_sigma)[None,:]
+
+    print pred_sigma.shape
+    print test_data_y.shape
 
     num_outputs = network_params_inv['dim_output']
     output_vars = ['x','y']
