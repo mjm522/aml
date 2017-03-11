@@ -244,23 +244,28 @@ class DataManager(object):
         if keys is None:
             keys = data_list[0].get_keys()
 
-        for datum in data_list:
+        for sample in data_list:
             #a single datum consist of a single push which consists of several 
             #recordings.
-            for sample_point in sample_points:
-                point = []
-                datum_contents = datum.get(sample_point, keys)
+
+            packed_entry = []
+
+
+            # Query data and lay it on a row
+
+            for sample_entry_idx in sample_points:
+                sample_entry = sample.get(sample_entry_idx, keys)
                 if sub_keys is not None:
                     for k in range(len(sub_keys)):
                         for sub_key in sub_keys[k]:
                             if sub_key is not None:
-                                point = np.r_[point, datum_contents[k][sub_key]]
+                                packed_entry = np.r_[packed_entry, sample_entry[k][sub_key]]
                             else:
-                                point = np.r_[point, datum_contents[k]]
+                                packed_entry = np.r_[packed_entry, sample_entry[k]]
                 else:
-                    point =  datum_contents
+                    packed_entry =  sample_entry
 
-                data.append(point)
+            data.append(packed_entry)
 
         return data
  

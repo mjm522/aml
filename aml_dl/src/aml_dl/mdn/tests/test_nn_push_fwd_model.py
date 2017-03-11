@@ -1,12 +1,11 @@
+import os
 import argparse
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from aml_data_collec_utils.core.data_manager import DataManager
-from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
-from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
+from aml_dl.mdn.training.config import network_params_fwd
+from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
-from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
 
 def get_data(operation):
 
@@ -22,13 +21,16 @@ def get_data(operation):
 
 def test_fwd_model():
 
-    sess = tf.Session()
+    if network_params_fwd['write_summary']:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
     test_data_x, test_data_y = get_data('test')
 
     print "Got the data, gonna test the model..."
 
-    forward_model = NNPushForwardModel(sess=sess, network_params=network_params_fwd)
+    forward_model = NNPushFwdModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
 
     prediction = forward_model.run_op('output', test_data_x)
@@ -53,11 +55,14 @@ def test_fwd_model():
     
 def train_fwd_model():
 
-    sess = tf.Session()
+    if network_params_fwd['write_summary']:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
     network_params_fwd['load_saved_model'] = False
 
-    forward_model = NNPushForwardModel(sess=sess, network_params=network_params_fwd)
+    forward_model = NNPushFwdModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
 
     train_data_x, train_data_y = get_data('train')
@@ -70,14 +75,20 @@ def train_fwd_model():
 
     print "Got the data, gonna train the model..."
 
-    epochs = 10000#10000
+    epochs = 100#10000
     loss = forward_model.train(train_data_x, train_data_y, epochs = epochs)
 
     forward_model.save_model()
+    
+    if network_params_fwd['write_summary']:
+        logdir = forward_model._tf_sumry_wrtr._summary_dir
+        instruction = 'tensorboard --logdir=' + logdir
+        os.system(instruction)
 
-    plt.figure(figsize=(8, 8))
-    plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
-    plt.show()
+    else:
+        plt.figure(figsize=(8, 8))
+        plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
+        plt.show()
 
     
 if __name__ == '__main__':

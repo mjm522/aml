@@ -1,8 +1,6 @@
-
 import tensorflow as tf
 import numpy as np
 from aml_io.tf_io import load_tf_check_point
-
 from tf_mdn_model import MixtureDensityNetwork
 
 class MDNPushInverseModel(object):

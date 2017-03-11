@@ -4,9 +4,10 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
-from aml_data_collec_utils.core.data_manager import DataManager
-from aml_dl.mdn.model.cnn_model_with_summary import CNNModelWithSummary
 from aml_dl.mdn.training.config import network_params_cmbnd
+from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
+from aml_data_collec_utils.core.data_manager import DataManager
+from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
 
 def get_data(operation, string_img_convert=True):
@@ -16,19 +17,7 @@ def get_data(operation, string_img_convert=True):
     elif operation =='train':
         data_file_indices = network_params_cmbnd['train_file_indices']
 
-    data_man = DataManager(data_folder_path=network_params_cmbnd['training_data_path'], data_name_prefix='test_push_data')
-
-    ids=range(0,5)
-    x_keys = ['rgb_image']
-    x_sub_keys = None
-    y_keys = ['box_pos', 'box_ori']
-    y_sub_keys = [[None],[None]]
-
-    tmp_x, data_y = data_man.pack_data_in_range_xy(x_keys=x_keys, y_keys=y_keys, 
-                                                    x_sub_keys=x_sub_keys, y_sub_keys=y_sub_keys, 
-                                                    ids=ids, 
-                                                    before_after=True, 
-                                                    data_file_range=data_file_indices)
+    tmp_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='cnn')
 
     data_x = []
     if string_img_convert:
@@ -51,7 +40,7 @@ def test_fwd_model():
 
     print "Got the data, gonna test the model..."
 
-    forward_model = CNNModelWithSummary(sess=sess, network_params=network_params_cmbnd)
+    forward_model = NNPushFwdModel(sess=sess, network_params=network_params_cmbnd)
     forward_model.init_model()
 
     prediction = forward_model.run_op('output', test_data_x)
@@ -83,13 +72,12 @@ def train_fwd_model():
 
     network_params_cmbnd['load_saved_model'] = False
 
-    forward_model = CNNModelWithSummary(sess=sess, network_params=network_params_cmbnd)
+    forward_model = NNPushFwdModel(sess=sess, network_params=network_params_cmbnd)
     forward_model.init_model()
 
     train_data_x, train_data_y = get_data('train')
     
     # h = forward_model.run_op('last_hidden',data_x)
-
     # plt.figure(figsize=(8, 8))
     # plt.plot(h, data_y,'ro', alpha=0.3)
     # plt.show()
@@ -97,7 +85,7 @@ def train_fwd_model():
     print "Got the data, gonna train the model..."
 
     epochs = 100#10000
-    forward_model.train(train_data_x, train_data_y, epochs = epochs)
+    forward_model.train(train_data_x, train_data_y, epochs=epochs)
 
     forward_model.save_model()
 

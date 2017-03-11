@@ -72,6 +72,13 @@ def get_loss_cnn(output, target):
 
     return cost, total
 
+def get_quadratic_loss(output, target):
+    with tf.name_scope('cost'):
+        cost =  tf.square(tf.sub(target, output))
+    with tf.name_scope('total'):
+        total = tf.sqrt(tf.reduce_mean(cost))
+
+    return cost, total
 
 def configure_params(params):
     #usually strides and max_pooling happens for cnn layers and not fc layers, to 
@@ -113,7 +120,7 @@ def create_nn_layers(inp, params, tf_sumry_wrtr, layer_type):
     for k in range(num_layers):
 
         if layer_type=='fc':
-            
+
             weights, biases, preactivate, activations = nn_layer(input_tensor=layer_input,
                                                                  layer_name=layer_names[k], 
                                                                  output_dim=layer_outputs[k], 
@@ -156,39 +163,49 @@ def create_nn_layers(inp, params, tf_sumry_wrtr, layer_type):
     return layer_input
 
 
-def tf_cnn_model(dim_output, learning_rate, cnn_params, fc_params, tf_sumry_wrtr):
+def tf_model(dim_input, dim_output, loss_type, learning_rate, cnn_params, fc_params, tf_sumry_wrtr):
     # Create a multilayer model.
 
-    image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
-    image_input  = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
-    #in case we are not resizing
-    x = image_input
-    
-    with tf.name_scope('input_reshape'):
-        image_shaped_input = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
-        img_resize_params = cnn_params['img_resize']
+    if cnn_params is not None:
 
-        if  img_resize_params is not None:
-            image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
-            with tf.name_scope('input_resize'):
-                image_shaped_input = tf.image.resize_images(image_shaped_input, size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
-                x = tf.reshape(image_shaped_input, [-1, image_len], name='x-input')
+        image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
+        image_input  = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
+        #in case we are not resizing
+        x = image_input
         
-        if tf_sumry_wrtr is not None:
-            tf_sumry_wrtr.add_image(name_scope='input_resize', image=image_shaped_input)
+        with tf.name_scope('input_reshape'):
+            image_shaped_input = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+            img_resize_params = cnn_params['img_resize']
 
-    # Input placeholders
+            if  img_resize_params is not None:
+                image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
+                with tf.name_scope('input_resize'):
+                    image_shaped_input = tf.image.resize_images(image_shaped_input, size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
+                    x = tf.reshape(image_shaped_input, [-1, image_len], name='x-input')
+            
+            if tf_sumry_wrtr is not None:
+                tf_sumry_wrtr.add_image(name_scope='input_resize', image=image_shaped_input)
+
+        cnn_layer_output = create_nn_layers(image_shaped_input, cnn_params, tf_sumry_wrtr, layer_type='cnn')
+        layer_shape = cnn_layer_output.get_shape()
+        num_features = layer_shape[1:4].num_elements()
+        layer_flat = tf.reshape(cnn_layer_output, [-1, num_features])
+    
+    else:
+         # Input placeholders
+        with tf.name_scope('input'):
+            layer_flat = tf.placeholder(dtype=tf.float32, shape=[None, dim_input],  name='x-input')
+            x = layer_flat
+    
     with tf.name_scope('input'):
         target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
 
-    cnn_layer_output = create_nn_layers(image_shaped_input, cnn_params, tf_sumry_wrtr, layer_type='cnn')
-    layer_shape = cnn_layer_output.get_shape()
-    num_features = layer_shape[1:4].num_elements()
-    layer_flat = tf.reshape(cnn_layer_output, [-1, num_features])
-
     fc_layer_output  = create_nn_layers(layer_flat, fc_params, tf_sumry_wrtr, layer_type='fc')
 
-    cost, total = get_loss_cnn(fc_layer_output, target)
+    if loss_type == 'normal':
+        cost, total = get_loss_cnn(fc_layer_output, target)
+    elif loss_type == 'quadratic':
+        cost, total = get_quadratic_loss(fc_layer_output, target)
 
     with tf.name_scope('train'):
         train_step = tf.train.AdamOptimizer(learning_rate).minimize(cost)
@@ -205,7 +222,7 @@ def tf_cnn_model(dim_output, learning_rate, cnn_params, fc_params, tf_sumry_wrtr
         # Merge all the summaries and write them out to /tmp/tensorflow/mnist/logs/mnist_with_summaries (by default)
         tf_sumry_wrtr.write_summary()
 
-    output_ops = {'output' : fc_layer_output, 'cost': cost, 'accuracy':accuracy, 'train_step': train_step, 'x': image_input, 'y': target}
+    output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
     return output_ops
 
 

@@ -20,7 +20,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,380)
+train_file_indices = range(1,10)
 test_file_indices  = range(1,10)
 
 network_params_inv = {
@@ -42,27 +42,6 @@ network_params_inv = {
     'device': '/cpu:0',
 }
 
-
-
-network_params_fwd = {
-    'num_filters': [5, 5, NUM_FP],
-    'dim_input': 9, 
-    'dim_output': 7,
-    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
-    'n_hidden_layers': 2, #including the input layer excluding the output layer
-    'units_in_hidden_layers':[9,9],#pass none is all layers have equal to input
-    'batch_size': 25,
-    'image_width': IMAGE_WIDTH,
-    'image_height': IMAGE_HEIGHT,
-    'image_channels': IMAGE_CHANNELS,
-    'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
-    'load_saved_model': True,
-    'model_path': check_point_path+'push_model_fwd.ckpt',
-    'training_data_path':training_data_path,
-    'train_file_indices':train_file_indices,
-    'test_file_indices':test_file_indices,
-    'device': '/cpu:0',
-}
 
 num_conv_layers = 3
 filter_sizes_each_layer = [5, 5, 5]
@@ -138,6 +117,7 @@ network_params_cmbnd = {
 'fc_params':fc_network_params,
 'learning_rate':0.01,
 'write_summary':True,
+'dim_input':300,
 'dim_output':7,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,
@@ -146,4 +126,22 @@ network_params_cmbnd = {
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
 'device':'/cpu:0',
+}
+
+network_params_fwd = {
+    'num_filters': [5, 5, NUM_FP],
+    'dim_input': 9, 
+    'dim_output': 7,
+    'cnn_params':None,
+    'fc_params':fc_network_params,
+    'learning_rate':0.01,
+    'write_summary':True,
+    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
+    'batch_size': 25,
+    'load_saved_model': True,
+    'model_path': check_point_path+'push_model_fwd.ckpt',
+    'training_data_path':training_data_path,
+    'train_file_indices':train_file_indices,
+    'test_file_indices':test_file_indices,
+    'device': '/cpu:0',
 }

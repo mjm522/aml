@@ -1,6 +1,3 @@
-
-
-
 import tensorflow as tf
 import math
 import numpy as np
@@ -128,9 +125,6 @@ class MixtureDensityNetwork(object):
 
 
     return out
-
-
-
 
 
 
