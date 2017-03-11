@@ -1,2 +1,2 @@
-model_checkpoint_path: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_cnn_10.ckpt"
-all_model_checkpoint_paths: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_cnn_10.ckpt"
+model_checkpoint_path: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_inv_60_kernels.ckpt"
+all_model_checkpoint_paths: "/home/mjm/catkin_workspaces/baxter_ws/src/aml/aml_dl/src/aml_dl/mdn/training/tf_check_points/push_model_inv_60_kernels.ckpt"

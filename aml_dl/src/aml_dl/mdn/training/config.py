@@ -30,6 +30,7 @@ network_params_inv = {
     'n_hidden': 24,
     'k_mixtures': 60,
     'batch_size': 25,
+    'write_summary':True,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'image_channels': IMAGE_CHANNELS,

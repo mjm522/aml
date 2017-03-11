@@ -1,11 +1,12 @@
-import tensorflow as tf
+import os
 import numpy as np
+import tensorflow as tf
 from aml_io.tf_io import load_tf_check_point
 from tf_mdn_model import MixtureDensityNetwork
+from aml_dl.utilities.tf_summary_writer import TfSummaryWriter
 
 class MDNPushInverseModel(object):
-
-
+    
     def __init__(self, sess, network_params):
 
         self._sess = sess
@@ -14,13 +15,31 @@ class MDNPushInverseModel(object):
 
         self._device = self._params['device']
 
+        self._tf_sumry_wrtr = None
+
+        if network_params['write_summary']:
+            self._tf_sumry_wrtr = TfSummaryWriter(sess)
+            cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
+
+            curr_ld_path = os.environ["LD_LIBRARY_PATH"]
+
+            if not cuda_path in curr_ld_path.split(os.pathsep):
+                print "Enviroment variable LD_LIBRARY_PATH does not contain %s"%cuda_path
+                print "Please add it, else the program will crash!"
+                raw_input("Press Ctrl+C")
+                # os.environ["LD_LIBRARY_PATH"] = curr_ld_path + ':'+cuda_path
+
         with tf.device(self._device):
+
+            if self._params['write_summary']:
+                tf.global_variables_initializer().run()
 
 
             self._mdn = MixtureDensityNetwork(network_params['dim_input'], 
                                               network_params['dim_output'], 
                                               network_params['k_mixtures'], 
-                                              network_params['n_hidden'])
+                                              network_params['n_hidden'],
+                                              tf_sumry_wrtr = self._tf_sumry_wrtr)
 
             self._mdn._init_model()
             self._net_ops = self._mdn._ops
@@ -28,6 +47,9 @@ class MDNPushInverseModel(object):
             self._init_op = tf.global_variables_initializer()
 
             self._saver = tf.train.Saver()
+
+            if self._tf_sumry_wrtr is not None:
+                self._tf_sumry_wrtr.close_writer()
 
 
     def init_model(self):
