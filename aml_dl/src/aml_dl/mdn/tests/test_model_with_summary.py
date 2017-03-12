@@ -1,33 +1,35 @@
+import os
 import argparse
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
-from aml_dl.mdn.model.cnn_model import CNNModel
-from aml_visual_tools.visual_tools import show_image, continous_3D_plot
 from aml_data_collec_utils.core.data_manager import DataManager
-from aml_dl.mdn.training.config import network_params_cnn, check_point_path
+from aml_dl.mdn.model.cnn_model_with_summary import CNNModelWithSummary
+from aml_dl.mdn.training.config import network_params_cmbnd
 
 
 def get_data(operation, string_img_convert=True):
 
     if operation == 'test':
-        data_file_indices = network_params_cnn['test_file_indices']
+        data_file_indices = network_params_cmbnd['test_file_indices']
     elif operation =='train':
-        data_file_indices = network_params_cnn['train_file_indices']
+        data_file_indices = network_params_cmbnd['train_file_indices']
 
-    data_man = DataManager(data_folder_path=network_params_cnn['training_data_path'], data_name_prefix='test_push_data')
+    data_man = DataManager(data_folder_path=network_params_cmbnd['training_data_path'], data_name_prefix='test_push_data')
 
     ids=range(0,5)
     x_keys = ['rgb_image']
+    x_sub_keys = None
     y_keys = ['box_pos', 'box_ori']
     y_sub_keys = [[None],[None]]
 
     tmp_x, data_y = data_man.pack_data_in_range_xy(x_keys=x_keys, y_keys=y_keys, 
-                                                    x_sub_keys=None, y_sub_keys=y_sub_keys, 
+                                                    x_sub_keys=x_sub_keys, y_sub_keys=y_sub_keys, 
                                                     ids=ids, 
                                                     before_after=True, 
                                                     data_file_range=data_file_indices)
+
     data_x = []
     if string_img_convert:
         for x_image in tmp_x:
@@ -38,55 +40,24 @@ def get_data(operation, string_img_convert=True):
     return np.asarray(data_x), np.asarray(data_y)
 
 
-def visualize_data(data):
+def test_fwd_model():
 
-    print "Press any key to incrementally see all images."
-
-    for x_image, y_data in zip(data_x, data_y):
-        show_image(x_image, window_name='x_image')
-        fig = continous_3D_plot(y_data)
-
-
-def train_cnn_model(debug=True):
-
-    if debug:
+    if network_params_cmbnd['write_summary']:
         sess = tf.InteractiveSession()
     else:
         sess = tf.Session()
-
-    network_params_cnn['load_saved_model'] = False
-
-    cnn_model = CNNModel(sess=sess, network_params=network_params_cnn)
-    cnn_model.init_model()
-
-    train_data_x, train_data_y = get_data('train')
-
-    print "Got the data, gonna train the model..."
-
-    epochs = 10000#10000
-    loss = cnn_model.train(train_data_x, train_data_y, epochs = epochs)
-
-    cnn_model.save_model()
-
-    plt.figure(figsize=(8, 8))
-    plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
-    plt.show()
-
-
-def test_cnn_model():
-    sess = tf.Session()
 
     test_data_x, test_data_y = get_data('test')
 
     print "Got the data, gonna test the model..."
 
-    cnn_model = CNNModel(sess=sess, network_params=network_params_cnn)
-    cnn_model.init_model()
+    forward_model = CNNModelWithSummary(sess=sess, network_params=network_params_cmbnd)
+    forward_model.init_model()
 
-    prediction = cnn_model.run_op('output', test_data_x)
+    prediction = forward_model.run_op('output', test_data_x)
 
-    num_outputs = network_params_cnn['dim_output']
-    output_vars = network_params_cnn['output_order']
+    num_outputs = network_params_cmbnd['dim_output']
+    output_vars = network_params_cmbnd['output_order']
 
     fig, axlist = plt.subplots(num_outputs)
     d = 0
@@ -102,9 +73,41 @@ def test_cnn_model():
     fig.subplots_adjust(hspace=.5)
     plt.show()
 
+    
+def train_fwd_model():
 
+    if network_params_cmbnd['write_summary']:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
-def main():
+    network_params_cmbnd['load_saved_model'] = False
+
+    forward_model = CNNModelWithSummary(sess=sess, network_params=network_params_cmbnd)
+    forward_model.init_model()
+
+    train_data_x, train_data_y = get_data('train')
+    
+    # h = forward_model.run_op('last_hidden',data_x)
+
+    # plt.figure(figsize=(8, 8))
+    # plt.plot(h, data_y,'ro', alpha=0.3)
+    # plt.show()
+
+    print "Got the data, gonna train the model..."
+
+    epochs = 100#10000
+    forward_model.train(train_data_x, train_data_y, epochs = epochs)
+
+    forward_model.save_model()
+
+    if network_params_cmbnd['write_summary']:
+        logdir = forward_model._tf_sumry_wrtr._summary_dir
+        instruction = 'tensorboard --logdir=' + logdir
+        os.system(instruction)
+
+    
+if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Train and test forward model')
     parser.add_argument('-t', '--operation', type=str, help='*-t train* to Train the model or *-t test*  to Test the model')
@@ -112,13 +115,8 @@ def main():
     args = parser.parse_args()
 
     if args.operation == 'train':
-        train_cnn_model()
+        train_fwd_model()
     elif args.operation == 'test':
-        test_cnn_model()
+        test_fwd_model()
     else:
         print "Type file -h for suggestions on arguments"
-
-
-
-if __name__ == '__main__':
-    main()
