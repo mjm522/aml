@@ -73,6 +73,35 @@ class StochasticPushMachine(BoxObject):
         br_frame = {'pos':pos, 'ori':ori, 'frame_name':frame_name, 'base_name': base_name}
         self._list_br_poses.append(br_frame)
 
+    def get_side(self,x,z):
+
+        abs_x = np.abs(x)
+        abs_z =  np.abs(z)
+
+        
+        RIGHT = 0
+        LEFT = 1
+        FRONT = 2
+        BACK = 3
+        NONE = 4
+
+        side = NONE
+
+        # either left or right
+        if abs_x > abs_z:
+            if x > 0:
+                side = RIGHT
+            else:
+                side = LEFT
+        else:
+            if z > 0:
+                side = FRONT
+            else:
+                side = BACK
+
+
+        return side
+
 
     def compute_push_location(self, tgt_box_pose):
         pre_push_offset = config['pre_push_offsets']
@@ -95,10 +124,17 @@ class StochasticPushMachine(BoxObject):
 
         x_box, z_box, sigma = predict_action_client(curr_state=np.hstack([box_pos, box_ori]), tgt_state=tgt_box_pose)
         print "predicted push:", x_box, z_box
-        print "uncertainity \t", sigma
+        print "uncertainity ", sigma
+
+        names = ["right", "left", "front", "back", "NONE"]
+        side = self.get_side(x_box,z_box)
+        print "Push side: ", names[side]
 
         point_on_box = np.array([x_box, 0., z_box]) #with ofset on y
-        pre_push_pos = np.hstack([self._offset_scale*point_on_box, 1.])
+
+        offsets = np.array([[0.1, 0, 0], [-0.1, 0.0, 0.0], [0.0, 0.0, 0.1], [0.0, 0.0, -0.1]])
+
+        pre_push_pos = np.hstack([offsets[side,:] + point_on_box, 1.])
         pre_push_pos[1] = pre_push_offset[1]
 
         push_pos = np.hstack([np.zeros(3),1])
