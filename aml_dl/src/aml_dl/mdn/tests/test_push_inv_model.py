@@ -92,13 +92,18 @@ def train_inv_model():
 
     print "Got the data, gonna train the model..."
 
-    epochs = 100000#10000
+    epochs = 100#100000#10000
 
     loss = inverse_model.train(train_data_x, train_data_y, epochs = epochs)
 
     inverse_model.save_model()
 
     if network_params_inv['write_summary']:
+
+        plt.figure(figsize=(8, 8))
+        plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
+        plt.show()
+
         logdir = inverse_model._tf_sumry_wrtr._summary_dir
         instruction = 'tensorboard --logdir=' + logdir
         os.system(instruction)

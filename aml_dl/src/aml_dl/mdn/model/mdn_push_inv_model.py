@@ -45,9 +45,6 @@ class MDNPushInverseModel(object):
 
             self._saver = tf.train.Saver()
 
-            if self._tf_sumry_wrtr is not None:
-                self._tf_sumry_wrtr.close_writer()
-
 
     def init_model(self):
 
@@ -78,10 +75,16 @@ class MDNPushInverseModel(object):
             for i in range(epochs):
                 run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
                 run_metadata = tf.RunMetadata()
-                summary, loss[i] = self._sess.run([train_op, loss_op],feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
+                summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, train_op],
+                                                  feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data},
+                                                  options=run_options,
+                                                  run_metadata=run_metadata)
                 self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
                 self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
 
+
+            if self._tf_sumry_wrtr is not None:
+                self._tf_sumry_wrtr.close_writer()
             return loss
 
     # TODO: Fix
