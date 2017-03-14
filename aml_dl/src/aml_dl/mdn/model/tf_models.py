@@ -165,7 +165,8 @@ def create_nn_layers(inp, params, tf_sumry_wrtr, layer_type):
 
 def tf_model(dim_input, dim_output, loss_type, learning_rate, cnn_params, fc_params, tf_sumry_wrtr):
     # Create a multilayer model.
-
+    image_input = None
+    
     if cnn_params is not None:
 
         image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']

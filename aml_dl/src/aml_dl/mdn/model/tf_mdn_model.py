@@ -1,16 +1,17 @@
 import tensorflow as tf
 import math
 import numpy as np
-
+from aml_dl.utilities.tf_optimisers import optimiser_op
 
 class MixtureDensityNetwork(object):
 
-  def __init__(self, dim_input = 1, dim_output = 1, n_kernels = 5, n_hidden = 24, tf_sumry_wrtr=None):
+  def __init__(self, network_params, tf_sumry_wrtr=None):
     
-    self._dim_input = dim_input
-    self._dim_output = dim_output
-    self._n_kernels = n_kernels
-    self._n_hidden = n_hidden
+    self._dim_input = network_params['dim_input']
+    self._dim_output = network_params['dim_output']
+    self._n_kernels = network_params['k_mixtures']
+    self._n_hidden = network_params['n_hidden']
+    self._optimiser = network_params['optimiser']
     self._tf_sumry_wrtr = tf_sumry_wrtr
 
   def _init_model(self):
@@ -89,7 +90,7 @@ class MixtureDensityNetwork(object):
 
   def _init_train(self,loss_op):
 
-    train_op = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss_op)
+    train_op = optimiser_op(loss_op, self._optimiser)
 
     return train_op
 

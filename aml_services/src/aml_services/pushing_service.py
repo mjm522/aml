@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
-from aml_dl.mdn.model.nn_push_fwd_model import NNPushForwardModel
+from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
@@ -15,7 +15,7 @@ def predict_next_state_from_learned_model(req):
     input_x = np.expand_dims(np.r_[req.state, req.action], 0)
 
     sess = tf.Session()
-    forward_model = NNPushForwardModel(sess=sess, network_params=network_params_fwd)
+    forward_model = NNPushFwdModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
 
     next_state = forward_model.run_op('output', input_x)

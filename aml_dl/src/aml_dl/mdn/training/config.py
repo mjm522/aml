@@ -20,26 +20,34 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,10)
-test_file_indices  = range(1,10)
+train_file_indices = range(1,380)
+test_file_indices  = range(381,397)
+
+adam_params = {
+    'type': 'adam',
+    'params': {'learning_rate' : 0.001, 'beta1': 0.9, 'beta2': 0.999, 'epsilon': 1e-08, 'use_locking': False}
+}
 
 network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 14, 
     'dim_output': 2,
     'n_hidden': 24,
-    'k_mixtures': 60,
+    'k_mixtures': 40,
     'batch_size': 25,
-    'write_summary':True,
+    'write_summary': True,
+    'learning_rate': 0.0005,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'image_channels': IMAGE_CHANNELS,
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': False,
-    'model_path': check_point_path + 'push_model_inv_60_kernels.ckpt',
-    'train_file_indices':train_file_indices,
-    'test_file_indices':test_file_indices,
-    'training_data_path':training_data_path,
+    'model_path': check_point_path + 'push_model_inv_40_kernels_ep50000.ckpt',
+    'train_file_indices': train_file_indices,
+    'test_file_indices': test_file_indices,
+    'training_data_path': training_data_path,
+    'summary_folder_name': 'summary_inv',
+    'optimiser': adam_params,
     'device': '/cpu:0',
 }
 
@@ -122,7 +130,7 @@ network_params_cmbnd = {
 'dim_output':7,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,
-'model_path': check_point_path+'push_model_cnn_10.ckpt',
+'model_path': check_point_path+'push_model_fwd_with_cnn.ckpt',
 'training_data_path':training_data_path,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,

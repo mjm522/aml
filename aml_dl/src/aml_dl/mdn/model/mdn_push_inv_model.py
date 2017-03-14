@@ -18,7 +18,7 @@ class MDNPushInverseModel(object):
         self._tf_sumry_wrtr = None
 
         if network_params['write_summary']:
-            self._tf_sumry_wrtr = TfSummaryWriter(sess)
+            self._tf_sumry_wrtr = TfSummaryWriter(sess, network_params['summary_folder_name'])
             cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
 
             curr_ld_path = os.environ["LD_LIBRARY_PATH"]
@@ -35,10 +35,7 @@ class MDNPushInverseModel(object):
                 tf.global_variables_initializer().run()
 
 
-            self._mdn = MixtureDensityNetwork(network_params['dim_input'], 
-                                              network_params['dim_output'], 
-                                              network_params['k_mixtures'], 
-                                              network_params['n_hidden'],
+            self._mdn = MixtureDensityNetwork(network_params,
                                               tf_sumry_wrtr = self._tf_sumry_wrtr)
 
             self._mdn._init_model()
@@ -79,7 +76,11 @@ class MDNPushInverseModel(object):
             loss_op = self._net_ops['loss']
 
             for i in range(epochs):
-              _, loss[i] = self._sess.run([train_op, loss_op],feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
+                run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                run_metadata = tf.RunMetadata()
+                summary, loss[i] = self._sess.run([train_op, loss_op],feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
+                self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
+                self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
 
             return loss
 

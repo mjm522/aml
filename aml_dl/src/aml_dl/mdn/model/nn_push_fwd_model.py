@@ -64,7 +64,11 @@ class NNPushFwdModel(object):
             tf.global_variables_initializer().run()
         
         loss = np.zeros(epochs)
-        feed_dict = {self._net_ops['image_input']:train_data_x, self._net_ops['y']:train_data_y}
+        
+        if self._params['cnn_params'] is None:
+            feed_dict = {self._net_ops['x']:train_data_x, self._net_ops['y']:train_data_y}
+        else:
+            feed_dict = {self._net_ops['image_input']:train_data_x, self._net_ops['y']:train_data_y}
 
         if self._tf_sumry_wrtr is not None:
 
