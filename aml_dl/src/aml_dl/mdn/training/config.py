@@ -20,7 +20,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,380)
+train_file_indices = range(1,10)
 test_file_indices  = range(381,397)
 
 adam_params = {
@@ -124,7 +124,7 @@ fc_network_params = {
 network_params_cmbnd = {
 'cnn_params':cnn_network_params,
 'fc_params':fc_network_params,
-'learning_rate':0.01,
+'optimiser': adam_params,
 'write_summary':True,
 'dim_input':300,
 'dim_output':7,
@@ -143,7 +143,7 @@ network_params_fwd = {
     'dim_output': 7,
     'cnn_params':None,
     'fc_params':fc_network_params,
-    'learning_rate':0.01,
+    'optimiser': adam_params,
     'write_summary':True,
     'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'batch_size': 25,

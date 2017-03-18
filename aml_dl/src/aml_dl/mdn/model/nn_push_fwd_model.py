@@ -17,6 +17,8 @@ class NNPushFwdModel(object):
 
         self._tf_sumry_wrtr = None
 
+        self._optimiser = network_params['optimiser']
+
         if network_params['write_summary']:
             self._tf_sumry_wrtr = TfSummaryWriter(sess)
             cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
@@ -33,9 +35,9 @@ class NNPushFwdModel(object):
             self._net_ops = tf_model(dim_input=network_params['dim_input'],
                                      dim_output=network_params['dim_output'],
                                      loss_type='normal',
-                                     learning_rate=network_params['learning_rate'],
                                      cnn_params=network_params['cnn_params'], 
-                                     fc_params=network_params['fc_params'], 
+                                     fc_params=network_params['fc_params'],
+                                     optimiser_params=network_params['optimiser'],
                                      tf_sumry_wrtr=self._tf_sumry_wrtr)
 
             self._init_op = tf.initialize_all_variables()
