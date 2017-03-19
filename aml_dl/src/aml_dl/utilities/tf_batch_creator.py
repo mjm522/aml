@@ -2,6 +2,7 @@ import random
 import numpy as np
 from collections import deque
 from multiprocessing import Process
+from aml_io.convert_tools import string2image
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
@@ -123,8 +124,16 @@ class BatchCreator(DataManager):
 
     def load_data_to_buffer(self):
 
-        data_x, data_y = get_data_from_files(data_file_range=self._parmams['data_file_indices'], 
+        tmp_x, data_y = get_data_from_files(data_file_range=self._parmams['data_file_indices'], 
                                              model_type=self._parmams['model_type'])
+
+        #if input is an image, then we need to convert the string to float
+        if self._parmams['model_type'] == 'cnn':
+            data_x = []
+            for x_image in tmp_x:
+                data_x.append(string2image(x_image[0]).flatten())
+        else:
+            data_x = tmp_x
         
         for x,y in zip(data_x,data_y):
             if (self._buffer_1.add_to_buffer((x,y))):
