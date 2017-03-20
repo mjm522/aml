@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_dl.mdn.training.config import network_params_fwd
+from aml_dl.utilities.tf_batch_creator import BatchCreator
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
@@ -17,7 +18,7 @@ def get_data(operation):
     data_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='fwd')
 
     return data_x, data_y
-                                         
+                               
 
 def test_fwd_model():
 
@@ -60,12 +61,17 @@ def train_fwd_model():
     else:
         sess = tf.Session()
 
+    train_data_x = None; train_data_y = None; batch_creator = None   
+    if network_params_fwd['batch_params'] is not None:
+        batch_creator = BatchCreator(network_params_fwd['batch_params'])
+    else:
+        train_data_x, train_data_y = get_data('train')
+
     network_params_fwd['load_saved_model'] = False
 
     forward_model = NNPushFwdModel(sess=sess, network_params=network_params_fwd)
     forward_model.init_model()
-
-    train_data_x, train_data_y = get_data('train')
+    forward_model.configure_data(data_x=train_data_x, data_y=train_data_y, batch_creator=batch_creator)
     
     # h = forward_model.run_op('last_hidden',data_x)
 
@@ -76,8 +82,7 @@ def train_fwd_model():
     print "Got the data, gonna train the model..."
 
     epochs = 100#10000
-    loss = forward_model.train(train_data_x, train_data_y, epochs = epochs)
-
+    loss = forward_model.train(epochs = epochs)
     forward_model.save_model()
     
     if network_params_fwd['write_summary']:

@@ -17,6 +17,10 @@ class NNPushFwdModel(object):
 
         self._tf_sumry_wrtr = None
 
+        self._optimiser = network_params['optimiser']
+
+        self._data_configured = False
+
         if network_params['write_summary']:
             self._tf_sumry_wrtr = TfSummaryWriter(sess)
             cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
@@ -33,9 +37,9 @@ class NNPushFwdModel(object):
             self._net_ops = tf_model(dim_input=network_params['dim_input'],
                                      dim_output=network_params['dim_output'],
                                      loss_type='normal',
-                                     learning_rate=network_params['learning_rate'],
                                      cnn_params=network_params['cnn_params'], 
-                                     fc_params=network_params['fc_params'], 
+                                     fc_params=network_params['fc_params'],
+                                     optimiser_params=network_params['optimiser'],
                                      tf_sumry_wrtr=self._tf_sumry_wrtr)
 
             self._init_op = tf.initialize_all_variables()
@@ -50,6 +54,12 @@ class NNPushFwdModel(object):
             if self._params['load_saved_model']:
                 self.load_model()
 
+    def configure_data(self, data_x, data_y, batch_creator):
+        self._data_x = data_x
+        self._data_y = data_y
+        self._batch_creator = batch_creator
+        self._data_configured = True
+
     def load_model(self):
 
         load_tf_check_point(session=self._sess, filename=self._params['model_path'])
@@ -58,21 +68,40 @@ class NNPushFwdModel(object):
         save_path = self._saver.save(self._sess, self._params['model_path'])
         print("Model saved in file: %s" % save_path)
 
-    def train(self, train_data_x, train_data_y, epochs):
+
+    def get_data(self):
+        if self._params['batch_params'] is not None:
+            if self._batch_creator is not None:
+                self._data_x, self._data_y = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
+            else:
+                raise Exception("Batch training chosen but batch_creator not configured")
+
+        if self._params['cnn_params'] is None:
+            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y}
+        else:
+            feed_dict = {self._net_ops['image_input']:self._data_x, self._net_ops['y']:self._data_y}
+        
+        return feed_dict
+
+    def train(self, epochs):
+
+        if not self._data_configured:
+            raise Exception("Data not configured, please configure..")
         
         if self._params['write_summary']:
             tf.global_variables_initializer().run()
         
         loss = np.zeros(epochs)
         
-        if self._params['cnn_params'] is None:
-            feed_dict = {self._net_ops['x']:train_data_x, self._net_ops['y']:train_data_y}
-        else:
-            feed_dict = {self._net_ops['image_input']:train_data_x, self._net_ops['y']:train_data_y}
+        feed_dict = self.get_data()
 
         if self._tf_sumry_wrtr is not None:
 
             for i in range(epochs):
+
+                if self._params['batch_params'] is not None:
+                    feed_dict = self.get_data()
+
                 if i % 10 == 0:  # Record summaries and test-set accuracy
                     summary, acc = self._sess.run([self._tf_sumry_wrtr._merged, self._net_ops['accuracy']], feed_dict=feed_dict)
                     

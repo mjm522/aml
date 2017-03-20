@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from aml_dl.utilities.tf_optimisers import optimiser_op
 
 def weight_variable(shape, stddev=0.05):
     """Create a weight variable with appropriate initialization."""
@@ -163,7 +164,7 @@ def create_nn_layers(inp, params, tf_sumry_wrtr, layer_type):
     return layer_input
 
 
-def tf_model(dim_input, dim_output, loss_type, learning_rate, cnn_params, fc_params, tf_sumry_wrtr):
+def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_params, tf_sumry_wrtr):
     # Create a multilayer model.
     image_input = None
     
@@ -209,7 +210,7 @@ def tf_model(dim_input, dim_output, loss_type, learning_rate, cnn_params, fc_par
         cost, total = get_quadratic_loss(fc_layer_output, target)
 
     with tf.name_scope('train'):
-        train_step = tf.train.AdamOptimizer(learning_rate).minimize(cost)
+        train_step = optimiser_op(cost, optimiser_params)
 
     with tf.name_scope('accuracy'):
         with tf.name_scope('correct_prediction'):

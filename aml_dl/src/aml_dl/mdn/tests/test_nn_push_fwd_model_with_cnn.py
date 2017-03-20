@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
+from aml_dl.utilities.tf_batch_creator import BatchCreator
 from aml_dl.mdn.training.config import network_params_cmbnd
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_data_collec_utils.core.data_manager import DataManager
@@ -72,10 +73,15 @@ def train_fwd_model():
 
     network_params_cmbnd['load_saved_model'] = False
 
+    train_data_x = None; train_data_y = None; batch_creator = None   
+    if network_params_cmbnd['batch_params'] is not None:
+        batch_creator = BatchCreator(network_params_cmbnd['batch_params'])
+    else:
+        train_data_x, train_data_y = get_data('train')
+
     forward_model = NNPushFwdModel(sess=sess, network_params=network_params_cmbnd)
     forward_model.init_model()
-
-    train_data_x, train_data_y = get_data('train')
+    forward_model.configure_data(data_x=train_data_x, data_y=train_data_y, batch_creator=batch_creator)
     
     # h = forward_model.run_op('last_hidden',data_x)
     # plt.figure(figsize=(8, 8))
@@ -85,7 +91,7 @@ def train_fwd_model():
     print "Got the data, gonna train the model..."
 
     epochs = 100#10000
-    forward_model.train(train_data_x, train_data_y, epochs=epochs)
+    forward_model.train(epochs=epochs)
 
     forward_model.save_model()
 

@@ -20,7 +20,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1,380)
+train_file_indices = range(1,10)
 test_file_indices  = range(381,397)
 
 adam_params = {
@@ -92,6 +92,13 @@ network_params_cnn = {
 }
 
 
+batch_params_cmbnd = {
+'buffer_size':45, 
+'batch_size': 20, 
+'data_file_indices': train_file_indices, 
+'model_type':'cnn', 
+'use_random_batches':True}
+
 cnn_network_params = {
 'num_layers':2,
 'filter_sizes':[5, 5],
@@ -124,7 +131,8 @@ fc_network_params = {
 network_params_cmbnd = {
 'cnn_params':cnn_network_params,
 'fc_params':fc_network_params,
-'learning_rate':0.01,
+'optimiser': adam_params,
+'batch_params':batch_params_cmbnd, #pass None if not using batch training
 'write_summary':True,
 'dim_input':300,
 'dim_output':7,
@@ -137,13 +145,22 @@ network_params_cmbnd = {
 'device':'/cpu:0',
 }
 
+
+batch_params_fwd = {
+'buffer_size':45, 
+'batch_size': 20, 
+'data_file_indices': train_file_indices, 
+'model_type':'fwd', 
+'use_random_batches':False}
+
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 9, 
     'dim_output': 7,
+    'batch_params':batch_params_fwd, #pass None if not using batch training
     'cnn_params':None,
     'fc_params':fc_network_params,
-    'learning_rate':0.01,
+    'optimiser': adam_params,
     'write_summary':True,
     'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'batch_size': 25,

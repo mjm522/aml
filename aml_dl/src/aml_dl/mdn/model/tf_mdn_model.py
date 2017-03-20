@@ -11,7 +11,6 @@ class MixtureDensityNetwork(object):
     self._dim_output = network_params['dim_output']
     self._n_kernels = network_params['k_mixtures']
     self._n_hidden = network_params['n_hidden']
-    self._optimiser = network_params['optimiser']
     self._tf_sumry_wrtr = tf_sumry_wrtr
 
   def _init_model(self):
