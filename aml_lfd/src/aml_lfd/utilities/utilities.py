@@ -44,7 +44,7 @@ def get_sampling_rate(limb_name, demo_idx=None, demo_path=None):
         demo_data = load_demo_data(limb_name=limb_name, demo_idx=demo_idx)
 
     sampling_rate = demo_data[0].get(0,['sampling_rate'])
-    
+
     if not sampling_rate:
 
         sampling_rate = 1.
@@ -52,7 +52,6 @@ def get_sampling_rate(limb_name, demo_idx=None, demo_path=None):
     else:
 
         sampling_rate = sampling_rate[0]
-
 
     return sampling_rate
 

@@ -152,7 +152,8 @@ class PushMachine(object):
         return success
 
     def on_shutdown(self):
-        send_pos_cmd_pisa_hand()
+        pass
+        # send_pos_cmd_pisa_hand()
         #this if for saving files in case keyboard interrupt happens
         # self._record_sample.save_data_now()
 
