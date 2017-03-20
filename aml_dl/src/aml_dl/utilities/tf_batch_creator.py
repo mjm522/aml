@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from itertools import islice
 from collections import deque
 from multiprocessing import Process
 from aml_io.convert_tools import string2image
@@ -11,8 +12,8 @@ class Buffer():
 
     def __init__(self, buffer_size):
         self._storage =  deque()
-        self._size =  buffer_size
-        self._in_use = False
+        self._size    =  buffer_size
+        self._in_use  = False
 
     @property
     def size(self):
@@ -51,6 +52,8 @@ class MakeBatch():
         self._size = batch_size
         self._buffer = None
         self._is_configured = False
+        self._start_idx = 0
+        self._end_idx = self._size
 
     def configure_buffer(self, new_buffer):
         self._buffer = new_buffer
@@ -69,7 +72,16 @@ class MakeBatch():
             batch = random.sample(self._buffer._storage, self._size)
         else:
             if self._buffer:
-                batch = [self._buffer._storage.popleft() for _ in range(self._size)]
+                # batch = [self._buffer._storage.popleft() for _ in range(self._size)]
+                batch = deque(islice(self._buffer._storage, self._start_idx, self._end_idx))
+                
+                self._start_idx = self._end_idx
+                self._end_idx += self._size
+
+                if self._end_idx > self._buffer.size:
+                    self._end_idx = self._size
+                    self._start_idx = 0 
+
             else:
                 self._buffer._full = False
                 self._buffer._in_use = False

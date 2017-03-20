@@ -2,7 +2,13 @@ from aml_dl.utilities.tf_batch_creator import BatchCreator
 
 
 def main():
-    batch_params = {'buffer_size':45, 'batch_size': 20, 'data_file_indices': range(1,10), 'model_type':'fwd'}
+    batch_params = {
+                    'buffer_size':45, 
+                    'batch_size': 20, 
+                    'data_file_indices': range(1,10), 
+                    'model_type':'fwd', 
+                    'use_random_batches':False}
+
     batch_creator = BatchCreator(batch_params)
 
     x_batch1 = None; y_batch1 = None

@@ -151,7 +151,7 @@ batch_params_fwd = {
 'batch_size': 20, 
 'data_file_indices': train_file_indices, 
 'model_type':'fwd', 
-'use_random_batches':True}
+'use_random_batches':False}
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
