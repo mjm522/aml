@@ -59,7 +59,12 @@ class Sample(object):
             # adjust key order
 
         #out = [ data[k] for k in list(set(keys) & set(data)) ]
-        out = [data[k] for k in keys]
+        out = []
+
+        try:
+            out = [data[k] for k in keys]
+        except Exception as e:
+            print "No such key ", e, " ", keys
 
         return out
 
