@@ -289,18 +289,56 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
             tf_sumry_wrtr.add_variable_summaries(cnn_layer_output_t_1)
 
 
-    layer_shape_t      = cnn_layer_output_t.get_shape() 
-    num_features_t     = layer_shape_t[1:4].num_elements()
-    layer_flat_t       = tf.reshape(cnn_layer_output_t, [-1, num_features_t])
+    # layer_shape_t      = cnn_layer_output_t.get_shape() 
+    # num_features_t     = layer_shape_t[1:4].num_elements()
+    # layer_flat_t       = tf.reshape(cnn_layer_output_t, [-1, num_features_t])
 
-    layer_shape_t_1      = cnn_layer_output_t_1.get_shape()
-    num_features_t_1     = layer_shape_t_1[1:4].num_elements()
-    layer_flat_t_1       = tf.reshape(cnn_layer_output_t_1, [-1, num_features_t_1])
+    # layer_shape_t_1      = cnn_layer_output_t_1.get_shape()
+    # num_features_t_1     = layer_shape_t_1[1:4].num_elements()
+    # layer_flat_t_1       = tf.reshape(cnn_layer_output_t_1, [-1, num_features_t_1])
+
+    def get_feature_points(cnn_layer_out):
+
+        _, num_rows, num_cols, num_fp = cnn_layer_out.get_shape()
+        num_rows, num_cols, num_fp = [int(x) for x in [num_rows, num_cols, num_fp]]
+        x_map = np.empty([num_rows, num_cols], np.float32)
+        y_map = np.empty([num_rows, num_cols], np.float32)
+
+        for i in range(num_rows):
+            for j in range(num_cols):
+                x_map[i, j] = (i - num_rows / 2.0) / num_rows
+                y_map[i, j] = (j - num_cols / 2.0) / num_cols
+
+        x_map = tf.convert_to_tensor(x_map)
+        y_map = tf.convert_to_tensor(y_map)
+
+        x_map = tf.reshape(x_map, [num_rows * num_cols])
+        y_map = tf.reshape(y_map, [num_rows * num_cols])
+
+        # rearrange features to be [batch_size, num_fp, num_rows, num_cols]
+        features = tf.reshape(tf.transpose(cnn_layer_out, [0,3,1,2]),
+                              [-1, num_rows*num_cols])
+        softmax = tf.nn.softmax(features)
+        fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
+        fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
+        fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
+        return fp
+
+    with tf.variable_scope('feature_points_t'):
+        feature_point_t = get_feature_points(cnn_layer_output_t)
+
+    with tf.variable_scope('feature_points_t_1'):
+        feature_point_t_1 = get_feature_points(cnn_layer_output_t_1)
+
+    if tf_sumry_wrtr is not None:
+        tf_sumry_wrtr.add_variable_summaries(feature_point_t)
+        tf_sumry_wrtr.add_variable_summaries(feature_point_t_1)
+
 
     with tf.name_scope('input_y'):
         target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
 
-    fc_layer_output  = create_nn_layers(layer_flat_t, fc_params, tf_sumry_wrtr, layer_type='fc')
+    fc_layer_output  = create_nn_layers(feature_point_t, fc_params, tf_sumry_wrtr, layer_type='fc')
 
     # mdn_layer_output = ???????
 

@@ -53,7 +53,12 @@ class SiamesePushModel(object):
                 self.load_model()
 
     def configure_data(self, data_x, data_y, batch_creator):
-        self._data_x = data_x
+        if data_x is not None:
+            self._data_x_t   = data_x[:-1]
+            self._data_x_t_1 = data_x[1:]
+        else:
+            self._data_x_t = data_x
+            self._data_x_t_1 = data_x
         self._data_y = data_y
         self._batch_creator = batch_creator
         self._data_configured = True
@@ -78,7 +83,8 @@ class SiamesePushModel(object):
         if self._params['cnn_params'] is None:
             feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y}
         else:
-            feed_dict = {self._net_ops['image_input_t']:self._data_x, self._net_ops['image_input_t_1']:self._data_x, self._net_ops['y']:self._data_y}
+            #is y correct?
+            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1]}
         
         return feed_dict, round_complete
 
