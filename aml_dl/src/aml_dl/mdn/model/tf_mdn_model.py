@@ -37,7 +37,7 @@ class MixtureDensityNetwork(object):
         self._tf_sumry_wrtr.add_variable_summaries(self._sigmas_op)
         self._tf_sumry_wrtr.add_variable_summaries(self._pis_op)
 
-    with tf.name_scope('loss'):
+    with tf.name_scope('cost_inv'):
       self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
       if self._tf_sumry_wrtr is not None:
         self._tf_sumry_wrtr.add_variable_summaries(self._loss_op)

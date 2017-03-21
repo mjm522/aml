@@ -2,8 +2,10 @@ import os
 from aml_robot.box2d.config import config
 from aml_io.io_tools import get_aml_package_path
 
-check_point_path   = get_aml_package_path('aml_dl') + '/src/aml_dl/mdn/training/tf_check_points/'
+check_point_path   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/'
 training_data_path = ''
+summary_path       = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
+
 try:
     training_data_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
 except:
@@ -46,8 +48,8 @@ network_params_inv = {
     'train_file_indices': train_file_indices,
     'test_file_indices': test_file_indices,
     'training_data_path': training_data_path,
-    'summary_folder_name': 'summary_inv',
     'optimiser': adam_params,
+    'summary_path':summary_path+'/inv/',
     'device': '/cpu:0',
 }
 
@@ -87,6 +89,7 @@ network_params_cnn = {
     'training_data_path':training_data_path,
     'train_file_indices':train_file_indices,
     'test_file_indices':test_file_indices,
+    'summary_path':summary_path+'/cnn/',
     'device':'/cpu:0',
 
 }
@@ -142,6 +145,7 @@ network_params_cmbnd = {
 'training_data_path':training_data_path,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
+'summary_path':summary_path+'/cmbnd/',
 'device':'/cpu:0',
 }
 
@@ -169,6 +173,7 @@ network_params_fwd = {
     'training_data_path':training_data_path,
     'train_file_indices':train_file_indices,
     'test_file_indices':test_file_indices,
+    'summary_path':summary_path+'/fwd/',
     'device': '/cpu:0',
 }
 
@@ -187,11 +192,11 @@ cnn_network_params_siam = {
 'filter_sizes':[5, 5, 5],
 'num_filters':[16, 32, 64],
 'layer_names':['cnn_layer%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
-'variable_names':['variables%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
-'weight_names':['weight%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
-'bias_names':['bias%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
-'pre_activate_scope':['pre_activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
-'activate_scope':['activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'variable_names':['cnn_variables%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'weight_names':['cnn_weight%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'bias_names':['cnn_bias%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'pre_activate_scope':['cnn_pre_activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'activate_scope':['cnn_activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
 'layer_outputs':[128, 10, 10],
 'image_width': IMAGE_WIDTH,
 'image_height': IMAGE_HEIGHT,
@@ -240,5 +245,6 @@ network_params_siam = {
 'training_data_path':training_data_path,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
+'summary_path':summary_path+'/siam/',
 'device':'/cpu:0',
 }

@@ -11,10 +11,11 @@ class TfSummaryWriter():
         
         if summary_dir is None:
             self._summary_dir = './summary'
-            if not os.path.exists(self._summary_dir):
-                os.makedirs(self._summary_dir)
         else:
             self._summary_dir = summary_dir
+
+        if not os.path.exists(self._summary_dir):
+            os.makedirs(self._summary_dir)
 
         if tf.gfile.Exists(self._summary_dir):
             tf.gfile.DeleteRecursively(self._summary_dir)

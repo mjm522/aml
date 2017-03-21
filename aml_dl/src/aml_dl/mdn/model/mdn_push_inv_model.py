@@ -18,7 +18,12 @@ class MDNPushInverseModel(object):
         self._tf_sumry_wrtr = None
 
         if network_params['write_summary']:
-            self._tf_sumry_wrtr = TfSummaryWriter(sess, network_params['summary_folder_name'])
+            if 'summary_path' in network_params:
+                summary_dir = network_params['summary_path']
+            else:
+                summary_dir = None
+            self._tf_sumry_wrtr = TfSummaryWriter(tf_session=sess,summary_dir=summary_dir)
+            
             cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
 
             curr_ld_path = os.environ["LD_LIBRARY_PATH"]

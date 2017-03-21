@@ -22,7 +22,12 @@ class NNPushFwdModel(object):
         self._data_configured = False
 
         if network_params['write_summary']:
-            self._tf_sumry_wrtr = TfSummaryWriter(sess)
+            if 'summary_path' in network_params:
+                summary_dir = network_params['summary_path']
+            else:
+                summary_dir = None
+            
+            self._tf_sumry_wrtr = TfSummaryWriter(tf_session=sess,summary_dir=summary_dir)
             cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
 
             curr_ld_path = os.environ["LD_LIBRARY_PATH"]
@@ -36,7 +41,7 @@ class NNPushFwdModel(object):
         with tf.device(self._device):
             self._net_ops = tf_model(dim_input=network_params['dim_input'],
                                      dim_output=network_params['dim_output'],
-                                     loss_type='normal',
+                                     loss_type='quadratic',
                                      cnn_params=network_params['cnn_params'], 
                                      fc_params=network_params['fc_params'],
                                      optimiser_params=network_params['optimiser'],
@@ -114,28 +119,21 @@ class NNPushFwdModel(object):
                     if round_complete:
                         print "Completed round"
     
-
-                    if i % 10 == 0:  # Record summaries and test-set accuracy
-                        summary, acc = self._sess.run([self._tf_sumry_wrtr._merged, self._net_ops['accuracy']], feed_dict=feed_dict)
+                    if i % 100 == 99:  # Record execution stats
+                        run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                        run_metadata = tf.RunMetadata()
+                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
+                                                    feed_dict=feed_dict,
+                                                    options=run_options,
+                                                    run_metadata=run_metadata)
                         
+                        self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
                         self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-                        print('Accuracy at step %s: %s' % (i, acc))
-                    else:  # Record train set summaries, and train
-                        if i % 100 == 99:  # Record execution stats
-                            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-                            run_metadata = tf.RunMetadata()
-                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
-                                                        feed_dict=feed_dict,
-                                                        options=run_options,
-                                                        run_metadata=run_metadata)
-                            
-                            self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
-                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-                            print('Adding run metadata for', i)
-                        else:  # Record a summary
-                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
-                                                        feed_dict=feed_dict)
-                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+                        print('Adding run metadata for', i)
+                    else:  # Record a summary
+                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
+                                                    feed_dict=feed_dict)
+                        self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
            
             self._tf_sumry_wrtr.close_writer()
 
