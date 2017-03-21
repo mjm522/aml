@@ -336,13 +336,7 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
         tf_sumry_wrtr.add_variable_summaries(feature_point_t_1)
 
 
-    with tf.name_scope('input_y'):
-        target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
-
-    fc_layer_output  = create_nn_layers(feature_point_t, fc_params, tf_sumry_wrtr, layer_type='fc')
-
-
-    ###### Pluging in MDN ######
+    ##########################################Pluging in MDN ####################################
     _, num_fp = feature_point_t.get_shape()
     num_fp = int(num_fp)
 
@@ -359,6 +353,18 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
     
     mdn._init_model(input_op=mdn_input_op) # Construct model graph
 
+    ##############################################################################################
+
+
+    ############################################FORWARD MODEL#####################################
+    fwd_model_inp = tf.concat(concat_dim=1,values=[feature_point_t, mdn._ops['y']])
+
+    fc_layer_output  = create_nn_layers(fwd_model_inp, fc_params, tf_sumry_wrtr, layer_type='fc')
+
+    with tf.name_scope('input_y'):
+        target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
+
+
     if loss_type == 'normal':
         cost, total = get_loss_cnn(fc_layer_output, target)
     elif loss_type == 'quadratic':
@@ -372,6 +378,8 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
             correct_prediction = tf.equal(tf.argmax(fc_layer_output, 1), tf.argmax(target, 1))
         with tf.name_scope('accuracy'):
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+    ##################################################################################################
     
     if tf_sumry_wrtr is not None:
         tf_sumry_wrtr.add_scalar(name_scope='cost', data=total)
@@ -379,15 +387,12 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
         # Merge all the summaries and write them out to /tmp/tensorflow/mnist/logs/mnist_with_summaries (by default)
         tf_sumry_wrtr.write_summary()
 
-
-
-
     output_ops = {'output' : fc_layer_output, 
                   'cost': total, 
                   'accuracy':accuracy, 
                   'train_step': train_step, 
                   'image_input_t':image_input_t, 
-                  'image_input_t_1':image_input_t_1, 
+                  'image_input_t_1':image_input_t_1,
                   'y': target,
                   'mdn_y': mdn._ops['y'], # mdn target is a push action
                   'mdn_loss' : mdn._ops['loss'],

@@ -16,7 +16,7 @@ def get_data(operation, string_img_convert=True):
     elif operation =='train':
         data_file_indices = network_params_siam['train_file_indices']
 
-    tmp_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='cnn')
+    tmp_x, data_y = get_data_from_files(data_file_range=data_file_indices, model_type='siam')
 
     data_x = []
     if string_img_convert:

@@ -177,7 +177,7 @@ batch_params_siam = {
 'buffer_size':45, 
 'batch_size': 20, 
 'data_file_indices': train_file_indices, 
-'model_type':'cnn', 
+'model_type':'siam', 
 'use_random_batches':False}
 
 NUM_CNN_LAYERS_SIAM = 3
@@ -207,6 +207,7 @@ cnn_network_params_siam = {
 
 fc_network_params_siam = {
 'num_layers':3,
+'action_dim':2,
 'layer_names':['fc_layer1', 'fc_layer2', 'fc_layer3'],
 'num_units_per_layer':[10, 9, 7],
 'layer_outputs':[7, 7, 7],

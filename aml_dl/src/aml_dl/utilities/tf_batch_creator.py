@@ -25,7 +25,7 @@ class BatchCreator(DataManager):
                                              model_type=self._parmams['model_type'])
 
         #if input is an image, then we need to convert the string to float
-        if self._parmams['model_type'] == 'cnn':
+        if self._parmams['model_type'] == 'cnn' or self._parmams['model_type'] == 'siam':
             self._x_buffer = []
             for x_image in tmp_x:
                 self._x_buffer.append(string2image(x_image[0]).flatten())

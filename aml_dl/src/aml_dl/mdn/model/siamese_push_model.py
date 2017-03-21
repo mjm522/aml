@@ -57,9 +57,17 @@ class SiamesePushModel(object):
         if data_x is not None:
             self._data_x_t   = data_x[:-1]
             self._data_x_t_1 = data_x[1:]
+            data_y_point_len = len(data_y[0])
+            target_indices   = range(0, data_y_point_len-self._params['fc_params']['action_dim'])
+            action_indices   = range(data_y_point_len-self._params['fc_params']['action_dim'], data_y_point_len)
+            self._data_y     = data_y[:, target_indices]
+            self._action_t   = data_y[:, action_indices]
         else:
-            self._data_x_t = data_x
-            self._data_x_t_1 = data_x
+            self._data_x_t   = None
+            self._data_x_t_1 = None
+            self._action_t   = None
+            self._data_y     = None
+        
         self._data_y = data_y
         self._batch_creator = batch_creator
         self._data_configured = True
@@ -77,15 +85,22 @@ class SiamesePushModel(object):
         round_complete = None 
         if self._params['batch_params'] is not None:
             if self._batch_creator is not None:
-                self._data_x, self._data_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
+                self._data_x, tmp_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
+                data_y_point_len = len(tmp_y[0])
+                target_indices   = range(0, data_y_point_len-self._params['fc_params']['action_dim'])
+                action_indices   = range(data_y_point_len-self._params['fc_params']['action_dim'], data_y_point_len)
+  
+                self._data_y     = [tmp_y[i][target_indices] for i in range(len(tmp_y))]
+                self._action_t   = [tmp_y[i][action_indices] for i in range(len(tmp_y))]
+
             else:
                 raise Exception("Batch training chosen but batch_creator not configured")
 
         if self._params['cnn_params'] is None:
-            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: [0]}
+            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: self._action_t}
         else:
             #is y correct?
-            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1], self._net_ops['mdn_y']: [[0,0]]}
+            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1], self._net_ops['mdn_y']: self._action_t[:-1]}
         
         return feed_dict, round_complete
 
