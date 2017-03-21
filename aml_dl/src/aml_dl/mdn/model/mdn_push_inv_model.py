@@ -84,7 +84,7 @@ class MDNPushInverseModel(object):
                     self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
                     self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
                 else:
-                    loss[i] = self._sess.run([train_op], feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})[0]
+                    _, loss[i] = self._sess.run([train_op, loss_op], feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
 
 
             if self._tf_sumry_wrtr is not None:

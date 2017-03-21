@@ -38,6 +38,7 @@ class SiamesePushModel(object):
                                      loss_type='normal',
                                      cnn_params=network_params['cnn_params'], 
                                      fc_params=network_params['fc_params'],
+                                     mdn_params=network_params['inv_params'],
                                      optimiser_params=network_params['optimiser'],
                                      tf_sumry_wrtr=self._tf_sumry_wrtr)
 

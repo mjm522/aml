@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from aml_dl.utilities.tf_optimisers import optimiser_op
+from tf_mdn_model import MixtureDensityNetwork
 
 def weight_variable(shape, stddev=0.05):
     """Create a weight variable with appropriate initialization."""
@@ -225,7 +226,7 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
     output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
     return output_ops
 
-def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, tf_sumry_wrtr):
+def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, mdn_params, tf_sumry_wrtr):
 
     image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
     image_input_t   = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x_t-input')
@@ -340,7 +341,14 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
 
     fc_layer_output  = create_nn_layers(feature_point_t, fc_params, tf_sumry_wrtr, layer_type='fc')
 
-    # mdn_layer_output = ???????
+
+    ###### Pluging in MDN ######
+    num_rows, num_fp = feature_point_t_1.get_shape()
+    num_fp = int(num_fp)
+    mdn_params['dim_input'] = num_fp
+    mdn = MixtureDensityNetwork(mdn_params,
+                                tf_sumry_wrtr = tf_sumry_wrtr)
+    mdn._init_model(input_op=feature_point_t_1) # Construct model graph
 
     if loss_type == 'normal':
         cost, total = get_loss_cnn(fc_layer_output, target)
@@ -362,7 +370,18 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
         # Merge all the summaries and write them out to /tmp/tensorflow/mnist/logs/mnist_with_summaries (by default)
         tf_sumry_wrtr.write_summary()
 
-    output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'image_input_t':image_input_t, 'image_input_t_1':image_input_t_1, 'y': target}
+    output_ops = {'output' : fc_layer_output, 
+                  'cost': total, 
+                  'accuracy':accuracy, 
+                  'train_step': train_step, 
+                  'image_input_t':image_input_t, 
+                  'image_input_t_1':image_input_t_1, 
+                  'y': target,
+                  'y_mdn': mdn._ops['y'],
+                  'mdn_loss' : mdn._ops['loss'],
+                  'mdn_mu' : mdn._ops['mu'],
+                  'mdn_pi' : mdn._ops['pi'],
+                  'mdn_sigma' : mdn._ops['sigma']}
     return output_ops
 
 
