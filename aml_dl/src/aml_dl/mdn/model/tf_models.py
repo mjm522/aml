@@ -343,12 +343,19 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
 
 
     ###### Pluging in MDN ######
-    num_rows, num_fp = feature_point_t_1.get_shape()
+    _, num_fp = feature_point_t.get_shape()
     num_fp = int(num_fp)
-    mdn_params['dim_input'] = num_fp
+
+    mdn_input_op = tf.reshape(tf.concat(1, [feature_point_t, feature_point_t_1]), [-1, 2*num_fp*2])
+    _, dim_input = mdn_input_op.get_shape()
+    dim = int(dim_input) 
+    mdn_params['dim_input'] = dim
+    
     mdn = MixtureDensityNetwork(mdn_params,
                                 tf_sumry_wrtr = tf_sumry_wrtr)
-    mdn._init_model(input_op=feature_point_t_1) # Construct model graph
+
+    
+    mdn._init_model(input_op=mdn_input_op) # Construct model graph
 
     if loss_type == 'normal':
         cost, total = get_loss_cnn(fc_layer_output, target)
