@@ -18,7 +18,7 @@ class MixtureDensityNetwork(object):
 
     with tf.name_scope('input'):
 
-      if input_op is not None:
+      if input_op is None:
         self._x = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_input],  name="x")
       else:
         self._x = input_op

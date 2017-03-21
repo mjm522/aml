@@ -346,11 +346,13 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
     _, num_fp = feature_point_t.get_shape()
     num_fp = int(num_fp)
 
-    mdn_input_op = tf.reshape(tf.concat(1, [feature_point_t, feature_point_t_1]), [-1, 2*num_fp*2])
+    mdn_input_op = tf.concat(concat_dim=1,values=[feature_point_t, feature_point_t_1])
     _, dim_input = mdn_input_op.get_shape()
     dim = int(dim_input) 
     mdn_params['dim_input'] = dim
-    
+
+    print "Dim input ", dim
+
     mdn = MixtureDensityNetwork(mdn_params,
                                 tf_sumry_wrtr = tf_sumry_wrtr)
 
@@ -377,6 +379,9 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
         # Merge all the summaries and write them out to /tmp/tensorflow/mnist/logs/mnist_with_summaries (by default)
         tf_sumry_wrtr.write_summary()
 
+
+
+
     output_ops = {'output' : fc_layer_output, 
                   'cost': total, 
                   'accuracy':accuracy, 
@@ -384,7 +389,7 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
                   'image_input_t':image_input_t, 
                   'image_input_t_1':image_input_t_1, 
                   'y': target,
-                  'y_mdn': mdn._ops['y'],
+                  'mdn_y': mdn._ops['y'], # mdn target is a push action
                   'mdn_loss' : mdn._ops['loss'],
                   'mdn_mu' : mdn._ops['mu'],
                   'mdn_pi' : mdn._ops['pi'],

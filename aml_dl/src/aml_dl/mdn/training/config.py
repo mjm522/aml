@@ -219,6 +219,7 @@ fc_network_params_siam = {
 network_params_siam = {
 'cnn_params':cnn_network_params_siam,
 'fc_params':fc_network_params_siam,
+'inv_params': network_params_inv,
 'optimiser': adam_params,
 'batch_params':batch_params_siam, #pass None if not using batch training
 'write_summary':True,

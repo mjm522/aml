@@ -82,10 +82,10 @@ class SiamesePushModel(object):
                 raise Exception("Batch training chosen but batch_creator not configured")
 
         if self._params['cnn_params'] is None:
-            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y}
+            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: [0]}
         else:
             #is y correct?
-            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1]}
+            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1], self._net_ops['mdn_y']: [[0,0]]}
         
         return feed_dict, round_complete
 
