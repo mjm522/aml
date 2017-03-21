@@ -171,3 +171,64 @@ network_params_fwd = {
     'test_file_indices':test_file_indices,
     'device': '/cpu:0',
 }
+
+
+batch_params_siam = {
+'buffer_size':45, 
+'batch_size': 20, 
+'data_file_indices': train_file_indices, 
+'model_type':'cnn', 
+'use_random_batches':False}
+
+NUM_CNN_LAYERS_SIAM = 3
+
+cnn_network_params_siam = {
+'num_layers':NUM_CNN_LAYERS_SIAM,
+'filter_sizes':[5, 5, 5],
+'num_filters':[16, 32, 64],
+'layer_names':['cnn_layer%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'variable_names':['variables%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'weight_names':['weight%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'bias_names':['bias%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'pre_activate_scope':['pre_activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'activate_scope':['activate%d'%i for i in range(NUM_CNN_LAYERS_SIAM)],
+'layer_outputs':[128, 10, 10],
+'image_width': IMAGE_WIDTH,
+'image_height': IMAGE_HEIGHT,
+'image_channels': IMAGE_CHANNELS,
+'max_pooling':[None, None, None],#{'x':2, 'y':2},
+'use_dropout':[False, False, False],
+'strides':[[1,1,1,1],[1,1,1,1], [1,1,1,1]],
+'activation':['relu', 'relu', 'relu'],
+'padding':['SAME','SAME', 'SAME'],
+'img_resize':{'width':10,'height':10},
+'stddev':0.05,
+}
+
+fc_network_params_siam = {
+'num_layers':3,
+'layer_names':['fc_layer1', 'fc_layer2', 'fc_layer3'],
+'num_units_per_layer':[10, 9, 7],
+'layer_outputs':[7, 7, 7],
+'max_pooling':[None, None, None],
+'use_dropout':[False, False, False],
+'activation':['idty', 'idty', 'idty'],
+'stddev':0.05,  
+}
+
+network_params_siam = {
+'cnn_params':cnn_network_params_siam,
+'fc_params':fc_network_params_siam,
+'optimiser': adam_params,
+'batch_params':batch_params_siam, #pass None if not using batch training
+'write_summary':True,
+'dim_input':300,
+'dim_output':7,
+'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
+'load_saved_model': True,
+'model_path': check_point_path+'push_model_fwd_with_cnn.ckpt',
+'training_data_path':training_data_path,
+'train_file_indices':train_file_indices,
+'test_file_indices':test_file_indices,
+'device':'/cpu:0',
+}
