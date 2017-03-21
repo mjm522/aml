@@ -1,6 +1,6 @@
-import rospy
+import os
 import copy
-import os.path
+import rospy
 import argparse
 import numpy as np
 from aml_robot.baxter_robot import BaxterArm
@@ -9,10 +9,9 @@ from aml_lfd.utilities.store_demonstration import StoreDemonstration
 from aml_io.io_tools import save_data, load_data, get_aml_package_path
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
-
 reset_jnt_positions = {}
 
-storage_path = get_aml_package_path('aml_data_collec_utils') + '/utilities/'
+storage_path = os.environ['AML_DATA'] + '/aml_data_collec_utils/reset_box_trajectories/'
 
 def save_jnt_position(baxter_arm):
     
@@ -99,10 +98,10 @@ def check_jnt_position(baxter_arm):
 
 def get_sweep_goto_path(baxter_arm, side_name):
 
-    goto_path = storage_path+'right_arm_goto_'+side_name+'_01.pkl'
-    sweep_path = storage_path+'right_arm_sweep_'+side_name+'_01.pkl'
-    kwargs_goto = {'path_to_demo':goto_path, 'limb_name':baxter_arm._limb}
-    kwargs_sweep = {'path_to_demo':sweep_path,'limb_name':baxter_arm._limb}
+    goto_path     = storage_path+'right_arm_goto_'+side_name+'_01.pkl'
+    sweep_path    = storage_path+'right_arm_sweep_'+side_name+'_01.pkl'
+    kwargs_goto   = {'path_to_demo':goto_path, 'limb_name':baxter_arm._limb}
+    kwargs_sweep  = {'path_to_demo':sweep_path,'limb_name':baxter_arm._limb}
     goto_js_traj  = JSTrajGenerator(load_from_demo=True, **kwargs_goto)
     sweep_js_traj = JSTrajGenerator(load_from_demo=True, **kwargs_sweep)
 

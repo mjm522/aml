@@ -1,40 +1,47 @@
-
-
-
 import tensorflow as tf
 import math
 import numpy as np
-
+from aml_dl.utilities.tf_optimisers import optimiser_op
 
 class MixtureDensityNetwork(object):
 
-  def __init__(self, dim_input = 1, dim_output = 1, n_kernels = 5, n_hidden = 24):
-    self._dim_input = dim_input
-    self._dim_output = dim_output
-    self._n_kernels = n_kernels
-    self._n_hidden = n_hidden
-
+  def __init__(self, network_params, tf_sumry_wrtr=None):
+    
+    self._dim_input = network_params['dim_input']
+    self._dim_output = network_params['dim_output']
+    self._n_kernels = network_params['k_mixtures']
+    self._n_hidden = network_params['n_hidden']
+    self._tf_sumry_wrtr = tf_sumry_wrtr
 
   def _init_model(self):
 
-    self._x = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_input], name="x")
-    self._y = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_output], name="y")
+    with tf.name_scope('input'):
+      self._x = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_input],  name="x")
+      self._y = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_output], name="y")
 
-    self._output_fc_op = self._init_fc_layer(self._x)
+    with tf.name_scope('output_fc_op'):
+      self._output_fc_op = self._init_fc_layer(self._x)
+      if self._tf_sumry_wrtr is not None:
+        self._tf_sumry_wrtr.add_variable_summaries(self._output_fc_op)
 
-    self._mus_op, self._sigmas_op, self._pis_op = self._init_mixture_parameters(self._output_fc_op)
+    with tf.name_scope('init_mixture_params'):
+      self._mus_op, self._sigmas_op, self._pis_op = self._init_mixture_parameters(self._output_fc_op)
+      if self._tf_sumry_wrtr is not None:
+        self._tf_sumry_wrtr.add_variable_summaries(self._mus_op)
+        self._tf_sumry_wrtr.add_variable_summaries(self._sigmas_op)
+        self._tf_sumry_wrtr.add_variable_summaries(self._pis_op)
 
+    with tf.name_scope('loss'):
+      self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
+      if self._tf_sumry_wrtr is not None:
+        self._tf_sumry_wrtr.add_variable_summaries(self._loss_op)
 
-    self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
-
-
+    
     self._train_op = self._init_train(self._loss_op)
-
-
     self._ops = {'x': self._x, 'y': self._y, 'mu': self._mus_op, 'sigma': self._sigmas_op, 'pi': self._pis_op, 'loss': self._loss_op, 'train': self._train_op}
 
-
-
+    if self._tf_sumry_wrtr is not None:
+      self._tf_sumry_wrtr.write_summary()
 
   def _init_fc_layer(self, input, stddev = 0.1):
 
@@ -82,7 +89,7 @@ class MixtureDensityNetwork(object):
 
   def _init_train(self,loss_op):
 
-    train_op = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(loss_op)
+    train_op = optimiser_op(loss_op, self._optimiser)
 
     return train_op
 
@@ -137,11 +144,7 @@ class MixtureDensityNetwork(object):
 
 
 
-
-
-
 class MixtureOfGaussians(object):
-
 
   def sample_pi_idx(self, x, pdf):
     N = pdf.size

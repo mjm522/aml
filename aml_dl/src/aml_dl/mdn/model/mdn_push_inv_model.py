@@ -1,13 +1,12 @@
-
-import tensorflow as tf
+import os
 import numpy as np
+import tensorflow as tf
 from aml_io.tf_io import load_tf_check_point
-
 from tf_mdn_model import MixtureDensityNetwork
+from aml_dl.utilities.tf_summary_writer import TfSummaryWriter
 
 class MDNPushInverseModel(object):
-
-
+    
     def __init__(self, sess, network_params):
 
         self._sess = sess
@@ -16,13 +15,28 @@ class MDNPushInverseModel(object):
 
         self._device = self._params['device']
 
+        self._tf_sumry_wrtr = None
+
+        if network_params['write_summary']:
+            self._tf_sumry_wrtr = TfSummaryWriter(sess, network_params['summary_folder_name'])
+            cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
+
+            curr_ld_path = os.environ["LD_LIBRARY_PATH"]
+
+            if not cuda_path in curr_ld_path.split(os.pathsep):
+                print "Enviroment variable LD_LIBRARY_PATH does not contain %s"%cuda_path
+                print "Please add it, else the program will crash!"
+                raw_input("Press Ctrl+C")
+                # os.environ["LD_LIBRARY_PATH"] = curr_ld_path + ':'+cuda_path
+
         with tf.device(self._device):
 
+            if self._params['write_summary']:
+                tf.global_variables_initializer().run()
 
-            self._mdn = MixtureDensityNetwork(network_params['dim_input'], 
-                                              network_params['dim_output'], 
-                                              network_params['k_mixtures'], 
-                                              network_params['n_hidden'])
+
+            self._mdn = MixtureDensityNetwork(network_params,
+                                              tf_sumry_wrtr = self._tf_sumry_wrtr)
 
             self._mdn._init_model()
             self._net_ops = self._mdn._ops
@@ -59,8 +73,22 @@ class MDNPushInverseModel(object):
             loss_op = self._net_ops['loss']
 
             for i in range(epochs):
-              _, loss[i] = self._sess.run([train_op, loss_op],feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})
 
+                if self._params['write_summary']:
+                    run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                    run_metadata = tf.RunMetadata()
+                    summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, train_op],
+                                                      feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data},
+                                                      options=run_options,
+                                                      run_metadata=run_metadata)
+                    self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
+                    self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+                else:
+                    loss[i] = self._sess.run([train_op], feed_dict={self._net_ops['x']: x_data, self._net_ops['y']: y_data})[0]
+
+
+            if self._tf_sumry_wrtr is not None:
+                self._tf_sumry_wrtr.close_writer()
             return loss
 
     # TODO: Fix
@@ -149,7 +177,7 @@ class MDNPushInverseModel(object):
 
     def _max_pi_idx(self, pdf):
         
-        i = np.argmax(pdf)
+        i = np.argmax(pdf, axis=1)
 
         return i
 
@@ -164,11 +192,11 @@ class MDNPushInverseModel(object):
 
         # Number of test inputs
         N = out_mu.shape[0]
-
+        D = out_mu.shape[1] # mean dimension
         M = m_samples
 
-        result = np.random.rand(N, M)
-        rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
+        result = np.random.rand(N, D, M) # initially random [0, 1]
+        rn  = np.random.randn(N, D, M) # normal random matrix (0.0, 1.0)
 
         # Generates M samples from the mixture for each test input
         for j in range(M):
@@ -176,7 +204,7 @@ class MDNPushInverseModel(object):
               idx = self._max_pi_idx(out_pi[i])
               mu = out_mu[i, idx]
               std = out_sigma[i, idx]
-              result[i, j] = self._sample_gaussian(rn[i, j], mu, std)
+              result[i, :, j] = self._sample_gaussian(rn[i, :, j], mu, std)
 
         return result
 
@@ -185,21 +213,19 @@ class MDNPushInverseModel(object):
 
         # Number of test inputs
         N = out_mu.shape[0]
+        D = out_mu.shape[1] # mean dimension
         M = m_samples
 
-        result = np.random.rand(N, M) # initially random [0, 1]
-        rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
-        mu  = 0
-        std = 0
-        idx = 0
+        result = np.random.rand(N, D, M) # initially random [0, 1]
+        rn  = np.random.randn(N, D, M) # normal random matrix (0.0, 1.0)
 
         # Generates M samples from the mixture for each test input
         for j in range(M):
             for i in range(0, N):
-              idx = self._sample_pi_idx(result[i, j], out_pi[i])
-              mu = out_mu[i, idx]
+              idx = self._sample_pi_idx(np.random.rand(1)[0], out_pi[i])
+              mu = out_mu[i, :, idx]
               std = out_sigma[i, idx]
-              result[i, j] = self._sample_gaussian(rn[i, j], mu, std)
+              result[i, :, j] = self._sample_gaussian(rn[i, :, j], mu, std)
 
         return result
 

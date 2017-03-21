@@ -24,3 +24,8 @@ tf_model_delme.py
 set_env.bash
 
 .mjm
+
+aml_dl/src/aml_dl/mdn/training/tf_check_points
+*summary*
+
+*summary_*

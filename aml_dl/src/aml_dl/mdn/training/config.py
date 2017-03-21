@@ -21,48 +21,36 @@ IMAGE_CHANNELS = 3
 
 
 train_file_indices = range(1,10)
-test_file_indices  = range(1,10)
+test_file_indices  = range(381,397)
+
+adam_params = {
+    'type': 'adam',
+    'params': {'learning_rate' : 0.001, 'beta1': 0.9, 'beta2': 0.999, 'epsilon': 1e-08, 'use_locking': False}
+}
 
 network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 14, 
     'dim_output': 2,
     'n_hidden': 24,
-    'k_mixtures': 5,
+    'k_mixtures': 40,
     'batch_size': 25,
+    'write_summary': True,
+    'learning_rate': 0.0005,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'image_channels': IMAGE_CHANNELS,
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': False,
-    'model_path': check_point_path + 'push_model_inv_60_kernels.ckpt',
-    'train_file_indices':train_file_indices,
-    'test_file_indices':test_file_indices,
-    'training_data_path':training_data_path,
+    'model_path': check_point_path + 'push_model_inv_40_kernels_ep50000.ckpt',
+    'train_file_indices': train_file_indices,
+    'test_file_indices': test_file_indices,
+    'training_data_path': training_data_path,
+    'summary_folder_name': 'summary_inv',
+    'optimiser': adam_params,
     'device': '/cpu:0',
 }
 
-
-
-network_params_fwd = {
-    'num_filters': [5, 5, NUM_FP],
-    'dim_input': 9, 
-    'dim_output': 7,
-    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
-    'n_hidden_layers': 2, #including the input layer excluding the output layer
-    'units_in_hidden_layers':[9,9],#pass none is all layers have equal to input
-    'batch_size': 25,
-    'image_width': IMAGE_WIDTH,
-    'image_height': IMAGE_HEIGHT,
-    'image_channels': IMAGE_CHANNELS,
-    'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
-    'load_saved_model': True,
-    'model_path': check_point_path+'push_model_fwd.ckpt',
-    'training_data_path':training_data_path,
-    'train_file_indices':train_file_indices,
-    'test_file_indices':test_file_indices,
-    'device': '/cpu:0',
-}
 
 num_conv_layers = 3
 filter_sizes_each_layer = [5, 5, 5]
@@ -104,12 +92,18 @@ network_params_cnn = {
 }
 
 
+batch_params_cmbnd = {
+'buffer_size':45, 
+'batch_size': 20, 
+'data_file_indices': train_file_indices, 
+'model_type':'cnn', 
+'use_random_batches':True}
+
 cnn_network_params = {
 'num_layers':2,
 'filter_sizes':[5, 5],
 'num_filters':[16,32],
 'layer_names':['cnn_layer1', 'cnn_layer2'],
-'layer_inputs':[300,128],
 'layer_outputs':[128,10],
 'image_width': IMAGE_WIDTH,
 'image_height': IMAGE_HEIGHT,
@@ -127,7 +121,6 @@ fc_network_params = {
 'num_layers':2,
 'layer_names':['fc_layer1', 'fc_layer2'],
 'num_units_per_layer':[10,7],
-'layer_inputs':[10, 7],
 'layer_outputs':[7, 7],
 'max_pooling':[None, None],
 'use_dropout':[False, False],
@@ -138,15 +131,43 @@ fc_network_params = {
 network_params_cmbnd = {
 'cnn_params':cnn_network_params,
 'fc_params':fc_network_params,
-'learning_rate':0.01,
+'optimiser': adam_params,
+'batch_params':batch_params_cmbnd, #pass None if not using batch training
 'write_summary':True,
 'dim_input':300,
 'dim_output':7,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,
-'model_path': check_point_path+'push_model_cnn_10.ckpt',
+'model_path': check_point_path+'push_model_fwd_with_cnn.ckpt',
 'training_data_path':training_data_path,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
 'device':'/cpu:0',
+}
+
+
+batch_params_fwd = {
+'buffer_size':45, 
+'batch_size': 20, 
+'data_file_indices': train_file_indices, 
+'model_type':'fwd', 
+'use_random_batches':False}
+
+network_params_fwd = {
+    'num_filters': [5, 5, NUM_FP],
+    'dim_input': 9, 
+    'dim_output': 7,
+    'batch_params':batch_params_fwd, #pass None if not using batch training
+    'cnn_params':None,
+    'fc_params':fc_network_params,
+    'optimiser': adam_params,
+    'write_summary':True,
+    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
+    'batch_size': 25,
+    'load_saved_model': True,
+    'model_path': check_point_path+'push_model_fwd.ckpt',
+    'training_data_path':training_data_path,
+    'train_file_indices':train_file_indices,
+    'test_file_indices':test_file_indices,
+    'device': '/cpu:0',
 }

@@ -19,3 +19,6 @@ export PYTHONPATH=$AML_DIR/aml_calib/scripts:$PYTHONPATH
 
 export AML_DATA
 
+#this is for tensor board
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'/usr/local/cuda/extras/CUPTI/lib64'
+

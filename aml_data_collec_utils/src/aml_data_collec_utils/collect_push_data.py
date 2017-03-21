@@ -31,9 +31,9 @@ class PushMachine(object):
 
     def __init__(self, robot_interface, sample_start_index=None):
 
-        # print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
-        # cmd = raw_input('Enter position command (between 0 and 1 to close)')
-        # pisa_hand_service_send_pos_client(float(cmd))
+        print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
+        cmd = raw_input('Enter position command (between 0 and 1 to close)')
+        pisa_hand_service_send_pos_client(float(cmd))
 
         self._push_counter = 0
         self._box = BoxObject()
@@ -152,7 +152,8 @@ class PushMachine(object):
         return success
 
     def on_shutdown(self):
-        send_pos_cmd_pisa_hand()
+        pass
+        # send_pos_cmd_pisa_hand()
         #this if for saving files in case keyboard interrupt happens
         # self._record_sample.save_data_now()
 

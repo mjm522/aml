@@ -1,6 +1,8 @@
+import os
 import argparse
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
 from aml_visual_tools.visual_tools import visualize_2D_data_with_sigma
@@ -22,7 +24,10 @@ def get_data(operation):
 
 def test_inv_model():
 
-    sess = tf.Session()
+    if network_params_inv['write_summary']:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
     test_data_x, test_data_y = get_data('test')
 
@@ -61,14 +66,16 @@ def test_inv_model():
     num_outputs = network_params_inv['dim_output']
     output_vars = ['x','y']
 
-
     visualize_2D_data_with_sigma(data=test_data_y[0][None,:], sigma=pred_sigma)
     visualize_2D_data_with_sigma(data=test_data_y[1][None,:], sigma=pred_sigma)
 
     
 def train_inv_model():
 
-    sess = tf.Session()
+    if network_params_inv['write_summary']:
+        sess = tf.InteractiveSession()
+    else:
+        sess = tf.Session()
 
     network_params_inv['load_saved_model'] = False
 
@@ -85,15 +92,25 @@ def train_inv_model():
 
     print "Got the data, gonna train the model..."
 
-    epochs = 10000#10000
+    epochs = 100#100000#10000
 
     loss = inverse_model.train(train_data_x, train_data_y, epochs = epochs)
 
     inverse_model.save_model()
 
-    plt.figure(figsize=(8, 8))
-    plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
-    plt.show()
+    if network_params_inv['write_summary']:
+
+        plt.figure(figsize=(8, 8))
+        plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
+        plt.show()
+
+        logdir = inverse_model._tf_sumry_wrtr._summary_dir
+        instruction = 'tensorboard --logdir=' + logdir
+        os.system(instruction)
+    else:
+        plt.figure(figsize=(8, 8))
+        plt.plot(np.arange(100, epochs,1), loss[100:], 'r-') 
+        plt.show()
 
     
 if __name__ == '__main__':

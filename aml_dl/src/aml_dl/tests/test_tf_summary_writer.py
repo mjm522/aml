@@ -167,10 +167,10 @@ def train():
 
 def main(_):
 
-    print "**************************************************************************************** \n\n"
-    print "Did you add export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64 ?"
-    print "Else this code will crash with error not able to access libcupti.so \n \n"
-    print "****************************************************************************************"
+    print ("**************************************************************************************** \n\n")
+    print ("Did you add export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64 ?")
+    print ("Else this code will crash with error not able to access libcupti.so \n \n")
+    print ("****************************************************************************************")
     raw_input("If yes, press enter to continue ...")
 
     train()

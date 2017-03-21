@@ -55,8 +55,16 @@ class Sample(object):
 
         if keys is None:
             keys = data.keys()
-  
-        out = [ data[k] for k in list(set(keys) & set(data)) ]
+            # TODO add key order in config file
+            # adjust key order
+
+        #out = [ data[k] for k in list(set(keys) & set(data)) ]
+        out = []
+
+        try:
+            out = [data[k] for k in keys]
+        except Exception as e:
+            print "No such key ", e, " ", keys
 
         return out
 
