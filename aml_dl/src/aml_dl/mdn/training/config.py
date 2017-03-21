@@ -2,16 +2,16 @@ import os
 from aml_robot.box2d.config import config
 from aml_io.io_tools import get_aml_package_path
 
-check_point_path   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/'
-training_data_path = ''
-summary_path       = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
+check_point_dir   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/'
+training_data_dir = ''
+summary_dir       = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
 
 try:
-    training_data_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
+    training_data_dir = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
 except:
     print "AML_DATA environment variable is not set."
 
-if not os.path.exists(training_data_path):
+if not os.path.exists(training_data_dir):
     print "Training data folder does not exist..."
     #raise ValueError
 
@@ -44,12 +44,13 @@ network_params_inv = {
     'image_channels': IMAGE_CHANNELS,
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': False,
-    'model_path': check_point_path + 'push_model_inv_40_kernels_ep50000.ckpt',
+    'model_dir': check_point_dir + '/inv/',
+    'model_name':'push_model_inv_40_kernels_ep50000.ckpt',
     'train_file_indices': train_file_indices,
     'test_file_indices': test_file_indices,
-    'training_data_path': training_data_path,
+    'training_data_dir': training_data_dir,
     'optimiser': adam_params,
-    'summary_path':summary_path+'/inv/',
+    'summary_dir':summary_dir+'/inv/',
     'device': '/cpu:0',
 }
 
@@ -85,11 +86,12 @@ network_params_cnn = {
     'use_relu':True,
     'stddev':0.05,
     'load_saved_model': True,
-    'model_path': check_point_path+'push_model_cnn.ckpt',
-    'training_data_path':training_data_path,
+    'model_dir': check_point_dir+'/cnn/',
+    'model_name':'push_model_cnn.ckpt',
+    'training_data_dir':training_data_dir,
     'train_file_indices':train_file_indices,
     'test_file_indices':test_file_indices,
-    'summary_path':summary_path+'/cnn/',
+    'summary_dir':summary_dir+'/cnn/',
     'device':'/cpu:0',
 
 }
@@ -141,11 +143,12 @@ network_params_cmbnd = {
 'dim_output':7,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,
-'model_path': check_point_path+'push_model_fwd_with_cnn.ckpt',
-'training_data_path':training_data_path,
+'model_dir': check_point_dir+'/cmbnd/',
+'model_name':'push_model_fwd_with_cnn.ckpt',
+'training_data_dir':training_data_dir,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
-'summary_path':summary_path+'/cmbnd/',
+'summary_dir':summary_dir+'/cmbnd/',
 'device':'/cpu:0',
 }
 
@@ -169,11 +172,12 @@ network_params_fwd = {
     'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'batch_size': 25,
     'load_saved_model': True,
-    'model_path': check_point_path+'push_model_fwd.ckpt',
-    'training_data_path':training_data_path,
+    'model_dir': check_point_dir+'/fwd/',
+    'model_name':'push_model_fwd.ckpt',
+    'training_data_dir':training_data_dir,
     'train_file_indices':train_file_indices,
     'test_file_indices':test_file_indices,
-    'summary_path':summary_path+'/fwd/',
+    'summary_dir':summary_dir+'/fwd/',
     'device': '/cpu:0',
 }
 
@@ -241,10 +245,11 @@ network_params_siam = {
 'dim_output':7,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,
-'model_path': check_point_path+'push_model_fwd_with_cnn.ckpt',
-'training_data_path':training_data_path,
+'model_dir': check_point_dir+'/siam/',
+'model_name':'push_model_fwd_with_siam.ckpt',
+'training_data_dir':training_data_dir,
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
-'summary_path':summary_path+'/siam/',
+'summary_dir':summary_dir+'/siam/',
 'device':'/cpu:0',
 }
