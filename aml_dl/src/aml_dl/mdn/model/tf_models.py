@@ -228,13 +228,12 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
 def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, tf_sumry_wrtr):
 
     image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
-    image_input_t   = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
-    image_input_t_1 = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
+    image_input_t   = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x_t-input')
+    image_input_t_1 = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x_t_1-input')
     
     with tf.name_scope('input_reshape'):
-        image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
-        image_shaped_input_t   = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
-        image_shaped_input_t_1 = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+        image_shaped_input_t   = tf.reshape(image_input_t, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+        image_shaped_input_t_1 = tf.reshape(image_input_t_1, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
 
         img_resize_params = cnn_params['img_resize']
 
@@ -248,49 +247,98 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
             tf_sumry_wrtr.add_image(name_scope='input_resize_t',   image=image_shaped_input_t)
             tf_sumry_wrtr.add_image(name_scope='input_resize_t_1', image=image_shaped_input_t_1)
 
-    def conv_relu(input, kernel_shape, bias_shape):
+    def conv_relu(input, variable_name, weight_name, bias_name, kernel_shape, bias_shape, pre_activate_scope=None, activate_scope=None):
         # Create variable named "weights".
-        weights = tf.get_variable("weights", kernel_shape,
-            initializer=tf.random_normal_initializer())
-        # Create variable named "biases".
-        biases = tf.get_variable("biases", bias_shape,
-            initializer=tf.constant_initializer(0.0))
-        conv = tf.nn.conv2d(input, weights,
-            strides=[1, 1, 1, 1], padding='SAME')
-        return tf.nn.relu(conv + biases)
+        with tf.variable_scope(variable_name):
+            weights = tf.get_variable(weight_name, kernel_shape, initializer=tf.random_normal_initializer())
+            # Create variable named "biases".
+            biases = tf.get_variable(bias_name, bias_shape, initializer=tf.constant_initializer(0.0))
+        
+        with tf.variable_scope(pre_activate_scope):
+            conv = tf.nn.conv2d(input, weights, strides=[1, 1, 1, 1], padding='SAME')
 
-    def image_filter(input_images, filter_shape, bias_shape):
-        with tf.variable_scope("conv1"):
-            # Variables created here will be named "conv1/weights", "conv1/biases".
-            relu1 = conv_relu(input_images, filter_shape, bias_shape)
-        with tf.variable_scope("conv2"):
-            # Variables created here will be named "conv2/weights", "conv2/biases".
-            relu2 = conv_relu(relu1, filter_shape, bias_shape)
-        with tf.variable_scope("conv3"):
-            # Variables created here will be named "conv3/weights", "conv3/biases".
-            return conv_relu(relu2, filter_shape, bias_shape)
+        with tf.variable_scope(activate_scope):
+            result  = tf.nn.relu(conv + biases)
+
+        return result
+
+    def image_filter(input_images, params):
+        no_channels = params['image_channels']
+        for k in range(params['num_layers']):
+            with tf.variable_scope(params['layer_names'][k]):
+                kernel_shape = [params['filter_sizes'][k], params['filter_sizes'][k], no_channels, params['num_filters'][k]]
+                no_channels = params['num_filters'][k]
+                bias_shape = params['num_filters'][k]  #for clarity
+                result = conv_relu(input=input_images, 
+                                   variable_name=params['variable_names'][k], 
+                                   weight_name=params['weight_names'][k], 
+                                   bias_name=params['bias_names'][k], 
+                                   kernel_shape=kernel_shape, 
+                                   bias_shape=bias_shape, 
+                                   pre_activate_scope=params['pre_activate_scope'][k], 
+                                   activate_scope=params['activate_scope'][k])
+                input_images = result
+        return result
 
     with tf.variable_scope("image_filters") as scope:
-        cnn_layer_output_t = image_filter(image_input_t, cnn_params['filter_shape'], cnn_params['bias_shape'])
+        cnn_layer_output_t = image_filter(image_shaped_input_t, cnn_params)
         scope.reuse_variables()
-        cnn_layer_output_t_1 = image_filter(image_input_t_1, cnn_params['filter_shape'], cnn_params['bias_shape'])
+        cnn_layer_output_t_1 = image_filter(image_shaped_input_t_1, cnn_params)
         if tf_sumry_wrtr is not None:
             tf_sumry_wrtr.add_variable_summaries(cnn_layer_output_t)
             tf_sumry_wrtr.add_variable_summaries(cnn_layer_output_t_1)
 
 
-    layer_shape_t      = cnn_layer_output_t.get_shape() 
-    num_features_t     = layer_shape_t[1:4].num_elements()
-    layer_flat_t       = tf.reshape(cnn_layer_output_t, [-1, num_features_t])
+    # layer_shape_t      = cnn_layer_output_t.get_shape() 
+    # num_features_t     = layer_shape_t[1:4].num_elements()
+    # layer_flat_t       = tf.reshape(cnn_layer_output_t, [-1, num_features_t])
 
-    layer_shape_t_1      = cnn_layer_output_t_1.get_shape()
-    num_features_t_1     = layer_shape_t_1[1:4].num_elements()
-    layer_flat_t_1       = tf.reshape(cnn_layer_output_t_1, [-1, num_features_t_1])
+    # layer_shape_t_1      = cnn_layer_output_t_1.get_shape()
+    # num_features_t_1     = layer_shape_t_1[1:4].num_elements()
+    # layer_flat_t_1       = tf.reshape(cnn_layer_output_t_1, [-1, num_features_t_1])
+
+    def get_feature_points(cnn_layer_out):
+
+        _, num_rows, num_cols, num_fp = cnn_layer_out.get_shape()
+        num_rows, num_cols, num_fp = [int(x) for x in [num_rows, num_cols, num_fp]]
+        x_map = np.empty([num_rows, num_cols], np.float32)
+        y_map = np.empty([num_rows, num_cols], np.float32)
+
+        for i in range(num_rows):
+            for j in range(num_cols):
+                x_map[i, j] = (i - num_rows / 2.0) / num_rows
+                y_map[i, j] = (j - num_cols / 2.0) / num_cols
+
+        x_map = tf.convert_to_tensor(x_map)
+        y_map = tf.convert_to_tensor(y_map)
+
+        x_map = tf.reshape(x_map, [num_rows * num_cols])
+        y_map = tf.reshape(y_map, [num_rows * num_cols])
+
+        # rearrange features to be [batch_size, num_fp, num_rows, num_cols]
+        features = tf.reshape(tf.transpose(cnn_layer_out, [0,3,1,2]),
+                              [-1, num_rows*num_cols])
+        softmax = tf.nn.softmax(features)
+        fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
+        fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
+        fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
+        return fp
+
+    with tf.variable_scope('feature_points_t'):
+        feature_point_t = get_feature_points(cnn_layer_output_t)
+
+    with tf.variable_scope('feature_points_t_1'):
+        feature_point_t_1 = get_feature_points(cnn_layer_output_t_1)
+
+    if tf_sumry_wrtr is not None:
+        tf_sumry_wrtr.add_variable_summaries(feature_point_t)
+        tf_sumry_wrtr.add_variable_summaries(feature_point_t_1)
+
 
     with tf.name_scope('input_y'):
         target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
 
-    fc_layer_output  = create_nn_layers(layer_flat_t, fc_params, tf_sumry_wrtr, layer_type='fc')
+    fc_layer_output  = create_nn_layers(feature_point_t, fc_params, tf_sumry_wrtr, layer_type='fc')
 
     # mdn_layer_output = ???????
 
