@@ -226,7 +226,7 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
     output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
     return output_ops
 
-def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, mdn_params, tf_sumry_wrtr):
+def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, mdn_params, cost_weights, tf_sumry_wrtr):
 
     image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
     image_input_t   = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x_t-input')
@@ -345,18 +345,11 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
     dim = int(dim_input) 
     mdn_params['dim_input'] = dim
 
-    print "Dim input ", dim
-
-    mdn = MixtureDensityNetwork(mdn_params,
-                                tf_sumry_wrtr = tf_sumry_wrtr)
-
-    
+    mdn = MixtureDensityNetwork(network_params=mdn_params, tf_sumry_wrtr = tf_sumry_wrtr) 
     mdn._init_model(input_op=mdn_input_op) # Construct model graph
 
-    ##############################################################################################
+    ############################################FORWARD MODEL######################################
 
-
-    ############################################FORWARD MODEL#####################################
     fwd_model_inp = tf.concat(concat_dim=1,values=[feature_point_t, mdn._ops['y']])
 
     fc_layer_output  = create_nn_layers(fwd_model_inp, fc_params, tf_sumry_wrtr, layer_type='fc')
@@ -366,9 +359,14 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
 
 
     if loss_type == 'normal':
-        cost, total = get_loss_cnn(fc_layer_output, target)
+        cost_fwd, _ = get_loss_cnn(fc_layer_output, target)
     elif loss_type == 'quadratic':
-        cost, total = get_quadratic_loss(fc_layer_output, target)
+        cost_fwd, _ = get_quadratic_loss(fc_layer_output, target)
+
+    ###########################COMBINED COST FUNCTION##############################################
+
+    cost  =  cost_weights['fwd']*cost_fwd + cost_weights['inv']*mdn._ops['loss']
+    total = tf.reduce_mean(cost)
 
     with tf.name_scope('train'):
         train_step = optimiser_op(cost, optimiser_params)
@@ -379,7 +377,7 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
         with tf.name_scope('accuracy'):
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-    ##################################################################################################
+    ######################################WRAP UP##################################################
     
     if tf_sumry_wrtr is not None:
         tf_sumry_wrtr.add_scalar(name_scope='cost', data=total)

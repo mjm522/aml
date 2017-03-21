@@ -40,6 +40,7 @@ class SiamesePushModel(object):
                                      fc_params=network_params['fc_params'],
                                      mdn_params=network_params['inv_params'],
                                      optimiser_params=network_params['optimiser'],
+                                     cost_weights=network_params['cost_weights'],
                                      tf_sumry_wrtr=self._tf_sumry_wrtr)
 
             self._init_op = tf.initialize_all_variables()

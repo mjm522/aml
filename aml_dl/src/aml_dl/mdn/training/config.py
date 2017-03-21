@@ -217,11 +217,19 @@ fc_network_params_siam = {
 'stddev':0.05,  
 }
 
+cost_weights = {
+    'fwd':0.5,
+    'inv':1.,
+}
+
 network_params_siam = {
 'cnn_params':cnn_network_params_siam,
 'fc_params':fc_network_params_siam,
 'inv_params': network_params_inv,
 'optimiser': adam_params,
+'fwd_loss_wght': 0.5,
+'mdn_loss_wght':1.,
+'cost_weights':cost_weights,
 'batch_params':batch_params_siam, #pass None if not using batch training
 'write_summary':True,
 'dim_input':300,
