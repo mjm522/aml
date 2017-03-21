@@ -108,6 +108,12 @@ class MixtureDensityNetwork(object):
 
     return out
 
+  def _mixture(self, kernels, pis):
+
+    result = tf.multiply(kernels,tf.reshape(pis, [-1, 1, m]))
+    mixture = tf.reduce_sum(result, 2, keep_dims=True)
+
+
 
   def run(self, sess, xs, ys = None):
     out = []
