@@ -70,9 +70,10 @@ class NNPushFwdModel(object):
 
 
     def get_data(self):
+        round_complete = None 
         if self._params['batch_params'] is not None:
             if self._batch_creator is not None:
-                self._data_x, self._data_y = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
+                self._data_x, self._data_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
             else:
                 raise Exception("Batch training chosen but batch_creator not configured")
 
@@ -81,7 +82,7 @@ class NNPushFwdModel(object):
         else:
             feed_dict = {self._net_ops['image_input']:self._data_x, self._net_ops['y']:self._data_y}
         
-        return feed_dict
+        return feed_dict, round_complete
 
     def train(self, epochs):
 
@@ -93,36 +94,48 @@ class NNPushFwdModel(object):
         
         loss = np.zeros(epochs)
         
-        feed_dict = self.get_data()
+        feed_dict, _ = self.get_data()
 
         if self._tf_sumry_wrtr is not None:
 
             for i in range(epochs):
 
-                if self._params['batch_params'] is not None:
-                    feed_dict = self.get_data()
+                print "Starting epoch \t", i
+                round_complete = False
 
-                if i % 10 == 0:  # Record summaries and test-set accuracy
-                    summary, acc = self._sess.run([self._tf_sumry_wrtr._merged, self._net_ops['accuracy']], feed_dict=feed_dict)
-                    
-                    self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-                    print('Accuracy at step %s: %s' % (i, acc))
-                else:  # Record train set summaries, and train
-                    if i % 100 == 99:  # Record execution stats
-                        run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-                        run_metadata = tf.RunMetadata()
-                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
-                                                    feed_dict=feed_dict,
-                                                    options=run_options,
-                                                    run_metadata=run_metadata)
+                while not round_complete:
+
+                    if self._params['batch_params'] is not None:
+                        feed_dict, round_complete = self.get_data()
+                    else:
+                        #this is to take care of the case when we are not doing batch training.
+                        round_complete = True
+
+                    if round_complete:
+                        print "Completed round"
+    
+
+                    if i % 10 == 0:  # Record summaries and test-set accuracy
+                        summary, acc = self._sess.run([self._tf_sumry_wrtr._merged, self._net_ops['accuracy']], feed_dict=feed_dict)
                         
-                        self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
                         self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-                        print('Adding run metadata for', i)
-                    else:  # Record a summary
-                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
-                                                    feed_dict=feed_dict)
-                        self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+                        print('Accuracy at step %s: %s' % (i, acc))
+                    else:  # Record train set summaries, and train
+                        if i % 100 == 99:  # Record execution stats
+                            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                            run_metadata = tf.RunMetadata()
+                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
+                                                        feed_dict=feed_dict,
+                                                        options=run_options,
+                                                        run_metadata=run_metadata)
+                            
+                            self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
+                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+                            print('Adding run metadata for', i)
+                        else:  # Record a summary
+                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
+                                                        feed_dict=feed_dict)
+                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
            
             self._tf_sumry_wrtr.close_writer()
 

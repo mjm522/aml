@@ -12,8 +12,8 @@ def bias_variable(shape, stddev=0.1):
     initial = tf.constant(stddev, shape=shape)
     return tf.Variable(initial)
 
-
-def cnn_layer(input_tensor, layer_name, num_inp_channels, filter_size,  num_filters, activate, max_pooling=None, strides=None, padding='SAME', stddev=0.05):
+def cnn_layer(input_tensor, layer_name, num_inp_channels, filter_size,  num_filters, activate, 
+              max_pooling=None, strides=None, padding='SAME', stddev=0.05):
     
     with tf.name_scope(layer_name):
         # Shape of the filter-weights for the convolution.
@@ -61,7 +61,6 @@ def nn_layer(input_tensor, layer_name, output_dim, activate, max_pooling=None):
         
         activations = activate(layer, name='activation')
         return weights, biases, layer, activations
-
 
 def get_loss_cnn(output, target):
     # cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=target)
@@ -163,7 +162,6 @@ def create_nn_layers(inp, params, tf_sumry_wrtr, layer_type):
 
     return layer_input
 
-
 def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_params, tf_sumry_wrtr):
     # Create a multilayer model.
     image_input = None
@@ -225,6 +223,98 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
         tf_sumry_wrtr.write_summary()
 
     output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
+    return output_ops
+
+def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, tf_sumry_wrtr):
+
+    image_len = cnn_params['image_width']*cnn_params['image_height']*cnn_params['image_channels']
+    image_input_t   = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
+    image_input_t_1 = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x-input')
+    
+    with tf.name_scope('input_reshape'):
+        image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
+        image_shaped_input_t   = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+        image_shaped_input_t_1 = tf.reshape(image_input, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+
+        img_resize_params = cnn_params['img_resize']
+
+        if  img_resize_params is not None:
+            image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
+            with tf.name_scope('input_resize'):
+                image_shaped_input_t   = tf.image.resize_images(image_shaped_input_t,   size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
+                image_shaped_input_t_1 = tf.image.resize_images(image_shaped_input_t_1, size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
+        
+        if tf_sumry_wrtr is not None:
+            tf_sumry_wrtr.add_image(name_scope='input_resize_t',   image=image_shaped_input_t)
+            tf_sumry_wrtr.add_image(name_scope='input_resize_t_1', image=image_shaped_input_t_1)
+
+    def conv_relu(input, kernel_shape, bias_shape):
+        # Create variable named "weights".
+        weights = tf.get_variable("weights", kernel_shape,
+            initializer=tf.random_normal_initializer())
+        # Create variable named "biases".
+        biases = tf.get_variable("biases", bias_shape,
+            initializer=tf.constant_initializer(0.0))
+        conv = tf.nn.conv2d(input, weights,
+            strides=[1, 1, 1, 1], padding='SAME')
+        return tf.nn.relu(conv + biases)
+
+    def image_filter(input_images, filter_shape, bias_shape):
+        with tf.variable_scope("conv1"):
+            # Variables created here will be named "conv1/weights", "conv1/biases".
+            relu1 = conv_relu(input_images, filter_shape, bias_shape)
+        with tf.variable_scope("conv2"):
+            # Variables created here will be named "conv2/weights", "conv2/biases".
+            relu2 = conv_relu(relu1, filter_shape, bias_shape)
+        with tf.variable_scope("conv3"):
+            # Variables created here will be named "conv3/weights", "conv3/biases".
+            return conv_relu(relu2, filter_shape, bias_shape)
+
+    with tf.variable_scope("image_filters") as scope:
+        cnn_layer_output_t = image_filter(image_input_t, cnn_params['filter_shape'], cnn_params['bias_shape'])
+        scope.reuse_variables()
+        cnn_layer_output_t_1 = image_filter(image_input_t_1, cnn_params['filter_shape'], cnn_params['bias_shape'])
+        if tf_sumry_wrtr is not None:
+            tf_sumry_wrtr.add_variable_summaries(cnn_layer_output_t)
+            tf_sumry_wrtr.add_variable_summaries(cnn_layer_output_t_1)
+
+
+    layer_shape_t      = cnn_layer_output_t.get_shape() 
+    num_features_t     = layer_shape_t[1:4].num_elements()
+    layer_flat_t       = tf.reshape(cnn_layer_output_t, [-1, num_features_t])
+
+    layer_shape_t_1      = cnn_layer_output_t_1.get_shape()
+    num_features_t_1     = layer_shape_t_1[1:4].num_elements()
+    layer_flat_t_1       = tf.reshape(cnn_layer_output_t_1, [-1, num_features_t_1])
+
+    with tf.name_scope('input_y'):
+        target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
+
+    fc_layer_output  = create_nn_layers(layer_flat_t, fc_params, tf_sumry_wrtr, layer_type='fc')
+
+    # mdn_layer_output = ???????
+
+    if loss_type == 'normal':
+        cost, total = get_loss_cnn(fc_layer_output, target)
+    elif loss_type == 'quadratic':
+        cost, total = get_quadratic_loss(fc_layer_output, target)
+
+    with tf.name_scope('train'):
+        train_step = optimiser_op(cost, optimiser_params)
+
+    with tf.name_scope('accuracy'):
+        with tf.name_scope('correct_prediction'):
+            correct_prediction = tf.equal(tf.argmax(fc_layer_output, 1), tf.argmax(target, 1))
+        with tf.name_scope('accuracy'):
+            accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    
+    if tf_sumry_wrtr is not None:
+        tf_sumry_wrtr.add_scalar(name_scope='cost', data=total)
+        tf_sumry_wrtr.add_scalar(name_scope='accuracy', data=accuracy)
+        # Merge all the summaries and write them out to /tmp/tensorflow/mnist/logs/mnist_with_summaries (by default)
+        tf_sumry_wrtr.write_summary()
+
+    output_ops = {'output' : fc_layer_output, 'cost': total, 'accuracy':accuracy, 'train_step': train_step, 'image_input_t':image_input_t, 'image_input_t_1':image_input_t_1, 'y': target}
     return output_ops
 
 
