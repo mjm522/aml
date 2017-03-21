@@ -17,10 +17,10 @@ def main():
     #while loops are given since if we make batch_creator multi threaded, this will be 
     #useful
     while x_batch1 is None and y_batch1 is None:
-        x_batch1, y_batch1 =  batch_creator.get_batch()
+        x_batch1, y_batch1,_ =  batch_creator.get_batch()
     
     while x_batch2 is None and y_batch2 is None:
-        x_batch2, y_batch2 =  batch_creator.get_batch()
+        x_batch2, y_batch2, _ =  batch_creator.get_batch()
 
     x_check_list = []
     y_check_list = []

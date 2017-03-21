@@ -1,7 +1,19 @@
 import logging
 
+LEVELS = {'debug':    logging.DEBUG,
+          'info':     logging.INFO,
+          'warning':  logging.WARNING,
+          'error':    logging.ERROR,
+          'critical': logging.CRITICAL}
 
 class aml_logging(object):
+
+	# @classmethod
+	# def setup(cls, level_name):
+	# 	if level_name is None:
+	# 		level_name = 'info'
+	# 	level = LEVELS.get(level_name, logging.NOTSET)
+ #    	logging.basicConfig(level=level)
 
 	@classmethod
 	def debug(cls, msg):
