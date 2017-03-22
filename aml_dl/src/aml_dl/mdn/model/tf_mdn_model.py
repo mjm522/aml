@@ -11,12 +11,18 @@ class MixtureDensityNetwork(object):
     self._dim_output = network_params['dim_output']
     self._n_kernels = network_params['k_mixtures']
     self._n_hidden = network_params['n_hidden']
+    self._optimiser = network_params['optimiser']
     self._tf_sumry_wrtr = tf_sumry_wrtr
 
-  def _init_model(self):
+  def _init_model(self, input_op = None):
 
     with tf.name_scope('input'):
-      self._x = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_input],  name="x")
+
+      if input_op is None:
+        self._x = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_input],  name="x")
+      else:
+        self._x = input_op
+
       self._y = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_output], name="y")
 
     with tf.name_scope('output_fc_op'):
@@ -31,7 +37,7 @@ class MixtureDensityNetwork(object):
         self._tf_sumry_wrtr.add_variable_summaries(self._sigmas_op)
         self._tf_sumry_wrtr.add_variable_summaries(self._pis_op)
 
-    with tf.name_scope('loss'):
+    with tf.name_scope('cost_inv'):
       self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
       if self._tf_sumry_wrtr is not None:
         self._tf_sumry_wrtr.add_variable_summaries(self._loss_op)
@@ -115,6 +121,12 @@ class MixtureDensityNetwork(object):
 
     return out
 
+  def _mixture(self, kernels, pis):
+
+    result = tf.multiply(kernels,tf.reshape(pis, [-1, 1, m]))
+    mixture = tf.reduce_sum(result, 2, keep_dims=True)
+
+
 
   def run(self, sess, xs, ys = None):
     out = []
@@ -135,86 +147,4 @@ class MixtureDensityNetwork(object):
 
 
     return out
-
-
-
-class MixtureOfGaussians(object):
-
-  def sample_pi_idx(self, x, pdf):
-    N = pdf.size
-    acc = 0
-
-    for i in range(0, N):
-      acc += pdf[i]
-      if (acc >= x):
-        return i
-
-        print 'failed to sample mixture weight index'
-
-
-    return -1
-
-
-  def max_pi_idx(self, pdf):
-
-    i = np.argmax(pdf)
-
-    return i
-
-  def sample_gaussian(self, rn, mu, std):
-
-
-    return mu + rn*std
-
-  def generate_mixture_samples_from_max_pi(self, out_pi, out_mu, out_sigma, m_samples=10):
-
-
-    # Number of test inputs
-
-    N = out_mu.shape[0]
-
-    M = m_samples
-
-    result = np.random.rand(N, M)
-    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
-
-    # Generates M samples from the mixture for each test input
-
-    for j in range(M):
-      for i in range(0, N):
-        idx = self.max_pi_idx(out_pi[i])
-        mu = out_mu[i, idx]
-        std = out_sigma[i, idx]
-        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
-
-
-    return result
-
-
-  def generate_mixture_samples(self, out_pi, out_mu, out_sigma, m_samples=10):
-
-
-    # Number of test inputs
-    N = out_mu.shape[0]
-    M = m_samples
-
-    result = np.random.rand(N, M) # initially random [0, 1]
-    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
-    mu  = 0
-    std = 0
-    idx = 0
-
-    # Generates M samples from the mixture for each test input
-    for j in range(M):
-      for i in range(0, N):
-        idx = self.sample_pi_idx(result[i, j], out_pi[i])
-        mu = out_mu[i, idx]
-        std = out_sigma[i, idx]
-        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
-
-
-    return result
-
-
-
 
