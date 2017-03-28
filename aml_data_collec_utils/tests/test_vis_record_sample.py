@@ -2,6 +2,8 @@ import aml_data_collec_utils
 
 import cv2
 
+import numpy as np
+
 from aml_data_collec_utils.core.data_manager import DataManager
 
 data_man = DataManager(data_name_prefix='test_push_data')
@@ -67,10 +69,15 @@ while not quit:
     print "SAMPLE KEYS ", sample.get_keys()
     # print "START STATE ", sample._contents[0]
     # print "FINAL STATE ", sample._contents[-1]
-    print "Start location of the box \n", sample.get(0,['task_state'])
-    print "Start location of the box \n", sample.get(0,['task_state'])
+    print "Start location of the box \n", sample.get(0,['box_pos'])
     print "Push action \n", sample.get(0,['task_action'])
-    print "End location of the box \n", sample.get(-1,['task_state'])
+    print "End location of the box \n", sample.get(-1,['box_pos'])
+    print "Box tracking good Before", sample.get(0,['box_tracking_good'])
+    print "Box tracking good After", sample.get(-1,['box_tracking_good'])
+
+    sample_is_valid = np.linalg.norm(sample.get(-1,['box_pos'])[0] - sample.get(0,['box_pos'])[0]) > 1e-7 and sample.size > 2
+
+    print "Sample is valid ", sample_is_valid
 
     #for i in range(sample.size()):
     cv2.imshow("Image sequence",  string2image(sample.get(sample_data_point_idx,['rgb_image'])[0]))
