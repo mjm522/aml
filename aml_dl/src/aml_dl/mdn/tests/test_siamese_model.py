@@ -38,8 +38,8 @@ def get_data(operation, string_img_convert=True):
     data_x = []
     if string_img_convert:
         for x_image in tmp_x:
-            data_x.append(((np.transpose(string2image(x_image[0][0]), axes=[2,1,0])).flatten(), 
-                           (np.transpose(string2image(x_image[1][0]), axes=[2,1,0]))).flatten())
+            data_x.append((np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten(), 
+                           np.transpose(string2image(x_image[1][0]), axes=[2,1,0]).flatten()))
 
     else:
         data_x = tmp_x

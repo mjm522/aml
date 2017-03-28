@@ -22,7 +22,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1, 380)
+train_file_indices = range(1, 10)
 test_file_indices  = range(381,397)
 
 adam_params = {
@@ -216,6 +216,7 @@ cnn_network_params_siam = {
 
 fc_network_params_siam = {
 'num_layers':3,
+'state_dim':7,
 'action_dim':2,
 'layer_names':['fc_layer1', 'fc_layer2', 'fc_layer3'],
 'num_units_per_layer':[10, 9, 7],
@@ -236,7 +237,7 @@ network_params_siam = {
 'fc_params':fc_network_params_siam,
 'inv_params': network_params_inv,
 'optimiser': adam_params,
-'epochs': 3000,
+'epochs': 1,
 'fwd_loss_wght': 0.5,
 'mdn_loss_wght':1.,
 'cost_weights':cost_weights,

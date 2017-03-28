@@ -22,7 +22,7 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1, 380)
+train_file_indices = range(1, 10)
 test_file_indices  = range(381,397)
 
 adam_params = {

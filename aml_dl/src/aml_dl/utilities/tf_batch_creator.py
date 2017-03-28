@@ -28,10 +28,10 @@ class BatchCreator(DataManager):
             self._x_buffer = []
             for x_image in tmp_x:
                 if self._parmams['model_type'] == 'siam':
-                    self._x_buffer.append(((np.transpose(string2image(x_image[0][0]), axes=[2,1,0])).flatten(), 
-                                           (np.transpose(string2image(x_image[1][0]), axes=[2,1,0]))).flatten())
+                    self._x_buffer.append((np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten(), 
+                                           np.transpose(string2image(x_image[1][0]), axes=[2,1,0]).flatten()))
                 else:
-                    self._x_buffer.append((np.transpose(string2image(x_image[0]), axes=[2,1,0])).flatten())
+                    self._x_buffer.append(np.transpose(string2image(x_image[0]), axes=[2,1,0]).flatten())
         else:
             self._x_buffer = tmp_x
 
