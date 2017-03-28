@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import rospy
+import matplotlib
 import numpy as np
 import tensorflow as tf
-import matplotlib
 import matplotlib.pyplot as plt
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
+from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
+from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, network_params_siam
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
 
 def predict_next_state_from_learned_model(req):
@@ -26,9 +27,11 @@ def predict_next_state_from_learned_model(req):
 def predict_action_from_learned_model(req):
     sess = tf.Session()
 
-    inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
-    inverse_model.init_model()
+    # inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
+    # inverse_model.init_model()
 
+    inverse_model = SiamesePushModel(sess=sess, network_params=network_params_siam)
+    inverse_model.init_model()
 
     input_x = np.expand_dims(np.r_[req.curr_state, req.tgt_state], 0)
     mus = inverse_model.run_op('mu', input_x)[0]
