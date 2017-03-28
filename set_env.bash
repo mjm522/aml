@@ -4,7 +4,7 @@ AML_DIR=$(pwd)
 
 AML_DATA='REPLACE THIS LINE WITH THE PATH TO AML_DATA'
 
-AML_DATA='/home/mjm/gitlibs/aml_data' #gitignore
+AML_DATA='/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml_data'
 
 MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collection_utils'
 

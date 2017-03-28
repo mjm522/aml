@@ -4,7 +4,6 @@ from aml_io.convert_tools import string2image
 from aml_data_collec_utils.core.data_manager import DataManager
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
-
 class BatchCreator(DataManager):
     def __init__(self, batch_params):
 
@@ -29,9 +28,10 @@ class BatchCreator(DataManager):
             self._x_buffer = []
             for x_image in tmp_x:
                 if self._parmams['model_type'] == 'siam':
-                    self._x_buffer.append((string2image(x_image[0][0]).flatten(), string2image(x_image[1][0]).flatten()))
+                    self._x_buffer.append(((np.transpose(string2image(x_image[0][0]), axes=[2,1,0])).flatten(), 
+                                           (np.transpose(string2image(x_image[1][0]), axes=[2,1,0]))).flatten())
                 else:
-                    self._x_buffer.append(string2image(x_image[0]).flatten())
+                    self._x_buffer.append((np.transpose(string2image(x_image[0]), axes=[2,1,0])).flatten())
         else:
             self._x_buffer = tmp_x
 

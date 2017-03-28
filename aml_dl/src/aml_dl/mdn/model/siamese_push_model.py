@@ -21,23 +21,24 @@ class SiamesePushModel(object):
 
         self._data_configured = False
 
-        if network_params['write_summary']:
-            if 'summary_dir' in network_params:
-                summary_dir = network_params['summary_dir']
-            else:
-                summary_dir = None
-            self._tf_sumry_wrtr = TfSummaryWriter(tf_session=sess,summary_dir=summary_dir)
-            cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
-
-            curr_ld_path = os.environ["LD_LIBRARY_PATH"]
-
-            if not cuda_path in curr_ld_path.split(os.pathsep):
-                print "Enviroment variable LD_LIBRARY_PATH does not contain %s"%cuda_path
-                print "Please add it, else the program will crash!"
-                raw_input("Press Ctrl+C")
-                # os.environ["LD_LIBRARY_PATH"] = curr_ld_path + ':'+cuda_path
-
         with tf.device(self._device):
+
+            if network_params['write_summary']:
+                if 'summary_dir' in network_params:
+                    summary_dir = network_params['summary_dir']
+                else:
+                    summary_dir = None
+                self._tf_sumry_wrtr = TfSummaryWriter(tf_session=sess,summary_dir=summary_dir)
+                cuda_path = '/usr/local/cuda/extras/CUPTI/lib64'
+
+                curr_ld_path = os.environ["LD_LIBRARY_PATH"]
+
+                if not cuda_path in curr_ld_path.split(os.pathsep):
+                    print "Enviroment variable LD_LIBRARY_PATH does not contain %s"%cuda_path
+                    print "Please add it, else the program will crash!"
+                    raw_input("Press Ctrl+C")
+                    # os.environ["LD_LIBRARY_PATH"] = curr_ld_path + ':'+cuda_path
+
             self._net_ops = tf_siamese_model(dim_output=network_params['dim_output'],
                                      loss_type='quadratic',
                                      cnn_params=network_params['cnn_params'], 
@@ -68,6 +69,7 @@ class SiamesePushModel(object):
             data_y_t_1       = data_y_array[:,data_y_point_len:]
             self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
             self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
+
         else:
             self._data_x_t   = None
             self._data_x_t_1 = None
@@ -126,65 +128,79 @@ class SiamesePushModel(object):
 
         if not self._data_configured:
             raise Exception("Data not configured, please configure..")
+
+        with tf.device(self._device):
         
-        if self._params['write_summary']:
-            tf.global_variables_initializer().run()
+            if self._params['write_summary']:
+                tf.global_variables_initializer().run()
+            
+            loss = np.zeros(epochs)
+            
+            feed_dict, _ = self.get_data()
+
         
-        loss = np.zeros(epochs)
-        
-        feed_dict, _ = self.get_data()
-
-        if self._tf_sumry_wrtr is not None:
-
-            for i in range(epochs):
-
-                print "Starting epoch \t", i
-                round_complete = False
-
-                while not round_complete:
-
-                    if self._params['batch_params'] is not None:
-                        feed_dict, round_complete = self.get_data()
-                    else:
-                        #this is to take care of the case when we are not doing batch training.
-                        round_complete = True
-
-                    if round_complete:
-                        print "Completed round"
-    
-                    if i % 100 == 99:  # Record execution stats
-                        run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-                        run_metadata = tf.RunMetadata()
-                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
-                                                    feed_dict=feed_dict,
-                                                    options=run_options,
-                                                    run_metadata=run_metadata)
-                        
-                        self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
-                        self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-                        print('Adding run metadata for', i)
-                    else:  # Record a summary
-                        summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
-                                                    feed_dict=feed_dict)
-                        self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
-           
-            self._tf_sumry_wrtr.close_writer()
-
-        else:
-            with tf.device(self._device):
-                # Keeping track of loss progress as we train
-                train_step = self._net_ops['train_step']
-                loss_op  = self._net_ops['cost']
+            if self._tf_sumry_wrtr is not None:
 
                 for i in range(epochs):
-                  _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
+
+                    print "Starting epoch \t", i
+                    round_complete = False
+
+                    while not round_complete:
+
+                        if self._params['batch_params'] is not None:
+                            feed_dict, round_complete = self.get_data()
+                        else:
+                            #this is to take care of the case when we are not doing batch training.
+                            round_complete = True
+
+                        if round_complete:
+                            print "Completed round"
+        
+                        if i % 100 == 99:  # Record execution stats
+                            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                            run_metadata = tf.RunMetadata()
+                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']],
+                                                        feed_dict=feed_dict,
+                                                        options=run_options,
+                                                        run_metadata=run_metadata)
+                            
+                            self._tf_sumry_wrtr.add_run_metadata(metadata=run_metadata, itr=i)
+                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+                            print('Adding run metadata for', i)
+                        else:  # Record a summary
+                            summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
+                                                        feed_dict=feed_dict)
+                            self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+           
+                self._tf_sumry_wrtr.close_writer()
+
+            else:
+                with tf.device(self._device):
+                    # Keeping track of loss progress as we train
+                    train_step = self._net_ops['train_step']
+                    loss_op  = self._net_ops['cost']
+
+                    for i in range(epochs):
+                      _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
   
         return loss
 
-    def run_op(self, op_name, x_input):
+    def run_op(self, op_name, image_input_t, image_input_t_1):
         with tf.device(self._device):
             op = self._net_ops[op_name]
 
-            out = self._sess.run(op, feed_dict={self._net_ops['x']: x_input})
+            out = self._sess.run(op, feed_dict={self._net_ops['image_input_t']: image_input_t, self._net_ops['image_input_t_1']: image_input_t_1})
+
+            return out
+
+
+    def run_loss(self, xs , ys_fwd, ys_inv):
+        with tf.device(self._device):
+            op = self._net_ops['cost']
+
+            feed_dict = {self._net_ops['image_input_t']: xs[:-1], self._net_ops['image_input_t_1']: xs[1:], self._net_ops['y']: ys_fwd[:-1], self._net_ops['mdn_y']: ys_inv[:-1]}
+
+            out = self._sess.run(op, feed_dict=feed_dict)
 
             return out

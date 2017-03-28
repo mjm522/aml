@@ -219,16 +219,16 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
     image_input_t_1 = tf.placeholder(dtype=tf.float32, shape=[None, image_len],   name='x_t_1-input')
     
     with tf.name_scope('input_reshape'):
-        image_shaped_input_t   = tf.reshape(image_input_t, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
-        image_shaped_input_t_1 = tf.reshape(image_input_t_1, [-1, cnn_params['image_width'], cnn_params['image_height'], cnn_params['image_channels']])
+        image_shaped_input_t   = tf.transpose(tf.reshape(image_input_t, [-1, cnn_params['image_channels'], cnn_params['image_width'], cnn_params['image_height']]), perm=[0,3,2,1])
+        image_shaped_input_t_1 = tf.transpose(tf.reshape(image_input_t_1, [-1, cnn_params['image_channels'], cnn_params['image_width'], cnn_params['image_height']]), perm=[0,3,2,1])
 
         img_resize_params = cnn_params['img_resize']
 
         if  img_resize_params is not None:
             image_len = img_resize_params['width']*img_resize_params['height']*cnn_params['image_channels']
             with tf.name_scope('input_resize'):
-                image_shaped_input_t   = tf.image.resize_images(image_shaped_input_t,   size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
-                image_shaped_input_t_1 = tf.image.resize_images(image_shaped_input_t_1, size=[img_resize_params['width'], img_resize_params['height']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
+                image_shaped_input_t   = tf.image.resize_images(image_shaped_input_t,   size=[img_resize_params['height'], img_resize_params['width']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
+                image_shaped_input_t_1 = tf.image.resize_images(image_shaped_input_t_1, size=[img_resize_params['height'], img_resize_params['width']], method=tf.image.ResizeMethod.BILINEAR, align_corners=False)
         
         if tf_sumry_wrtr is not None:
             tf_sumry_wrtr.add_image(name_scope='input_resize_t',   image=image_shaped_input_t)
@@ -394,8 +394,8 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
     output_ops = {'output' : fc_layer_output, 
                   'cost': cost_total, 
                   'train_step': train_step, 
-                  'image_input_t':image_input_t, 
-                  'image_input_t_1':image_input_t_1,
+                  'image_input_t': image_input_t, 
+                  'image_input_t_1': image_input_t_1,
                   'y': target,
                   'mdn_y': mdn._ops['y'], # mdn target is a push action
                   'mdn_loss' : mdn._ops['loss'],

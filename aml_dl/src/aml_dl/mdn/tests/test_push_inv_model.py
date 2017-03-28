@@ -92,7 +92,7 @@ def train_inv_model():
 
     print "Got the data, gonna train the model..."
 
-    epochs = 100#100000#10000
+    epochs = 100000#10000
 
     loss = inverse_model.train(train_data_x, train_data_y, epochs = epochs)
 

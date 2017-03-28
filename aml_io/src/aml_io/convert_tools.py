@@ -30,5 +30,5 @@ def string2image(str_image_in):
     '''
     nparr = np.fromstring(str_image_in, np.uint8)
     out = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
-    out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
+    # out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
     return out
