@@ -22,18 +22,22 @@ class BatchCreator(DataManager):
     def load_data_to_buffer(self):
 
         tmp_x, self._y_buffer = get_data_from_files(data_file_range=self._parmams['data_file_indices'], 
-                                             model_type=self._parmams['model_type'])
+                                                    model_type=self._parmams['model_type'])
 
         #if input is an image, then we need to convert the string to float
         if self._parmams['model_type'] == 'cnn' or self._parmams['model_type'] == 'siam':
             self._x_buffer = []
             for x_image in tmp_x:
-                self._x_buffer.append(string2image(x_image[0]).flatten())
+                if self._parmams['model_type'] == 'siam':
+                    self._x_buffer.append((string2image(x_image[0][0]).flatten(), string2image(x_image[1][0]).flatten()))
+                else:
+                    self._x_buffer.append(string2image(x_image[0]).flatten())
         else:
             self._x_buffer = tmp_x
 
         assert(len(self._x_buffer) == len(self._y_buffer))
         self._buffer_size = len(self._x_buffer)
+
 
     def get_batch(self, random_samples=False):
 

@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from aml_io.convert_tools import string2image
 from aml_dl.utilities.tf_batch_creator import BatchCreator
 from aml_dl.mdn.training.config import network_params_siam
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
@@ -21,7 +22,8 @@ def get_data(operation, string_img_convert=True):
     data_x = []
     if string_img_convert:
         for x_image in tmp_x:
-            data_x.append(string2image(x_image[0]).flatten())
+            data_x.append(string2image(x_image[0][0]).flatten())
+            data_x.append(string2image(x_image[1][0]).flatten())
     else:
         data_x = tmp_x
 
@@ -111,3 +113,5 @@ if __name__ == '__main__':
         test_siamese_model()
     else:
         print "Type file -h for suggestions on arguments"
+
+

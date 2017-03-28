@@ -216,6 +216,7 @@ cnn_network_params_siam = {
 
 fc_network_params_siam = {
 'num_layers':3,
+'state_dim':7,
 'action_dim':2,
 'layer_names':['fc_layer1', 'fc_layer2', 'fc_layer3'],
 'num_units_per_layer':[10, 9, 7],

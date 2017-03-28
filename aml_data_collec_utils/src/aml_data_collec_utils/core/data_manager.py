@@ -263,7 +263,7 @@ class DataManager(object):
                             else:
                                 packed_entry = np.r_[packed_entry, sample_entry[k]]
                 else:
-                    packed_entry =  sample_entry
+                    packed_entry.append(sample_entry)
 
             data.append(packed_entry)
 

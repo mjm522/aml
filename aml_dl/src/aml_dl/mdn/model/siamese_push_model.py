@@ -60,20 +60,20 @@ class SiamesePushModel(object):
 
     def configure_data(self, data_x, data_y, batch_creator):
         if data_x is not None:
-            self._data_x_t   = data_x[:-1]
-            self._data_x_t_1 = data_x[1:]
-            data_y_point_len = len(data_y[0])
-            target_indices   = range(0, data_y_point_len-self._params['fc_params']['action_dim'])
-            action_indices   = range(data_y_point_len-self._params['fc_params']['action_dim'], data_y_point_len)
-            self._data_y     = data_y[:, target_indices]
-            self._action_t   = data_y[:, action_indices]
+            self._data_x_t   = [_x[0] for _x in tmp_x] #every first element of the tuple
+            self._data_x_t_1 = [_x[1] for _x in tmp_x] #every second element of the tuple
+            data_y_point_len = len(data_y[0])/2 #a single line consists of data at t and t+1
+            data_y_array     = np.asarray(data_y)
+            data_y_t         = data_y_array[:,0:data_y_point_len]
+            data_y_t_1       = data_y_array[:,data_y_point_len:]
+            self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
+            self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
         else:
             self._data_x_t   = None
             self._data_x_t_1 = None
             self._action_t   = None
             self._data_y     = None
         
-        self._data_y = data_y
         self._batch_creator = batch_creator
         self._data_configured = True
 
@@ -106,22 +106,19 @@ class SiamesePushModel(object):
         round_complete = None 
         if self._params['batch_params'] is not None:
             if self._batch_creator is not None:
-                self._data_x, tmp_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
-                data_y_point_len = len(tmp_y[0])
-                target_indices   = range(0, data_y_point_len-self._params['fc_params']['action_dim'])
-                action_indices   = range(data_y_point_len-self._params['fc_params']['action_dim'], data_y_point_len)
-  
-                self._data_y     = [tmp_y[i][target_indices] for i in range(len(tmp_y))]
-                self._action_t   = [tmp_y[i][action_indices] for i in range(len(tmp_y))]
-
+                tmp_x, tmp_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
+                self._data_x_t   = [_x[0] for _x in tmp_x] #every first element of the tuple
+                self._data_x_t_1 = [_x[1] for _x in tmp_x] #every second element of the tuple
+                data_y_point_len = len(tmp_y[0])/2 #a single line consists of data at t and t+1
+                data_y_array     = np.asarray(tmp_y)
+                data_y_t         = data_y_array[:,0:data_y_point_len]
+                data_y_t_1       = data_y_array[:,data_y_point_len:]
+                self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
+                self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
             else:
                 raise Exception("Batch training chosen but batch_creator not configured")
 
-        if self._params['cnn_params'] is None:
-            feed_dict = {self._net_ops['x']:self._data_x, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: self._action_t}
-        else:
-            #is y correct?
-            feed_dict = {self._net_ops['image_input_t']:self._data_x[:-1], self._net_ops['image_input_t_1']:self._data_x[1:], self._net_ops['y']:self._data_y[:-1], self._net_ops['mdn_y']: self._action_t[:-1]}
+            feed_dict = {self._net_ops['image_input_t']:self._data_x_t, self._net_ops['image_input_t_1']:self._data_x_t_1, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: self._action_t}
         
         return feed_dict, round_complete
 

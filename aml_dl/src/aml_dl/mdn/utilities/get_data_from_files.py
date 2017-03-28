@@ -53,8 +53,8 @@ def get_data_from_files(data_file_range, model_type, ids=range(0,5)):
             y_sub_keys = [[None],[None], ['push_xz']]
 
 
-            x_sample_points = [0]
-            y_sample_points = [0]
+            x_sample_points = [0,-1]
+            y_sample_points = [0,-1]
 
 
 
