@@ -93,11 +93,11 @@ class PushMachine(object):
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
             goals.reverse()
-            success = self.goto_goals(goals[1:])
+            success = success and self.goto_goals(goals[1:]) 
 
             self._robot.untuck_arm()
 
-            self._sample_recorder.stop_record(task_status=True)
+            self._sample_recorder.stop_record(task_status=success)
 
             timeelapsed = rospy.Time.now() - start
 

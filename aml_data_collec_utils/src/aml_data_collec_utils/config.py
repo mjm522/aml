@@ -2,7 +2,6 @@ import os
 from aml_io.io_tools import get_aml_package_path
 
 data_storage_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
-
 print data_storage_path
 
 if not os.path.exists(data_storage_path):

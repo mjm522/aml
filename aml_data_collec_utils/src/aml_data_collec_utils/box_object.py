@@ -3,6 +3,8 @@ import rospy
 import random
 import numpy as np
 from tf import TransformListener
+from sensor_msgs.msg import Image
+from interruptingcow import timeout
 from aml_data_collec_utils.config import config
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
@@ -18,11 +20,16 @@ class BoxObject(object):
 
         self._base_frame_name = 'base'
 
-
+        try:
+            self._rgb_image_sub = rospy.Subscriber('/rgb_image_out', Image, self.perception_callback)
+        except Exception as e:
+            pass
+        
         self._box_reset_pos0 = None
 
         self._last_pushes = None
 
+        self._scene_image = None
 
         # Publish
         self._br = tf.TransformBroadcaster()
@@ -30,6 +37,9 @@ class BoxObject(object):
         update_rate = 30.0
         update_period = rospy.Duration(1.0/update_rate)
         rospy.Timer(update_period, self.update_frames)
+
+    def perception_callback(self, image_data):
+        self._scene_image = image_data
 
     #this is a util that makes the data in storing form
     def get_effect(self):
@@ -103,15 +113,19 @@ class BoxObject(object):
             print "Error on update frames", e
             pass
 
-    def get_pose(self, time = None):
+    def get_pose(self, time = None, time_out=5):
 
         if time is None:
-            while True:
-                try:
-                    time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
-                except Exception as e:
-                    continue
-                break
+            try:
+                with timeout(5, exception=RuntimeError):
+                # perform a potentially very slow operation
+                    while True:
+                        try:
+                            time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
+                        except Exception as e:
+                            continue
+            except RuntimeError:
+                print "Didn't finish *tf.getLatestCommonTime* within %d seconds"%time_out
             
         box_pos = box_q = None
         # Getting box center (adding center offset to retrieved pose)
@@ -121,8 +135,20 @@ class BoxObject(object):
         _, box_q = transform_to_pq(pose)
         pose = pq_to_transform(self._tf,box_pos,box_q)
 
-
         return pose, box_pos, box_q
+
+    def get_curr_image(self, time=None, time_out=5):
+       
+        if self._scene_image is None:
+            try:
+                with timeout(5, exception=RuntimeError):
+                # perform a potentially very slow operation
+                    while self._scene_image is None:
+                        pass          
+            except RuntimeError:
+                print "Didn't finish *tf.getLatestCommonTime* within %d seconds"%time_out
+
+        return self._scene_image
 
     # Computes a list of "pushes", a push contains a pre-push pose, 
     # a push action (goal position a push starting from a pre-push pose) 

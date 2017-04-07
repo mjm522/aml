@@ -17,13 +17,13 @@ def check_sample(sample):
     return sample_is_valid
 
 def main():
-    data_file_range = range(1,10)
+    data_file_range = range(1,632)
 
    
 
     for data_idx in data_file_range:
 
-        data_man = DataManager(data_folder_path=data_folder_path, data_name_prefix='test_push_data')
+        data_man = DataManager(data_name_prefix='test_push_data')
         data_list = data_man.read_data(data_idx)
 
         if data_list is None:
@@ -32,23 +32,30 @@ def main():
         
         print data_idx
 
-        sample_num = len(data_list)
+        ids_to_keep = []
+        num_samples = len(data_list)
 
-        for k in range(sample_num):
+        print num_samples
+        for k in range(num_samples):
             sample = data_list[k]
             print "Sample number \t", k
             if check_sample(sample):
                 print "Check sample returned is valid"
+                ids_to_keep.append(k)
             else:
+
                 print "Status according to sample \t", sample.is_valid()
                 sample.set_valid(False)
+                
 
-        data_man._data = data_list
+        data_man._data = [data_list[s_idx] for s_idx in ids_to_keep]
 
-        data_man._data_folder_path = data_folder_path
-        data_man._data_idx = data_idx
+        if len(data_man._data) > 0:
+            data_man._data_folder_path = data_folder_path
+            data_man._data_idx = data_idx
 
-        data_man.write_data()
+            data_man.write_data()
+
 
 
 if __name__ == '__main__':

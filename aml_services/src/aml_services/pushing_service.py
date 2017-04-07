@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, network_params_siam
+from aml_dl.mdn.training.config_exp3 import network_params_inv, fc_network_params_siam, network_params_siam
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
 
 def predict_next_state_from_learned_model(req):
@@ -39,9 +39,9 @@ def predict_action_from_learned_model(req):
     pis = inverse_model.run_op('pi', input_x)[0]
 
 
-    # print "MUS: ", mus
-    # print "SIGMA: ", sigma
-    # print "PIs:", pis
+    print "MUS: ", mus
+    print "SIGMA: ", sigma
+    print "PIs:", pis
     #theta = inverse_model.sample_out_max_pi(input_x, 1)[0]
     
     pi_idx = inverse_model._max_pi_idx(pis)

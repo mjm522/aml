@@ -5,7 +5,9 @@ import numpy as np
 import quaternion
 from functools import partial
 from aml_robot.baxter_robot import BaxterArm
+from aml_io.convert_tools import string2image
 from aml_data_collec_utils.config import config
+from aml_visual_tools.visual_tools import show_image
 from aml_data_collec_utils.box_object import BoxObject
 from aml_services.srv import PredictAction, PredictState
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
@@ -40,6 +42,19 @@ def predict_action_client(curr_state, tgt_state):
     # z_box = response[1]
 
     # return x_box, z_box
+
+def get_data(file_inidices, model_type='siam', string_img_convert=True):
+
+    tmp_x, data_y = get_data_from_files(data_file_range=file_inidices, model_type=model_type)
+
+    data_x = []
+    if string_img_convert:
+        for x_image in tmp_x:
+            data_x.append(np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten())
+    else:
+        data_x = tmp_x
+
+    return np.asarray(data_x), np.asarray(data_y)
 
 
 class StochasticPushMachine(BoxObject):
@@ -99,14 +114,25 @@ class StochasticPushMachine(BoxObject):
             else:
                 side = BACK
 
-
         return side
 
 
-    def compute_push_location(self, tgt_box_pose):
+    def compute_push_location(self, tgt_box_pose, image_input=False):
+
+        print "CAME HERE ***************************************************** 1"
         pre_push_offset = config['pre_push_offsets']
 
+        print "CAME HERE ***************************************************** 2"
         box_pose, box_pos, box_ori = self.get_pose()
+        
+        print "CAME HERE ***************************************************** 3"
+        if image_input:
+            print "CAME HERE ***************************************************** 4"
+            curr_state =  self.get_curr_image()
+            show_image(curr_state)
+            raw_input()
+        else:
+            curr_state = np.hstack([box_pos, box_ori])
 
         while True:
             try:
@@ -122,7 +148,7 @@ class StochasticPushMachine(BoxObject):
         
         ee_pos, q_ee = transform_to_pq(ee_pose)
 
-        x_box, z_box, sigma = predict_action_client(curr_state=np.hstack([box_pos, box_ori]), tgt_state=tgt_box_pose)
+        x_box, z_box, sigma = predict_action_client(curr_state=curr_state, tgt_state=tgt_box_pose)
         print "predicted push:", x_box, z_box
         print "uncertainity ", sigma
 
@@ -150,7 +176,6 @@ class StochasticPushMachine(BoxObject):
         self.add_to_br_poses(pos=pre_push_action, ori=q_ee, frame_name='pre-push-location')
         self.add_to_br_poses(pos=push_action, ori=q_ee, frame_name='push-location')
 
-
         k = raw_input("Sigma is %f, continue (y/n)?"%(sigma,))
         if k == 'n':
             return None, None
@@ -176,7 +201,7 @@ class StochasticPushMachine(BoxObject):
 
     def push_box(self, tgt_box_pose):
         self._robot.untuck_arm()
-        pre_push_action, push_action = self.compute_push_location(tgt_box_pose)
+        pre_push_action, push_action = self.compute_push_location(tgt_box_pose, image_input=True)
         #this is a hack when there is no way to get the transform sending arm away and bringing
         #back tends to give the tf correctly.
         if pre_push_action is None or push_action is None:
@@ -201,17 +226,17 @@ def main():
     spm = StochasticPushMachine(robot_interface=arm)
 
     data_file_indices = range(1,10)
-    fwd_data_x, fwd_data_y = get_data_from_files(data_file_range=data_file_indices, model_type='fwd')
-    inv_data_x, inv_data_y = get_data_from_files(data_file_range=data_file_indices, model_type='inv')
-
+    # data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='fwd', string_img_convert=False)
+    # data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='inv', string_img_convert=False)
+    data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='siam', string_img_convert=True)
 
     while not rospy.is_shutdown():
-        for data_x in inv_data_x:
-            print "Trying to push box to target pose \t", np.round(data_x[7:],3)
-            spm.add_to_br_poses(pos=data_x[7:10], ori=np.array([data_x[11],data_x[12], data_x[13], data_x[10]]), frame_name='target_box_pose')
-            status = spm.push_box(data_x[7:])
+        for data_x, data_y in zip(data_X, data_Y):
+            print "Trying to push box to target pose \t", np.round(data_y[9:],3)
+            spm.add_to_br_poses(pos=data_y[9:12], ori=np.array([data_y[13],data_y[14], data_y[15], data_y[12]]), frame_name='target_box_pose')
+            status = spm.push_box(data_x)
             if status is None:
-                print "Failed to go to the target pose \t", np.round(data_x[7:],3)
+                print "Failed to go to the target pose \t", np.round(data_x[9:],3)
                 print "Trying the next one."
                 spm._list_br_poses = []
                 continue

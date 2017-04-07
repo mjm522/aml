@@ -1,9 +1,14 @@
 import os
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from aml_io.tf_io import load_tf_check_point
 from aml_dl.mdn.model.tf_models import tf_siamese_model
 from aml_dl.utilities.tf_summary_writer import TfSummaryWriter
+
+
+import cv2
+
 
 class SiamesePushModel(object):
     
@@ -111,6 +116,10 @@ class SiamesePushModel(object):
                 tmp_x, tmp_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
                 self._data_x_t   = [_x[0] for _x in tmp_x] #every first element of the tuple
                 self._data_x_t_1 = [_x[1] for _x in tmp_x] #every second element of the tuple
+                # for x in tmp_x:
+                #     cv2.imshow("Before:", np.transpose(np.reshape(x[0],(3,640,480)), axes=[2,1,0]))
+                #     cv2.imshow("After:", np.transpose(np.reshape(x[1],(3,640,480)), axes=[2,1,0]))
+                #     cv2.waitKey(0)
                 data_y_point_len = len(tmp_y[0])/2 #a single line consists of data at t and t+1
                 data_y_array     = np.asarray(tmp_y)
                 data_y_t         = data_y_array[:,0:data_y_point_len]
@@ -138,13 +147,13 @@ class SiamesePushModel(object):
             
             feed_dict, _ = self.get_data()
 
-        
             if self._tf_sumry_wrtr is not None:
 
                 for i in range(epochs):
 
                     print "Starting epoch \t", i
                     round_complete = False
+                    batch_no = 0
 
                     while not round_complete:
 
@@ -154,8 +163,8 @@ class SiamesePushModel(object):
                             #this is to take care of the case when we are not doing batch training.
                             round_complete = True
 
-                        if round_complete:
-                            print "Completed round"
+                        print "Batch number \t", batch_no
+                        batch_no += 1
         
                         if i % 100 == 99:  # Record execution stats
                             run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
@@ -172,6 +181,9 @@ class SiamesePushModel(object):
                             summary, loss[i] = self._sess.run(fetches=[self._tf_sumry_wrtr._merged, self._net_ops['train_step']], 
                                                         feed_dict=feed_dict)
                             self._tf_sumry_wrtr.add_summary(summary=summary, itr=i)
+
+                        if round_complete:
+                            print "That was the last round of epoch %d"%i
            
                 self._tf_sumry_wrtr.close_writer()
 
@@ -182,7 +194,28 @@ class SiamesePushModel(object):
                     loss_op  = self._net_ops['cost']
 
                     for i in range(epochs):
-                      _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
+                        print "Starting epoch \t", i
+                        round_complete = False
+                        batch_no = 0
+                        while not round_complete:
+                            if self._params['batch_params'] is not None:
+                                feed_dict, round_complete = self.get_data()
+                            else:
+                                #this is to take care of the case when we are not doing batch training.
+                                round_complete = True
+
+                            print "Batch number \t", batch_no
+                            batch_no += 1
+                            _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
+
+                            if round_complete:
+                                print "That was the last round of epoch %d"%i
+
+                    np.savetxt('loss_values.txt', np.asarray(loss))
+                    plt.figure()
+                    plt.plot(loss)
+                    plt.show()
+
   
         return loss
 

@@ -1,8 +1,8 @@
 import numpy as np
 from aml_data_collec_utils.core.data_manager import DataManager
-from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, network_params_cmbnd, network_params_siam
+from aml_dl.mdn.training.config2 import network_params_inv, network_params_fwd, network_params_cmbnd, network_params_siam
 
-def get_data_from_files(data_file_range, model_type, ids=range(0,5)):
+def get_data_from_files(data_file_range, model_type, ids=None):
         
         if model_type == 'fwd':
 
@@ -42,6 +42,8 @@ def get_data_from_files(data_file_range, model_type, ids=range(0,5)):
             y_sample_points = [0]
 
         elif model_type == 'siam':
+            print network_params_siam['training_data_dir']
+            print "*****************************"
             data_man = DataManager(data_folder_path=network_params_siam['training_data_dir'], data_name_prefix='test_push_data')
 
             x_keys = ['rgb_image']

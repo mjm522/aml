@@ -39,6 +39,7 @@ class BatchCreator(DataManager):
         self._buffer_size = len(self._x_buffer)
 
 
+
     def get_batch(self, random_samples=False):
 
         if random_samples:
@@ -48,7 +49,7 @@ class BatchCreator(DataManager):
 
         x_batch = [self._x_buffer[idx] for idx in indices]
         y_batch = [self._y_buffer[idx] for idx in indices]
-            
+
         self._start_idx = self._end_idx
         self._end_idx  += self._size
 
@@ -56,6 +57,8 @@ class BatchCreator(DataManager):
             self._end_idx = self._size
             self._start_idx = 0
             self._round_complete = True
+        else:
+            self._round_complete = False
 
         return x_batch, y_batch, self._round_complete
 

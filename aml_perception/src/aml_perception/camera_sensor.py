@@ -16,7 +16,6 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
 
-
 class CameraSensor(object):
 
   def __init__(self,image_topic="/camera/rgb/image_rect_color", depth_topic="/camera/depth_registered/sw_registered/image_rect"):
@@ -41,7 +40,7 @@ class CameraSensor(object):
     self._rgb_image_sub.shutdown()
     self._depth_image_sub.shutdown()
 
-  def _on_rgb_image(self,data):
+  def _on_rgb_image(self, data):
     pass
     try:
         cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")

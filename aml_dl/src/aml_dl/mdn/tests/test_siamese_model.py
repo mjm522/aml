@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.utilities.tf_batch_creator import BatchCreator
-from aml_dl.mdn.training.config2 import network_params_siam
+from aml_dl.mdn.training.config_exp3 import network_params_siam
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
@@ -15,7 +15,7 @@ def get_session():
     if network_params_siam['device'] == '/cpu:0':
         config=tf.ConfigProto(intra_op_parallelism_threads=multiprocessing.cpu_count())
     elif network_params_siam['device'] == '/gpu:0':
-        config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+        config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
 
     if network_params_siam['write_summary']:
         sess = tf.InteractiveSession(config=config)

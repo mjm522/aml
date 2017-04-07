@@ -232,9 +232,6 @@ class DataManager(object):
         #subkeys=[sub_key_1, [None]]
 
         data = []
-
-        if ids is None:
-            ids = [0]
         
         data_list = self.select_data(ids)
 
