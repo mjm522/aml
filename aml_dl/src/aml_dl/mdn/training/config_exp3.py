@@ -72,7 +72,8 @@ batch_params_fwd = {
 'buffer_size':45, 
 'batch_size': 20, 
 'data_file_indices': train_file_indices, 
-'model_type':'fwd', 
+'model_type':'fwd',
+'files_per_read':10, 
 'use_random_batches':False}
 
 batch_params_siam = {
