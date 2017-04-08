@@ -3,7 +3,7 @@ import StringIO
 import Image
 import numpy as np
 import cv2
-
+from cv_bridge import CvBridge, CvBridgeError
 
 def image2string(image_in, fmt = 'png'):
 
@@ -32,3 +32,12 @@ def string2image(str_image_in):
     out = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
     # out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
     return out
+
+def rosimage2openCVimage(ros_image):
+	bridge = CvBridge()
+	try:
+		cv_image = bridge.imgmsg_to_cv2(ros_image, "bgr8")
+	except CvBridgeError as e:
+		print(e)
+	rgb_image = np.array(cv_image, dtype=np.uint8)
+	return rgb_image

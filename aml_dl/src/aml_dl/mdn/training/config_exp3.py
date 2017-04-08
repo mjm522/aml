@@ -147,5 +147,5 @@ network_params_siam = {
 'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
 'summary_dir':summary_dir+'/siam_config_exp3/',
-'device':'/gpu:0',
+'device':'/cpu:0',
 }

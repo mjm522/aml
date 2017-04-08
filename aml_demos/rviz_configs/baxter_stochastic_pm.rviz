@@ -379,10 +379,6 @@ Visualization Manager:
         All Enabled: false
         base:
           Value: false
-        box:
-          Value: true
-        calibration_marker:
-          Value: true
         camera_depth_frame:
           Value: true
         camera_depth_optical_frame:
@@ -443,8 +439,6 @@ Visualization Manager:
           Value: false
         left_wrist:
           Value: false
-        openni_rgb_camera:
-          Value: true
         pedestal:
           Value: false
         reference/base:
@@ -601,15 +595,9 @@ Visualization Manager:
       Tree:
         world:
           base:
-            box:
-              {}
-            calibration_marker:
-              {}
             collision_head_link_1:
               {}
             collision_head_link_2:
-              {}
-            openni_rgb_camera:
               {}
             target_box_pose:
               {}
@@ -860,5 +848,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1855
-  X: 2115
+  X: 1975
   Y: 14

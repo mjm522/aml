@@ -50,7 +50,10 @@ def get_data(file_inidices, model_type='siam', string_img_convert=True):
     data_x = []
     if string_img_convert:
         for x_image in tmp_x:
-            data_x.append(np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten())
+            #x_image[1][0] is the image at t_1 and x_image[0][0] is the iamge at t
+            data_x.append(np.transpose(string2image(x_image[1][0]), axes=[2,1,0]).flatten())
+            # data_x.append((np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten(), 
+            #                np.transpose(string2image(x_image[1][0]), axes=[2,1,0]).flatten()))
     else:
         data_x = tmp_x
 
@@ -117,7 +120,7 @@ class StochasticPushMachine(BoxObject):
         return side
 
 
-    def compute_push_location(self, tgt_box_pose, image_input=False):
+    def compute_push_location(self, tgt_box_pose, image_input=False, time_out=5.):
 
         print "CAME HERE ***************************************************** 1"
         pre_push_offset = config['pre_push_offsets']
@@ -128,18 +131,30 @@ class StochasticPushMachine(BoxObject):
         print "CAME HERE ***************************************************** 3"
         if image_input:
             print "CAME HERE ***************************************************** 4"
-            curr_state =  self.get_curr_image()
-            show_image(curr_state)
-            raw_input()
+            curr_state =  self.get_curr_image().flatten() #tgt_box_pose[0]
+            print "CAME HERE ***************************************************** 5"
+            # show_image(curr_state)
+            # print type(curr_state)
+            # print curr_state.shape
+            # print type(tgt_box_pose)
+            # print tgt_box_pose.shape
+            # raw_input()
         else:
             curr_state = np.hstack([box_pos, box_ori])
 
-        while True:
+        time = None
+        start_time = rospy.Time.now()
+        timeout = rospy.Duration(time_out) # Timeout of 'time_out' seconds
+        while time is None:
             try:
                 time = self._tf.getLatestCommonTime(self._base_frame_name, self._push_gripper_name)
             except Exception as e:
-                continue
-            break
+                if (rospy.Time.now() - start_time > timeout):
+                    raise Exception("Time out reached, was not able to get *tf.getLatestCommonTime*")
+                    break
+                else:
+                    continue
+        print "CAME HERE ***************************************************** 6"
 
         ee_pose = get_pose(self._tf, self._base_frame_name, self._push_gripper_name, time)
         if ee_pose is None:
@@ -147,6 +162,8 @@ class StochasticPushMachine(BoxObject):
             return None, None
         
         ee_pos, q_ee = transform_to_pq(ee_pose)
+
+        print "CAME HERE ***************************************************** 7"
 
         x_box, z_box, sigma = predict_action_client(curr_state=curr_state, tgt_state=tgt_box_pose)
         print "predicted push:", x_box, z_box
@@ -225,18 +242,21 @@ def main():
     arm = BaxterArm(limb)
     spm = StochasticPushMachine(robot_interface=arm)
 
-    data_file_indices = range(1,10)
+    data_file_indices = range(1,2)
     # data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='fwd', string_img_convert=False)
     # data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='inv', string_img_convert=False)
     data_X, data_Y = get_data(file_inidices=data_file_indices, model_type='siam', string_img_convert=True)
 
     while not rospy.is_shutdown():
         for data_x, data_y in zip(data_X, data_Y):
+            print type(data_x)
+            print len(data_x)
+
             print "Trying to push box to target pose \t", np.round(data_y[9:],3)
             spm.add_to_br_poses(pos=data_y[9:12], ori=np.array([data_y[13],data_y[14], data_y[15], data_y[12]]), frame_name='target_box_pose')
             status = spm.push_box(data_x)
             if status is None:
-                print "Failed to go to the target pose \t", np.round(data_x[9:],3)
+                print "Failed to go to the target pose \t", np.round(data_y[9:],3)
                 print "Trying the next one."
                 spm._list_br_poses = []
                 continue

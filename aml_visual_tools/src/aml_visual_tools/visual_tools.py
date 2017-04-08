@@ -5,10 +5,9 @@ import numpy as np
 # import multiprocessing
 from functools import partial
 import matplotlib.pyplot as plt
+from sensor_msgs.msg import Image
 from mpl_toolkits.mplot3d import Axes3D
-from aml_io.convert_tools import string2image
-from cv_bridge import CvBridge, CvBridgeError
-
+from aml_io.convert_tools import string2image, rosimage2openCVimage
 
 def visualize_3D_data(data, fig_handle=None, axis_lim=None, color=None, label=None):
     '''
@@ -175,7 +174,9 @@ def show_image(image_data, window_name=None):
     if window_name is None:
         window_name = 'Show image window'
 
-    if isinstance(image_data[0], str):
+    if isinstance(image_data, Image):
+        image = rosimage2openCVimage(image_data)
+    elif isinstance(image_data[0], str):
         image = string2image(image_data[0])
     else:
         image = image_data

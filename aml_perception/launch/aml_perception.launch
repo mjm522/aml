@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find aml_calib)/launch/marker_odometry.launch">
+    </include>
+
+    <!-- perception - camera implementation -->
+    <node pkg="aml_perception" type="camera_sensor.py" name="rgb_camera_scene_view" output="screen"/>
+</launch>

@@ -33,8 +33,8 @@ class CameraSensor(object):
     self._curr_depth_image = None#np.zeros((480,640),dtype=np.uint16)
 
   def start(self):
-    self._rgb_image_sub = rospy.Subscriber(self._image_topic,Image,self._on_rgb_image)
-    self._depth_image_sub = rospy.Subscriber(self._depth_topic,Image,self._on_depth_image)
+    self._rgb_image_sub = rospy.Subscriber(self._image_topic,Image,   self._on_rgb_image)
+    self._depth_image_sub = rospy.Subscriber(self._depth_topic,Image, self._on_depth_image)
 
   def shutdown(self):
     self._rgb_image_sub.shutdown()
@@ -51,19 +51,18 @@ class CameraSensor(object):
     # if cols > 60 and rows > 60 :
     #   cv2.circle(cv_image, (50,50), 10, 255)
 
-    self._curr_rgb_image = np.array(cv_image,dtype=np.uint8)
+    self._curr_rgb_image = np.array(cv_image, dtype=np.uint8)
 
     # cv2.imshow("RGB Image window", self._curr_rgb_image)
     # cv2.waitKey(1)
 
-
-    # try:
-    #   image_msg = self._bridge.cv2_to_imgmsg(self._curr_rgb_image, "bgr8")
-    #   self.rgb_image_pub.publish(image_msg)
-    # except CvBridgeError as e:
-    #   print("camera_sensor: cv_bridge error. Unable to publish rgb_image")
-    # except Exception as e:
-    #   print("camera_sensor: other error. Unable to publish rgb_image")
+    try:
+      image_msg = self._bridge.cv2_to_imgmsg(self._curr_rgb_image, "bgr8")
+      self.rgb_image_pub.publish(image_msg)
+    except CvBridgeError as e:
+      print("camera_sensor: cv_bridge error. Unable to publish rgb_image")
+    except Exception as e:
+      print("camera_sensor: other error. Unable to publish rgb_image")
 
   def _on_depth_image(self,data):
 

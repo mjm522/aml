@@ -4,8 +4,9 @@ import random
 import numpy as np
 from tf import TransformListener
 from sensor_msgs.msg import Image
-from interruptingcow import timeout
 from aml_data_collec_utils.config import config
+from aml_visual_tools.visual_tools import show_image
+from aml_io.convert_tools import rosimage2openCVimage
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
 class BoxObject(object):
@@ -21,7 +22,8 @@ class BoxObject(object):
         self._base_frame_name = 'base'
 
         try:
-            self._rgb_image_sub = rospy.Subscriber('/rgb_image_out', Image, self.perception_callback)
+            #the /rgb_image_out topic of aml_perception is failing, FIX THIS
+            self._rgb_image_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.perception_callback)
         except Exception as e:
             pass
         
@@ -39,7 +41,9 @@ class BoxObject(object):
         rospy.Timer(update_period, self.update_frames)
 
     def perception_callback(self, image_data):
-        self._scene_image = image_data
+        self._scene_image = rosimage2openCVimage(image_data)
+        #THIS IMAGE LOOKS GREENISH??? WHY?
+        #show_image(self._scene_image)
 
     #this is a util that makes the data in storing form
     def get_effect(self):
@@ -94,9 +98,7 @@ class BoxObject(object):
         return pos, q
 
     def update_frames(self,event):
-
         try:
-
             if self._last_pushes is not None:
                 pushes = self._last_pushes
                 count = 0
@@ -113,23 +115,24 @@ class BoxObject(object):
             print "Error on update frames", e
             pass
 
-    def get_pose(self, time = None, time_out=5):
-
+    def get_pose(self, time = None, time_out=5.):
+        start_time = rospy.Time.now()
+        timeout = rospy.Duration(time_out) # Timeout of 'time_out' seconds
         if time is None:
-            try:
-                with timeout(5, exception=RuntimeError):
-                # perform a potentially very slow operation
-                    while True:
-                        try:
-                            time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
-                        except Exception as e:
-                            continue
-            except RuntimeError:
-                print "Didn't finish *tf.getLatestCommonTime* within %d seconds"%time_out
-            
+            while (time is None):
+                try:
+                    time = self._tf.getLatestCommonTime(self._base_frame_name, self._frame_name)
+                except Exception as e:
+                    if (rospy.Time.now() - start_time > timeout):
+                        # time = rospy.Time.now()
+                        raise Exception("Time out reached, was not able to get *tf.getLatestCommonTime*")
+                        break
+                    else:
+                        continue
+
         box_pos = box_q = None
         # Getting box center (adding center offset to retrieved pose)
-        pose = get_pose(self._tf, self._base_frame_name,self._frame_name, time)
+        pose = get_pose(self._tf, self._base_frame_name, self._frame_name, time)
         box_center_offset = config['box_center_offset']
         box_pos = np.asarray(np.dot(pose,np.array([box_center_offset[0],box_center_offset[1],box_center_offset[2],1]))).ravel()[:3]
         _, box_q = transform_to_pq(pose)
@@ -137,16 +140,16 @@ class BoxObject(object):
 
         return pose, box_pos, box_q
 
-    def get_curr_image(self, time=None, time_out=5):
-       
+    def get_curr_image(self, time=None, time_out=5.):
+        start_time = rospy.Time.now()
+        timeout = rospy.Duration(time_out) # Timeout of 'time_out' seconds
         if self._scene_image is None:
-            try:
-                with timeout(5, exception=RuntimeError):
-                # perform a potentially very slow operation
-                    while self._scene_image is None:
-                        pass          
-            except RuntimeError:
-                print "Didn't finish *tf.getLatestCommonTime* within %d seconds"%time_out
+            while self._scene_image is None:
+                if (rospy.Time.now() - start_time > timeout):
+                    raise Exception("Time out reached, was not able to get *_scene_image*")
+                    break
+                else:
+                    continue          
 
         return self._scene_image
 
