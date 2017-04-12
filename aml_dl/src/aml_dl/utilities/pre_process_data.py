@@ -53,7 +53,7 @@ def input_pipeline(filenames, batch_size, num_epochs=None, shuffle=True):
 
 
 def save_files():
-    x_data, y_data = get_data(pre_process_siam_config['data_file_indices'], pre_process_siam_config['model_type'])
+    x_data, y_data = get_data(pre_process_siam_config['data_file_range'], pre_process_siam_config['model_type'])
     num_data_per_file = pre_process_siam_config['samples_per_file']
     file_name_prefix  = pre_process_siam_config['file_name_prefix']
     data_folder_path  = pre_process_siam_config['data_folder_path']
@@ -86,14 +86,14 @@ def save_files():
 
 
 def main(): 
-    # save_files()
-    data_folder_path  = pre_process_siam_config['data_folder_path']
-    file_name_prefix  = pre_process_siam_config['file_name_prefix']
-    filenames = [data_folder_path + file_name_prefix + '_%02d.pkl'%idx for idx in range(1,5)]
-    x_batch, y_batch = input_pipeline(filenames=filenames, batch_size=10)
+    save_files()
+    # data_folder_path  = pre_process_siam_config['data_folder_path']
+    # file_name_prefix  = pre_process_siam_config['file_name_prefix']
+    # filenames = [data_folder_path + file_name_prefix + '_%02d.pkl'%idx for idx in range(1,5)]
+    # x_batch, y_batch = input_pipeline(filenames=filenames, batch_size=10)
 
-    print "Len of batch \t", len(x_batch)
-    print "Len of batch \t", len(y_batch)
+    # print "Len of batch \t", len(x_batch)
+    # print "Len of batch \t", len(y_batch)
 
 if __name__ == '__main__':
     main()

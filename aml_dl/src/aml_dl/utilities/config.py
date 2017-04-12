@@ -13,6 +13,6 @@ pre_process_siam_config={
     'data_folder_path':data_folder_path,
     'file_name_prefix':'test_push_data_pre_processed',
     'samples_per_file':20,
-    'data_file_range':range(1,27),
+    'data_file_range':range(1,461),
     'model_type':'siam',
 }
