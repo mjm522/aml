@@ -65,6 +65,49 @@ var annotated_dup =
         ] ]
       ] ]
     ] ],
+    [ "aml_data_collec_utils", null, [
+      [ "box_object", null, [
+        [ "BoxObject", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html", "classaml__data__collec__utils_1_1box__object_1_1_box_object" ]
+      ] ],
+      [ "collect_gravity_comp_data", null, [
+        [ "CollectGravityCompData", "classaml__data__collec__utils_1_1collect__gravity__comp__data_1_1_collect_gravity_comp_data.html", "classaml__data__collec__utils_1_1collect__gravity__comp__data_1_1_collect_gravity_comp_data" ]
+      ] ],
+      [ "collect_pretraining_data", null, [
+        [ "AgentProxy", "classaml__data__collec__utils_1_1collect__pretraining__data_1_1_agent_proxy.html", "classaml__data__collec__utils_1_1collect__pretraining__data_1_1_agent_proxy" ]
+      ] ],
+      [ "collect_push_data", null, [
+        [ "PushMachine", "classaml__data__collec__utils_1_1collect__push__data_1_1_push_machine.html", "classaml__data__collec__utils_1_1collect__push__data_1_1_push_machine" ]
+      ] ],
+      [ "core", null, [
+        [ "data_manager", null, [
+          [ "DataManager", "classaml__data__collec__utils_1_1core_1_1data__manager_1_1_data_manager.html", "classaml__data__collec__utils_1_1core_1_1data__manager_1_1_data_manager" ]
+        ] ],
+        [ "data_recorder", null, [
+          [ "DataRecorder", "classaml__data__collec__utils_1_1core_1_1data__recorder_1_1_data_recorder.html", "classaml__data__collec__utils_1_1core_1_1data__recorder_1_1_data_recorder" ]
+        ] ],
+        [ "sample", null, [
+          [ "Sample", "classaml__data__collec__utils_1_1core_1_1sample_1_1_sample.html", "classaml__data__collec__utils_1_1core_1_1sample_1_1_sample" ]
+        ] ]
+      ] ],
+      [ "record_sample", null, [
+        [ "DataManager", "classaml__data__collec__utils_1_1record__sample_1_1_data_manager.html", "classaml__data__collec__utils_1_1record__sample_1_1_data_manager" ],
+        [ "RecordSample", "classaml__data__collec__utils_1_1record__sample_1_1_record_sample.html", "classaml__data__collec__utils_1_1record__sample_1_1_record_sample" ],
+        [ "Sample", "classaml__data__collec__utils_1_1record__sample_1_1_sample.html", "classaml__data__collec__utils_1_1record__sample_1_1_sample" ]
+      ] ]
+    ] ],
+    [ "aml_demos", null, [
+      [ "stochastic_pushing_machine", null, [
+        [ "StochasticPushMachine", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine.html", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine" ]
+      ] ]
+    ] ],
+    [ "aml_io", null, [
+      [ "data_manager", null, [
+        [ "DataManager", "classaml__io_1_1data__manager_1_1_data_manager.html", "classaml__io_1_1data__manager_1_1_data_manager" ]
+      ] ],
+      [ "log_utils", null, [
+        [ "aml_logging", "classaml__io_1_1log__utils_1_1aml__logging.html", "classaml__io_1_1log__utils_1_1aml__logging" ]
+      ] ]
+    ] ],
     [ "aml_lfd", null, [
       [ "dmp", null, [
         [ "discrete_dmp_shell", null, [
@@ -121,35 +164,44 @@ var annotated_dup =
           [ "PyGameViewer", "classaml__robot_1_1box2d_1_1pygame__viewer_1_1_py_game_viewer.html", "classaml__robot_1_1box2d_1_1pygame__viewer_1_1_py_game_viewer" ]
         ] ]
       ] ],
+      [ "bullet", null, [
+        [ "bullet_robot", null, [
+          [ "BulletRobot", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot" ]
+        ] ],
+        [ "push_world", null, [
+          [ "push_machine", null, [
+            [ "BoxObject", "classaml__robot_1_1bullet_1_1push__world_1_1push__machine_1_1_box_object.html", "classaml__robot_1_1bullet_1_1push__world_1_1push__machine_1_1_box_object" ],
+            [ "PushMachine", "classaml__robot_1_1bullet_1_1push__world_1_1push__machine_1_1_push_machine.html", "classaml__robot_1_1bullet_1_1push__world_1_1push__machine_1_1_push_machine" ]
+          ] ]
+        ] ]
+      ] ],
       [ "mujoco", null, [
         [ "mujoco_robot", null, [
           [ "MujocoRobot", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot" ]
         ] ],
         [ "mujoco_viewer", null, [
           [ "MujocoViewer", "classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer.html", "classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer" ]
+        ] ],
+        [ "push_world", null, [
+          [ "collect_push_data_sim", null, [
+            [ "BoxObject", "classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_box_object.html", "classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_box_object" ],
+            [ "PushMachine", "classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_push_machine.html", "classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_push_machine" ]
+          ] ],
+          [ "push_world", null, [
+            [ "PushWorld", "classaml__robot_1_1mujoco_1_1push__world_1_1push__world_1_1_push_world.html", "classaml__robot_1_1mujoco_1_1push__world_1_1push__world_1_1_push_world" ]
+          ] ]
         ] ]
+      ] ],
+      [ "robot_interface", null, [
+        [ "RobotInterface", "classaml__robot_1_1robot__interface_1_1_robot_interface.html", "classaml__robot_1_1robot__interface_1_1_robot_interface" ]
       ] ]
+    ] ],
+    [ "baxter_gazebo_plugin", null, [
+      [ "BaxterGazeboRosControlPlugin", "classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html", "classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin" ]
     ] ],
     [ "scripts", null, [
       [ "camera_calib", null, [
         [ "BaxterEyeHandCalib", "classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html", "classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib" ]
-      ] ],
-      [ "collect_gravity_comp_data", null, [
-        [ "CollectGravityCompData", "classscripts_1_1collect__gravity__comp__data_1_1_collect_gravity_comp_data.html", "classscripts_1_1collect__gravity__comp__data_1_1_collect_gravity_comp_data" ]
-      ] ],
-      [ "collect_poke_data", null, [
-        [ "CollectPokeData", "classscripts_1_1collect__poke__data_1_1_collect_poke_data.html", "classscripts_1_1collect__poke__data_1_1_collect_poke_data" ]
-      ] ],
-      [ "collect_pretraining_data", null, [
-        [ "AgentProxy", "classscripts_1_1collect__pretraining__data_1_1_agent_proxy.html", "classscripts_1_1collect__pretraining__data_1_1_agent_proxy" ]
-      ] ],
-      [ "collect_push_data", null, [
-        [ "BoxObject", "classscripts_1_1collect__push__data_1_1_box_object.html", "classscripts_1_1collect__push__data_1_1_box_object" ],
-        [ "PushMachine", "classscripts_1_1collect__push__data_1_1_push_machine.html", "classscripts_1_1collect__push__data_1_1_push_machine" ]
-      ] ],
-      [ "record_sample", null, [
-        [ "RecordSample", "classscripts_1_1record__sample_1_1_record_sample.html", "classscripts_1_1record__sample_1_1_record_sample" ],
-        [ "Sample", "classscripts_1_1record__sample_1_1_sample.html", "classscripts_1_1record__sample_1_1_sample" ]
       ] ]
     ] ],
     [ "src", null, [
@@ -158,13 +210,41 @@ var annotated_dup =
           [ "model", null, [
             [ "mdn_push_inv_model", null, [
               [ "MDNPushInverseModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__inv__model_1_1_m_d_n_push_inverse_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__inv__model_1_1_m_d_n_push_inverse_model" ]
+            ] ],
+            [ "nn_push_fwd_model", null, [
+              [ "NNPushFwdModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model" ]
+            ] ],
+            [ "siamese_push_model", null, [
+              [ "SiamesePushModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model" ]
+            ] ],
+            [ "tf_mdn_model", null, [
+              [ "MixtureDensityNetwork", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network" ]
             ] ]
+          ] ]
+        ] ],
+        [ "utilities", null, [
+          [ "tf_batch_creator", null, [
+            [ "BatchCreator", "classsrc_1_1aml__dl_1_1utilities_1_1tf__batch__creator_1_1_batch_creator.html", "classsrc_1_1aml__dl_1_1utilities_1_1tf__batch__creator_1_1_batch_creator" ]
+          ] ],
+          [ "tf_summary_writer", null, [
+            [ "TfSummaryWriter", "classsrc_1_1aml__dl_1_1utilities_1_1tf__summary__writer_1_1_tf_summary_writer.html", "classsrc_1_1aml__dl_1_1utilities_1_1tf__summary__writer_1_1_tf_summary_writer" ]
           ] ]
         ] ]
       ] ]
     ] ],
+    [ "test_finger_hitting_box", null, [
+      [ "PushMachine", "classtest__finger__hitting__box_1_1_push_machine.html", "classtest__finger__hitting__box_1_1_push_machine" ]
+    ] ],
+    [ "test_push_world", null, [
+      [ "TestModelPushWorld", "classtest__push__world_1_1_test_model_push_world.html", "classtest__push__world_1_1_test_model_push_world" ]
+    ] ],
+    [ "test_record_sample", null, [
+      [ "DummyTaskInterface", "classtest__record__sample_1_1_dummy_task_interface.html", "classtest__record__sample_1_1_dummy_task_interface" ]
+    ] ],
     [ "tests", null, [
       [ "SomeObj", "classtests_1_1_some_obj.html", "classtests_1_1_some_obj" ]
     ] ],
-    [ "MarkerOdometry", "class_marker_odometry.html", "class_marker_odometry" ]
+    [ "comm_settings", "structcomm__settings.html", "structcomm__settings" ],
+    [ "MarkerOdometry", "class_marker_odometry.html", "class_marker_odometry" ],
+    [ "PisaSoftHand", "class_pisa_soft_hand.html", "class_pisa_soft_hand" ]
 ];
