@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['jscontroller',['JSController',['../classaml__ctrl_1_1controllers_1_1js__controller_1_1_j_s_controller.html',1,'aml_ctrl::controllers::js_controller']]],
-  ['jspositioncontroller',['JSPositionController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html',1,'aml_ctrl::controllers::js_controllers::js_postn_controller']]],
-  ['jstorquecontroller',['JSTorqueController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html',1,'aml_ctrl::controllers::js_controllers::js_torque_controller']]],
-  ['jstrajgenerator',['JSTrajGenerator',['../classaml__ctrl_1_1traj__generator_1_1js__traj__generator_1_1_j_s_traj_generator.html',1,'aml_ctrl::traj_generator::js_traj_generator']]]
+  ['handle',['HANDLE',['../qbmove__communications_8h.html#ab521aa5010fb1afb801a899a55569e03',1,'qbmove_communications.h']]],
+  ['handle_5fevent',['handle_event',['../classaml__robot_1_1box2d_1_1push__world_1_1_push_world.html#a3795cb626fde3df305543dbc8d7e2899',1,'aml_robot::box2d::push_world::PushWorld']]]
 ];

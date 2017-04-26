@@ -1,0 +1,3 @@
+<map id="aml_robot.bullet.push_world.push_machine.BoxObject" name="aml_robot.bullet.push_world.push_machine.BoxObject">
+<area shape="rect" id="node2" href="$classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html" title="{aml_robot.bullet.bullet\l_robot.BulletRobot\n||+ __init__()\l+ configure_default_pos()\l+ configure_camera()\l+ get_image()\l+ get_ee_pose()\l+ get_pos_ori()\l+ get_contact_points()\l+ set_default_pos_ori()\l+ set_pos_ori()\l+ get_jnt_state()\l+ set_jnt_state()\l+ apply_external_force()\l+ apply_external_torque()\l}" alt="" coords="27,127,200,373"/>
+</map>

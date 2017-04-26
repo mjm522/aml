@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['check_5foffset',['check_offset',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a10cec75150acb1c2e426fc17ce22bde6',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]]
+  ['add_5fvariable_5fsummaries',['add_variable_summaries',['../classsrc_1_1aml__dl_1_1utilities_1_1tf__summary__writer_1_1_tf_summary_writer.html#a97d5d0e9814b9efa9c6bbe8b1565f51d',1,'src::aml_dl::utilities::tf_summary_writer::TfSummaryWriter']]]
 ];

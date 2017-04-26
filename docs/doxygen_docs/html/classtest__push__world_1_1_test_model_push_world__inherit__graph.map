@@ -1,0 +1,3 @@
+<map id="test_push_world.TestModelPushWorld" name="test_push_world.TestModelPushWorld">
+<area shape="rect" id="node2" href="$classaml__robot_1_1box2d_1_1push__world_1_1_push_world.html" title="{aml_robot.box2d.push\l_world.PushWorld\n||+ __init__()\l+ step()\l+ draw()\l+ handle_event()\l+ get_screen_point2()\l+ get_point()\l+ get_screen_point()\l+ reset_box()\l+ get_box_state()\l+ get_vertices()\l+ generate_random_push()\l+ to_vec()\l+ save_screen()\l+ add_sample()\l+ update()\l+ apply_push()\l+ save_samples()\l}" alt="" coords="5,127,189,427"/>
+</map>
