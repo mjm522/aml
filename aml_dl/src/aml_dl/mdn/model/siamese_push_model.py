@@ -44,8 +44,7 @@ class SiamesePushModel(object):
                     raw_input("Press Ctrl+C")
                     # os.environ["LD_LIBRARY_PATH"] = curr_ld_path + ':'+cuda_path
 
-            self._net_ops = tf_siamese_model(dim_output=network_params['dim_output'],
-                                     loss_type='quadratic',
+            self._net_ops = tf_siamese_model(loss_type='quadratic',
                                      cnn_params=network_params['cnn_params'], 
                                      fc_params=network_params['fc_params'],
                                      mdn_params=network_params['inv_params'],
@@ -57,12 +56,12 @@ class SiamesePushModel(object):
 
             self._saver = tf.train.Saver()
 
-    def init_model(self):
+    def init_model(self, epoch = None):
         with tf.device(self._device):
             self._sess.run(self._init_op)
 
             if self._params['load_saved_model']:
-                self.load_model()
+                self.load_model(epoch = epoch)
 
     def configure_data(self, data_x, data_y, batch_creator):
         if data_x is not None:
@@ -72,19 +71,27 @@ class SiamesePushModel(object):
             data_y_array     = np.asarray(data_y)
             data_y_t         = data_y_array[:,0:data_y_point_len]
             data_y_t_1       = data_y_array[:,data_y_point_len:]
-            self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
+            # self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
             self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
 
         else:
             self._data_x_t   = None
             self._data_x_t_1 = None
             self._action_t   = None
-            self._data_y     = None
+            # self._data_y     = None
         
         self._batch_creator = batch_creator
         self._data_configured = True
 
-    def get_model_path(self):
+    def get_model_path(self, subscript=None):
+
+        model_name_subscript = '_'
+
+        if subscript is not None:
+            if not isinstance(subscript, str):
+                subscript = str(subscript)
+            model_name_subscript = subscript + '_'
+
         if 'model_dir' in self._params:
             model_dir = self._params['model_dir']
         else:
@@ -94,23 +101,25 @@ class SiamesePushModel(object):
             os.makedirs(model_dir)
 
         if 'model_name' in self._params:
-            model_name = self._params['model_name']
+            model_name = model_name_subscript + self._params['model_name']
         else:
-            model_name = 'siam_model.ckpt'
+            model_name = model_name_subscript + 'siam_model.ckpt'
 
         return model_dir+model_name
 
 
-    def load_model(self):
-        load_tf_check_point(session=self._sess, filename=self.get_model_path())
+    def load_model(self, epoch=None):
+        '''
+        question: is it better to give filename directly or give epoch number?
+        '''
+        load_tf_check_point(session=self._sess, filename=self.get_model_path(epoch))
 
-    def save_model(self):
-        save_path = self._saver.save(self._sess, self.get_model_path())
+    def save_model(self, epoch=None):
+        save_path = self._saver.save(self._sess, self.get_model_path(epoch))
         print("Model saved in file: %s" % save_path)
 
-
     def get_data(self):
-        round_complete = None 
+        round_complete = False 
         if self._params['batch_params'] is not None:
             if self._batch_creator is not None:
                 tmp_x, tmp_y, round_complete = self._batch_creator.get_batch(random_samples=self._params['batch_params']['use_random_batches'])
@@ -124,16 +133,16 @@ class SiamesePushModel(object):
                 data_y_array     = np.asarray(tmp_y)
                 data_y_t         = data_y_array[:,0:data_y_point_len]
                 data_y_t_1       = data_y_array[:,data_y_point_len:]
-                self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
+                # self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
                 self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
             else:
                 raise Exception("Batch training chosen but batch_creator not configured")
 
-            feed_dict = {self._net_ops['image_input_t']:self._data_x_t, self._net_ops['image_input_t_1']:self._data_x_t_1, self._net_ops['y']:self._data_y, self._net_ops['mdn_y']: self._action_t}
+            feed_dict = {self._net_ops['image_input_t']:self._data_x_t, self._net_ops['image_input_t_1']:self._data_x_t_1, self._net_ops['mdn_y']: self._action_t}
         
         return feed_dict, round_complete
 
-    def train(self, epochs):
+    def train(self, epochs, chk_pnt_save_invl=500):
 
         if not self._data_configured:
             raise Exception("Data not configured, please configure..")
@@ -184,6 +193,9 @@ class SiamesePushModel(object):
 
                         if round_complete:
                             print "That was the last round of epoch %d"%i
+
+                        if i%chk_pnt_save_invl==0 and i!=0:
+                            self.save_model(epoch=i)
            
                 self._tf_sumry_wrtr.close_writer()
 
@@ -211,12 +223,146 @@ class SiamesePushModel(object):
                             if round_complete:
                                 print "That was the last round of epoch %d"%i
 
+                        if i%chk_pnt_save_invl==0 and i!=0:
+                            self.save_model(epoch=i)
+
                     np.savetxt('loss_values.txt', np.asarray(loss))
                     plt.figure()
                     plt.plot(loss)
                     plt.show()
 
   
+        return loss
+
+
+    def train2(self, iterations, chk_pnt_save_invl=10):
+
+        if not self._data_configured:
+            raise Exception("Data not configured, please configure..")
+
+        with tf.device(self._device):
+        
+            if self._params['write_summary']:
+                tf.global_variables_initializer().run()
+            
+            loss = np.zeros(iterations)
+            
+            feed_dict, _ = self.get_data()
+
+            xs = []
+            ys = []
+
+            fig = plt.figure()
+            plt.ion()
+            plt.show()
+            loss_tmp = 0.0
+
+            # Keeping track of loss progress as we train
+            train_step = self._net_ops['train_step']
+            loss_op  = self._net_ops['cost']
+            for i in range(iterations):
+                print "Starting epoch \t", i
+                round_complete = False
+                if self._params['batch_params'] is not None:
+                    feed_dict, round_complete = self.get_data()
+                else:
+                    #this is to take care of the case when we are not doing batch training.
+                    round_complete = True
+
+                _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
+                loss_tmp += loss[i]
+                if round_complete:
+                    print "That was the last round of epoch %d"%i
+                if i%chk_pnt_save_invl==0 and i!=0:
+                    self.save_model(epoch=i)
+
+
+                if i%10 == 0:
+                    print "Iteration %d loss %f"%(i,loss_tmp/10)
+                    
+                    xs.append(i)
+                    ys.append(loss_tmp/10)
+                    fig.add_subplot(111).plot(xs, ys, 'b')
+                    fig.canvas.flush_events()
+                    plt.draw()
+
+                    loss_tmp = 0.0
+                
+                
+
+                
+
+            
+            np.savetxt('loss_values.txt', np.asarray(loss))
+                #plt.figure()
+                #plt.plot(loss)
+                #plt.show()
+        return loss
+
+    def test(self, iterations):
+
+        if not self._data_configured:
+            raise Exception("Data not configured, please configure..")
+
+        with tf.device(self._device):
+        
+            if self._params['write_summary']:
+                tf.global_variables_initializer().run()
+            
+            loss = np.zeros(iterations)
+            
+            feed_dict, _ = self.get_data()
+
+            xs = []
+            ys = []
+
+            fig = plt.figure()
+            plt.ion()
+            plt.show()
+            loss_tmp = 0.0
+
+            # Keeping track of loss progress as we train
+            loss_op  = self._net_ops['cost']
+
+            round_complete = False
+            i = 0
+            while not round_complete:
+
+                if self._params['batch_params'] is not None:
+                    feed_dict, round_complete = self.get_data()
+                else:
+                    #this is to take care of the case when we are not doing batch training.
+                    round_complete = True
+
+                loss[i] = self._sess.run([loss_op], feed_dict=feed_dict)[0]
+                loss_tmp += loss[i]
+                i += 1
+
+                if round_complete:
+                    print "That was the last round of epoch %d"%i
+
+
+
+                if i%1 == 0:
+                    print "Iteration %d loss %f"%(i,loss_tmp/10)
+                    
+                    xs.append(i)
+                    ys.append(loss_tmp/10)
+                    fig.add_subplot(111).plot(xs, ys, 'b')
+                    fig.canvas.flush_events()
+                    plt.draw()
+
+                    loss_tmp = 0.0
+                
+                
+
+                
+
+            
+            np.savetxt('loss_values.txt', np.asarray(loss))
+                #plt.figure()
+                #plt.plot(loss)
+                #plt.show()
         return loss
 
     def run_op(self, op_name, image_input_t, image_input_t_1):
@@ -232,7 +378,7 @@ class SiamesePushModel(object):
         with tf.device(self._device):
             op = self._net_ops['cost']
 
-            feed_dict = {self._net_ops['image_input_t']: xs[:-1], self._net_ops['image_input_t_1']: xs[1:], self._net_ops['y']: ys_fwd[:-1], self._net_ops['mdn_y']: ys_inv[:-1]}
+            feed_dict = {self._net_ops['image_input_t']: xs[:-1], self._net_ops['image_input_t_1']: xs[1:], self._net_ops['mdn_y']: ys_inv[:-1]}
 
             out = self._sess.run(op, feed_dict=feed_dict)
 

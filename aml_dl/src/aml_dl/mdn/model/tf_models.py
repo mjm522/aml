@@ -210,7 +210,7 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
     output_ops = {'output' : fc_layer_output, 'cost': cost, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
     return output_ops
 
-def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_params, mdn_params, cost_weights, tf_sumry_wrtr):
+def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_params, cost_weights, tf_sumry_wrtr):
     fc_params  = configure_params(fc_params)
     cnn_params = configure_params(cnn_params)
 
@@ -368,12 +368,15 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
 
     fc_layer_output  = create_nn_layers(fwd_model_inp, fc_params, tf_sumry_wrtr, layer_type='fc')
 
-    with tf.name_scope('input_y'):
-        target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
+    # with tf.name_scope('input_y'):
+    #     target = tf.placeholder(dtype=tf.float32, shape=[None, dim_output],  name='y-input')
 
     with tf.name_scope('cost_fwd'):
         if loss_type == 'quadratic':
-            cost_fwd = get_quadratic_loss(fc_layer_output, target)
+            print fc_layer_output
+            print feature_point_t_1
+            print "**********************************************************************"
+            cost_fwd = get_quadratic_loss(fc_layer_output, feature_point_t_1)
 
     ###########################COMBINED COST FUNCTION##############################################
     with tf.name_scope('total_cost'):
@@ -396,7 +399,6 @@ def tf_siamese_model(dim_output, loss_type, cnn_params, fc_params, optimiser_par
                   'train_step': train_step, 
                   'image_input_t': image_input_t, 
                   'image_input_t_1': image_input_t_1,
-                  'y': target,
                   'mdn_y': mdn._ops['y'], # mdn target is a push action
                   'mdn_loss' : mdn._ops['loss'],
                   'mdn_mu' : mdn._ops['mu'],

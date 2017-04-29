@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.utilities.tf_batch_creator import BatchCreator
-from aml_dl.mdn.training.config_exp5 import network_params_siam
+from aml_dl.mdn.training.config_debug import network_params_siam
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
@@ -50,27 +50,27 @@ def test_siamese_model():
 
     network_params_siam['load_saved_model'] = True
 
-    print "Got the data, gonna test the model..."
-
-    test_data_x, test_data_y = get_data('test')
-
-    data_y_point_len = len(test_data_y[0])
-    target_indices   = range(0, data_y_point_len-network_params_siam['fc_params']['action_dim'])
-    action_indices   = range(data_y_point_len-network_params_siam['fc_params']['action_dim'], data_y_point_len)
-  
-    data_y     = [test_data_y[i][target_indices] for i in range(len(test_data_y))]
-    action_t   = [test_data_y[i][action_indices] for i in range(len(test_data_y))]
+    test_data_x = None; test_data_y = None; batch_creator = None   
+    if network_params_siam['batch_params'] is not None:
+        network_params_siam['batch_params']['data_file_indices'] = network_params_siam['batch_params']['test_data_file_indices']
+        batch_creator = BatchCreator(network_params_siam['batch_params'])
+    else:
+        test_data_x, test_data_y = get_data('test')
 
     siamese_model = SiamesePushModel(sess=get_session(), network_params=network_params_siam)
-    siamese_model.init_model()
+    siamese_model.init_model(epoch = 10)
+    siamese_model.configure_data(data_x=test_data_x, data_y=test_data_y, batch_creator=batch_creator)
+    
+    # h = siamese_model.run_op('last_hidden',data_x)
+    # plt.figure(figsize=(8, 8))
+    # plt.plot(h, data_y,'ro', alpha=0.3)
+    # plt.show()
 
-    prediction = siamese_model.run_loss(test_data_x, data_y, action_t)
+    print "Got the data, gonna train the model..."
 
-#     train_data_x = None; train_data_y = None; batch_creator = None   
-#    if network_params_siam['batch_params'] is not None:
-#        batch_creator = BatchCreator(network_params_siam['batch_params'])
-#    else:
-#        train_data_x, train_data_y = get_data('test')
+    epochs = network_params_siam['epochs']
+    siamese_model.test(iterations=epochs)
+
 
     
 def train_siamese_model():
@@ -84,7 +84,7 @@ def train_siamese_model():
         train_data_x, train_data_y = get_data('train')
 
     siamese_model = SiamesePushModel(sess=get_session(), network_params=network_params_siam)
-    siamese_model.init_model()
+    siamese_model.init_model(epoch = 50)
     siamese_model.configure_data(data_x=train_data_x, data_y=train_data_y, batch_creator=batch_creator)
     
     # h = siamese_model.run_op('last_hidden',data_x)
@@ -95,7 +95,7 @@ def train_siamese_model():
     print "Got the data, gonna train the model..."
 
     epochs = network_params_siam['epochs']
-    siamese_model.train(epochs=epochs, chk_pnt_save_invl=network_params_siam['check_point_save_interval'])
+    siamese_model.train2(iterations=epochs, chk_pnt_save_invl=network_params_siam['check_point_save_interval'])
 
     siamese_model.save_model('final') #providing subscript for the final model saved, so the model name is final_blah_lah
 
