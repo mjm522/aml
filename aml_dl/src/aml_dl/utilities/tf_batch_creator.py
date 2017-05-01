@@ -7,8 +7,8 @@ from aml_dl.mdn.utilities.get_pre_process_data import LoadPreprocessData
 
 class BatchCreator(DataManager):
     def __init__(self, batch_params):
-        self._parmams = batch_params
-        self._size      =  self._parmams['batch_size']
+        self._params = batch_params
+        self._size      =  self._params['batch_size']
         self._x_buffer  =  None
         self._y_buffer  = None
         self._start_idx = 0
@@ -17,13 +17,13 @@ class BatchCreator(DataManager):
         self._buffer_size = None
         self._finish_reading_files = False
 
-        self._data_file_range = self._parmams['data_file_indices']
-        self._files_per_read  = self._parmams['files_per_read']
+        self._data_file_range = self._params['data_file_indices']
+        self._files_per_read  = self._params['files_per_read']
         self._file_idx_start  = self._data_file_range[0]
-        self._load_pre_processd_data = self._parmams['load_pre_processd_data']
+        self._load_pre_processd_data = self._params['load_pre_processd_data']
 
         if self._load_pre_processd_data:
-            self._get_pre_processd_data = LoadPreprocessData()
+            self._get_pre_processd_data = LoadPreprocessData(file_location=self._params['data_dir'])
     
         self.start_batcher()
 
@@ -46,13 +46,13 @@ class BatchCreator(DataManager):
         if not self._load_pre_processd_data:
 
             tmp_x, self._y_buffer = get_data_from_files(data_file_range=data_file_range, 
-                                                        model_type=self._parmams['model_type'])
+                                                        model_type=self._params['model_type'])
 
             #if input is an image, then we need to convert the string to float
-            if self._parmams['model_type'] == 'cnn' or self._parmams['model_type'] == 'siam':
+            if self._params['model_type'] == 'cnn' or self._params['model_type'] == 'siam':
                 self._x_buffer = []
                 for x_image in tmp_x:
-                    if self._parmams['model_type'] == 'siam':
+                    if self._params['model_type'] == 'siam':
                         self._x_buffer.append((np.transpose(string2image(x_image[0][0]), axes=[2,1,0]).flatten(), 
                                                np.transpose(string2image(x_image[1][0]), axes=[2,1,0]).flatten()))
                     else:

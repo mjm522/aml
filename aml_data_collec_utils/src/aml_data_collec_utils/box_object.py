@@ -7,6 +7,7 @@ from sensor_msgs.msg import Image
 from aml_data_collec_utils.config import config
 from aml_visual_tools.visual_tools import show_image
 from aml_io.convert_tools import rosimage2openCVimage
+from aml_perception.camera_sensor import CameraSensor
 from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
 
 class BoxObject(object):
@@ -21,17 +22,11 @@ class BoxObject(object):
 
         self._base_frame_name = 'base'
 
-        try:
-            #the /rgb_image_out topic of aml_perception is failing, FIX THIS
-            self._rgb_image_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.perception_callback)
-        except Exception as e:
-            pass
+        self._camera_sensor =  CameraSensor()
         
         self._box_reset_pos0 = None
 
         self._last_pushes = None
-
-        self._scene_image = None
 
         # Publish
         self._br = tf.TransformBroadcaster()
@@ -39,11 +34,6 @@ class BoxObject(object):
         update_rate = 30.0
         update_period = rospy.Duration(1.0/update_rate)
         rospy.Timer(update_period, self.update_frames)
-
-    def perception_callback(self, image_data):
-        self._scene_image = rosimage2openCVimage(image_data)
-        #THIS IMAGE LOOKS GREENISH??? WHY?
-        #show_image(self._scene_image)
 
     #this is a util that makes the data in storing form
     def get_effect(self):
@@ -143,21 +133,30 @@ class BoxObject(object):
     def get_curr_image(self, time=None, time_out=5.):
         start_time = rospy.Time.now()
         timeout = rospy.Duration(time_out) # Timeout of 'time_out' seconds
-        if self._scene_image is None:
-            while self._scene_image is None:
-                if (rospy.Time.now() - start_time > timeout):
-                    raise Exception("Time out reached, was not able to get *_scene_image*")
-                    break
-                else:
-                    continue          
+        
+        _scene_image = None
+        
+        while _scene_image is None:
+            _scene_image = self._camera_sensor._curr_rgb_image
+            if (rospy.Time.now() - start_time > timeout):
+                raise Exception("Time out reached, was not able to get *_scene_image*")
+                break
+            else:
+                continue
+        # _scene_image = np.transpose(_scene_image, axes=[2,1,0]).flatten()       
 
-        return self._scene_image
+        '''
+        NOTE:  _scene_image is None in the beginning, we need to make sure that 
+        when it is read for the second time, it is the currect scene and not an old image,
+        that is we need a way to invalidate the existing image, after it is read
+        '''
+        return _scene_image
 
     # Computes a list of "pushes", a push contains a pre-push pose, 
     # a push action (goal position a push starting from a pre-push pose) 
     # and its respective name
     # It also returns the current box pose, and special reset_push
-    def get_pushes(self):
+    def get_pushes(self, use_random=True):
 
         success = False
         max_trials = 200
@@ -190,8 +189,12 @@ class BoxObject(object):
             length_div2 = config['box_type']['length']*config['scale_adjust']/2.0
             breadth_div2 = config['box_type']['breadth']*config['scale_adjust']/2.0
             
-            x_box = random.uniform(-length_div2,length_div2) # w.r.t box frame
-            z_box = random.uniform(-breadth_div2,breadth_div2) # w.r.t box frame
+            if use_random:
+                x_box = random.uniform(-length_div2,length_div2) # w.r.t box frame
+                z_box = random.uniform(-breadth_div2,breadth_div2) # w.r.t box frame
+            else:
+                x_box = 0.
+                z_box = 0.
 
             pre_positions = np.array([[pre_push_offset[0]    , pre_push_offset[1],  z_box,               1], # right-side of the object
                                   [-pre_push_offset[0]   , pre_push_offset[1],  z_box,               1], # left-side of the object

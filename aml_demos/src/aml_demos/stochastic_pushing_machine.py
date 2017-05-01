@@ -131,7 +131,7 @@ class StochasticPushMachine(BoxObject):
         print "CAME HERE ***************************************************** 3"
         if image_input:
             print "CAME HERE ***************************************************** 4"
-            curr_state =  self.get_curr_image().flatten() #tgt_box_pose[0]
+            curr_state =  self.get_curr_image() #tgt_box_pose[0]
             print "CAME HERE ***************************************************** 5"
             # show_image(curr_state)
             # print type(curr_state)

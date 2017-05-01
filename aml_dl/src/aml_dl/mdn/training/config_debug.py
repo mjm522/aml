@@ -4,12 +4,17 @@ from aml_io.io_tools import get_aml_package_path
 
 EXP_NAME = 'exp_debug'
 
+EXP_MODE = 'test'
+
 check_point_dir   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/'
 training_data_dir = ''
-summary_dir       = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
+test_data_dir = ''
+data_dir = ''
+summary_dir = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
 
 try:
-    training_data_dir = os.environ['AML_DATA'] + '/aml_dl/push_data_post_processed/'
+    training_data_dir = os.environ['AML_DATA'] + '/aml_dl/pre_process_data_siamese/train/'
+    test_data_dir = os.environ['AML_DATA'] + '/aml_dl/pre_process_data_siamese/test/'
 except:
     print "AML_DATA environment variable is not set."
 
@@ -32,6 +37,13 @@ IMAGE_CHANNELS = 3
 
 train_file_indices = range(1, 550)#550
 test_file_indices  = range(1,550)
+
+if EXP_MODE=='train':
+    data_dir = training_data_dir
+elif EXP_MODE=='test':
+    data_dir = test_data_dir
+else:
+    raise Exception('Unkown experiment mode.')
 
 adam_params = {
     'type': 'adam',
@@ -92,6 +104,7 @@ batch_params_siam = {
 'test_data_file_indices': test_file_indices, 
 'model_type':'siam',
 'load_pre_processd_data':True,
+'data_dir': data_dir,
 'use_random_batches':False}
 
 NUM_CNN_LAYERS_SIAM = 3
@@ -155,8 +168,6 @@ network_params_siam = {
 'load_saved_model': True,
 'model_dir': check_point_dir+'siam/'+ EXP_NAME + '/',
 'model_name':'push_model_fwd_with_siam.ckpt',
-'training_data_dir':training_data_dir,
-'train_file_indices':train_file_indices,
 'test_file_indices':test_file_indices,
 'summary_dir':summary_dir+'/siam/'+ EXP_NAME + '/',
 'device':'/gpu:0',

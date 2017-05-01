@@ -52,13 +52,15 @@ def test_siamese_model():
 
     test_data_x = None; test_data_y = None; batch_creator = None   
     if network_params_siam['batch_params'] is not None:
+
         network_params_siam['batch_params']['data_file_indices'] = network_params_siam['batch_params']['test_data_file_indices']
+
         batch_creator = BatchCreator(network_params_siam['batch_params'])
     else:
         test_data_x, test_data_y = get_data('test')
 
     siamese_model = SiamesePushModel(sess=get_session(), network_params=network_params_siam)
-    siamese_model.init_model(epoch = 10)
+    siamese_model.init_model(epoch = 560)
     siamese_model.configure_data(data_x=test_data_x, data_y=test_data_y, batch_creator=batch_creator)
     
     # h = siamese_model.run_op('last_hidden',data_x)

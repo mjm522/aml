@@ -246,20 +246,34 @@ class SiamesePushModel(object):
                 tf.global_variables_initializer().run()
             
             loss = np.zeros(iterations)
+            loss_mdn = np.zeros(iterations)
+            loss_fwd = np.zeros(iterations)
             
             feed_dict, _ = self.get_data()
 
             xs = []
             ys = []
 
-            fig = plt.figure()
+            xs2 = []
+            ys2 = []
+
+            xs3 = []
+            ys3 = []
+
+            fig1 = plt.figure()
+            fig2 = plt.figure()
+            fig3 = plt.figure()
             plt.ion()
             plt.show()
             loss_tmp = 0.0
+            loss_tmp2 = 0.0
+            loss_tmp3 = 0.0
 
             # Keeping track of loss progress as we train
             train_step = self._net_ops['train_step']
             loss_op  = self._net_ops['cost']
+            loss_mdn_op  = self._net_ops['mdn_loss']
+            loss_fwd_op  = self._net_ops['fwd_cost']
             for i in range(iterations):
                 print "Starting epoch \t", i
                 round_complete = False
@@ -269,8 +283,10 @@ class SiamesePushModel(object):
                     #this is to take care of the case when we are not doing batch training.
                     round_complete = True
 
-                _, loss[i] = self._sess.run([train_step, loss_op], feed_dict=feed_dict)
+                _, loss[i], loss_mdn[i], loss_fwd[i] = self._sess.run([train_step, loss_op, loss_mdn_op, loss_fwd_op], feed_dict=feed_dict)
                 loss_tmp += loss[i]
+                loss_tmp2 += loss_mdn[i]
+                loss_tmp3 += loss_fwd[i]
                 if round_complete:
                     print "That was the last round of epoch %d"%i
                 if i%chk_pnt_save_invl==0 and i!=0:
@@ -282,11 +298,27 @@ class SiamesePushModel(object):
                     
                     xs.append(i)
                     ys.append(loss_tmp/10)
-                    fig.add_subplot(111).plot(xs, ys, 'b')
-                    fig.canvas.flush_events()
+
+                    xs2.append(i)
+                    ys2.append(loss_tmp2/10)
+
+                    xs3.append(i)
+                    ys3.append(loss_tmp3/10)
+
+                    fig1.add_subplot(111).plot(xs, ys, 'b')
+                    fig1.canvas.flush_events()
+
+
+                    fig2.add_subplot(111).plot(xs2, ys2, 'g')
+                    fig2.canvas.flush_events()
+                    
+
+                    fig3.add_subplot(111).plot(xs3, ys3, 'r')
+                    fig3.canvas.flush_events()
+ 
                     plt.draw()
 
-                    loss_tmp = 0.0
+                    loss_tmp = loss_tmp2 = loss_tmp3 = 0.0
                 
                 
 
@@ -310,23 +342,37 @@ class SiamesePushModel(object):
                 tf.global_variables_initializer().run()
             
             loss = np.zeros(iterations)
+            loss_mdn = np.zeros(iterations)
+            loss_fwd = np.zeros(iterations)
             
             feed_dict, _ = self.get_data()
 
             xs = []
             ys = []
 
-            fig = plt.figure()
+            xs2 = []
+            ys2 = []
+
+            xs3 = []
+            ys3 = []
+
+            fig1 = plt.figure()
+            fig2 = plt.figure()
+            fig3 = plt.figure()
             plt.ion()
             plt.show()
             loss_tmp = 0.0
+            loss_tmp2 = 0.0
+            loss_tmp3 = 0.0
 
             # Keeping track of loss progress as we train
             loss_op  = self._net_ops['cost']
+            loss_mdn_op  = self._net_ops['mdn_loss']
+            loss_fwd_op  = self._net_ops['fwd_cost']
 
             round_complete = False
-            i = 0
-            while not round_complete:
+  
+            for i in range(iterations):
 
                 if self._params['batch_params'] is not None:
                     feed_dict, round_complete = self.get_data()
@@ -334,9 +380,12 @@ class SiamesePushModel(object):
                     #this is to take care of the case when we are not doing batch training.
                     round_complete = True
 
-                loss[i] = self._sess.run([loss_op], feed_dict=feed_dict)[0]
+                loss[i], loss_mdn[i], loss_fwd[i] = self._sess.run([loss_op, loss_mdn_op, loss_fwd_op], feed_dict=feed_dict)
+
                 loss_tmp += loss[i]
-                i += 1
+                loss_tmp2 += loss_mdn[i]
+                loss_tmp3 += loss_fwd[i]
+
 
                 if round_complete:
                     print "That was the last round of epoch %d"%i
@@ -348,11 +397,27 @@ class SiamesePushModel(object):
                     
                     xs.append(i)
                     ys.append(loss_tmp/10)
-                    fig.add_subplot(111).plot(xs, ys, 'b')
-                    fig.canvas.flush_events()
+
+                    xs2.append(i)
+                    ys2.append(loss_tmp2/10)
+
+                    xs3.append(i)
+                    ys3.append(loss_tmp3/10)
+
+                    fig1.add_subplot(111).plot(xs, ys, 'b')
+                    fig1.canvas.flush_events()
+
+
+                    fig2.add_subplot(111).plot(xs2, ys2, 'g')
+                    fig2.canvas.flush_events()
+                    
+
+                    fig3.add_subplot(111).plot(xs3, ys3, 'r')
+                    fig3.canvas.flush_events()
+ 
                     plt.draw()
 
-                    loss_tmp = 0.0
+                    loss_tmp = loss_tmp2 = loss_tmp3 = 0.0
                 
                 
 
