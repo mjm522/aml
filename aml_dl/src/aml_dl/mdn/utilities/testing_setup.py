@@ -97,7 +97,7 @@ class TestSetup(BoxObject):
                 
                 goals.reverse()
                 success = self.goto_goals(goals[1:])
-
+                self._robot.untuck_arm()
                 if success:
                     final_state =  self._box.get_curr_image()
                     f_box_pose, f_box_pos, f_box_q = self._box.get_pose()
@@ -111,7 +111,21 @@ class TestSetup(BoxObject):
                     test_data['f_box_q']    = f_box_q
                     test_data['f_box_pose'] = f_box_pose
 
+
+                    raw_input('adjust box manually')
+
+                    final_state =  self._box.get_curr_image()
+                    f_box_pose, f_box_pos, f_box_q = self._box.get_pose()
+
+                    test_data['fm_image']    = final_state
+                    test_data['fm_box_pos']  = f_box_pos
+                    test_data['fm_box_q']    = f_box_q
+                    test_data['fm_box_pose'] = f_box_pose
+
                     save_data(test_data, filename=test_save_location+'test_data_'+str(k)+'.pkl')
+
+
+
                     print "Saved data!"
             else:
                 print "Failed push ", k
