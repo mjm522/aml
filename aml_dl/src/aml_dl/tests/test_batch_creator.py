@@ -6,8 +6,10 @@ def main():
                     'buffer_size':45, 
                     'batch_size': 20, 
                     'data_file_indices': range(1,10), 
-                    'model_type':'fwd', 
-                    'use_random_batches':False}
+                    'model_type':'siam', 
+                    'use_random_batches':False,
+                    'files_per_read':10,
+                    'load_pre_processd_data':True}
 
     batch_creator = BatchCreator(batch_params)
 
@@ -17,7 +19,7 @@ def main():
     #while loops are given since if we make batch_creator multi threaded, this will be 
     #useful
     while x_batch1 is None and y_batch1 is None:
-        x_batch1, y_batch1,_ =  batch_creator.get_batch()
+        x_batch1, y_batch1, _ =  batch_creator.get_batch()
     
     while x_batch2 is None and y_batch2 is None:
         x_batch2, y_batch2, _ =  batch_creator.get_batch()

@@ -90,6 +90,8 @@ $(document).ready(function(){initNavTree('classaml__robot_1_1mujoco_1_1mujoco__r
 Collaboration diagram for aml_robot.mujoco.mujoco_robot.MujocoRobot:</div>
 <div class="dyncontent">
 <div class="center"><img src="classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot__coll__graph.png" border="0" usemap="#aml__robot_8mujoco_8mujoco__robot_8_mujoco_robot_coll__map" alt="Collaboration graph"/></div>
+<map name="aml__robot_8mujoco_8mujoco__robot_8_mujoco_robot_coll__map" id="aml__robot_8mujoco_8mujoco__robot_8_mujoco_robot_coll__map">
+</map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -97,6 +99,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0c93caf9f5746868f6e847c726dcc6c3"><td class="memItemLeft" align="right" valign="top"><a id="a0c93caf9f5746868f6e847c726dcc6c3"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, xml_path)</td></tr>
 <tr class="separator:a0c93caf9f5746868f6e847c726dcc6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f18fbfdde2a14ca8a9721c5f3af7501"><td class="memItemLeft" align="right" valign="top"><a id="a0f18fbfdde2a14ca8a9721c5f3af7501"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>set_sampling_rate</b> (self, rate=100)</td></tr>
+<tr class="separator:a0f18fbfdde2a14ca8a9721c5f3af7501"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c6f2efeec6ef3e551ae098780c59bd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a36c6f2efeec6ef3e551ae098780c59bd">robot_state_set_start_end_index</a> (self, p_start_idx, p_end_idx, v_start_idx, v_end_idx)</td></tr>
+<tr class="separator:a36c6f2efeec6ef3e551ae098780c59bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07867eb5e34c86e6b0c9933f7314f272"><td class="memItemLeft" align="right" valign="top"><a id="a07867eb5e34c86e6b0c9933f7314f272"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_ee_pose</b> (self)</td></tr>
 <tr class="separator:a07867eb5e34c86e6b0c9933f7314f272"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -106,6 +113,12 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>get_compensation_force
 <tr class="memitem:a61055aa4cd93fe16ed9af7c2658db2b3"><td class="memItemLeft" align="right" valign="top"><a id="a61055aa4cd93fe16ed9af7c2658db2b3"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_ee_velocity</b> (self)</td></tr>
 <tr class="separator:a61055aa4cd93fe16ed9af7c2658db2b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1a12e82381e4ab718cd5e8d7093e866"><td class="memItemLeft" align="right" valign="top"><a id="aa1a12e82381e4ab718cd5e8d7093e866"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>reset_model</b> (self)</td></tr>
+<tr class="separator:aa1a12e82381e4ab718cd5e8d7093e866"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f61333a1fd8178f853066885b41ff7e"><td class="memItemLeft" align="right" valign="top"><a id="a2f61333a1fd8178f853066885b41ff7e"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>untuck_arm</b> (self)</td></tr>
+<tr class="separator:a2f61333a1fd8178f853066885b41ff7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb18971ecf340d803a366b1354ba215c"><td class="memItemLeft" align="right" valign="top"><a id="afb18971ecf340d803a366b1354ba215c"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>set_qpos</b> (self, qpos)</td></tr>
 <tr class="separator:afb18971ecf340d803a366b1354ba215c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -128,6 +141,56 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>exec_position_cmd</b> 
 def&#160;</td><td class="memItemRight" valign="bottom"><b>exec_position_cmd_delta</b> (self, cmd)</td></tr>
 <tr class="separator:ae4870147d3f87826bd2237511536aff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a36c6f2efeec6ef3e551ae098780c59bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36c6f2efeec6ef3e551ae098780c59bd">&sect;&nbsp;</a></span>robot_state_set_start_end_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def aml_robot.mujoco.mujoco_robot.MujocoRobot.robot_state_set_start_end_index </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>p_start_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>p_end_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>v_start_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>v_end_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">since mujoco provides a single array of all states of all objects in the scene, it becomes essential
+to give a start index and end index in that array which corresponds to the robot
+if the input arguments are none, then all values are returned
+</pre> 
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>aml_robot/src/aml_robot/mujoco/mujoco_robot.py</li>
 </ul>

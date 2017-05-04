@@ -1,0 +1,3 @@
+<map id="src.aml_dl.utilities.tf_batch_creator.BatchCreator" name="src.aml_dl.utilities.tf_batch_creator.BatchCreator">
+<area shape="rect" id="node2" href="$classaml__data__collec__utils_1_1core_1_1data__manager_1_1_data_manager.html" title="{aml_data_collec_utils.core.data\l_manager.DataManager\n||+ __init__()\l+ create_new_data()\l+ write_data()\l+ read_data()\l+ add()\l+ check_sample()\l+ get_sample()\l+ get_last()\l+ get_last_elems()\l+ get_last_elems()\l+ get_last_ids()\l+ select_data()\l+ pack_data()\l+ pack_data_x()\l+ pack_data_y()\l+ pack_data_in_range()\l+ pack_data_in_range_xy()\l+ create_sample()\l+ size()\l}" alt="" coords="5,127,213,453"/>
+</map>

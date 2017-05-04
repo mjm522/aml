@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.utilities.tf_batch_creator import BatchCreator
-from aml_dl.mdn.training.config_exp3 import network_params_siam
+from aml_dl.mdn.training.config_exp5 import network_params_siam
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 
@@ -73,10 +73,6 @@ def test_siamese_model():
 #        train_data_x, train_data_y = get_data('test')
 
     
-
-
-   
-    
 def train_siamese_model():
 
     network_params_siam['load_saved_model'] = False
@@ -99,9 +95,9 @@ def train_siamese_model():
     print "Got the data, gonna train the model..."
 
     epochs = network_params_siam['epochs']
-    siamese_model.train(epochs=epochs)
+    siamese_model.train(epochs=epochs, chk_pnt_save_invl=network_params_siam['check_point_save_interval'])
 
-    siamese_model.save_model()
+    siamese_model.save_model('final') #providing subscript for the final model saved, so the model name is final_blah_lah
 
     if network_params_siam['write_summary']:
         logdir = siamese_model._tf_sumry_wrtr._summary_dir

@@ -1,0 +1,67 @@
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin}{}\section{baxter\+\_\+gazebo\+\_\+plugin\+:\+:Baxter\+Gazebo\+Ros\+Control\+Plugin Class Reference}
+\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin}\index{baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin@{baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin}}
+
+
+Inheritance diagram for baxter\+\_\+gazebo\+\_\+plugin\+:\+:Baxter\+Gazebo\+Ros\+Control\+Plugin\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for baxter\+\_\+gazebo\+\_\+plugin\+:\+:Baxter\+Gazebo\+Ros\+Control\+Plugin\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_ad18708c5af902c198c114c6908c86d66}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_ad18708c5af902c198c114c6908c86d66} 
+void {\bfseries Load} (gazebo\+::physics\+::\+Model\+Ptr parent, sdf\+::\+Element\+Ptr sdf)
+\item 
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_ae142ff05eb7ee5d223939b1ecb41731f}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_ae142ff05eb7ee5d223939b1ecb41731f} 
+void {\bfseries enable\+Command\+Callback} (const baxter\+\_\+core\+\_\+msgs\+::\+Assembly\+State msg)
+\item 
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_abcbb5c7e3d26eb2dadfd03de5070ba47}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_abcbb5c7e3d26eb2dadfd03de5070ba47} 
+void {\bfseries head\+Command\+Callback} (const baxter\+\_\+core\+\_\+msgs\+::\+Head\+Pan\+Command msg)
+\item 
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_aad16fe48445d9dd9b21d3615034e2f37}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_aad16fe48445d9dd9b21d3615034e2f37} 
+void {\bfseries left\+Mode\+Command\+Callback} (const baxter\+\_\+core\+\_\+msgs\+::\+Joint\+Command\+Const\+Ptr \&msg)
+\item 
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_a5d21bace211533c2ea269e10ff7f63aa}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_a5d21bace211533c2ea269e10ff7f63aa} 
+void {\bfseries right\+Mode\+Command\+Callback} (const baxter\+\_\+core\+\_\+msgs\+::\+Joint\+Command\+Const\+Ptr \&msg)
+\item 
+void \hyperlink{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_aff0207bdb9a7d00b791ce5edc6ee27b9}{mode\+Command\+Callback} (const baxter\+\_\+core\+\_\+msgs\+::\+Joint\+Command\+Const\+Ptr \&msg, const std\+::string \&side)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_aff0207bdb9a7d00b791ce5edc6ee27b9}{}\label{classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin_aff0207bdb9a7d00b791ce5edc6ee27b9} 
+\index{baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin@{baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin}!mode\+Command\+Callback@{mode\+Command\+Callback}}
+\index{mode\+Command\+Callback@{mode\+Command\+Callback}!baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin@{baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin}}
+\subsubsection{\texorpdfstring{mode\+Command\+Callback()}{modeCommandCallback()}}
+{\footnotesize\ttfamily void baxter\+\_\+gazebo\+\_\+plugin\+::\+Baxter\+Gazebo\+Ros\+Control\+Plugin\+::mode\+Command\+Callback (\begin{DoxyParamCaption}\item[{const baxter\+\_\+core\+\_\+msgs\+::\+Joint\+Command\+Const\+Ptr \&}]{msg,  }\item[{const std\+::string \&}]{side }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Switch multiple controllers simultaneously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+\_\+controllers} & A vector of controller names to be started \\
+\hline
+{\em stop\+\_\+controllers} & A vector of controller names to be stopped \\
+\hline
+{\em strictness} & How important it is that the requested controllers are started and stopped. The levels are defined in the controller\+\_\+manager\+\_\+msgs/\+Switch\+Controllers service as either {\ttfamily B\+E\+S\+T\+\_\+\+E\+F\+F\+O\+RT} or {\ttfamily S\+T\+R\+I\+CT}. {\ttfamily B\+E\+S\+T\+\_\+\+E\+F\+F\+O\+RT} means that switch\+Controller can still succeed if a non-\/existant controller is requested to be stopped or started.\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+aml\+\_\+assets/gazebo\+\_\+files/aml\+\_\+baxter\+\_\+gazebo/src/aml\+\_\+baxter\+\_\+gazebo\+\_\+ros\+\_\+control\+\_\+plugin.\+cpp\end{DoxyCompactItemize}
