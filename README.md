@@ -49,12 +49,34 @@
 	$workon robotics
 	```
      
-3. Install CUDA 8.0 and Cuda-NN 6.0
+3. Install CUDA 8.0 and Cuda-NN 5.1
     
     You can get the compiled binary files from following websites:
     
-    * [CUDA](https://developer.nvidia.com/cuda-downloads)
-    * [CUDANN](https://developer.nvidia.com/cudnn)
+    a. [CUDA](https://developer.nvidia.com/cuda-downloads)
+
+    b. [CUDANN](https://developer.nvidia.com/cudnn)
+
+    * You will have to create an account in Nvdia to download the libraries
+    * Goto "Download cuDNN v5.1 (Jan 20, 2017), for CUDA 8.0", Dowload cuDNN v5.1 Library for Linux
+    * From the terminal goto the download directory
+    	
+    	```
+    	$tar -zxf cudnn-8.0-linux-x64-v5.1.tgz
+    	$cd cuda/
+    	$sudo cp include/* /usr/local/cuda/include/
+    	$sudo cp lib64/* /usr/local/cuda/lib64/
+    	```
+
+    * Add the following bit to ~/.bashrc file
+
+    	```
+    	export CUDA_HOME=/usr/local/cuda-8.0 
+		export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
+		PATH=${CUDA_HOME}/bin:${PATH} 
+		export PATH
+    	```
+
 
 4. Install tensorflow in virtual environment 
 	```
