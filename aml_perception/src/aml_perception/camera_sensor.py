@@ -56,13 +56,13 @@ class CameraSensor(object):
     # cv2.imshow("RGB Image window", self._curr_rgb_image)
     # cv2.waitKey(1)
 
-    try:
-      image_msg = self._bridge.cv2_to_imgmsg(self._curr_rgb_image, "bgr8")
-      self.rgb_image_pub.publish(image_msg)
-    except CvBridgeError as e:
-      print("camera_sensor: cv_bridge error. Unable to publish rgb_image")
-    except Exception as e:
-      print("camera_sensor: other error. Unable to publish rgb_image")
+    #try:
+    #  image_msg = self._bridge.cv2_to_imgmsg(self._curr_rgb_image, "bgr8")
+    #  self.rgb_image_pub.publish(image_msg)
+    #except CvBridgeError as e:
+    #  print("camera_sensor: cv_bridge error. Unable to publish rgb_image")
+    #except Exception as e:
+    #  print("camera_sensor: other error. Unable to publish rgb_image")
 
   def _on_depth_image(self,data):
 

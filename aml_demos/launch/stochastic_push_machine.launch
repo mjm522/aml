@@ -15,6 +15,6 @@
     <node pkg="aml_services" type="pushing_service.py" name="pushing_service" output="screen"/>
 
     <!-- start the stochastic push machine -->
-    <!--<node pkg="aml_demos" type="stochastic_pushing_machine.py" name="spm" output="screen"/> -->
+    <node pkg="aml_demos" type="stochastic_pushing_machine.py" name="spm" output="screen"/>
 
 </launch>

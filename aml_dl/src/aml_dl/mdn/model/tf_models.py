@@ -210,7 +210,7 @@ def tf_model(dim_input, dim_output, loss_type, cnn_params, fc_params, optimiser_
     output_ops = {'output' : fc_layer_output, 'cost': cost, 'train_step': train_step, 'x': x, 'image_input':image_input, 'y': target}
     return output_ops
 
-def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_params, cost_weights, tf_sumry_wrtr):
+def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_params, cost_weights, tf_sumry_wrtr, ):
     fc_params  = configure_params(fc_params)
     cnn_params = configure_params(cnn_params)
 
@@ -399,11 +399,14 @@ def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_par
                   'train_step': train_step, 
                   'image_input_t': image_input_t, 
                   'image_input_t_1': image_input_t_1,
+                  'fwd_cost': cost_fwd,
                   'mdn_y': mdn._ops['y'], # mdn target is a push action
                   'mdn_loss' : mdn._ops['loss'],
                   'mdn_mu' : mdn._ops['mu'],
                   'mdn_pi' : mdn._ops['pi'],
-                  'mdn_sigma' : mdn._ops['sigma']}
+                  'mdn_sigma' : mdn._ops['sigma'],
+                  'fp_xt': feature_point_t,
+                  'fp_xt1': feature_point_t_1}
     return output_ops
 
 
