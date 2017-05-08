@@ -82,13 +82,10 @@ class PyGameViewer(object):
             self._world.handle_event(event)
 
 
-    def clear_screen(self):
-        self._screen.fill((0, 0, 0, 0))
+    def clear_screen(self, color=(0,0,0,0)):
+        self._screen.fill(color)
 
     def flip(self):
-
-        img = pygame.surfarray.pixels3d(self._screen) 
-        self._last_screen = copy.deepcopy(img.transpose(1,0,2))
 
         # Flip the screen and try to keep at the target FPS
         pygame.display.flip()
@@ -100,6 +97,20 @@ class PyGameViewer(object):
         pygame.quit()
 
 
+    def store_screen(self):
+        img = copy.deepcopy(pygame.surfarray.pixels3d(self._screen))
+        self._last_screen = copy.deepcopy(img.transpose(1,0,2))
+
+
+    def draw(self, view_info=True):
+        # Draw the world
+        #view_info to true to see the text, arrow as well as point of pushing
+        self._world.draw(self, view_info=view_info)
+        # self.save_screen()
+        self.store_screen()
+        self.flip()
+
+
     def loop(self):
 
         # --- main game loop ---
@@ -107,19 +118,20 @@ class PyGameViewer(object):
 
             self.handle_events()
 
-            self.clear_screen()
+            self.clear_screen(color=(255,255,255,255))
+
+            self.draw(view_info=False)
 
             for i in range(self._steps_per_frame):
-                self._world.update(self)
+                self._world.update(self)               
                 self._world.step()
 
 
-            # Draw the world
-            self._world.draw(self)
-            # self.save_screen()
+
+
 
             
-            self.flip()
+            
 
             
 

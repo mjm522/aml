@@ -2,7 +2,6 @@
 
 
 import matplotlib.image as mpimg
-
 from aml_io.io_tools import load_data, save_data
 
 import numpy as np
@@ -17,7 +16,7 @@ class DataManager(object):
         self._next_sample_id = 0
 
     @classmethod
-    def from_file(cls,filename):
+    def from_file(cls, filename):
 
         return cls(load_data(filename))
 
@@ -35,15 +34,12 @@ class DataManager(object):
 
     def add(self, sample):
 
-
         sample['sample_id'] = self._next_sample_id
         self._next_sample_id += 1
         
         self._data.append(sample)
 
         
-
-
     def get_sample(self, idx, key):
         assert( idx < len(self._data) )
 

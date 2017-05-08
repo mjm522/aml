@@ -19,6 +19,7 @@ from pygame_viewer import PyGameViewer
 
 
 from data_manager import DataManager
+from aml_io.convert_tools import image2string
 
 STATE = {
     'RESET': 0,
@@ -28,10 +29,9 @@ STATE = {
     'NOP': 4,
 }
 
-
 class PushWorld(object):
 
-    def __init__(self,config):
+    def __init__(self, config):
 
         self._config = config
         self._ppm = self._config['pixels_per_meter']
@@ -71,7 +71,7 @@ class PushWorld(object):
     def step(self):
         self._world.Step(self._dt, 10, 10)
 
-    def draw(self,viewer):
+    def draw(self, viewer, view_info=True):
 
         screen = viewer._screen
 
@@ -100,19 +100,21 @@ class PushWorld(object):
                 px, py, ix, iy, theta = self._last_push
                 ix, iy = self.to_vec(theta)
 
-                p = self.get_screen_point2(body,(px,py))
-                p = (int(p[0]),int(p[1]))
-                
-                pygame.draw.line(screen,(127,255,127,255),(p[0],p[1]),(int(p[0]+ix*70),int(p[1]-iy*70)), 6)
-                pygame.draw.circle(screen, (127,255,127,255), p, 5,0)
+                if view_info:
+                    p = self.get_screen_point2(body,(px,py))
+                    p = (int(p[0]),int(p[1]))
+                    
+                    pygame.draw.line(screen,(127,255,127,255),(p[0],p[1]),(int(p[0]+ix*70),int(p[1]-iy*70)), 6)
+                    pygame.draw.circle(screen, (127,255,127,255), p, 5,0)
 
-                center = self.get_point(body,(0,0))
+                    center = self.get_point(body,(0,0))
+
+                    # render text
+                    label = viewer.create_text_surface("Push angle %0.2f, Pos (%0.2f,%0.2f), Vel(%0.2f,%0.2f) AngVel %0.2f"%(theta*180/np.pi,center[0],center[1],vel[0],vel[1],ang_vel))
+                    screen.blit(label, (0, 10))
 
                 vel = body.linearVelocity
                 ang_vel = body.angularVelocity
-                # render text
-                label = viewer.create_text_surface("Push angle %0.2f, Pos (%0.2f,%0.2f), Vel(%0.2f,%0.2f) AngVel %0.2f"%(theta*180/np.pi,center[0],center[1],vel[0],vel[1],ang_vel))
-                screen.blit(label, (0, 10))
 
 
     def handle_event(self, event):
@@ -148,7 +150,7 @@ class PushWorld(object):
         body.linearVelocity = (0,0)
         body.angularVelocity = 0
 
-    def get_box_state(self,body, viewer = None):
+    def get_box_state(self, body, viewer = None):
 
         (px,py) = body.position
         angle = body.angle
@@ -157,14 +159,18 @@ class PushWorld(object):
 
         image_file = None
         if viewer is not None:
-            image_file = "images/img%d.png"%(self._next_idx,)
+            # viewer.store_screen()
             if self._config['record_training_data']:
-                self.save_screen(viewer._last_screen,image_file)
-            
+                image_file = viewer._last_screen
+                if image_file is not None:
+                    image_file = image2string(image_file)
+                # image_file = self._config['data_folder_path']+"/img%d.png"%(self._next_idx,) 
+                # self.save_screen(viewer._last_screen, image_file)
+                
             self._next_idx += 1
 
         # Current state of the box (position,linear and angular velocities, image_rgb)
-        # Final state of the box 
+        # Final state of the box
 
         state = {
             'position': np.array([px,py]),
@@ -200,8 +206,6 @@ class PushWorld(object):
         theta = np.random.rand()*np.pi*2#*0.5#(2*np.pi)
 
         # self.get_vertices()
-
-
 
         self._push_counter += 1
 
@@ -271,7 +275,6 @@ class PushWorld(object):
                 print "END: ", state['position'], state['angle']
                 print "SAMPLE_ID:", self._data_manager._next_sample_id
 
-
                 self.add_sample(self._new_sample)
 
             else:
@@ -306,7 +309,7 @@ class PushWorld(object):
 
         return self._current_state 
 
-    def apply_push(self,body, px, py, ix, iy, theta):
+    def apply_push(self, body, px, py, ix, iy, theta):
 
         px_world, py_world = self.get_point(body,(px,py))
         ix, iy = self.to_vec(theta)
@@ -314,7 +317,7 @@ class PushWorld(object):
         body.ApplyLinearImpulse(impulse=(ix*10,iy*10), point=(px_world,py_world), wake=True)
 
 
-    def save_samples(self,filename):
+    def save_samples(self, filename):
 
         self._data_manager.save(filename)
 

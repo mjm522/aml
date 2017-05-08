@@ -20,6 +20,7 @@
 * [decorator](https://pypi.python.org/pypi/decorator/4.0.11)
 * [matplotlib](https://pypi.python.org/pypi/matplotlib/2.0.1)
 * [ipython](https://pypi.python.org/pypi/ipython/6.0.0)
+* [cv2](https://github.com/opencv/opencv)
 
 #### This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.
 
@@ -39,8 +40,9 @@
 
 	* Add the following two lines in your ~/.bashrc script:
 	```
-	$export WORKON_HOME="$HOME/.virtualenvs"
-	$source $HOME/bin/virtualenvwrapper_bashrc
+	export WORKON_HOME=~/.venvs  
+	source /usr/share/virtualenvwrapper/virtualenvwrapper.sh  
+	export PIP_VIRTUALENV_BASE=~/.venvs
 	```
 	* Close the bashrc file and source them:
 	```
@@ -130,8 +132,46 @@
 	```
 
 8. Installing pybox2d - follow instructions in this [page](https://github.com/pybox2d/pybox2d/blob/master/INSTALL.md).
+
+9. Installing opencv for python
+
+	**Note:** this compilation could take a while! And install this only after removing opencv-python (this is unofficial version) if installed previously.
+	
+	* Go to a folder of your choice
+	```
+	$git clone https://github.com/Itseez/opencv.git
+	$cd opencv
+	$git checkout 3.2.0
+	$mkdir build
+	$cd build
+	$cmake ..                             
+	$sudo make                   
+	$sudo make install         
+	$sudo /bin/bash -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/opencv.conf'  
+	$sudo ldconfig
+	```
+
+	* Set symlink to virtual environment (on assumtion that your venv name is "robotics")
+	```
+	$cd ~/.venvs/robotics/lib/python2.7/site-packages/
+	$ln -s /usr/local/lib/python2.7/site-packages/cv2.so cv2.so
+	```
+
+	* Check installation
+	```
+	$workon robotics
+	$python
+	>>import cv2
+	```
+
+	* To compile samples
+	```
+	$cd <opencv folder path>/opencv/samples
+	$cmake .               
+	$sudo make 
+	```
+
         
-       
 #### Possible Errors:
 
 1. Could not find any downloads that satisfy the requirement tensorflow
@@ -152,10 +192,12 @@
 
 5. Could not stop controller 'left_joint_velocity_controller' since it is not running
   
-  **Solution:** goto ```$~/catkin_ws/baxter_ws/src/ baxter_gazebo/src/baxter_gazebo_ros_control_plugin.cpp```
-Edit lines:```::SwitchController::Request::STRICT to ::SwitchController::Request::BEST_EFFORT (This happens in two places)```
+	  **Solution:** goto ```$~/catkin_ws/baxter_ws/src/ baxter_gazebo/src/baxter_gazebo_ros_control_plugin.cpp```
 
-*Note:* You have to rebuild the catkin_make from $baxter_ws
+	**Edit lines:**```::SwitchController::Request::STRICT to ::SwitchController::Request::BEST_EFFORT ```
+	 (This happens in two places)
+
+	*Note:* You have to rebuild the catkin_make from $baxter_ws
 
 
 

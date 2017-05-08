@@ -1,4 +1,9 @@
+import os
 
+data_folder_path = os.environ.get('AML_DATA')+'/aml_dl/box2d_push_data'
+
+if not os.path.exists(data_folder_path):
+	os.mkdir(data_folder_path)
 
 config = {
 	
@@ -10,7 +15,8 @@ config = {
 	'window_caption': 'BoxWorld',
 	'box_dim': (2,1),
 	'record_training_data': True,
-	'training_data_file': 'data_test.pkl',
+	'training_data_file': data_folder_path+'/data_test.pkl',
 	'steps_per_frame': 5,
+	'data_folder_path':data_folder_path,
 
 }

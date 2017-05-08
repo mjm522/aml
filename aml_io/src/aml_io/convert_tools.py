@@ -1,6 +1,6 @@
 
 import StringIO
-import Image
+from PIL import Image
 import numpy as np
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
@@ -29,7 +29,7 @@ def string2image(str_image_in):
     expects a string array
     '''
     nparr = np.fromstring(str_image_in, np.uint8)
-    out = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
+    out = cv2.imdecode(nparr, 1)#cv2.CV_LOAD_IMAGE_COLOR
     # out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
     return out
 

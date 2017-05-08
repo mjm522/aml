@@ -12,7 +12,6 @@ import camera_calib
 from aml_robot.baxter_robot import BaxterArm
 from aml_data_collec_utils.box_object import BoxObject
 from aml_data_collec_utils.core.sample import Sample
-from aml_data_collec_utils.core.data_manager import DataManager
 from aml_data_collec_utils.core.data_recorder import DataRecorder
 from aml_data_collec_utils.config import config
 from aml_data_collec_utils.baxter_reset_box import fsm_reset

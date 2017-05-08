@@ -5,6 +5,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_dl.utilities.tf_batch_creator import BatchCreator
 from aml_dl.mdn.model.mdn_push_fwd_model import MDNPushFwdModel
+from aml_visual_tools.visual_tools import visualize_2D_data_with_sigma
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 from aml_dl.mdn.training.config_both_mdn_debug import network_params_fwd
 
@@ -31,10 +32,26 @@ def test_fwd_model():
 
     print "Got the data, gonna test the model..."
 
-    forward_model = MDNPushFwdModel(sess=sess, network_params=network_params_fwd)
-    forward_model.init_model()
+    inverse_model = MDNPushFwdModel(sess=sess, network_params=network_params_fwd)
+    inverse_model.init_model()
 
-    prediction = forward_model.run_op('output', test_data_x)
+    mu_out = inverse_model.run_op('mu', test_data_x)
+    sigma_out = inverse_model.run_op('sigma', test_data_x)
+    pi_out = inverse_model.run_op('pi', test_data_x)
+
+    mu_out =  np.asarray(mu_out).squeeze()
+
+    num_points = mu_out.shape[0]
+
+    x_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,0]])
+    y_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,1]])
+    z_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,2]])
+    qw_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,3]])
+    qx_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,4]])
+    qy_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,5]])
+    qz_pred = np.vstack([np.asarray(range(num_points)), mu_out[:,6]])
+
+    # visualize_2D_data_with_sigma(data=x_pred, sigma=sigma_out)
 
     num_outputs = network_params_fwd['dim_output']
     output_vars = network_params_fwd['output_order']
@@ -44,12 +61,12 @@ def test_fwd_model():
     for ax in axlist.flatten():
         ax.set_title(output_vars[d])
         h1 =  ax.plot(np.asarray(test_data_y)[:,d],    color='r', label='true')
-        h2 =  ax.plot(prediction[:,d],    color='g', label='pred')
+        h2 =  ax.plot(mu_out[:,d],    color='g', label='pred')
         d += 1
 
     fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)  # create some space below the plots by increasing the bottom-value
     axlist.flatten()[-2].legend(loc='upper center', bbox_to_anchor=(0.5, -1.35), ncol=3)
-    plt.suptitle('Prediction - True',size=16)
+    plt.suptitle('Mean of Prediction - True',size=16)
     fig.subplots_adjust(hspace=.5)
     plt.show()
 

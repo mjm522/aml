@@ -81,7 +81,7 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     if data.shape[0] == 1:
         data = np.vstack([range(data.shape[1]), data])
 
-    print data.shape
+    # print data.shape
 
     if color is None:
         color = 'g'
@@ -149,9 +149,6 @@ def continous_2D_plot(data, X = [], Y = [], fig_handle=None, axis_lim=None, colo
     if color is None:
         color = 'g'
 
-
-
-
     def update_plot(X, Y, event):
         while not rospy.is_shutdown():
             fig.add_subplot(111).plot(X, Y, color)
@@ -184,7 +181,7 @@ def show_image(image_data, window_name=None):
         image = string2image(image_data[0])
     else:
         image = image_data
-
+        
     cv2.imshow(window_name, image)
     cv2.waitKey(0)
 

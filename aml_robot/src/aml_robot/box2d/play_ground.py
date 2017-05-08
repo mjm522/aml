@@ -6,7 +6,7 @@ from data_manager import DataManager
 
 
 data_manager = DataManager()
-data_manager =data_manager.from_file('data_test.pkl')
+data_manager = data_manager.from_file('data_test.pkl')
 
 
 print data_manager.get_sample(0,'state_end')

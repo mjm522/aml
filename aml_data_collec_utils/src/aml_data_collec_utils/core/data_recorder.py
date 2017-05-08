@@ -70,9 +70,6 @@ class DataRecorder(object):
         robot_state = copy.deepcopy(self._robot._state)
         task_state = self._task.get_effect()
 
-
-        
-
         if not self.check_sample(robot_state['timestamp']):
             aml_logging.warning("DataRecorder.record_once: check_sample failed")
             return 
@@ -144,7 +141,6 @@ class DataRecorder(object):
             self._sample.set_valid(task_status)
 
             # Setting last data point as terminal
-
 
             if self._sample.size > 0:
                 self._sample.set(-1,'terminal', True)

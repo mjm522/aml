@@ -4,7 +4,7 @@ from aml_io.io_tools import get_aml_package_path
 
 EXP_NAME = 'exp_debug'
 
-EXP_MODE = 'test'
+EXP_MODE = 'train'
 
 check_point_dir   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/'
 training_data_dir = ''
@@ -35,8 +35,8 @@ IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
 
-train_file_indices = range(1, 10)#550
-test_file_indices  = range(1,550)
+train_file_indices = range(1, 5)#550
+test_file_indices  = range(8,12)
 
 if EXP_MODE=='train':
     data_dir = training_data_dir
@@ -57,7 +57,7 @@ network_params_inv = {
     'n_hidden': 48,
     'k_mixtures': 40,
     'batch_size': 25,
-    'write_summary': True,
+    'write_summary': False,
     'learning_rate': 0.0005,
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
@@ -148,12 +148,13 @@ fc_network_params_siam = {
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
-    'dim_input': 14, 
-    'dim_output': 2,
+    'dim_input': 9, 
+    'dim_output': 7,
+    'cnn_params':None,
     'n_hidden': 48,
     'k_mixtures': 1,
     'batch_size': 25,
-    'write_summary': True,
+    'write_summary': False,
     'learning_rate': 0.0005,
     'batch_params':None,
     'image_width': IMAGE_WIDTH,
@@ -161,8 +162,9 @@ network_params_fwd = {
     'image_channels': IMAGE_CHANNELS,
     'image_size': IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNELS,
     'load_saved_model': False,
-    'model_dir': check_point_dir + '/inv/',
+    'model_dir': check_point_dir + 'inv/',
     'model_name':'push_model_inv_1_kernels_ep50000.ckpt',
+    'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
     'train_file_indices': train_file_indices,
     'test_file_indices': test_file_indices,
     'training_data_dir': training_data_dir,
@@ -195,5 +197,5 @@ network_params_siam = {
 'model_name':'push_model_fwd_with_siam.ckpt',
 'test_file_indices':test_file_indices,
 'summary_dir':summary_dir+'/siam/'+ EXP_NAME + '/',
-'device':'/gpu:0',
+'device':'/cpu:0',
 }
