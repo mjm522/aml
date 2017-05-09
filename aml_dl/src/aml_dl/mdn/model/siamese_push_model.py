@@ -129,12 +129,11 @@ class SiamesePushModel(object):
                 #     cv2.imshow("Before:", np.transpose(np.reshape(x[0],(3,640,480)), axes=[2,1,0]))
                 #     cv2.imshow("After:", np.transpose(np.reshape(x[1],(3,640,480)), axes=[2,1,0]))
                 #     cv2.waitKey(0)
-                data_y_point_len = len(tmp_y[0])/2 #a single line consists of data at t and t+1
                 data_y_array     = np.asarray(tmp_y)
-                data_y_t         = data_y_array[:,0:data_y_point_len]
-                data_y_t_1       = data_y_array[:,data_y_point_len:]
+                data_y_t         = data_y_array[:,self._params['fc_params']['state_t_indices']]
+                data_y_t_1       = data_y_array[:,self._params['fc_params']['state_t_1_indices']]
                 # self._data_y     = data_y_t_1[:, :-self._params['fc_params']['action_dim']].tolist()
-                self._action_t   = data_y_t[:, self._params['fc_params']['state_dim']:].tolist()
+                self._action_t   = data_y_array[:, self._params['fc_params']['action_indices']].tolist()
             else:
                 raise Exception("Batch training chosen but batch_creator not configured")
 
@@ -231,7 +230,6 @@ class SiamesePushModel(object):
                     plt.plot(loss)
                     plt.show()
 
-  
         return loss
 
 
@@ -320,11 +318,6 @@ class SiamesePushModel(object):
 
                     loss_tmp = loss_tmp2 = loss_tmp3 = 0.0
                 
-                
-
-                
-
-            
             np.savetxt('loss_values.txt', np.asarray(loss))
                 #plt.figure()
                 #plt.plot(loss)
@@ -419,11 +412,6 @@ class SiamesePushModel(object):
 
                     loss_tmp = loss_tmp2 = loss_tmp3 = 0.0
                 
-                
-
-                
-
-            
             np.savetxt('loss_values.txt', np.asarray(loss))
                 #plt.figure()
                 #plt.plot(loss)

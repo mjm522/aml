@@ -65,7 +65,7 @@ class PushWorld(object):
 
         self._current_state = STATE['RESET']
         
-        self._data_manager = DataManager()
+        self._data_manager = DataManager(data_folder=config['data_folder_path'])
         self._new_sample = self._data_manager.create_sample()
 
     def step(self):

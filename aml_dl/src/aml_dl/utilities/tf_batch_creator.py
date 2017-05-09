@@ -23,7 +23,14 @@ class BatchCreator(DataManager):
         self._load_pre_processd_data = self._params['load_pre_processd_data']
 
         if self._load_pre_processd_data:
-            self._get_pre_processd_data = LoadPreprocessData(file_location=self._params['data_dir'])
+            
+            if 'filename_prefix' in self._params.keys():
+                filename_prefix = self._params['filename_prefix']
+            else:
+                filename_prefix = None
+            
+            self._get_pre_processd_data = LoadPreprocessData(file_location=self._params['data_dir'],
+                                                             filename_prefix=filename_prefix,)
     
         self.start_batcher()
 

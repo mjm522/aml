@@ -19,8 +19,6 @@ class DataRecorder(object):
     def __init__(self, robot_interface, task_interface, data_folder_path=None,  
                        data_name_prefix=None, num_samples_per_file=1000, record_rate = 20):
 
-
-
         self._robot            = robot_interface
 
         self._task             = task_interface

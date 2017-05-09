@@ -2,7 +2,7 @@ import os
 from aml_robot.box2d.config import config
 from aml_io.io_tools import get_aml_package_path
 
-EXP_NAME = 'exp_debug'
+EXP_NAME = 'exp_box2d'
 
 EXP_MODE = 'train'
 
@@ -13,8 +13,8 @@ data_dir = ''
 summary_dir = os.environ['AML_DATA'] + '/aml_dl/mdn/summaries/'
 
 try:
-    training_data_dir = os.environ['AML_DATA'] + '/aml_dl/pre_process_data_siamese/train/'
-    test_data_dir = os.environ['AML_DATA'] + '/aml_dl/pre_process_data_siamese/test/'
+    training_data_dir = os.environ['AML_DATA'] + '/aml_dl/box2d_pre_processed_data/train/'
+    test_data_dir = os.environ['AML_DATA'] + '/aml_dl/box2d_pre_processed_data/test/'
 except:
     print "AML_DATA environment variable is not set."
 
@@ -34,15 +34,17 @@ IMAGE_WIDTH    = config['image_width']
 IMAGE_HEIGHT   = config['image_height']
 IMAGE_CHANNELS = 3
 
-STATE_T_INDICES   = range(0,7)
-STATE_T_1_INDICES = range(7,14)
-ACTION_INDICES    = range(14,16)
+#for the fully connected layer to resolve indices of the array
+STATE_T_INDICES   = range(0,2)
+STATE_T_1_INDICES = range(2,4)
+ACTION_INDICES    = range(4,6)
 
 NUM_CNN_LAYERS_SIAM = 3
 NUM_FP_SIAM = 128 #number of feature points in the last layer
 
+
 train_file_indices = range(1, 5)#550
-test_file_indices  = range(8,12)
+test_file_indices  = range(8, 12)
 
 if EXP_MODE=='train':
     data_dir = training_data_dir
@@ -70,7 +72,7 @@ adam_params = {
 
 network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
-    'dim_input': 14, 
+    'dim_input': 4, 
     'dim_output': 2,
     'n_hidden': 48,
     'k_mixtures': 40,
@@ -92,6 +94,7 @@ network_params_inv = {
     'device': '/cpu:0',
 }
 
+
 batch_params_fwd = {
 'buffer_size':45, 
 'batch_size': 20, 
@@ -105,10 +108,11 @@ batch_params_siam = {
 'batch_size': 20,
 'files_per_read':10,
 'data_file_indices': train_file_indices,
-'test_data_file_indices': test_file_indices, 
+'test_data_file_indices': test_file_indices,
 'model_type':'siam',
 'load_pre_processd_data':True,
 'data_dir': data_dir,
+'filename_prefix':'pre_process_box2d_push_data',
 'use_random_batches':False}
 
 
@@ -135,6 +139,7 @@ cnn_network_params_siam = {
 'stddev':0.05,
 }
 
+
 fc_network_params_siam = {
 'num_layers':3,
 'state_t_indices':STATE_T_INDICES,
@@ -151,8 +156,8 @@ fc_network_params_siam = {
 
 network_params_fwd = {
     'num_filters': [5, 5, NUM_FP],
-    'dim_input': 9, 
-    'dim_output': 7,
+    'dim_input': 4, 
+    'dim_output': 2,
     'cnn_params':None,
     'n_hidden': 48,
     'k_mixtures': 1,
@@ -186,13 +191,13 @@ network_params_siam = {
 'fc_params':fc_network_params_siam,
 'inv_params': network_params_inv,
 'optimiser': adam_params,
-'epochs': 50000,
+'epochs': 5,
 'check_point_save_interval':10,
 'fwd_loss_wght': 0.5,
 'mdn_loss_wght':1.,
 'cost_weights':cost_weights,
 'batch_params':batch_params_siam, #pass None if not using batch training
-'write_summary':False,
+'write_summary':True,
 'dim_input':300,
 'output_order':['qt_w','qt_x','qt_y','qt_z','x','y','z'],
 'load_saved_model': True,

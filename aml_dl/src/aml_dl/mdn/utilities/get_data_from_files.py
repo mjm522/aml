@@ -59,7 +59,6 @@ def get_data_from_files(data_file_range, model_type, ids=None):
             y_sample_points = [0,-1]
 
 
-
         data_x = data_man.pack_data_in_range(keys=x_keys, 
                                              sub_keys=x_sub_keys, 
                                              ids=ids, 

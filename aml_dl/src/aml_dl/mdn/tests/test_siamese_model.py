@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.convert_tools import string2image
 from aml_dl.utilities.tf_batch_creator import BatchCreator
-from aml_dl.mdn.training.config_exp5 import network_params_siam
+from aml_dl.mdn.training.config_box2d import network_params_siam
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.utilities.get_data_from_files import get_data_from_files
 

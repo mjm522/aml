@@ -335,9 +335,9 @@ def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_par
         features = tf.reshape(tf.transpose(cnn_layer_out, [0,3,1,2]),
                               [-1, num_rows*num_cols])
         softmax = tf.nn.softmax(features)
-        fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
-        fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
-        fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
+        fp_x = tf.reduce_sum(tf.multiply(x_map, softmax), [1], keep_dims=True)
+        fp_y = tf.reduce_sum(tf.multiply(y_map, softmax), [1], keep_dims=True)
+        fp = tf.reshape(tf.concat(axis=1, values=[fp_x, fp_y]), [-1, num_fp*2])
         return fp
 
     with tf.variable_scope('feature_points_t'):
@@ -354,7 +354,7 @@ def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_par
     _, num_fp = feature_point_t.get_shape()
     num_fp = int(num_fp)
 
-    mdn_input_op = tf.concat(concat_dim=1,values=[feature_point_t, feature_point_t_1])
+    mdn_input_op = tf.concat(axis=1,values=[feature_point_t, feature_point_t_1])
     _, dim_input = mdn_input_op.get_shape()
     dim = int(dim_input) 
     mdn_params['dim_input'] = dim
@@ -364,7 +364,7 @@ def tf_siamese_model(loss_type, cnn_params, fc_params, optimiser_params, mdn_par
 
     ############################################FORWARD MODEL######################################
 
-    fwd_model_inp = tf.concat(concat_dim=1,values=[feature_point_t, mdn._ops['y']])
+    fwd_model_inp = tf.concat(axis=1,values=[feature_point_t, mdn._ops['y']])
 
     fc_layer_output  = create_nn_layers(fwd_model_inp, fc_params, tf_sumry_wrtr, layer_type='fc')
 

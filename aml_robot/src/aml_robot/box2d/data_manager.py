@@ -1,6 +1,6 @@
 #TODO: REMOVE THIS FILE, THERE IS SAME FILE IN AML_IO
 
-
+import os
 import matplotlib.image as mpimg
 from aml_io.io_tools import load_data, save_data
 
@@ -9,11 +9,19 @@ import pickle
 
 class DataManager(object):
 
-    def __init__(self, data = []):
+    def __init__(self, data = [], samples_per_file=5, file_prefix='box2d_push_data', data_folder='./data'):
 
         self._data = data
 
         self._next_sample_id = 0
+        self._file_idx = 0
+        self._file_prefix = file_prefix
+        self._data_folder = data_folder
+
+        if not os.path.exists(self._data_folder):
+            os.makedirs(self._data_folder)
+
+        self._num_samples_per_file = samples_per_file
 
     @classmethod
     def from_file(cls, filename):
@@ -32,12 +40,21 @@ class DataManager(object):
         output.close()
 
 
-    def add(self, sample):
+    def add(self, sample, seperate_files=False):
 
         sample['sample_id'] = self._next_sample_id
         self._next_sample_id += 1
         
-        self._data.append(sample)
+        if seperate_files:
+            if (self._next_sample_id > 0) and (self._next_sample_id % self._num_samples_per_file == 0):
+                filename = self._data_folder + '/' + self._file_prefix + '_' + str(self._file_idx) + '.pkl'
+                self.save(filename)
+                self._file_idx += 1
+                self._data = []
+            else:
+                self._data.append(sample)
+        else:
+            self._data.append(sample)
 
         
     def get_sample(self, idx, key):
