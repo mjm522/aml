@@ -149,10 +149,10 @@ def pose_estimation_network(dim_input=27, dim_output=9, batch_size=25, network_c
                           [-1, num_rows*num_cols])
     softmax = tf.nn.softmax(features)
 
-    fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
-    fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
+    fp_x = tf.reduce_sum(tf.multiply(x_map, softmax), [1], keep_dims=True)
+    fp_y = tf.reduce_sum(tf.multiply(y_map, softmax), [1], keep_dims=True)
 
-    fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
+    fp = tf.reshape(tf.concat(axis=1, values=[fp_x, fp_y]), [-1, num_fp*2])
 
     fc_input = fp
 
@@ -223,10 +223,10 @@ def get_fp_layer(conv_layer_in):
                           [-1, num_rows*num_cols])
     softmax = tf.nn.softmax(features)
 
-    fp_x = tf.reduce_sum(tf.mul(x_map, softmax), [1], keep_dims=True)
-    fp_y = tf.reduce_sum(tf.mul(y_map, softmax), [1], keep_dims=True)
+    fp_x = tf.reduce_sum(tf.multiply(x_map, softmax), [1], keep_dims=True)
+    fp_y = tf.reduce_sum(tf.multiply(y_map, softmax), [1], keep_dims=True)
 
-    fp = tf.reshape(tf.concat(1, [fp_x, fp_y]), [-1, num_fp*2])
+    fp = tf.reshape(tf.concat(axis=1, values=[fp_x, fp_y]), [-1, num_fp*2])
     
     return fp
 
@@ -344,7 +344,7 @@ def multi_modal_network_fp(dim_input=27, dim_output=7, batch_size=25, network_co
     
     fp = get_fp_layer(conv_layer_2)
 
-    fc_action_input = tf.concat(concat_dim=1, values=[fp, state_input])
+    fc_action_input = tf.concat(axis=1, values=[fp, state_input])
     fc_pose_input = fp
 
     fc_action_output, weights_FC_ACTION, biases_FC_ACTION = get_mlp_layers(fc_action_input, n_layers, dim_hidden)
