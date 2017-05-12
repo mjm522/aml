@@ -39,7 +39,8 @@ class MixtureDensityNetwork(object):
 
         with tf.name_scope('cost_inv'):
             self._loss_op = self._init_loss(self._mus_op, self._sigmas_op, self._pis_op, self._y)
-            self._loss_grad = tf.gradients(self._loss_op, [self._mus_op])[0]
+            #gradient of the loss function with respect to the input
+            self._loss_grad = tf.gradients(self._loss_op, [self._x])[0]
             if self._tf_sumry_wrtr is not None:
                 self._tf_sumry_wrtr.add_variable_summaries(self._loss_op)
 
