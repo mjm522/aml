@@ -108,7 +108,10 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     if axis_lim is not None:
         ax.axis(axis_lim)
     ax.grid()
-    plt.show()
+    
+    if fig_handle is None:
+        plt.show()
+    
     return fig
 
 def continous_3D_plot(data, fig_handle=None, axis_lim=None, color=None):
