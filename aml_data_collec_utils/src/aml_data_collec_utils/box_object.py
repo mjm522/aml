@@ -156,6 +156,22 @@ class BoxObject(object):
     # a push action (goal position a push starting from a pre-push pose) 
     # and its respective name
     # It also returns the current box pose, and special reset_push
+
+
+    def get_box_state(self, body=None, viewer=None):
+
+        state = {
+            'position': np.array([px, py]),
+            'angle': angle,
+            'linear_velocity': np.array([vx,vy]),
+            'angular_velocity': omega,
+            'image_rgb': image_file,
+        }
+
+        return state
+
+
+
     def get_pushes(self, use_random=True):
 
         success = False

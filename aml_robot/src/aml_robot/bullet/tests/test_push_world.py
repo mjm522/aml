@@ -1,7 +1,7 @@
 import time
 import rospy
 import pybullet as pb
-from aml_robot.bullet.push_world.push_machine import PushMachine
+from aml_robot.bullet.push_world.push_world import PushWorld
 from aml_robot.bullet.push_world.config import config_push_world
 
 
@@ -28,7 +28,7 @@ def main():
 
     finger = pb.loadURDF(config_push_world['robot_path'])
 
-    pm = PushMachine(world_id=world, box_id=box, robot_id=finger, config=config_push_world)
+    pm = PushWorld(world_id=world, box_id=box, robot_id=finger, config=config_push_world)
 
     pm.run()
 
