@@ -32,3 +32,5 @@ aml_dl/src/aml_dl/mdn/training/tf_check_points
 
 *.a
 *.o
+
+.idea
