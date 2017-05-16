@@ -1,4 +1,5 @@
 import time
+import numpy as np
 from aml_robot.box2d.push_world.config import config
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_robot.box2d.push_world.push_world import PushWorld
@@ -6,7 +7,7 @@ from aml_robot.box2d.push_world.push_world import PushWorld
 
 class Box2DBoxObject(PushWorld):
 
-    def __init__(self, config):
+    def __init__(self, config=config):
         PushWorld.__init__(self, config=config)
         self._push_action = (0,0,0,0)
 
