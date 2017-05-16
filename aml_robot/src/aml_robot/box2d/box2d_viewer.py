@@ -1,5 +1,6 @@
 import copy
 import pygame
+import threading
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -26,6 +27,10 @@ class Box2DViewer(object):
         self._running = True
         self._loop_thread = None
         self._last_screen = None
+
+        thread = threading.Thread(target=self.loop, args=())
+        thread.daemon = True # Daemonize thread
+        thread.start() # Start the execution
 
 
     def create_text_surface(self, text, colour = (255,255,0)):
