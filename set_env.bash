@@ -6,6 +6,17 @@ AML_DATA='REPLACE THIS LINE WITH THE PATH TO AML_DATA'
 
 AML_DATA='/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml_data'
 
+echo "Default AML_DATA set to ${AML_DATA}, change? (y/n)"
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+     echo -n "Enter path to AML_DATA > "
+     read AML_DATA;
+else
+    echo No
+fi
+
+
+
 MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collection_utils'
 
 for module in $MODULES
