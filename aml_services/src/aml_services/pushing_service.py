@@ -8,8 +8,13 @@ import matplotlib.pyplot as plt
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
 from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config_exp5 import network_params_inv, fc_network_params_siam, network_params_siam
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
+
+
+################################################################################################################
+###########################################CHANGE THIS##########################################################
+from aml_dl.mdn.training.config_box2d import network_params_inv, fc_network_params_siam, network_params_siam
+################################################################################################################
 
 def predict_next_state_from_learned_model(req):
 
@@ -32,7 +37,7 @@ def predict_action_from_learned_model(req):
     # input_x = np.expand_dims(np.r_[req.curr_state, req.tgt_state], 0)
 
     inverse_model = SiamesePushModel(sess=sess, network_params=network_params_siam)
-    inverse_model.init_model(epoch=48000)
+    inverse_model.init_model(epoch=100)
 
     #############################################THIS IS SPECIFIC TO SIAMESE MODEL####################################
     ##TODO: FIX: For inputs without images, that is for MDNPushInverseModel, there should be a way to give the inputs!

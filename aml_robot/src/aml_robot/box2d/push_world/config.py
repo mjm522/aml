@@ -5,16 +5,17 @@ data_folder_path = os.environ.get('AML_DATA')+'/aml_dl/box2d_push_data'
 pre_process_folder_path = os.environ.get('AML_DATA')+'/aml_dl/box2d_pre_processed_data/test'
 
 if not os.path.exists(data_folder_path):
-	os.mkdir(data_folder_path)
+	os.makedirs(data_folder_path)
 
 if not os.path.exists(pre_process_folder_path):
-	os.mkdir(pre_process_folder_path)
+	os.makedirs(pre_process_folder_path)
 
 config = {
 	
 	'image_width': 640,
 	'image_height': 480,
 	'pixels_per_meter': 20.0,
+	'no_samples':2000,
 	'fps': 60,
 	'dt': 0.0167,
 	'window_caption': 'BoxWorld',

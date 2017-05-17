@@ -8,9 +8,12 @@ def main():
 
     viewer = Box2DViewer(push_world, config = config)
 
-    viewer.loop()
+    sample_id = push_world._data_manager._next_sample_id
 
-    # push_world.save_samples(config['training_data_file'])
+    while sample_id < config['no_samples']:
+        sample_id = push_world._data_manager._next_sample_id
+
+    push_world.save_samples(config['training_data_file'])
 
 
 if __name__ == "__main__":

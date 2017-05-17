@@ -28,9 +28,9 @@ class Box2DRobot(object):
 
         self.configure_camera()
 
-        _update_period = rospy.Duration(1.0/update_rate)
+        # _update_period = rospy.Duration(1.0/update_rate)
 
-        rospy.Timer(_update_period, self._update_state)
+        # rospy.Timer(_update_period, self._update_state)
 
         
     def configure_default_pos(self, pos, ori):
@@ -51,9 +51,8 @@ class Box2DRobot(object):
     def _update_state(self, event):
 
         state = {}
-        now                      = rospy.Time.now()
-        state = {}
-        state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
+        # now                      = rospy.Time.now()
+        # state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
         self._state = state
 

@@ -71,13 +71,13 @@ class PushWorld(Box2DRobot):
                 # (-y) 
                 vertices = [(v[0], self._config['image_height'] - v[1]) for v in vertices]
 
-
                 pygame.draw.polygon(screen, self._colors[body.type], vertices)
 
-                px, py, f_mag, theta = self._last_push
-                ix, iy = self.to_vec(theta)
-
                 if view_info:
+                    
+                    px, py, f_mag, theta = self._last_push
+                    ix, iy = self.to_vec(theta)
+
                     p = self.get_screen_point2(body,(px,py))
                     p = (int(p[0]),int(p[1]))
                     
@@ -90,8 +90,8 @@ class PushWorld(Box2DRobot):
                     label = viewer.create_text_surface("Push angle %0.2f, Pos (%0.2f,%0.2f), Vel(%0.2f,%0.2f) AngVel %0.2f"%(theta*180/np.pi,center[0],center[1],vel[0],vel[1],ang_vel))
                     screen.blit(label, (0, 10))
 
-                vel = body.linearVelocity
-                ang_vel = body.angularVelocity
+                    vel = body.linearVelocity
+                    ang_vel = body.angularVelocity
 
 
     def handle_event(self, event):
