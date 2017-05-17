@@ -14,7 +14,7 @@ class MixtureDensityNetwork(object):
         self._optimiser = network_params['optimiser']
         self._tf_sumry_wrtr = tf_sumry_wrtr
 
-    def _init_model(self, input_op = None):
+    def _init_model(self, input_op = None, input_tgt = None):
 
         with tf.name_scope('input'):
 
@@ -23,7 +23,10 @@ class MixtureDensityNetwork(object):
             else:
                 self._x = input_op
 
-            self._y = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_output], name="y")
+            if input_tgt is None:
+                self._y = tf.placeholder(dtype=tf.float32, shape=[None,self._dim_output], name="y")
+            else:
+                self._y = input_tgt
 
         with tf.name_scope('output_fc_op'):
             self._output_fc_op = self._init_fc_layer(self._x)
@@ -144,6 +147,13 @@ class MixtureDensityNetwork(object):
             out = sess.run([self._mus_op, self._sigmas_op, self._pis_op, self._loss_op], feed_dict = { self._x: xs, self._y: ys})
 
         return out
+
+    def forward(self, sess, xs):
+
+        out = sess.run([self._mus_op, self._sigmas_op, self._pis_op], feed_dict = { self._x: xs })
+
+        return out
+
 
     def run_op(self, sess, op,  xs, ys = None):
         out = []
