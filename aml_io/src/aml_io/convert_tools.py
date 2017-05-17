@@ -3,7 +3,17 @@ import StringIO
 from PIL import Image
 import numpy as np
 import cv2
-from cv_bridge import CvBridge, CvBridgeError
+
+CV_BRIDGE_PRESENT = True
+
+try:
+
+    from cv_bridge import CvBridge, CvBridgeError
+
+except:
+    CV_BRIDGE_PRESENT = False
+
+
 
 def image2string(image_in, fmt = 'png'):
 
