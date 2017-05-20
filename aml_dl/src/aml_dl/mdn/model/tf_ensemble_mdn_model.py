@@ -4,6 +4,7 @@ import numpy as np
 import random
 from aml_dl.utilities.tf_optimisers import optimiser_op
 from aml_dl.mdn.model.tf_mdn_model import MixtureDensityNetwork
+import copy
 
 
 class EnsambleMDN(object):
@@ -85,9 +86,10 @@ class EnsambleMDN(object):
                     loss_grad = sess.run(grad_op,feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
                     
                     #get adversarial examples
-                    x_adv, y_adv = self.get_adversarial_examples(data_x = x_train, data_y = y_train, epsilon=0.0001, loss_grad=loss_grad, no_examples=10)
-                    x_train = np.append(x_train, x_adv, axis=0)
-                    y_train = np.append(y_train, y_adv, axis=0)
+                    #x_adv, y_adv = self.get_adversarial_examples(data_x = x_train, data_y = y_train, epsilon=0.00001, loss_grad=loss_grad, no_examples=5)
+                    
+                    # x_train = copy.deepcopy(np.append(x_train, x_adv, axis=0))
+                    # y_train = copy.deepcopy(np.append(y_train, y_adv, axis=0))
 
                     _, loss[k,i] = sess.run([train_op, loss_op], feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
 

@@ -3,6 +3,35 @@ import math
 import numpy as np
 from aml_dl.utilities.tf_optimisers import optimiser_op
 
+
+def init_weights(shape, name=None):
+    return tf.get_variable(name, initializer=tf.random_normal(shape, stddev=0.01))
+
+
+def init_bias(shape, name=None):
+    return tf.get_variable(name, initializer=tf.zeros(shape, dtype='float'))
+
+
+def get_mlp_layers(mlp_input, number_layers, dimension_hidden):
+    """compute MLP with specified number of layers.
+        math: sigma(Wx + b)
+        for each layer, where sigma is by default relu"""
+    cur_top = mlp_input
+    weights = []
+    biases = []
+    for layer_step in range(0, number_layers):
+        in_shape = cur_top.get_shape().dims[1].value
+        cur_weight = init_weights([in_shape, dimension_hidden[layer_step]], name='w_' + str(layer_step))
+        cur_bias = init_bias([dimension_hidden[layer_step]], name='b_' + str(layer_step))
+        weights.append(cur_weight)
+        biases.append(cur_bias)
+        if layer_step != number_layers-1:  # final layer has no RELU
+            cur_top = tf.nn.relu(tf.matmul(cur_top, cur_weight) + cur_bias)
+        else:
+            cur_top = tf.matmul(cur_top, cur_weight) + cur_bias
+
+    return cur_top, weights, biases
+
 class MixtureDensityNetwork(object):
 
     def __init__(self, network_params, tf_sumry_wrtr=None):
@@ -65,16 +94,42 @@ class MixtureDensityNetwork(object):
 
         n_params_out = (self._dim_output + 2)*self._n_kernels
 
-        Wh = tf.Variable(tf.random_normal([self._dim_input, self._n_hidden], stddev=stddev, dtype=tf.float32))
-        bh = tf.Variable(tf.random_normal([1, self._n_hidden], stddev=stddev, dtype=tf.float32))
+        input_op = input
 
-        Wo = tf.Variable(tf.random_normal([self._n_hidden, n_params_out], stddev=stddev, dtype=tf.float32))
-        bo = tf.Variable(tf.random_normal([1, n_params_out], stddev=stddev, dtype=tf.float32))
+        if type(self._n_hidden) == type([]):
 
-        hidden_layer = tf.nn.tanh(tf.matmul(input, Wh) + bh)
-        output_fc = tf.matmul(hidden_layer, Wo) + bo
 
-        return output_fc
+
+            for i in range(0,len(self._n_hidden)):
+
+                input_dim = input_op.get_shape().dims[1].value
+
+                Wh = tf.Variable(tf.random_normal([input_dim, self._n_hidden[i]], stddev=stddev, dtype=tf.float32), name='w_' + str(i))
+                bh = tf.Variable(tf.random_normal([1, self._n_hidden[i]], stddev=stddev, dtype=tf.float32), name='b_' + str(i))
+
+                input_op = tf.nn.tanh(tf.matmul(input_op, Wh) + bh)
+
+            input_dim = input_op.get_shape().dims[1].value
+
+            Wo = tf.Variable(tf.random_normal([input_dim, n_params_out], stddev=stddev, dtype=tf.float32), name='w_out_fc')
+            bo = tf.Variable(tf.random_normal([1, n_params_out], stddev=stddev, dtype=tf.float32), name='b_out_fc')
+
+            output_fc = tf.matmul(input_op, Wo) + bo
+
+            return output_fc
+
+        else:
+
+            Wh = tf.Variable(tf.random_normal([self._dim_input, self._n_hidden], stddev=stddev, dtype=tf.float32), name='w_0')
+            bh = tf.Variable(tf.random_normal([1, self._n_hidden], stddev=stddev, dtype=tf.float32), name='b_0')
+
+            Wo = tf.Variable(tf.random_normal([self._n_hidden, n_params_out], stddev=stddev, dtype=tf.float32), name='w_1')
+            bo = tf.Variable(tf.random_normal([1, n_params_out], stddev=stddev, dtype=tf.float32), name='b_1')
+
+            hidden_layer = tf.nn.tanh(tf.matmul(input, Wh) + bh)
+            output_fc = tf.matmul(hidden_layer, Wo) + bo
+
+            return output_fc
 
     def _init_mixture_parameters(self, output):
 
