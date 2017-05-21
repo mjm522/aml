@@ -4,6 +4,16 @@ import numpy as np
 from aml_dl.utilities.tf_optimisers import optimiser_op
 
 
+def init_var(shape, init_type, name, stddev = None):
+
+
+    if init_type == 'normal':
+        return tf.Variable(tf.random_normal(shape, stddev=stddev, dtype=tf.float32), name=name)
+    elif init_type == 'uniform':
+        return tf.Variable(tf.random_uniform(shape, dtype=tf.float32), name=name)
+
+
+
 class MixtureDensityNetwork(object):
 
     def __init__(self, network_params, tf_sumry_wrtr=None):
@@ -62,7 +72,7 @@ class MixtureDensityNetwork(object):
         if self._tf_sumry_wrtr is not None:
             self._tf_sumry_wrtr.write_summary()
 
-    def _init_fc_layer(self, input, stddev = 0.5):
+    def _init_fc_layer(self, input, stddev = 0.1):
 
         n_params_out = (self._dim_output + 2)*self._n_kernels
 
@@ -76,15 +86,15 @@ class MixtureDensityNetwork(object):
 
                 input_dim = input_op.get_shape().dims[1].value
 
-                Wh = tf.Variable(tf.random_normal([input_dim, self._n_hidden[i]], stddev=stddev, dtype=tf.float32), name='w_' + str(i))
-                bh = tf.Variable(tf.random_normal([1, self._n_hidden[i]], stddev=stddev, dtype=tf.float32), name='b_' + str(i))
+                Wh = init_var(shape=[input_dim, self._n_hidden[i]], init_type='uniform', stddev=stddev, name='w_' + str(i)) 
+                bh = init_var(shape=[1, self._n_hidden[i]], init_type='uniform', stddev=stddev, name='b_' + str(i))
 
                 input_op = tf.nn.tanh(tf.matmul(input_op, Wh) + bh)
 
             input_dim = input_op.get_shape().dims[1].value
 
-            Wo = tf.Variable(tf.random_normal([input_dim, n_params_out], stddev=stddev, dtype=tf.float32), name='w_out_fc')
-            bo = tf.Variable(tf.random_normal([1, n_params_out], stddev=stddev, dtype=tf.float32), name='b_out_fc')
+            Wo = init_var(shape=[input_dim, n_params_out], init_type='uniform', stddev=stddev, name='w_out_fc') 
+            bo = init_var(shape=[1, n_params_out], init_type='uniform', stddev=stddev, name='b_out_fc') 
 
             output_fc = tf.matmul(input_op, Wo) + bo
 
