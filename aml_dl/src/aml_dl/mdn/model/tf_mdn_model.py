@@ -102,11 +102,11 @@ class MixtureDensityNetwork(object):
 
         else:
 
-            Wh = tf.Variable(tf.random_normal([self._dim_input, self._n_hidden], stddev=stddev, dtype=tf.float32), name='w_0')
-            bh = tf.Variable(tf.random_normal([1, self._n_hidden], stddev=stddev, dtype=tf.float32), name='b_0')
+            Wh = init_var(shape=[self._dim_input, self._n_hidden], init_type='normal',  stddev=stddev, name='w_0')
+            bh = init_var(shape=[self._dim_input, self._n_hidden], init_type='normal',  stddev=stddev, name='b_0')
 
-            Wo = tf.Variable(tf.random_normal([self._n_hidden, n_params_out], stddev=stddev, dtype=tf.float32), name='w_1')
-            bo = tf.Variable(tf.random_normal([1, n_params_out], stddev=stddev, dtype=tf.float32), name='b_1')
+            Wo = init_var(shape=[self._n_hidden, n_params_out], init_type='normal', stddev=stddev, name='w_out_fc')
+            bo = init_var(shape=[1, n_params_out], init_type='normal', stddev=stddev, name='b_out_fc')
 
             hidden_layer = tf.nn.tanh(tf.matmul(input, Wh) + bh)
             output_fc = tf.matmul(hidden_layer, Wo) + bo

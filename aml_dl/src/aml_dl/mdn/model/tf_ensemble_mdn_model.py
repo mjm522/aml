@@ -54,10 +54,10 @@ class EnsambleMDN(object):
 
     def get_adversarial_examples(self, data_x, data_y, loss_grad, epsilon=0.0001, no_examples=50):
     
-        rand_indices = [random.randint(0,len(data_x)-1) for _ in range(no_examples)]
-
-        x_adv = np.zeros((no_examples, self._dim_input))
-        y_adv = np.zeros((no_examples, self._dim_output))
+        rand_indices = np.arange(len(data_x))[:no_examples]#[random.randint(0,len(data_x)-1) for _ in range(no_examples)]
+        ##
+        x_adv = np.zeros((len(rand_indices), self._dim_input))
+        y_adv = np.zeros((len(rand_indices), self._dim_output))
 
         idx = 0
         for index in rand_indices:
@@ -85,10 +85,15 @@ class EnsambleMDN(object):
                     loss_grad = sess.run(grad_op,feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
                     
                     #get adversarial examples
-                    x_adv, y_adv = self.get_adversarial_examples(data_x = x_train, data_y = y_train, epsilon=0.3, loss_grad=loss_grad, no_examples=10)
+
+                    x_adv, y_adv = self.get_adversarial_examples(data_x = x_train, 
+                                                                 data_y = y_train, 
+                                                                 epsilon=0.01, 
+                                                                 loss_grad=loss_grad, 
+                                                                 no_examples=5)
                     
-                    x_train = copy.deepcopy(np.append(x_train, x_adv, axis=0))
-                    y_train = copy.deepcopy(np.append(y_train, y_adv, axis=0))
+                    x_train = copy.deepcopy(np.append(x_adv, x_train, axis=0))
+                    y_train = copy.deepcopy(np.append(y_adv, y_train, axis=0))
 
                     _, loss[k,i] = sess.run([train_op, loss_op], feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
 
