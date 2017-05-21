@@ -86,15 +86,15 @@ class MixtureDensityNetwork(object):
 
                 input_dim = input_op.get_shape().dims[1].value
 
-                Wh = init_var(shape=[input_dim, self._n_hidden[i]], init_type='uniform', stddev=stddev, name='w_' + str(i)) 
-                bh = init_var(shape=[1, self._n_hidden[i]], init_type='uniform', stddev=stddev, name='b_' + str(i))
+                Wh = init_var(shape=[input_dim, self._n_hidden[i]], init_type='normal', stddev=stddev, name='w_' + str(i)) 
+                bh = init_var(shape=[1, self._n_hidden[i]], init_type='normal', stddev=stddev, name='b_' + str(i))
 
                 input_op = tf.nn.tanh(tf.matmul(input_op, Wh) + bh)
 
             input_dim = input_op.get_shape().dims[1].value
 
-            Wo = init_var(shape=[input_dim, n_params_out], init_type='uniform', stddev=stddev, name='w_out_fc') 
-            bo = init_var(shape=[1, n_params_out], init_type='uniform', stddev=stddev, name='b_out_fc') 
+            Wo = init_var(shape=[input_dim, n_params_out], init_type='normal', stddev=stddev, name='w_out_fc') 
+            bo = init_var(shape=[1, n_params_out], init_type='normal', stddev=stddev, name='b_out_fc') 
 
             output_fc = tf.matmul(input_op, Wo) + bo
 
