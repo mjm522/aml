@@ -17,6 +17,7 @@ class Box2DViewer(object):
         self._world = world
 
         # --- pygame setup ---
+        # pygame.init()
         self._screen = pygame.display.set_mode((config['image_width'], config['image_height']), 0, 32)
         pygame.display.set_caption(config['window_caption'])
         self._clock = pygame.time.Clock()
@@ -28,9 +29,7 @@ class Box2DViewer(object):
         self._loop_thread = None
         self._last_screen = None
 
-        thread = threading.Thread(target=self.loop, args=())
-        thread.daemon = True # Daemonize thread
-        thread.start() # Start the execution
+        self.threaded_loop()
 
 
     def create_text_surface(self, text, colour = (255,255,0)):
@@ -110,15 +109,26 @@ class Box2DViewer(object):
         # --- main game loop ---
         while self._running:
 
-            self.handle_events()
+            self.loop_once()
 
-            self.clear_screen(color=(255,255,255,255))
+    def threaded_loop(self):
 
-            self.draw(view_info=False)
+        self._thread = threading.Thread(target=self.loop, args=())
+        self._thread.daemon = True # Daemonize thread
+        self._thread.start() # Start the execution
 
-            for i in range(self._steps_per_frame):
-                self._world.update(self)               
-                self._world.step()
+    
+    def loop_once(self):
+        
+        self.handle_events()
+
+        self.clear_screen(color=(255,255,255,255))
+
+        for i in range(self._steps_per_frame):
+            self._world.update(self)               
+            self._world.step()
+
+        self.draw(view_info=False)
 
 
 

@@ -1,6 +1,12 @@
 import cv2
 import Box2D
-import rospy
+try:
+
+    import rospy
+
+except:
+    print("No ROS Installed")
+
 import numpy as np
 from config import config
 from box2d_viewer import Box2DViewer
