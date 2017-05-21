@@ -1,14 +1,14 @@
+
+import pygame
+
 from aml_robot.box2d.push_world.config import config
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_robot.box2d.push_world.push_world import PushWorld
 from pygame.locals import *
 
 def main():
-    
 
     push_world = PushWorld(config = config)
-
-
 
     sample_id = push_world._data_manager._next_sample_id
 
@@ -18,6 +18,9 @@ def main():
         for i in range(config['steps_per_frame']):
             push_world.update()               
             push_world.step()
+
+
+    push_world.save_samples(config['training_data_file'])
 
 
 if __name__ == "__main__":

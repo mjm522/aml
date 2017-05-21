@@ -8,6 +8,7 @@ from aml_robot.box2d.box2d_robot import Box2DRobot
 from aml_robot.box2d.core.data_manager import DataManager
 
 import copy
+import os
 
 
 STATE = {
@@ -17,6 +18,8 @@ STATE = {
     'APPLY_PUSH': 3,
     'NOP': 4,
 }
+
+DEBUG = False
 
 class PushWorld(Box2DRobot):
 
@@ -51,6 +54,8 @@ class PushWorld(Box2DRobot):
 
         self._surface = pygame.Surface((config['image_width'], config['image_height']))
 
+        print "Surface is None?", self._surface is None
+
     def step(self):
         self._world.Step(self._dt, 10, 10)
 
@@ -78,7 +83,9 @@ class PushWorld(Box2DRobot):
                 vertices = [(v[0], self._config['image_height'] - v[1]) for v in vertices]
 
                 pygame.draw.polygon(self._surface, self._colors[body.type], vertices)
-    
+        
+
+        return self._surface
 
 
     def get_cv_frame(self):
@@ -272,7 +279,11 @@ class PushWorld(Box2DRobot):
                 
                 self.add_sample(self._new_sample)
 
-                # matplotlib.image.imsave("tmp/After%d.jpg"%(self._new_sample['sample_id'],), self.get_cv_frame())
+                if DEBUG:
+                    if not os.path.exists('tmp/'):
+                        os.makedirs('tmp/')
+
+                    matplotlib.image.imsave("tmp/After%d.jpg"%(self._new_sample['sample_id'],), self.get_cv_frame())
 
             else:
 
@@ -282,7 +293,11 @@ class PushWorld(Box2DRobot):
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
 
-                # matplotlib.image.imsave("tmp/Before%d.jpg"%(self._data_manager._next_sample_id,), self.get_cv_frame())
+                if DEBUG:
+                    if not os.path.exists('tmp/'):
+                        os.makedirs('tmp/')
+
+                    matplotlib.image.imsave("tmp/Before%d.jpg"%(self._data_manager._next_sample_id,), self.get_cv_frame())
 
 
                 print "START: ", state['position'], state['angle']

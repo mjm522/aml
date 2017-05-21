@@ -1,12 +1,17 @@
+import pygame
 from aml_robot.box2d.push_world.config import config
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_robot.box2d.push_world.push_world import PushWorld
 
 def main():
-    
+    pygame.init()
+
     push_world = PushWorld(config = config)
+    push_world.reset_box()
 
     viewer = Box2DViewer(push_world, config = config)
+
+    # viewer.threaded_loop()
 
     sample_id = push_world._data_manager._next_sample_id
 
