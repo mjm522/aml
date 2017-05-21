@@ -7,6 +7,9 @@ from aml_io.convert_tools import image2string
 from aml_robot.box2d.box2d_robot import Box2DRobot
 from aml_robot.box2d.core.data_manager import DataManager
 
+import copy
+
+
 STATE = {
     'RESET': 0,
     'NEW_PUSH': 1,
@@ -45,8 +48,44 @@ class PushWorld(Box2DRobot):
         self._data_manager = DataManager(data_folder=config['data_folder_path'])
         self._new_sample = self._data_manager.create_sample()
 
+
+        self._surface = pygame.Surface((config['image_width'], config['image_height']))
+
     def step(self):
         self._world.Step(self._dt, 10, 10)
+
+    def get_frame(self):
+
+        self._surface.fill((0,0,0)) # paint it white
+
+        # Draw the world
+        for body in (self._dynamic_body,):  # or: world.bodies
+            
+            # The body gives us the position and angle of its shapes
+            for fixture in body.fixtures:
+                # The fixture holds information like density and friction,
+                # and also the shape.
+                shape = fixture.shape
+
+                # Naively assume that this is a polygon shape. (not good normally!)
+                # We take the body's transform and multiply it with each
+                # vertex, and then convert from meters to pixels with the scale
+                # factor.
+                vertices = [(body.transform * v) * self._ppm for v in shape.vertices]
+
+                # Box2d uses cannonical axis, we need to convert to match the screen axis convention
+                # (-y) 
+                vertices = [(v[0], self._config['image_height'] - v[1]) for v in vertices]
+
+                pygame.draw.polygon(self._surface, self._colors[body.type], vertices)
+    
+
+
+    def get_cv_frame(self):
+        img = copy.deepcopy(pygame.surfarray.pixels3d(self.get_frame()))
+        
+        return copy.deepcopy(img.transpose(1,0,2))
+
 
     def draw(self, viewer, view_info=True):
 
@@ -117,7 +156,7 @@ class PushWorld(Box2DRobot):
         if viewer is not None:
             # viewer.store_screen()
             if self._config['record_training_data']:
-                image_file = viewer._last_screen
+                image_file = self.get_cv_frame()
                 if image_file is not None:
                     image_file = image2string(image_file)
                 # image_file = self._config['data_folder_path']+"/img%d.png"%(self._next_idx,) 
@@ -192,7 +231,7 @@ class PushWorld(Box2DRobot):
             self._data_manager.add(new_sample)
 
 
-    def update(self, viewer):
+    def update(self, viewer = None):
 
         next_state = self._current_state
 
@@ -207,6 +246,9 @@ class PushWorld(Box2DRobot):
             self.reset_box()
 
             next_state = STATE['SAVE_DATA']
+
+
+
             self._new_sample = self._data_manager.create_sample()
 
         elif self._current_state == STATE['SAVE_DATA']:
@@ -227,7 +269,10 @@ class PushWorld(Box2DRobot):
                 print "END: ", state['position'], state['angle']
                 print "SAMPLE_ID:", self._data_manager._next_sample_id
 
+                
                 self.add_sample(self._new_sample)
+
+                # matplotlib.image.imsave("tmp/After%d.jpg"%(self._new_sample['sample_id'],), self.get_cv_frame())
 
             else:
 
@@ -236,6 +281,9 @@ class PushWorld(Box2DRobot):
                 # self._new_sample['image_rgb_start'] = self._viewer._last_screen
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
+
+                # matplotlib.image.imsave("tmp/Before%d.jpg"%(self._data_manager._next_sample_id,), self.get_cv_frame())
+
 
                 print "START: ", state['position'], state['angle']
 
