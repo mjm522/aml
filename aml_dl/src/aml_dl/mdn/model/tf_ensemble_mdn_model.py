@@ -80,22 +80,27 @@ class EnsambleMDN(object):
                     train_op = self._mdn_ensembles[k]._ops['train']
                     loss_op  = self._mdn_ensembles[k]._ops['loss']
                     grad_op  = self._mdn_ensembles[k]._ops['loss_grad']
+
+                    batchsize = 20
+                    batch_indices = np.random.choice(np.arange(len(x_train)), size=batchsize)
+                    x_batch = x_train[batch_indices]
+                    y_batch = y_train[batch_indices]
                     
                     #compute value of the gradients
-                    loss_grad = sess.run(grad_op,feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
+                    loss_grad = sess.run(grad_op, feed_dict={self._mdn_ensembles[k]._ops['x']: x_batch, self._mdn_ensembles[k]._ops['y']: y_batch})
                     
                     #get adversarial examples
 
-                    x_adv, y_adv = self.get_adversarial_examples(data_x = x_train, 
-                                                                 data_y = y_train, 
-                                                                 epsilon=0.01, 
+                    x_adv, y_adv = self.get_adversarial_examples(data_x = x_batch, 
+                                                                 data_y = y_batch, 
+                                                                 epsilon=0.001, 
                                                                  loss_grad=loss_grad, 
-                                                                 no_examples=5)
+                                                                 no_examples=batchsize)
                     
-                    x_train = copy.deepcopy(np.append(x_adv, x_train, axis=0))
-                    y_train = copy.deepcopy(np.append(y_adv, y_train, axis=0))
+                    x_batch = copy.deepcopy(np.append(x_adv, x_batch, axis=0))
+                    y_batch = copy.deepcopy(np.append(y_adv, y_batch, axis=0))
 
-                    _, loss[k,i] = sess.run([train_op, loss_op], feed_dict={self._mdn_ensembles[k]._ops['x']: x_train, self._mdn_ensembles[k]._ops['y']: y_train})
+                    _, loss[k,i] = sess.run([train_op, loss_op], feed_dict={self._mdn_ensembles[k]._ops['x']: x_batch, self._mdn_ensembles[k]._ops['y']: y_batch})
 
 
             return loss

@@ -72,7 +72,7 @@ class MixtureDensityNetwork(object):
         if self._tf_sumry_wrtr is not None:
             self._tf_sumry_wrtr.write_summary()
 
-    def _init_fc_layer(self, input, stddev = 0.1):
+    def _init_fc_layer(self, input, stddev = 0.5):
 
         n_params_out = (self._dim_output + 2)*self._n_kernels
 
