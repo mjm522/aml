@@ -3,7 +3,7 @@ import numpy as np
 
 class TrajPlayer():
 
-    def __init__(self, robot_interface, controller, trajectory):
+    def __init__(self, robot_interface, controller, trajectory, rate=10):
 
         self._ctrlr =  controller(robot_interface=robot_interface)
 
@@ -11,7 +11,7 @@ class TrajPlayer():
 
         self._traj = trajectory
 
-        self._rate = rospy.Rate(10)
+        self._rate = rospy.Rate(rate)
 
         self._time_steps = len(trajectory[trajectory.keys()[0]])
 
@@ -44,7 +44,7 @@ class TrajPlayer():
 
             t += 1
             
-            finished = (t == self._time_steps)
+            finished = (t >= self._time_steps)
 
             self._rate.sleep()
 

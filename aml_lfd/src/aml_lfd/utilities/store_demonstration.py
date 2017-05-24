@@ -1,3 +1,4 @@
+import os
 import tf# Needed for listening to and transforming robot state information.
 import copy
 import time
@@ -6,7 +7,6 @@ import argparse
 import numpy as np
 import quaternion
 from tf import TransformListener
-from aml_io.io_tools import get_aml_package_path
 from aml_data_collec_utils.core.data_recorder import DataRecorder
 
 
@@ -27,7 +27,7 @@ class Task():
 
 class StoreDemonstration():
 
-    def __init__(self, robot_interface, demo_idx, data_folder_path=None, data_name_prefix=None, sampling_rate=100):
+    def __init__(self, robot_interface, data_folder_path=None, data_name_prefix=None, sampling_rate=100):
 
         self._robot = robot_interface
         #this will be rate at which data will be read from the arm
@@ -35,16 +35,16 @@ class StoreDemonstration():
         
         self._robot.set_sampling_rate(sampling_rate=self._sampling_rate)
 
-        self._demo_idx = demo_idx
-
-        if data_folder_path is None:
-            data_folder_path = get_aml_package_path('aml_lfd') + '/data/'
-
         if data_name_prefix is None:
             data_name_prefix = robot_interface._limb + '_demo_data'
         else:
             data_name_prefix = robot_interface._limb + '_' + data_name_prefix
 
+        if data_folder_path is None:
+            data_folder_path = os.environ['AML_DATA'] + '/aml_lfd/' + data_name_prefix
+
+        if not os.path.exists(data_folder_path):
+            os.makedirs(data_folder_path)
 
         self._record_sample = DataRecorder(robot_interface=robot_interface, 
                                            task_interface=Task(),
@@ -92,7 +92,6 @@ class StoreDemonstration():
                 #here there is a logical error.
                 if option == 'y':
                     self._finish_demo  = False
-                    self._demo_idx     += 1
                 else:
                     self.save_now()
 
@@ -106,9 +105,9 @@ class StoreDemonstration():
         self._record_sample.save_data_now()
 
 
-def main(robot_interface, demo_idx):
+def main(robot_interface, data_name_prefix):
 
-    lfd = StoreDemonstration(robot_interface=robot_interface, demo_idx=0)
+    lfd = StoreDemonstration(robot_interface=robot_interface, data_name_prefix=data_name_prefix)
     
     lfd.save_demo_data()
 
@@ -116,22 +115,21 @@ def main(robot_interface, demo_idx):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Collect demonstrations')
-    
-    parser.add_argument('-n', '--demo_index', type=int, help='start index of demo collection')
 
     parser.add_argument('-l', '--limb_name', type=str, help='limb index-(left/right)')
+
+    parser.add_argument('-d', '--demo_name', type=str, help='demo name-(give a name for demo collected)')
     
     args = parser.parse_args()
 
-    if args.demo_index is None:
-
-        demo_index = 0
-
     if args.limb_name is None:
-
         print "Give limb option, -l left or -l right"
-        
         raise ValueError
+
+    if args.demo_name is None:
+        data_name_prefix = None
+    else:
+        data_name_prefix = args.demo_name
 
     rospy.init_node('store_demo_node')
 
@@ -139,4 +137,4 @@ if __name__ == '__main__':
 
     arm = BaxterArm(args.limb_name)
 
-    main(robot_interface=arm, demo_idx=0)
+    main(robot_interface=arm, data_name_prefix=data_name_prefix)
