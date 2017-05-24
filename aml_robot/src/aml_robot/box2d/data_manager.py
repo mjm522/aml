@@ -111,7 +111,7 @@ class DataManager(object):
 
         for datum in data:
 
-            data_y.append([datum['push_action'][0][4]])
+            data_y.append([datum['push_action'][0][4]]) # datum['push_action'][0][1], datum['push_action'][0][4]
 
 
         return data_y

@@ -30,6 +30,7 @@ config['steps_per_frame'] = 1
 network_params['load_saved_model'] = False
 network_params['model_path'] = check_point_path + 'push_model_k5_h10_360_damp.ckpt'
 network_params['dim_input'] = 6
+network_params['dim_output'] = 3
 network_params['k_mixtures'] = 5
 network_params['n_hidden'] = 10
 
@@ -90,31 +91,45 @@ class TestModelPushWorld(PushWorld):
         # px, py, tgt_x, tgt_y, theta = self._last_push
         input_x = np.expand_dims(np.r_[np.zeros(3), np.multiply(curr_pos - np.array([16.0,12.0]),[1./32.0,1./24.0]), curr_ang],0)
 
-        print "INPUT_X: ", input_x
+        # print "INPUT_X: ", input_x
         # theta = self._inverse_model.expected_out(input_x,1)
 
         # ix = np.cos(theta)
         # iy = np.sin(theta)
 
-        ix, iy = self._inverse_model.expected_max_pi_out2(input_x,20)
-        theta = np.arctan2(iy,ix)
+        # ix, iy = self._inverse_model.expected_max_pi_out2(input_x,20)
+        # theta = np.arctan2(iy,ix)
 
-        mus = self._inverse_model.run_op('mu', input_x)[0]
+  
+        # prediction = self._inverse_model.expected_max_pi_out2(input_x, 20)
+
+        mus = self._inverse_model.run_op('mu', input_x)
+        # print mus
         sigmas = self._inverse_model.run_op('sigma', input_x)[0]
         pis = self._inverse_model.run_op('pi', input_x)[0]
         
-        if show_mixture:
-            for i in range(len(pis)):
-                self.draw_prediction(screen, curr_pos, mus[i], sigmas[i], (255,255,127,10), 80, sigma_scale = 20, draw_at_circle_endpoint = True)
+        # if show_mixture:
+        #     for i in range(len(pis)):
+        #         self.draw_prediction(screen, curr_pos, mus[i], sigmas[i], (255,255,127,10), 80, sigma_scale = 20, draw_at_circle_endpoint = True)
 
 
         max_idx = np.argmax(pis)
         sigma = sigmas[max_idx]
+        mu = mus[max_idx]
+
+        px = mu[0] 
+        py = mu[1]
+        theta = mu[2]
+
+
+        predicted_push_point = self.get_point(body,(float(px),float(py)))
+
+
         
         gt_px, gt_py, gt_ix, gt_iy, gt_theta = self._last_push
 
         
-        self.draw_prediction(screen, curr_pos, theta, sigma, colour = (255,127,127,255), radius = 60, sigma_scale = 20)
+        self.draw_prediction(screen, predicted_push_point, theta, sigma, colour = (255,127,127,255), radius = 60, sigma_scale = 20)
 
         p = self.get_screen_point2(body,(gt_px,gt_py))
         self.draw_prediction(screen, p, gt_theta, 1, colour = (127,255,127,255), radius = 60, sigma_scale = 20)
@@ -170,8 +185,9 @@ class TestModelPushWorld(PushWorld):
             data_x, data_y = self._data_manager.pack_data(['state_start','state_end'],batch_ids)
 
 
-            # print "DATA_X: ", data_x
-            # print "DATA_Y: ", data_y
+            print "DATA_X: ", len(data_x), len(data_x[0])
+            print "DATA_Y: ", len(data_y), len(data_y[0])
+            # data_y = [np.array(data_y)[0]]
             self._loss = np.r_[self._loss,self._inverse_model.train(data_x, data_y, epochs=100)]
 
 
@@ -197,4 +213,4 @@ viewer.loop()
 
 
 # push_world._inverse_model.save_model()
-# push_world.save_samples('data_test_pi_div_2.pkl')
+push_world.save_samples('data_sim_push.pkl')

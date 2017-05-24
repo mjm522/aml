@@ -76,7 +76,7 @@ class PushWorld(object):
         screen = viewer._screen
 
         # Draw the world
-        for body in (self._dynamic_body,):  # or: world.bodies
+        for body in self._world.bodies:  # or: world.bodies
             
             # The body gives us the position and angle of its shapes
             for fixture in body.fixtures:
@@ -99,6 +99,7 @@ class PushWorld(object):
 
                 px, py, ix, iy, theta = self._last_push
                 ix, iy = self.to_vec(theta)
+
 
                 p = self.get_screen_point2(body,(px,py))
                 p = (int(p[0]),int(p[1]))
@@ -159,7 +160,8 @@ class PushWorld(object):
         if viewer is not None:
             image_file = "images/img%d.png"%(self._next_idx,)
             if self._config['record_training_data']:
-                self.save_screen(viewer._last_screen,image_file)
+                # self.save_screen(viewer._last_screen,image_file)
+                pass
             
             self._next_idx += 1
 
@@ -195,7 +197,7 @@ class PushWorld(object):
 
         box_w, box_h = self._config['box_dim']
 
-        px, py = np.multiply(np.random.rand(2),[2*box_w,2*box_h]) - np.array([box_w,box_h])
+        px, py = np.multiply(np.random.rand(2)*2 - np.ones(2),[box_w,box_h])
 
         theta = np.random.rand()*np.pi*2#*0.5#(2*np.pi)
 
@@ -206,7 +208,7 @@ class PushWorld(object):
         self._push_counter += 1
 
         # print self._push_counter
-        return 0.0, 0.0, theta
+        return px, py, theta
 
     def to_vec(self,theta):
 
@@ -268,8 +270,8 @@ class PushWorld(object):
                 # self._new_sample['image_rgb_end'] = self._viewer._last_screen
                 self._new_sample['state_end'] = state
 
-                print "END: ", state['position'], state['angle']
-                print "SAMPLE_ID:", self._data_manager._next_sample_id
+                # print "END: ", state['position'], state['angle']
+                # print "SAMPLE_ID:", self._data_manager._next_sample_id
 
 
                 self.add_sample(self._new_sample)
@@ -282,7 +284,7 @@ class PushWorld(object):
                 self._new_sample['state_start'] = state
                 self._new_sample['push_action'] = np.array([self._last_push])
 
-                print "START: ", state['position'], state['angle']
+                # print "START: ", state['position'], state['angle']
 
                 next_state = STATE['APPLY_PUSH']
 
