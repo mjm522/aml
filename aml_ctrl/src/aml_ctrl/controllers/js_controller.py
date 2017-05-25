@@ -42,7 +42,7 @@ class JSController(Controller):
         timeout = rospy.Duration(timeout)
         reached_goal = False
         failed = False
-        rate = rospy.Rate(100)
+        rate = rospy.Rate(200)
         time_start = rospy.Time.now()
         lin_error = 0.0
         ang_error = 0.0

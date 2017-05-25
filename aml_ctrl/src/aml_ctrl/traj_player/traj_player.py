@@ -3,7 +3,7 @@ import numpy as np
 
 class TrajPlayer():
 
-    def __init__(self, robot_interface, controller, trajectory, rate=10):
+    def __init__(self, robot_interface, controller, trajectory, timeout=1.0, rate=10):
 
         self._ctrlr =  controller(robot_interface=robot_interface)
 
@@ -14,6 +14,8 @@ class TrajPlayer():
         self._rate = rospy.Rate(rate)
 
         self._time_steps = len(trajectory[trajectory.keys()[0]])
+
+        self._timeout = timeout
 
     def player(self):
 
@@ -31,7 +33,7 @@ class TrajPlayer():
                                        goal_omg=self._traj['omg_traj'][t], 
                                        orientation_ctrl = True)
 
-                lin_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
+                lin_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=self._timeout)
 
             elif self._ctrlr.type is 'js':
 
@@ -40,7 +42,7 @@ class TrajPlayer():
                                        goal_js_acc=self._traj['acc_traj'][t])
             
             
-                js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
+                js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=self._timeout)
 
             t += 1
             
