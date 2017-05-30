@@ -6,6 +6,16 @@ from aml_robot.box2d.push_world.push_world import PushWorld
 def main():
     pygame.init()
 
+    start_positions = [(5, 5), (25, 5), (25, 20)]
+
+    data_file_names = ['data_test_%d.pkl' for d in range(len(start_positions))]
+    
+    index = 1
+
+    # config['no_samples'] = 2000
+
+    config['box_pos']=start_positions[index]
+
     push_world = PushWorld(config = config)
     push_world.reset_box()
 
@@ -18,7 +28,7 @@ def main():
     while sample_id < config['no_samples']:
         sample_id = push_world._data_manager._next_sample_id
 
-    push_world.save_samples(config['training_data_file'])
+    push_world.save_samples(data_file_names[index])
 
 
 if __name__ == "__main__":
