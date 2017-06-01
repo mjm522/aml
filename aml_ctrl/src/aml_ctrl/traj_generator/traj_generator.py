@@ -29,20 +29,15 @@ class TrajGenerator(object):
     def configure_demo(self, **kwargs):
 
         if kwargs.has_key('demo_idx'):
-
             self._demo_idx  = kwargs['demo_idx']
-            self._limb_name = kwargs['limb_name']
 
         elif kwargs.has_key('path_to_demo'):
-
             self._demo_path = kwargs['path_to_demo']
-            self._limb_name = kwargs['limb_name']
-
+        
         else:
-
-            print "Asked to load demo, but no demo index found, please pass it"
-            raise ValueError
-
+            raise Exception("Asked demo, pass either demo index or demo path")
+        
+        self._limb_name = kwargs['limb_name']
 
     def configure_traj(self, **kwargs):
 

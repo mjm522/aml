@@ -147,8 +147,8 @@ class PushWorld(Box2DRobot):
     def reset_box(self):
         body = self._dynamic_body
 
-        body.position = (16, 12)
-        body.angle = 0
+        body.position = self._config['box_pos']
+        body.angle = self._config['box_ori']
         body.linearVelocity = (0,0)
         body.angularVelocity = 0
 
@@ -254,8 +254,6 @@ class PushWorld(Box2DRobot):
 
             next_state = STATE['SAVE_DATA']
 
-
-
             self._new_sample = self._data_manager.create_sample()
 
         elif self._current_state == STATE['SAVE_DATA']:
@@ -336,7 +334,7 @@ class PushWorld(Box2DRobot):
 
     def save_samples(self, filename):
 
-        self._data_manager.save(filename)
+        self._data_manager.save(self._config['data_folder_path']+'/'+filename)
 
 
     def to_vec(self, theta):
