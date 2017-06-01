@@ -147,7 +147,7 @@ class PushWorld(Box2DRobot):
     def reset_box(self):
         body = self._dynamic_body
 
-        body.position = self._config['box_pos']
+        body.position = self._config['box_pos'] + np.random.randn(2)*np.sqrt(0.5)
         body.angle = self._config['box_ori']
         body.linearVelocity = (0,0)
         body.angularVelocity = 0
@@ -160,12 +160,12 @@ class PushWorld(Box2DRobot):
         omega = body.angularVelocity
 
         image_file = None
-        if viewer is not None:
+        # if viewer is not None:
             # viewer.store_screen()
-            if self._config['record_training_data']:
-                image_file = self.get_cv_frame()
-                if image_file is not None:
-                    image_file = image2string(image_file)
+        if self._config['record_training_data']:
+            image_file = self.get_cv_frame()
+            if image_file is not None:
+                image_file = image2string(image_file)
                 # image_file = self._config['data_folder_path']+"/img%d.png"%(self._next_idx,) 
                 # self.save_screen(viewer._last_screen, image_file)
                 
@@ -281,7 +281,9 @@ class PushWorld(Box2DRobot):
                     if not os.path.exists('tmp/'):
                         os.makedirs('tmp/')
 
-                    matplotlib.image.imsave("tmp/After%d.jpg"%(self._new_sample['sample_id'],), self.get_cv_frame())
+                    plt.figure(figsize=(8, 8))
+                    plt.imshow(img)
+                    # matplotlib.image.imsave("tmp/After%d.jpg"%(self._new_sample['sample_id'],), self.get_cv_frame())
 
             else:
 

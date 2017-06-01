@@ -24,9 +24,9 @@ class DataManager(object):
         self._num_samples_per_file = samples_per_file
 
     @classmethod
-    def from_file(cls, filename):
+    def from_file(cls, filename, data_folder='.'):
 
-        return cls(load_data(filename))
+        return cls(data=load_data(data_folder + '/' + filename))
 
 
     def save(self, filename):

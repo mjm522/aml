@@ -8,9 +8,9 @@ def main():
 
     start_positions = [(5, 5), (25, 5), (25, 20)]
 
-    data_file_names = ['data_test_%d.pkl' for d in range(len(start_positions))]
+    data_file_names = ['data_test_%d.pkl'%d for d in range(len(start_positions))]
     
-    index = 1
+    index = 0
 
     # config['no_samples'] = 2000
 

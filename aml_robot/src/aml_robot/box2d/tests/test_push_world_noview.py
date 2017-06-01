@@ -20,7 +20,7 @@ def main():
             push_world.step()
 
 
-    push_world.save_samples(config['training_data_file'])
+    push_world.save_samples(config['data_file_name'])
 
 
 if __name__ == "__main__":
