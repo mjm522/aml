@@ -108,7 +108,7 @@ class DataManager(object):
             x = []
             for key in keys:
                 
-                x = np.r_[x,np.multiply(datum[key]['position']- np.array([16.0,12.0]),[1./32.0,1./24.0]),datum[key]['angle']]
+                x = np.r_[x,np.multiply(datum[key]['position']-np.array([16.0,12.0]),[1./32.0,1./24.0]),datum[key]['linear_velocity']] #datum[key]['angle']
                     # datum[key]['position'], .., datum[key]['angle'],datum[key]['angular_velocity'], datum[key]['linear_velocity']
 
             data_x.append(x)
@@ -124,7 +124,7 @@ class DataManager(object):
 
         for datum in data:
 
-            data_y.append([datum['push_action'][0][4]])
+            data_y.append([datum['push_action'][0][3]])
 
 
         return data_y

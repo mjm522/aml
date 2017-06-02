@@ -28,7 +28,7 @@ for i in range(len(data_manager._data)):
 
     plt.show(block=False)
 
-    raw_input("hello")
+    raw_input("next")
 
 # img = data[0]['image_rgb_end']
 # plt.figure(figsize=(8, 8))

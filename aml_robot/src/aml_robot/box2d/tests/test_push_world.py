@@ -6,15 +6,15 @@ from aml_robot.box2d.push_world.push_world import PushWorld
 def main():
     pygame.init()
 
-    start_positions = [(5, 5), (25, 5), (25, 20)]
+    start_positions = [(5, 5), (25, 5), (25, 20), (5, 20)]
 
     data_file_names = ['data_test_%d.pkl'%d for d in range(len(start_positions))]
     
-    index = 0
+    index = 3
 
     # config['no_samples'] = 2000
 
-    config['box_pos']=start_positions[index]
+    config['box_pos'] = start_positions[index]
 
     push_world = PushWorld(config = config)
     push_world.reset_box()

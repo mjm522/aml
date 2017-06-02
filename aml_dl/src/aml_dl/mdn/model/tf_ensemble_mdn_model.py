@@ -129,11 +129,11 @@ class EnsambleMDN(object):
 
             # Correct only for the single kernel MDN case
             mean_out += mu
-            var_out += sigma + np.square(mu)
+            var_out += sigma + np.sum(np.square(mu))
 
         mean_out /= len(self._mdn_ensembles)
         var_out /= len(self._mdn_ensembles)
-        var_out -= np.square(mean_out)
+        var_out -= np.sum(np.square(mean_out))
 
         return mean_out, var_out
 
