@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from aml_io.convert_tools import image2string
 from aml_robot.box2d.box2d_robot import Box2DRobot
 from aml_robot.box2d.core.data_manager import DataManager
+from Box2D import (b2Filter,)
 
 import copy
 import os
@@ -30,7 +31,7 @@ class PushWorld(Box2DRobot):
         self._config = config
 
         # Create a dynamic body
-        self._dynamic_body = self._world.CreateDynamicBody(position=(32, 24), angle=0)
+        self._dynamic_body = self._world.CreateDynamicBody(position=(16, 12), angle=0)
 
         self._dynamic_body.linearDamping = 0.6
         self._dynamic_body.angularDamping = 0.05
@@ -38,7 +39,7 @@ class PushWorld(Box2DRobot):
         self._dynamic_body.awake = True
 
         # And add a box fixture onto it (with a nonzero density, so it will move)
-        self._box = self._dynamic_body.CreatePolygonFixture(box=self._config['box_dim'], density=1, friction=0.3)
+        self._box = self._dynamic_body.CreatePolygonFixture(box=self._config['box_dim'], density=1, friction=0.3, filter=b2Filter(groupIndex=-8,))
 
         self._last_push = [0,0,0,0] #px,py,F,theta
 
@@ -64,7 +65,7 @@ class PushWorld(Box2DRobot):
         self._surface.fill((0,0,0)) # paint it white
 
         # Draw the world
-        for body in (self._dynamic_body,):  # or: world.bodies
+        for body in self._world.bodies:#(self._dynamic_body,):  # or: world.bodies
             
             # The body gives us the position and angle of its shapes
             for fixture in body.fixtures:
@@ -99,7 +100,7 @@ class PushWorld(Box2DRobot):
         screen = viewer._screen
 
         # Draw the world
-        for body in (self._dynamic_body,):  # or: world.bodies
+        for body in self._world:#(self._dynamic_body,):  # or: world.bodies
             
             # The body gives us the position and angle of its shapes
             for fixture in body.fixtures:
