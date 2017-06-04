@@ -8,7 +8,7 @@ from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_r, K_f)
 
 class Box2DViewer(object):
 
-    def __init__(self, world, config):
+    def __init__(self, world, config, is_thread_loop = True):
 
         self._config = config
 
@@ -29,7 +29,8 @@ class Box2DViewer(object):
         self._loop_thread = None
         self._last_screen = None
 
-        self.threaded_loop()
+        if is_thread_loop:
+            self.threaded_loop()
 
 
     def create_text_surface(self, text, colour = (255,255,0)):
