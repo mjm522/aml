@@ -8,7 +8,7 @@ from aml_robot.box2d.core.data_manager import DataManager
 import tensorflow as tf
 import numpy as np
 
-from pygame.locals import (KEYDOWN, K_a,K_s,K_d,K_w,K_p,K_UP,K_DOWN)
+from pygame.locals import (KEYDOWN, K_a,K_s,K_d,K_w,K_p,K_i,K_UP,K_DOWN)
 import math
 # import matplotlib.backends.backend_agg as agg
 
@@ -24,7 +24,7 @@ from aml_dl.mdn.model.tf_ensemble_mdn_model import EnsambleMDN
 import os
 
 
-def get_model():
+def get_model(sess):
     EXP_NAME = 'exp_ensemble'
 
     check_point_dir   = os.environ['AML_DATA'] + '/aml_dl/mdn/tf_check_points/exp_ensemble_pushing/'
@@ -57,7 +57,7 @@ def get_model():
         'device': '/cpu:0',
     }
 
-    ensamble_mdn = EnsambleMDN(network_params)
+    ensamble_mdn = EnsambleMDN(network_params,sess)
 
 
     return ensamble_mdn
@@ -96,17 +96,20 @@ class TestModelPushWorld(PushWorld):
         self._push_action = [0,0,0,0]
 
         self._app_push = False
+        self._predict = False
+        self._predicted_state = np.zeros(4)
 
 
         ## Tensorflow
         tf.set_random_seed(42)
+        self._sess = tf.Session()
 
-        self._model = get_model()
+        self._model = get_model(self._sess)
 
         self._model._init_model()
         
-        self._sess = tf.Session()
-        self._sess.run(tf.global_variables_initializer())
+        
+        # self._sess.run(tf.global_variables_initializer())
 
 
 
@@ -151,6 +154,28 @@ class TestModelPushWorld(PushWorld):
                 print "Push angle %f"%(self._push_action[3],)
             if event.key == K_p:
                 self._app_push = True
+
+            if event.key == K_i:
+
+                state = self.get_box_state(self._bodies[0])
+                xt = np.multiply(state['position']-np.array([16.0,12.0]),np.array([1.0/32.0,1.0/24.0]))
+                self._predicted_state, unc = self._model.forward(self._sess, [np.r_[xt,state['linear_velocity'],self._push_action[3]]])
+                self._predicted_state = self._predicted_state[0]
+                unc = np.sqrt(np.sum(unc[0]))
+                self._predicted_state[0] *= 16.0
+                self._predicted_state[1] *= 12.0
+                
+                self._predicted_state[0] += 16
+                self._predicted_state[1] += 12
+
+                self._dbody_pred.position = (self._predicted_state[0],self._predicted_state[1])
+
+                print "Current state: ", xt
+                print "Predicted state: ", self._predicted_state, " Unc:", unc
+
+                self._predict = not self._predict
+
+
 
 
 

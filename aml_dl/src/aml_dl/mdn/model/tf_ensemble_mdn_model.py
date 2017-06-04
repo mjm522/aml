@@ -4,17 +4,27 @@ import numpy as np
 import random
 from aml_dl.utilities.tf_optimisers import optimiser_op
 from aml_dl.mdn.model.tf_mdn_model import MixtureDensityNetwork
+from aml_io.tf_io import load_tf_check_point
 import copy
+import os
 
 
 class EnsambleMDN(object):
 
-    def __init__(self, network_params, tf_sumry_wrtr = None):
+    def __init__(self, network_params, sess, tf_sumry_wrtr = None):
+
+        self._load_model = network_params['load_saved_model']
+        network_params['load_saved_model'] = False
+
+        self._params = network_params
+
+        self._sess = sess
 
         self._device_id = network_params['device']
         self._n_ensembles = network_params['n_ensembles']
         self._dim_input = network_params['dim_input']
         self._dim_output = network_params['dim_output']
+
         self._mdn_ensembles = [MixtureDensityNetwork(network_params, tf_sumry_wrtr = tf_sumry_wrtr) for _ in range(self._n_ensembles)]
 
     def _init_model(self, input_op = None, input_tgt = None):
@@ -45,11 +55,20 @@ class EnsambleMDN(object):
                 self._pi_ops =  [self._mdn_ensembles[k]._ops['pi'] for k in range(self._n_ensembles)]
 
 
+            self._init_op = tf.global_variables_initializer()
+            self._saver = tf.train.Saver()
+
+            self._sess.run(self._init_op)
+
+
         self._ops = {'x': self._x, 
                      'y': self._y,
                      'mus': self._mu_ops,
                      'sigmas': self._sigma_ops,
                      'pis': self._pi_ops}
+
+        if self._load_model:
+            self.load_model()
 
 
     def get_adversarial_examples(self, data_x, data_y, loss_grad, epsilon=0.0001, no_examples=50):
@@ -129,11 +148,38 @@ class EnsambleMDN(object):
 
             # Correct only for the single kernel MDN case
             mean_out += mu
-            var_out += sigma + np.sum(np.square(mu))
+            var_out += sigma + np.reshape(np.sum(np.square(mu),axis=1),(-1,1))
 
         mean_out /= len(self._mdn_ensembles)
         var_out /= len(self._mdn_ensembles)
-        var_out -= np.sum(np.square(mean_out))
+        # print mean_out.shape
+        # print mean_out
+        tmp = np.reshape(np.sum(np.square(mean_out),axis=1),(-1,1))
+        # print "Other", tmp.shape, var_out.shape, mean_out.shape
+        var_out -= tmp
 
         return mean_out, var_out
+
+    def get_model_path(self):
+        if 'model_dir' in self._params:
+            model_dir = self._params['model_dir']
+        else:
+            model_path = './inv/'
+
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+
+        if 'model_name' in self._params:
+            model_name = self._params['model_name']
+        else:
+            model_name = 'inv_model.ckpt'
+
+        return model_dir+model_name
+
+    def load_model(self):
+        load_tf_check_point(session=self._sess, filename=self.get_model_path())
+
+    def save_model(self):
+        save_path = self._saver.save(self._sess, self.get_model_path())
+        print("Model saved in file: %s" % save_path)
 
