@@ -18,7 +18,7 @@ config = {
 	'no_samples':2000,
 	'box_pos':(16, 12),
 	'box_ori':0.,
-	'fps': 200,
+	'fps': 30,
 	'dt': 0.0167,
 	'window_caption': 'BoxWorld',
 	'box_dim': (2,1),
