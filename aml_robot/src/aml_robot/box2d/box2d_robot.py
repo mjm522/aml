@@ -26,7 +26,7 @@ class Box2DRobot(object):
         self._world = world(gravity=(0, 0), doSleep=True)
 
         self._colors = {
-            staticBody: (255, 255, 255, 255),
+            staticBody: (125, 125, 255, 255),
             dynamicBody: (127, 127, 127, 255),
         }
 
