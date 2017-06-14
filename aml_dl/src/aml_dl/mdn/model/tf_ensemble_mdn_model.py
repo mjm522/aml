@@ -112,7 +112,7 @@ class EnsambleMDN(object):
 
                     x_adv, y_adv = self.get_adversarial_examples(data_x = x_batch, 
                                                                  data_y = y_batch, 
-                                                                 epsilon=0.001, 
+                                                                 epsilon=0.005, 
                                                                  loss_grad=loss_grad, 
                                                                  no_examples=batchsize)
                     
@@ -137,12 +137,14 @@ class EnsambleMDN(object):
 
     def forward(self, sess, xs):
 
-        mean_out = np.zeros((len(xs),self._dim_output))
-        var_out = np.zeros((len(xs),self._dim_output))
+        mean_out = np.zeros((xs.shape[0],self._dim_output))
+        var_out = np.zeros((xs.shape[0],self._dim_output))
 
         for model in self._mdn_ensembles:
 
             mu, sigma, pi = model.forward(sess, xs)
+            # mu, sigma, pi
+
 
             mu = np.reshape(mu,(-1,self._dim_output))
 
@@ -152,10 +154,11 @@ class EnsambleMDN(object):
 
         mean_out /= len(self._mdn_ensembles)
         var_out /= len(self._mdn_ensembles)
-        # print mean_out.shape
-        # print mean_out
+
+
         tmp = np.reshape(np.sum(np.square(mean_out),axis=1),(-1,1))
-        # print "Other", tmp.shape, var_out.shape, mean_out.shape
+
+
         var_out -= tmp
 
         return mean_out, var_out

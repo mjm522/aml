@@ -72,7 +72,7 @@ class MixtureDensityNetwork(object):
         if self._tf_sumry_wrtr is not None:
             self._tf_sumry_wrtr.write_summary()
 
-    def _init_fc_layer(self, input, stddev = 0.5):
+    def _init_fc_layer(self, input, stddev = 0.3):
 
         n_params_out = (self._dim_output + 2)*self._n_kernels
 
@@ -102,6 +102,7 @@ class MixtureDensityNetwork(object):
 
         else:
 
+            ## TODO: Output dimensions are wrong here.
             Wh = init_var(shape=[self._dim_input, self._n_hidden], init_type='normal',  stddev=stddev, name='w_0')
             bh = init_var(shape=[self._dim_input, self._n_hidden], init_type='normal',  stddev=stddev, name='b_0')
 
@@ -136,7 +137,7 @@ class MixtureDensityNetwork(object):
         result = tf.reduce_sum(result, 2, keep_dims=True)
 
         epsilon = 1e-20
-        result = -tf.log(tf.maximum(result,1e-20))
+        result = -tf.log(tf.maximum(result,epsilon))
 
 
         return tf.reduce_mean(result, 0)

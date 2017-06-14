@@ -147,10 +147,12 @@ class TestModelPushWorld(PushWorld):
                 body.position = [body.position[0],body.position[1]-ds]
             if event.key == K_UP:
                 self._push_action[3] += 0.2
+                self._push_action[3] = self._push_action[3]%(2*np.pi)
                 # self._body_idx = (self._body_idx+1)%2
                 print "Push angle %f"%(self._push_action[3],)
             if event.key == K_DOWN:
                 self._push_action[3] -= 0.2
+                self._push_action[3] = self._push_action[3]%(2*np.pi)
                 print "Push angle %f"%(self._push_action[3],)
             if event.key == K_p:
                 self._app_push = True
