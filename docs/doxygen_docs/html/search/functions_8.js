@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['openrs485',['openRS485',['../qbmove__communications_8h.html#a4d05126da422a8993b011282362c7882',1,'qbmove_communications.h']]]
+  ['modecommandcallback',['modeCommandCallback',['../classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html#aff0207bdb9a7d00b791ce5edc6ee27b9',1,'baxter_gazebo_plugin::BaxterGazeboRosControlPlugin']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['gaussianregressor',['GaussianRegressor',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__gauss__regressor_1_1_gaussian_regressor.html',1,'src::aml_dl::mdn::model::tf_gauss_regressor']]],
   ['gen_5fcs_5fcenters',['gen_cs_centers',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#ab364e2625c5983ba748c212e7cc4b16b',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
   ['gen_5ffront_5fterm',['gen_front_term',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a49cf27ca02e86e1773133835e1f606a2',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
   ['gen_5fpsi',['gen_psi',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a0da4fbcdb74db7ca2d32e5913be72a81',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],

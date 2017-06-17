@@ -208,6 +208,9 @@ var annotated_dup =
       [ "aml_dl", null, [
         [ "mdn", null, [
           [ "model", null, [
+            [ "mdn_push_fwd_model", null, [
+              [ "MDNPushFwdModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__fwd__model_1_1_m_d_n_push_fwd_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__fwd__model_1_1_m_d_n_push_fwd_model" ]
+            ] ],
             [ "mdn_push_inv_model", null, [
               [ "MDNPushInverseModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__inv__model_1_1_m_d_n_push_inverse_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__inv__model_1_1_m_d_n_push_inverse_model" ]
             ] ],
@@ -217,8 +220,19 @@ var annotated_dup =
             [ "siamese_push_model", null, [
               [ "SiamesePushModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model" ]
             ] ],
+            [ "tf_gauss_regressor", null, [
+              [ "GaussianRegressor", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__gauss__regressor_1_1_gaussian_regressor.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__gauss__regressor_1_1_gaussian_regressor" ]
+            ] ],
             [ "tf_mdn_model", null, [
               [ "MixtureDensityNetwork", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network.html", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network" ]
+            ] ]
+          ] ],
+          [ "utilities", null, [
+            [ "get_pre_process_data", null, [
+              [ "LoadPreprocessData", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1get__pre__process__data_1_1_load_preprocess_data.html", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1get__pre__process__data_1_1_load_preprocess_data" ]
+            ] ],
+            [ "testing_setup", null, [
+              [ "TestSetup", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1testing__setup_1_1_test_setup.html", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1testing__setup_1_1_test_setup" ]
             ] ]
           ] ]
         ] ],

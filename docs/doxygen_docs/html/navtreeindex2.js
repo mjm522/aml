@@ -1,5 +1,9 @@
 var NAVTREEINDEX2 =
 {
+"classaml__lfd_1_1lqr_1_1lqr__traj__follow_1_1_l_q_r_traj_follow.html#aec81ba9d2896a3077a502d5682588c6c":[3,0,4,3,1,0,2],
+"classaml__lfd_1_1utilities_1_1store__demonstration_1_1_store_demonstration.html":[3,0,4,4,0,0],
+"classaml__lfd_1_1utilities_1_1store__demonstration_1_1_store_demonstration.html#a345e5cbedf84f759586e600b60a8bc81":[3,0,4,4,0,0,0],
+"classaml__lfd_1_1utilities_1_1store__demonstration_1_1_store_demonstration.html#a626e68dbd7e29a25ca5f3d0496592884":[3,0,4,4,0,0,2],
 "classaml__lfd_1_1utilities_1_1store__demonstration_1_1_store_demonstration.html#af712a5bc7ae0793a53700c1f123aaf5f":[3,0,4,4,0,0,1],
 "classaml__lfd_1_1utilities_1_1store__demonstration_1_1_task.html":[3,0,4,4,0,1],
 "classaml__lfd_1_1utilities_1_1store__demonstration_1_1_task.html#a48e41283ac81edf9025dd9845ef90009":[3,0,4,4,0,1,1],
@@ -245,9 +249,5 @@ var NAVTREEINDEX2 =
 "classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a286f3e64b708fa5e421081a541112c9b":[3,0,8,0,0,10],
 "classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a2f92f6b1e6a428173d6a3a301ea716fd":[3,0,8,0,0,7],
 "classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a4a485c29284a2921e762d4599c736bd1":[3,0,8,0,0,17],
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a5c2fdba025d1127b89b2ca59e92143ff":[3,0,8,0,0,4],
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a757e472952ec208820d9c6773f32e42a":[3,0,8,0,0,8],
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a8c775943efd1fb7730e739366b295027":[3,0,8,0,0,21],
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a903718477ffc4bc61713b07722ea95b6":[3,0,8,0,0,5],
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a94e2bd3ddf9d53cf5d15541482bc8d79":[3,0,8,0,0,2]
+"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a5c2fdba025d1127b89b2ca59e92143ff":[3,0,8,0,0,4]
 };
