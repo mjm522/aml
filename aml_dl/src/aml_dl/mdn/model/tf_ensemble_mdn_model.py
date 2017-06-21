@@ -25,7 +25,7 @@ class EnsambleMDN(object):
         self._dim_input = network_params['dim_input']
         self._dim_output = network_params['dim_output']
 
-        self._adv_episolon = network_params['adv_episolon']
+        self._adv_epsilon = network_params['adv_epsilon']
 
         self._mdn_ensembles = [MixtureDensityNetwork(network_params, tf_sumry_wrtr = tf_sumry_wrtr) for _ in range(self._n_ensembles)]
 
@@ -114,7 +114,7 @@ class EnsambleMDN(object):
 
                     x_adv, y_adv = self.get_adversarial_examples(data_x = x_batch, 
                                                                  data_y = y_batch, 
-                                                                 epsilon=self._adv_episolon, 
+                                                                 epsilon=self._adv_epsilon, 
                                                                  loss_grad=loss_grad, 
                                                                  no_examples=batchsize)
                     
