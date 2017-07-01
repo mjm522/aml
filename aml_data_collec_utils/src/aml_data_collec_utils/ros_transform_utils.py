@@ -48,6 +48,6 @@ def quat2eulerROS(q):
 
 def quat2euler(q):
 
-    euler = quat.as_euler_angles(quat.quaternion(q[3],q[0],q[1],q[2]))
+    euler = quat.as_euler_angles(quat.quaternion(q[0],q[1],q[2],q[3]))
 
     return euler
