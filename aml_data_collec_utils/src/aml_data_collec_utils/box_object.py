@@ -54,7 +54,7 @@ class BoxObject(object):
         except:
             print "tracking failed"
             status['box_pos'] = np.zeros(3)
-            status['box_ori'] = np.zeros(3)
+            status['box_ori'] = np.zeros(4)
             status['box_tracking_good'] = False
 
         return status
