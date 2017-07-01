@@ -38,6 +38,7 @@ class MPPIPushingService(object):
         bx = state['box_pos'][0]
         by = state['box_pos'][1]
 
+        #print state['box_ori']
         euler = quat2euler(state['box_ori'])
 
         theta = euler[0]
