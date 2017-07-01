@@ -328,15 +328,15 @@ public:
         }
 
 
-       // if(calibrated)
-       //  {
-       //    // in case the box is not visible,
-       //    // but still if the arm is calibrated
-       //    // send openni camera location
-       //    tf::StampedTransform stampedTransformOpenniToBase(transformOpenniToBase, curr_stamp,
-       //                                          "base", "openni_rgb_camera");
-       //    br.sendTransform(stampedTransformOpenniToBase);
-       //  }
+       if(calibrated)
+        {
+          // in case the box is not visible,
+          // but still if the arm is calibrated
+          // send openni camera location
+          tf::StampedTransform stampedTransformOpenniToBase(transformOpenniToBase, curr_stamp,
+                                                "base", "openni_rgb_camera");
+          br.sendTransform(stampedTransformOpenniToBase);
+        }
 
 
         if(image_pub.getNumSubscribers() > 0)

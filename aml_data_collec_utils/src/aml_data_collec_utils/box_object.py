@@ -9,7 +9,7 @@ from aml_data_collec_utils.get_box_edge import get_box_edge2
 from aml_visual_tools.visual_tools import show_image
 from aml_io.convert_tools import rosimage2openCVimage
 from aml_perception.camera_sensor import CameraSensor
-from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform
+from ros_transform_utils import get_pose, transform_to_pq, pq_to_transform, quat2eulerROS
 
 class BoxObject(object):
 
@@ -346,3 +346,22 @@ class BoxObject(object):
             return pushes, pose, reset_push
         else:
             return [], None, None
+
+
+def main():
+
+    rospy.init_node("test_box_object")
+
+    box = BoxObject()
+    while not rospy.is_shutdown():
+         _, box_pos, box_q = box.get_pose()
+
+
+         print box_pos, quat2eulerROS(box_q)*180.0/np.pi
+
+
+
+
+
+if __name__ == '__main__':
+    main()

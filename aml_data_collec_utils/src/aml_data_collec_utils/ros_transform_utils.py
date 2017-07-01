@@ -1,6 +1,7 @@
 import numpy as np
 import rospy
 import tf
+import quaternion as quat
 
 ##### UTILS #######
 
@@ -37,3 +38,16 @@ def pq_to_transform(tf_listener,p,q):
     transform = np.asmatrix(tf_listener.fromTranslationRotation(p, q))
 
     return transform
+
+
+def quat2eulerROS(q):
+
+    euler = quat.as_euler_angles(quat.quaternion(q[3],q[0],q[1],q[2]))
+
+    return euler
+
+def quat2euler(q):
+
+    euler = quat.as_euler_angles(quat.quaternion(q[3],q[0],q[1],q[2]))
+
+    return euler

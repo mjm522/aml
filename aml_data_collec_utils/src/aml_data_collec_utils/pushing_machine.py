@@ -190,12 +190,17 @@ class PushMachine(object):
             
             self._robot.set_joint_position_speed(5.0)
             
+            print "Xi:", self._box.get_effect()
+
             push, box_pose, reset_push = self._box.get_push(np.random.rand())
             self._box._last_pushes = [push]
 
+            print "Action:", push
             if push:
 
                 self.apply_push(push)
+
+            print "Xf:", self._box.get_effect()
 
             rate.sleep()
 
