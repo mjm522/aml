@@ -43,7 +43,7 @@ class MPPIPushingService(object):
 
         theta = euler[0]
 
-        x = np.array([bx,by,theta,0.0,0.0,0.0])
+        x = np.array([bx,by,theta]) #0.0,0.0,0.0
 
         box_state_response = BoxStateResponse(x)
 
