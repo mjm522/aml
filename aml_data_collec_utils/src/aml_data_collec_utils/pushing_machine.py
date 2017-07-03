@@ -21,7 +21,6 @@ class PushMachine(object):
 
     def __init__(self, robot_interface, sample_start_index=None):
 
-        
         self._push_counter = 0
         self._box = BoxObject()
         self._robot = robot_interface
@@ -29,9 +28,6 @@ class PushMachine(object):
 
         self._states = {'RESET': 0, 'PUSH' : 1}
         self._state = self._states['RESET']
-
-
-
 
     def send_left_arm_away(self):
         self._robot.move_to_joint_position(np.array([ 0.21935925, -0.80380593,  0.06902914,  0.837937  ,  0.00421845, 1.34721863,  0.4314321 ]))
@@ -68,15 +64,12 @@ class PushMachine(object):
 
         start = rospy.Time.now()
 
-
-
         success = self.goto_goals(goals=goals, record=True, push = push)
 
         goals.reverse()
         success = success and self.goto_goals(goals[1:]) 
 
         self._robot.untuck_arm()
-
 
         timeelapsed = rospy.Time.now() - start
 
@@ -129,7 +122,6 @@ class PushMachine(object):
         push_action = push['push_action']
 
         goals.append({'pos': push_action, 'ori': None})
-
 
         return goals
 
@@ -213,7 +205,7 @@ class PushMachine(object):
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
+        goal_ori = quaternion.as_float_array(goal_ori)
         success, js_pos = self._robot.ik(goal_pos,goal_ori)
 
         if success:
