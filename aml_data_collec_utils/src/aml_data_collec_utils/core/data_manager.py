@@ -181,10 +181,13 @@ class DataManager(object):
         
 
 
-    def get_sample(self, idx, key):
+    def get_sample(self, idx, key=None):
         assert( idx >= 0 and idx < len(self._data) )
 
-        return self._data[idx][key]
+        if key is None:
+            return self._data[idx]
+        else:
+            return self._data[idx][key]
 
 
     def get_last(self):
