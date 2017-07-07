@@ -30,9 +30,9 @@ class PushMachine(object):
 
     def __init__(self, robot_interface, sample_start_index=None):
 
-        print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
-        cmd = raw_input('Enter position command (between 0 and 1 to close)')
-        pisa_hand_service_send_pos_client(float(cmd))
+        # print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
+        # cmd = raw_input('Enter position command (between 0 and 1 to close)')
+        # pisa_hand_service_send_pos_client(float(cmd))
 
         self._push_counter = 0
         self._box = BoxObject()
@@ -69,15 +69,15 @@ class PushMachine(object):
             print "RESETING WITH NEW POSE"
             #success = self.reset_box(reset_push)
 
-            self.send_left_arm_away()
+            # self.send_left_arm_away()
 
-            order_of_sweep = ['left', 'back', 'front', 'right']
-            fsm_reset(self._right_arm, order_of_sweep, rate=15)
+            # order_of_sweep = ['left', 'back', 'front', 'right']
+            # fsm_reset(self._right_arm, order_of_sweep, rate=15)
 
             self._robot.untuck_arm()
-            os.system("spd-say 'Reseting box without human supervision'")
-            #os.system("spd-say 'Please reset the box, Much appreciated dear human'")
-            #raw_input("Press enter to continue...")
+            # os.system("spd-say 'Reseting box without human supervision'")
+            os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+            raw_input("Press enter to continue...")
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -87,7 +87,7 @@ class PushMachine(object):
 
             start = rospy.Time.now()
 
-            self._sample_recorder.start_record(task_action=pushes[idx])
+            # self._sample_recorder.start_record(task_action=pushes[idx])
 
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
@@ -96,7 +96,7 @@ class PushMachine(object):
 
             self._robot.untuck_arm()
 
-            self._sample_recorder.stop_record(task_status=success)
+            # self._sample_recorder.stop_record(task_status=success)
 
             timeelapsed = rospy.Time.now() - start
 
@@ -178,9 +178,6 @@ class PushMachine(object):
             box_pose = None
 
             print "Moving to neutral position ..."
-                        
-            
-
             
             pushes, box_pose, reset_push = self._box.get_pushes()
             self._box._last_pushes = pushes
@@ -190,6 +187,10 @@ class PushMachine(object):
                 self.compute_next_state(idx)
 
                 idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
+
+                print self._box.get_pose()
+
+                raw_input("Press to continue...")
 
             rate.sleep()
 
