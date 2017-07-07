@@ -183,10 +183,7 @@ class DataManager(object):
 
     def get_sample(self, idx, key=None):
         assert( idx >= 0 and idx < len(self._data) )
-<<<<<<< HEAD
-=======
 
->>>>>>> 94fcc6e079a4e6ddba98813bc1707d5cb731a806
         if key is None:
             return self._data[idx]
         else:
