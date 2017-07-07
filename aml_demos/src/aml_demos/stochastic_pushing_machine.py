@@ -122,17 +122,12 @@ class StochasticPushMachine(BoxObject):
 
     def compute_push_location(self, tgt_box_pose, image_input=False, time_out=5.):
 
-        print "CAME HERE ***************************************************** 1"
         pre_push_offset = config['pre_push_offsets']
-
-        print "CAME HERE ***************************************************** 2"
         box_pose, box_pos, box_ori = self.get_pose()
         
-        print "CAME HERE ***************************************************** 3"
         if image_input:
-            print "CAME HERE ***************************************************** 4"
             curr_state =  self.get_curr_image() #tgt_box_pose[0]
-            print "CAME HERE ***************************************************** 5"
+    
             # show_image(curr_state)
             # print type(curr_state)
             # print curr_state.shape
@@ -154,7 +149,6 @@ class StochasticPushMachine(BoxObject):
                     break
                 else:
                     continue
-        print "CAME HERE ***************************************************** 6"
 
         ee_pose = get_pose(self._tf, self._base_frame_name, self._push_gripper_name, time)
         if ee_pose is None:
@@ -162,8 +156,6 @@ class StochasticPushMachine(BoxObject):
             return None, None
         
         ee_pos, q_ee = transform_to_pq(ee_pose)
-
-        print "CAME HERE ***************************************************** 7"
 
         x_box, z_box, sigma = predict_action_client(curr_state=curr_state, tgt_state=tgt_box_pose)
         print "predicted push:", x_box, z_box
@@ -206,7 +198,7 @@ class StochasticPushMachine(BoxObject):
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
+        goal_ori = quaternion.as_float_array(goal_ori)
         success, js_pos = self._robot.ik(goal_pos, goal_ori)
 
         if success:

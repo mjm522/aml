@@ -14,9 +14,9 @@ class LinInterp():
         self.start_pos = start_pos
         self.goal_pos  = goal_pos
         if isinstance(start_qt, np.quaternion):
-            start_qt = quaternion.as_float_array(start_qt)[0]
+            start_qt = quaternion.as_float_array(start_qt)
         if isinstance(goal_qt, np.quaternion):
-            goal_qt = quaternion.as_float_array(goal_qt)[0]
+            goal_qt = quaternion.as_float_array(goal_qt)
         self.start_qt  = start_qt
         self.goal_qt   = goal_qt
 

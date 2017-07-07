@@ -96,7 +96,7 @@ def test_follow_gps_policy2(arm_l, arm_r):
     state_r['jnt_start'] = arm_r.angles()
 
     #print right_pos - left_pos
-    #print quatdiff(quaternion.as_float_array(right_ori)[0], quaternion.as_float_array(left_ori)[0])
+    #print quatdiff(quaternion.as_float_array(right_ori), quaternion.as_float_array(left_ori))
     #the imaginary coordinate translation w.rt left ee
     #following is the initiall difference when using left_arm_start and rigt_arm_start
     const_tran = np.array([-0.00507125, -0.85750604, -0.00270199])
@@ -111,7 +111,7 @@ def test_follow_gps_policy2(arm_l, arm_r):
     req_pos_diff = left_pos + const_tran - right_pos
 
     #compute required change in orientation
-    #req_ori_diff = quatdiff(quaternion.as_float_array(right_ori)[0], quaternion.as_float_array(req_tansf)[0])
+    #req_ori_diff = quatdiff(quaternion.as_float_array(right_ori), quaternion.as_float_array(req_tansf))
     
     #following is the initiall difference when using left_arm_start and rigt_arm_start
     req_ori_diff = np.array([-0., -0.0, 0. ])#np.array([-0.12093466, -0.00218386, 0.5374029 ])

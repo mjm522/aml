@@ -50,7 +50,7 @@ class TestSetup(BoxObject):
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
+        goal_ori = quaternion.as_float_array(goal_ori)
         success, js_pos = self._robot.ik(goal_pos,goal_ori)
 
         if success:

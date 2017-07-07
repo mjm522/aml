@@ -27,11 +27,16 @@ from aml_lfd.utilities.utilities import compute_omg
 
 from aml_robot.baxter_ik import IKBaxter
 
+from aml_visual_tools.load_aml_logo import load_aml_logo
+
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 class BaxterArm(baxter_interface.limb.Limb):
 
     def __init__(self, limb, on_state_callback=None):
+
+        #Load aml_logo
+        load_aml_logo()
 
         self._ready = False
 
