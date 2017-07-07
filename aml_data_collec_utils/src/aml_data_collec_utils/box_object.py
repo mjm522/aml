@@ -197,7 +197,7 @@ class BoxObject(object):
             return [], None, None
 
 
-
+        pushes = []
 
         pre_push_offset = config['pre_push_offsets']
 
@@ -233,7 +233,7 @@ class BoxObject(object):
         push_action = np.asarray(np.dot(pose,push_position)).ravel()[:3] # w.r.t to base frame now
 
         push_xz = np.array([push_position[0],push_position[2]])
-        push = {'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'push_xz': push_xz, 'name' : 'pre_push'}
+        pushes.append({'push_seed':push_u_pos,'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'push_xz': push_xz, 'name' : 'pre_push'})
 
 
         if self._box_reset_pos0 is None:
@@ -249,9 +249,7 @@ class BoxObject(object):
         reset_displacement = (self._box_reset_pos0 - reset_pos)
         reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': reset_displacement, 'name' : 'reset_spot'}
             
-
-
-        return push, pose, reset_push
+        return pushes, pose, reset_push
 
                                            
     def get_pushes(self, use_random=True):

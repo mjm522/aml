@@ -4,7 +4,7 @@ AML_DIR=$(pwd)
 
 AML_DATA='REPLACE THIS LINE WITH THE PATH TO AML_DATA'
 
-AML_DATA='/home/baxter_gps/catkin_workspaces/baxter_ws/src/aml_data'
+AML_DATA='/home/mjm/gitlibs/aml_data'
 
 echo "Default AML_DATA set to ${AML_DATA}, change? (y/n)"
 read answer
