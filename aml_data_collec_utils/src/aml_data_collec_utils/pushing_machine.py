@@ -83,12 +83,13 @@ class PushMachine(object):
 
     def apply_push2(self,push_u):
 
-        push, box_pose, reset_push = self._box.get_push(push_u)
-        self._box._last_pushes = [push]
+        pushes, box_pose, reset_push = self._box.get_push(push_u)
+        self._box._last_pushes = pushes
 
         success = False
-        if push:
-            sucess = self.apply_push(push)
+        if pushes:
+            print pushes[0]
+            sucess = self.apply_push(pushes[0])
 
 
         return success
@@ -113,7 +114,7 @@ class PushMachine(object):
 
         return idx, success
 
-    def pack_push_goals(self,push):
+    def pack_push_goals(self, push):
 
         goals = []
         for goal in push['poses']:
@@ -184,13 +185,15 @@ class PushMachine(object):
             
             print "Xi:", self._box.get_effect()
 
-            push, box_pose, reset_push = self._box.get_push(np.random.rand())
-            self._box._last_pushes = [push]
+            pushes, box_pose, reset_push = self._box.get_push(np.random.rand())
 
-            print "Action:", push
-            if push:
+            self._box._last_pushes = pushes
 
-                self.apply_push(push)
+            if pushes:
+
+                print "Action:", pushes[0]
+
+                self.apply_push(pushes[0])
 
             print "Xf:", self._box.get_effect()
 

@@ -51,17 +51,13 @@ class MPPIPushingService(object):
 
     def apply_push(self, req):
 
-
         push_u = req.action
 
         print push_u[0]
+
         success = self._push_machine.apply_push2(push_u[0])
 
-
         return PushActionResponse(success)
-
-        
-
 
     def run(self):
 
@@ -69,12 +65,8 @@ class MPPIPushingService(object):
             pass
 
 
-
-
 if __name__ == "__main__":
     
-
-
     parser = argparse.ArgumentParser(description='Data collection for push manipulation')
     
     parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')

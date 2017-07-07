@@ -177,7 +177,7 @@ class BoxObject(object):
 
     def get_push(self, push_u_pos):
 
-
+        print "push_u_pos: ", push_u_pos
         # Retrieving box pose, end-effector pose and reset_pose
         pos = pose = time = ee_pose = box_q = box_pos =  None
 
@@ -237,7 +237,7 @@ class BoxObject(object):
 
 
         if self._box_reset_pos0 is None:
-                self._box_reset_pos0 = reset_pos
+            self._box_reset_pos0 = reset_pos
 
         # Reset push is a special kind of push
             
@@ -249,6 +249,10 @@ class BoxObject(object):
         reset_displacement = (self._box_reset_pos0 - reset_pos)
         reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': reset_displacement, 'name' : 'reset_spot'}
             
+        print "**************************************************************************"
+        print pushes
+        print "****************************HERE************************"
+
         return pushes, pose, reset_push
 
                                            
