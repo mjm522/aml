@@ -17,7 +17,7 @@ fi
 
 
 
-MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collection_utils'
+MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collec_utils'
 
 for module in $MODULES
 do
