@@ -15,9 +15,9 @@ class MinJerkInterp():
         self.start_pos = copy.deepcopy(start_pos)
         self.goal_pos  = copy.deepcopy(goal_pos)
         if isinstance(start_qt, np.quaternion):
-            start_qt = quaternion.as_float_array(start_qt)[0]
+            start_qt = quaternion.as_float_array(start_qt)
         if isinstance(goal_qt, np.quaternion):
-            goal_qt = quaternion.as_float_array(goal_qt)[0]
+            goal_qt = quaternion.as_float_array(goal_qt)
         self.start_qt  = copy.deepcopy(start_qt)
         self.goal_qt   = copy.deepcopy(goal_qt)
 
@@ -100,6 +100,7 @@ class MinJerkInterp():
         for j in range(4):
             # generate the minimum jerk trajectory between each component of
             # quarternions
+
             t = self.start_qt[j]
             td = 0
             tdd = 0

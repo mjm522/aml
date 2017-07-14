@@ -204,7 +204,7 @@ def plot_demo_data(limb_name, demo_idx):
 
 def quat_convert(q):
     if isinstance(q, np.quaternion):
-        return quaternion.as_float_array(q)[0]
+        return quaternion.as_float_array(q)
     else:
         return q
 

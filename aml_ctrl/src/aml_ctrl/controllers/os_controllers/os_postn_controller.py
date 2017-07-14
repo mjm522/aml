@@ -68,7 +68,7 @@ class OSPositionController(OSController):
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
 
-            delta_ori       = quatdiff(quaternion.as_float_array(goal_ori)[0], quaternion.as_float_array(curr_ori)[0])
+            delta_ori       = quatdiff(quaternion.as_float_array(goal_ori), quaternion.as_float_array(curr_ori))
             delta_omg       = goal_omg - curr_omg
 
             delta           = np.hstack([self._kp_p*delta_pos - self._kd_p*delta_vel, 
