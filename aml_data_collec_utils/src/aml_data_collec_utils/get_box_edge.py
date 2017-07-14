@@ -46,13 +46,13 @@ def get_box_edge2(u_alpha, bw, bh):
 
 	p = (1.0 - alpha)*pts[side-1,:] + alpha*pts[side,:]
 
+	edge_vector = pts[side,:] - pts[side-1,:]
 
-
-	return p, side
+	return p, side, edge_vector
 
 def get_box_edge(u_alpha, bw, bh):
 
-	p, _ = get_box_edge2(u_alpha, bw, bh)
+	p, _, _ = get_box_edge2(u_alpha, bw, bh)
 
 
 

@@ -95,6 +95,51 @@ class PushMachine(object):
         return success
 
 
+    def apply_push3(self, x_box, z_box):
+
+        pushes, box_pose, reset_push = self._box.get_push(x_box, z_box)
+        self._box._last_pushes = pushes
+
+        success = False
+        if pushes:
+            print pushes[0]
+            sucess = self.apply_push(pushes[0])
+
+
+        return success
+
+
+    # def sample_push(self):
+
+    #     bw = config['box_type']['length']*config['scale_adjust']
+    #     bh = config['box_type']['breadth']*config['scale_adjust']
+
+    #     u = np.random.rand()
+
+    #     edge_point, side, edge_vec = get_box_edge2(u,bw,bh)  # w.r.t box frame
+
+    #     x_box, z_box = [edge_point[0],edge_point[1]]
+
+
+    #     pre_position = np.array([x_box, pre_push_offset[1], z_box])
+
+    #     box_center = np.array([0, pre_push_offset[1], 0])
+
+    #     centre_vec = box_center - pre_position
+
+    #     edge_vec /= np.linalg.norm(edge_vec)
+    #     centre_vec /= np.linalg.norm(centre_vec)
+
+    #     push_vec = centre_vec - np.dot(centre_vec,edge_vec)*edge_vec
+
+    #     theta_offset = 2*np.random.rand()*(np.pi/6.0) - (np.pi/6.0)
+
+    #     theta = np.fmod((np.arctan2(push_vec[1],push_vec[0])) + theta_offset,2*np.pi)
+
+        
+
+
+
     def goto_next_state(self,idx,push, box_pose, reset_push):
 
         success = True
