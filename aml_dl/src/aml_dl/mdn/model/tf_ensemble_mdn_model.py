@@ -102,7 +102,7 @@ class EnsambleMDN(object):
                     loss_op  = self._mdn_ensembles[k]._ops['loss']
                     grad_op  = self._mdn_ensembles[k]._ops['loss_grad']
 
-                    batchsize = 20
+                    batchsize = 5
                     batch_indices = np.random.choice(np.arange(len(x_train)), size=batchsize)
                     x_batch = x_train[batch_indices]
                     y_batch = y_train[batch_indices]
@@ -145,14 +145,26 @@ class EnsambleMDN(object):
         for model in self._mdn_ensembles:
 
             mu, sigma, pi = model.forward(sess, xs)
-            # mu, sigma, pi
 
+            idx = np.argmax(pi, axis=1)
+            idx_max = np.max(pi, axis=1)
+        
+            # print pi[:5,:]
+            # print idx[:5]
+            # print idx_max[:5]
 
-            mu = np.reshape(mu,(-1,self._dim_output))
+            ids = zip(idx,np.arange(0,xs.shape[0]))
+
+            mu = np.array([ mu[data_idx,:, kernel_idx] for (kernel_idx, data_idx) in ids ])
+            std = np.array([ sigma[data_idx, kernel_idx] for (kernel_idx, data_idx) in ids ])
+
+            # mu = np.reshape(mu,(-1,self._dim_output))
+            std = np.reshape(std,(-1,1))
+            # print mu.shape
 
             # Correct only for the single kernel MDN case
             mean_out += mu
-            var_out += sigma + np.reshape(np.sum(np.square(mu),axis=1),(-1,1))
+            var_out += std + np.reshape(np.sum(np.square(mu),axis=1),(-1,1))
 
         mean_out /= len(self._mdn_ensembles)
         var_out /= len(self._mdn_ensembles)

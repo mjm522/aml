@@ -42,7 +42,7 @@ def make_demonstrations(start, goal, only_pos=True):
     #get demonstration
     for i in range(int(2*tau/dt)):
         t,td,tdd = min_jerk_step(t, td, tdd, goal, tau-i*dt, dt)
-        T.append([t, td, tdd])
+        T.append(np.array([t, td, tdd]))
     T = np.asarray(T).squeeze()
 
     if only_pos:
@@ -51,12 +51,12 @@ def make_demonstrations(start, goal, only_pos=True):
         return T 
 
 
-def get_desired_path(start, goal):
+def get_desired_path(start, goal, only_pos=True):
     des_path = []
     
     for k in range(len(start)):
-        traj = make_demonstrations(start[k], goal[k])
-        des_path.append(traj[:,0])
+        traj = make_demonstrations(start[k], goal[k], only_pos=only_pos)
+        des_path.append(traj)
     des_path = np.asarray(des_path).squeeze().T
 
     return des_path

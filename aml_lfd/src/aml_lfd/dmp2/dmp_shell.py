@@ -5,7 +5,7 @@ from utilities import make_demonstrations
 class DiscreteDMPShell(): 
     def __init__(self, params):
 
-        self._n_bfs       = params['n_bfs'] #number of basis functions
+        self._n_bfs        = params['n_bfs'] #number of basis functions
         self._tau          = params['duration'] #duration of demonstration
 
         self._y0           = params['start'] #start position
@@ -26,13 +26,13 @@ class DiscreteDMPShell():
         self._beta_z       = self._alpha_z / 4. # Schaal 2012
         
         #generate centers for the canonical system
-        self._ax          = 1.0
+        self._ax           = 1.0
         self._cs_centers   = self.gen_cs_centers()
         
         # set variance of Gaussian basis functions
         self._sigma        = np.ones(self._n_bfs) * self._n_bfs**1.5 / self._cs_centers
 
-        self._true_traj    = self.gen_path(self._des_path)
+        self._true_traj    = self.imitate_path(y_des=self._des_path)
         
         self.check_offset()
         self.reset_state_cs()
@@ -54,17 +54,6 @@ class DiscreteDMPShell():
             cs_centers[n] = -np.log(des_c[n])  # x = exp(-c), solving for c
         return cs_centers
 
-    def gen_path(self, trajectory):
-        """Generate the DMPs necessary to follow the 
-        specified trajectory.
-
-        trajectory np.array: the time series of points to follow
-                             [DOFs, time], with a column of None
-                             wherever the pen should be lifted
-        """
-        return self.imitate_path(y_des=trajectory)
-
-
     def imitate_path(self, y_des):
         """Takes in a desired trajectory and generates the set of 
         system parameters that best realize this path.
@@ -76,7 +65,7 @@ class DiscreteDMPShell():
             y_des = y_des.reshape(1,len(y_des))
         self._y0 = y_des[0,0].copy()
         self.y_des = y_des.copy()
-        self._goal = self.gen_goal(y_des)
+        self._goal = y_des[:,-1].copy()
         
         self.check_offset()
         
@@ -104,7 +93,7 @@ class DiscreteDMPShell():
         
         # find the force required to move along this trajectory
         f_target = ddy_des - self._alpha_z * (self._beta_z * (self._goal - y_des) - dy_des)
-            #f_target[:,d]   =   (ddy_des[d]+dy_des[d])/(self._alpha_z[d]*self._beta_z[d]) - (self._goal[d] - y_des[d]) + (self._goal[d]-self._y0[d]);
+        #f_target[:,d]   =   (ddy_des[d]+dy_des[d])/(self._alpha_z[d]*self._beta_z[d]) - (self._goal[d] - y_des[d]) + (self._goal[d]-self._y0[d]);
 
         # efficiently generate weights to realize f_target
         self.gen_weights(f_target)
@@ -169,15 +158,6 @@ class DiscreteDMPShell():
         return np.exp(-self._sigma * (x - self._cs_centers)**2)
 
 
-    def gen_front_term(self, x):
-        """Generates the diminishing front term on 
-        the forcing term.
-
-        x float: the current value of the canonical system
-        dmp_num int: the index of the current dmp
-        """
-        return x * (self._goal - self._y0)
-
     def step_dmp(self, tau=None, state_fb=None, external_force=None):
         """Run the DMP system for a single timestep.
 
@@ -202,7 +182,7 @@ class DiscreteDMPShell():
         psi = self.gen_psi(x)[:,None]
 
         # generate the forcing term
-        f = (self.gen_front_term(x) * (np.dot(self._weights, psi)) / np.sum(psi))[0]
+        f = (x * (self._goal - self._y0) * (np.dot(self._weights, psi)) / np.sum(psi))[0]
 
         # DMP acceleration
         self.ddy = (self._alpha_z * (self._beta_z * (self._goal - self.y) - self.dy/tau) + f) * tau
@@ -238,14 +218,6 @@ class DiscreteDMPShell():
 
         return y_track, dy_track, ddy_track
 
-    def gen_goal(self, y_des): 
-        """Generate the goal for path imitation. 
-        For rhythmic DMPs the goal is the average of the 
-        desired trajectory.
-    
-        y_des np.array: the desired trajectory to follow
-        """
-        return y_des[:,-1].copy()
 
     def step_cs(self, tau=1.0, error_coupling=1.0):
         """Generate a single step of x for discrete
