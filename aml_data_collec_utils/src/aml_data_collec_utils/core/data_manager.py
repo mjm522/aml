@@ -189,7 +189,6 @@ class DataManager(object):
         else:
             return self._data[idx]
 
-
     def get_last(self):
         if self.size() > 0:
             return self._data[-1]

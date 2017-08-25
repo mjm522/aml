@@ -45,7 +45,7 @@ limb = baxter_robot.BaxterArm('right',partial(callback,obj))
 start_pos, start_ori = limb.get_ee_pose()
 
 goal_pos = np.array([0.95,-0.08,-0.11])
-goal_ori = quaternion.as_float_array(start_ori)[0]
+goal_ori = quaternion.as_float_array(start_ori)
 print "GOALORI: ", goal_ori
 
 rate = rospy.Rate(5) # 10hz

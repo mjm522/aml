@@ -79,7 +79,7 @@ class OSVelocityController(OSController):
         jac_star       = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
 
         #gradient of redundancy resolution function
-        grad_g         = 
+        # grad_g         = 
 
         curr_time      = rospy.Time.now(0)
 
@@ -135,7 +135,7 @@ class OSVelocityController(OSController):
                 raise ValueError
             else:
                 if type(goal_ori) is np.quaternion:
-                    omg_des  = quatdiff(quaternion.as_float_array(goal_ori)[0], quaternion.as_float_array(ee_ori)[0])
+                    omg_des  = quatdiff(quaternion.as_float_array(goal_ori), quaternion.as_float_array(ee_ori))
                 elif len(goal_ori) == 3:
                     # omg_des = goal_ori
                     omg_des = self._kp_o*goal_ori + self._kd_o*(goal_omg - curr_omg)

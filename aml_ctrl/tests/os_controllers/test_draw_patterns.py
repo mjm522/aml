@@ -1,14 +1,23 @@
+import rospy
 import numpy as np
 import quaternion
-import rospy
 from aml_ctrl.utilities.utilities import quatdiff, standard_shape_traj
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
+# from aml_ctrl.controllers.os_controllers.os_velocity_controller import OSVelocityController
 
-def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight'):
+def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight', ctrlr_type='torque'):
     
     robot_interface.untuck_arm()
 
-    ctrlr = OSTorqueController(robot_interface)
+    if ctrlr_type == 'torque':
+        ctrlr = OSTorqueController(robot_interface)
+    elif ctrlr_type == 'postn':
+        ctrlr = OSPositionController(robot_interface)
+    elif ctrlr_type == 'velcty':
+        ctrlr = OSVelocityController(robot_interface)
+    else:
+        raise("Unknown type of controller specified")
 
     start_pos, start_ori  =  robot_interface.get_ee_pose()
 
@@ -20,7 +29,6 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight'):
 
     # Set first goal and active controller
     ctrlr.set_active(True)
-
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
@@ -46,5 +54,5 @@ if __name__ == '__main__':
     limb = 'right'
     arm = BaxterArm(limb)
 
-    test_draw_pattern(robot_interface=arm, no_set_points = 32, shape='circle')
+    test_draw_pattern(robot_interface=arm, no_set_points = 32, shape='circle', ctrlr_type='postn')
     

@@ -66,7 +66,7 @@ class JSTrajGenerator(TrajGenerator):
         for t in range(n_steps):
             
             goal_pos = os_traj['pos_traj'][t]
-            goal_ori = quaternion.as_float_array(os_traj['ori_traj'][t])[0]
+            goal_ori = quaternion.as_float_array(os_traj['ori_traj'][t])
 
             if np.any(np.isnan(goal_pos)) or np.any(np.isnan(goal_ori)):
                 

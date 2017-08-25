@@ -134,7 +134,7 @@ class BaxterMoveItController():
         arm_handle = self.get_group_handle(limb_group=limb_group)
 
         if isinstance(ori, np.quaternion):
-            ori = quaternion.as_float_array(ori)[0]
+            ori = quaternion.as_float_array(ori)
 
         pose_target = geometry_msgs.msg.Pose()
         pose_target.orientation.x = ori[1]

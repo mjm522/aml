@@ -1,4 +1,4 @@
-# Active Manipulation Learning (AML) 
+# Advanced Manipulation Learning (AML) 
 
 
 ## Dependencies

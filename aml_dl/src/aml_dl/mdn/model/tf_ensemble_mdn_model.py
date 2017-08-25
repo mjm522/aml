@@ -25,6 +25,13 @@ class EnsambleMDN(object):
         self._dim_input = network_params['dim_input']
         self._dim_output = network_params['dim_output']
 
+
+        try:
+            self._batch_size = network_params['batch_size']
+        except:
+            self._batch_size = 20
+            pass
+
         self._adv_epsilon = network_params['adv_epsilon']
 
         self._mdn_ensembles = [MixtureDensityNetwork(network_params, tf_sumry_wrtr = tf_sumry_wrtr) for _ in range(self._n_ensembles)]
@@ -102,7 +109,7 @@ class EnsambleMDN(object):
                     loss_op  = self._mdn_ensembles[k]._ops['loss']
                     grad_op  = self._mdn_ensembles[k]._ops['loss_grad']
 
-                    batchsize = 5
+                    batchsize = self._batch_size
                     batch_indices = np.random.choice(np.arange(len(x_train)), size=batchsize)
                     x_batch = x_train[batch_indices]
                     y_batch = y_train[batch_indices]

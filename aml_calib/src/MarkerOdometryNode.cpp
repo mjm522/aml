@@ -70,8 +70,8 @@ public:
     hand_cam_info_sub = nh.subscribe(hand_camera_info_topic, 1, &MarkerOdometry::hand_cam_info_callback, this);
     hand_image_sub = it.subscribe(hand_image_topic, 1, &MarkerOdometry::hand_image_callback, this);
 
-    openni_rgb_cam_info_sub = nh.subscribe("/openni_rgb_camera_info", 1, &MarkerOdometry::openni_rgb_cam_info_callback, this);
-    openni_rgb_image_sub = it.subscribe("/openni_rgb_rect_image", 1, &MarkerOdometry::openni_rgb_image_callback, this);
+    openni_rgb_cam_info_sub = nh.subscribe("/openni_rgb_camera_info", 5, &MarkerOdometry::openni_rgb_cam_info_callback, this);
+    openni_rgb_image_sub = it.subscribe("/openni_rgb_rect_image", 5, &MarkerOdometry::openni_rgb_image_callback, this);
     
     image_pub = it.advertise("result", 0);
     debug_pub = it.advertise("debug", 0);
@@ -134,6 +134,8 @@ public:
   void hand_image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
     
+    if(computedMarkerToBase)
+      return;
 
     // if (computedMarkerToBase)
     // {
@@ -241,14 +243,18 @@ public:
 
   void openni_rgb_image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
+
+
     // wait until object pose is computed with respect to right hand
     if(!computedMarkerToBase)
     {
       //come after the right hand data is available and 
       // has been successfully computed
+      ROS_INFO("No info on computedMarkerToBase, returning....");
       return;
     }
 
+    
     if(openni_rgb_cam_info_received)
     {
       ros::Time curr_stamp(ros::Time::now());
@@ -257,6 +263,8 @@ public:
       {
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
         inImage = cv_ptr->image;
+
+
 
         //detection results will go into "markers"
         openni_rgb_markers.clear();
@@ -269,6 +277,9 @@ public:
         {
           openni_rgb_mDetector.detect(inImage, openni_rgb_markers, openni_rgb_camParam, hand_marker_size, false);
         }
+
+
+
         
         //for each marker, draw info and its boundaries in the image
         for(size_t i=0; i<openni_rgb_markers.size(); ++i)
@@ -289,11 +300,11 @@ public:
             calibrated = true;
 
           }
+
           
           //for box marker
           if((openni_rgb_markers[i].id == box_marker_id) && calibrated) 
           {
-
             //keep in mind that this is called only if the marker on the box
             // is visible
             //only perform the following operations if we know the pose of openni camera w.r.t base
@@ -315,6 +326,7 @@ public:
           }
 
         }
+
 
        if(calibrated)
         {

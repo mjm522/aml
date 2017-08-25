@@ -74,7 +74,7 @@ class DataRecorder(object):
 
         #np.quaternion causes problem, hence convert to array
         if isinstance(robot_state['ee_ori'], np.quaternion):
-            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])
         
         #compressing image
         if robot_state['rgb_image'] is not None:

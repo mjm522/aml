@@ -245,7 +245,7 @@ class RecordSample():
 
         if isinstance(robot_state['ee_ori'], np.quaternion):
 
-            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])
 
 
         #if task action is none, that means there is no task execution.
@@ -289,7 +289,7 @@ class RecordSample():
             #np.quaternion causes problem, hence convert to array
             if isinstance(data['ee_ori'], np.quaternion):
 
-                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])[0]
+                data['ee_ori'] = quaternion.as_float_array(data['ee_ori'])
 
             else:
 
