@@ -13,6 +13,7 @@ def init_var(shape, init_type, name, stddev = None):
         return tf.Variable(tf.random_uniform(shape, dtype=tf.float32), name=name)
 
 
+
 class MixtureDensityNetwork(object):
 
     def __init__(self, network_params, tf_sumry_wrtr=None):
@@ -22,6 +23,13 @@ class MixtureDensityNetwork(object):
         self._n_kernels = network_params['k_mixtures']
         self._n_hidden = network_params['n_hidden']
         self._optimiser = network_params['optimiser']
+
+        try:
+            self._reg_lambda = network_params['reg_lambda']
+        except:
+            self._reg_lambda = 0.0
+
+
         self._tf_sumry_wrtr = tf_sumry_wrtr
 
     def _init_model(self, input_op = None, input_tgt = None):
@@ -71,7 +79,7 @@ class MixtureDensityNetwork(object):
         if self._tf_sumry_wrtr is not None:
             self._tf_sumry_wrtr.write_summary()
 
-    def _init_fc_layer(self, input, stddev = 0.2):
+    def _init_fc_layer(self, input, stddev = 0.3):
 
         n_params_out = (self._dim_output + 2)*self._n_kernels
 
@@ -79,6 +87,8 @@ class MixtureDensityNetwork(object):
 
         if type(self._n_hidden) == type([]):
 
+
+            reg_terms = []
             for i in range(0,len(self._n_hidden)):
 
                 input_dim = input_op.get_shape().dims[1].value
@@ -88,12 +98,16 @@ class MixtureDensityNetwork(object):
 
                 input_op = tf.nn.tanh(tf.matmul(input_op, Wh) + bh)
 
+                reg_terms.append(tf.norm(Wh, 2) + tf.norm(bh, 2))
+
             input_dim = input_op.get_shape().dims[1].value
 
             Wo = init_var(shape=[input_dim, n_params_out], init_type='normal', stddev=stddev, name='w_out_fc') 
             bo = init_var(shape=[1, n_params_out], init_type='normal', stddev=stddev, name='b_out_fc') 
 
             output_fc = tf.matmul(input_op, Wo) + bo
+
+            self._reg_term = sum([rg for rg in reg_terms])
 
             return output_fc
 
@@ -136,8 +150,8 @@ class MixtureDensityNetwork(object):
         epsilon = 1e-20
         result = -tf.log(tf.maximum(result,epsilon))
 
-
-        return tf.reduce_mean(result, 0)
+        
+        return tf.reduce_mean(result, 0) + self._reg_lambda * self._reg_term
 
     def _init_train(self,loss_op):
 
@@ -172,11 +186,7 @@ class MixtureDensityNetwork(object):
         result = tf.multiply(kernels,tf.reshape(pis, [-1, 1, m]))
         mixture = tf.reduce_sum(result, 2, keep_dims=True)
 
-    def _max_pi_idx(self, pdf):
-        
-        i = np.argmax(pdf, axis=1)
 
-        return i
 
     def run(self, sess, xs, ys = None):
         out = []

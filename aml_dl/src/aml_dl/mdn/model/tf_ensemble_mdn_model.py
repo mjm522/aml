@@ -26,6 +26,11 @@ class EnsambleMDN(object):
         self._dim_output = network_params['dim_output']
 
         self._adv_epsilon = network_params['adv_epsilon']
+        
+        try:
+            self._batch_size = network_params['batch_size']
+        except:
+            self._batch_size = 5
 
         self._mdn_ensembles = [MixtureDensityNetwork(network_params, tf_sumry_wrtr = tf_sumry_wrtr) for _ in range(self._n_ensembles)]
 
