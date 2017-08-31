@@ -34,7 +34,7 @@ network_params_inv = {
     'num_filters': [5, 5, NUM_FP],
     'dim_input': 14, 
     'dim_output': 2,
-    'n_hidden': 24,
+    'n_hidden': [24],
     'k_mixtures': 40,
     'batch_size': 25,
     'write_summary': True,
