@@ -149,6 +149,9 @@ private:
 
   tf::StampedTransform baseToOpenni;
   tf::StampedTransform boxGoalTransform;
+  std::vector<tf::StampedTransform> boxTransforms;
+  int boxCurrTransform;
+  int boxTransftormCount;
 
 
 public:
@@ -159,7 +162,6 @@ public:
   {
 
     nh.param<double>("box_marker_size", box_marker_size, 0.05);
-    nh.param<std::string>("reference_frame", reference_frame, "");
     nh.param<std::string>("camera_frame", camera_frame, "");
     nh.param<std::string>("marker_frame", marker_frame, "");
     nh.param<bool>("image_is_rectified", useRectifiedImages, true);
@@ -169,17 +171,7 @@ public:
     
     image_pub = it.advertise("result_ar", 0);
 
-
-
-    ROS_ASSERT(camera_frame != "" && marker_frame != "");
-
-    if ( reference_frame.empty() )
-      reference_frame = camera_frame;
-
-   
-
-    ROS_INFO("Aruco node will publish pose to TF with %s as parent and %s as child.",
-             reference_frame.c_str(), marker_frame.c_str());
+    boxCurrTransform = boxTransftormCount = 0;
   }
 
   bool getTransform(const std::string& refFrame,
@@ -222,14 +214,14 @@ public:
   void openni_rgb_image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
     // wait until object pose is computed with respect to right hand
-    //if(!received_cam_pose){
+    if(!received_cam_pose){
       received_cam_pose = getTransform("openni_rgb_camera",
                                        "base",
                                         baseToOpenni); 
 
       ROS_INFO("RECEIVED CAMERA POSE");
 
-    //}
+    }
 
     if(!received_box_goal){
 
@@ -239,6 +231,16 @@ public:
 
       ROS_INFO("RECEIVED BOX GOAL");
 
+    }
+
+    tf::StampedTransform boxTransform;
+    bool received_box_transform = getTransform("base","box",boxTransform);
+
+    if(received_box_transform){
+      boxTransforms.push_back(boxTransform);
+
+
+      ROS_INFO("Intermediate steps %d",(int)boxTransforms.size());
     }
     
     if(openni_rgb_cam_info_received && received_cam_pose && received_box_goal)
@@ -251,7 +253,13 @@ public:
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
         inImage = cv_ptr->image;
 
-        box_overlay(inImage);
+        box_overlay(inImage, boxGoalTransform);
+
+        for(int i = 0; i < boxTransforms.size(); i+=20){
+          box_overlay(inImage, boxTransforms[i], cv::Scalar(255,0,0));
+        }
+
+        publish_image(inImage);
 
 
       }
@@ -272,7 +280,7 @@ public:
   }
 
 
-  void box_overlay(cv::Mat& image){
+  void box_overlay(cv::Mat& image, tf::StampedTransform boxTransform, cv::Scalar colour = cv::Scalar(0,0,255)){
 
 
      //draw a 3d cube in each marker if there is 3d info
@@ -281,24 +289,24 @@ public:
 
       cv::Mat tvec, rvec;
       cv::Mat box_pos(1,3,CV_32FC1);
-      box_pos.at<float>(0) = boxGoalTransform.getOrigin()[0];
-      box_pos.at<float>(1) = boxGoalTransform.getOrigin()[1];
-      box_pos.at<float>(2) = boxGoalTransform.getOrigin()[2]; // Position of the box in the base frame of the robot
+      box_pos.at<float>(0) = boxTransform.getOrigin()[0];
+      box_pos.at<float>(1) = boxTransform.getOrigin()[1];
+      box_pos.at<float>(2) = boxTransform.getOrigin()[2]; // Position of the box in the base frame of the robot
 
 
       cv::Mat box_ori = cv::Mat::eye(3,3, CV_32FC1);
-      tf2Mat(boxGoalTransform,box_ori);
+      tf2Mat(boxTransform,box_ori);
       
       tf2Mat(baseToOpenni, tvec, rvec);
-      CvDrawingUtils::draw3dCube(image, box_pos, box_ori, tvec, rvec, box_marker_size, openni_rgb_camParam);
-      ROS_INFO("GOOD STUFF 2");
-
+      CvDrawingUtils::draw3dSquare(image, box_pos, box_ori, tvec, rvec, box_marker_size, openni_rgb_camParam, colour);
                
-
-                
-
      }
+    
 
+  }
+
+
+  void publish_image(cv::Mat& image){
 
      if(image_pub.getNumSubscribers() > 0)
      {
@@ -309,11 +317,7 @@ public:
         out_msg.encoding = sensor_msgs::image_encodings::RGB8;
         out_msg.image = image;
         image_pub.publish(out_msg.toImageMsg());
-        ROS_INFO("GOOD STUFF 3");
       }
-
-    
-
   }
 
 
