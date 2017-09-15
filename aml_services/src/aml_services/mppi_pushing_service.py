@@ -16,10 +16,8 @@ from aml_data_collec_utils.ros_transform_utils import quat2euler
 
 class MPPIPushingService(object):
 
-
     def __init__(self, limb = 'left', sample_start_index = 1):
         rospy.init_node('mppi_push_service_server')
-
 
         self._get_box_state_srv  = rospy.Service('get_box_state',  BoxState,  self.get_box_state)
         self._apply_push_srv  = rospy.Service('apply_push',  PushAction,  self.apply_push)
@@ -31,9 +29,7 @@ class MPPIPushingService(object):
 
     def get_box_state(self, req):
 
-
         state = self._push_machine._box.get_effect()
-
 
         bx = state['box_pos'][0]
         by = state['box_pos'][1]

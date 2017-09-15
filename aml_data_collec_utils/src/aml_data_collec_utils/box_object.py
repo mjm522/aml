@@ -173,73 +173,6 @@ class BoxObject(object):
         return state
 
 
-    # def get_push(self, x_box, z_box, push_x, push_z):
-
-    #     print "push_u_pos: ", push_u_pos
-    #     # Retrieving box pose, end-effector pose and reset_pose
-    #     pos = pose = time = ee_pose = box_q = box_pos =  None
-
-    #     try:
-    #         pose, box_pos, box_q = self.get_pose()
-
-    #         time = self._tf.getLatestCommonTime(self._base_frame_name, 'left_gripper')
-    #         ee_pose = get_pose(self._tf, self._base_frame_name,'left_gripper', time)
-
-    #         ee_pos, q_ee = transform_to_pq(ee_pose)
-
-    #         reset_pos, reset_q = self.get_reset_pose()
-
-    #     except Exception as e:
-    #         print "Failed to get required transforms", e
-
-    #         return [], None, None
-
-
-    #     pushes = []
-
-    #     pre_push_offset = config['pre_push_offsets']
-
-
-    #     push_locations = np.array([[0                      , pre_push_offset[1],  z_box,               1], # right-side of the object
-    #                                [0                      , pre_push_offset[1],  z_box,               1], # lef-side of the object
-    #                                [x_box                 , pre_push_offset[1],  0,  1], # front of the object
-    #                                [x_box                 , pre_push_offset[1],  0,  1]])  # back of the object
-
-
-    #     pre_position = pre_positions[side-1,:] # w.r.t to box
-    #     push_position = push_locations[side-1,:] # w.r.t to box
-
-    #     # "position" is relative to the box        
-    #     pre_push_pos1 = np.asarray(np.dot(pose,pre_position)).ravel()[:3]
-    #     pre_push_dir0 = pre_push_pos1 - ee_pos
-    #     pre_push_dir0[2] = 0
-    #     pre_push_pos0 = ee_pos + pre_push_dir0
-
-    #     # Pushing towards the center of the box
-    #     push_action = np.asarray(np.dot(pose,push_position)).ravel()[:3] # w.r.t to base frame now
-
-    #     push_xz = np.array([push_position[0],push_position[2]])
-    #     pushes.append({'push_seed':push_u_pos,'poses': [{'pos': pre_push_pos0, 'ori': box_q}, {'pos': pre_push_pos1, 'ori': box_q}], 'push_action': push_action, 'push_xz': push_xz, 'name' : 'pre_push'})
-
-
-    #     if self._box_reset_pos0 is None:
-    #         self._box_reset_pos0 = reset_pos
-
-    #     # Reset push is a special kind of push
-            
-    #     reset_offset = config['reset_spot_offset']
-    #     pre_reset_offset = config['pre_reset_offsets']
-    #     pos_rel_box = np.array([reset_offset[0],reset_offset[1]+pre_reset_offset[1],reset_offset[2],1])
-    #     pre_reset_pos = np.asarray(np.dot(pose,pos_rel_box)).ravel()[:3]
-
-    #     reset_displacement = (self._box_reset_pos0 - reset_pos)
-    #     reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': reset_displacement, 'name' : 'reset_spot'}
-            
-    #     print "**************************************************************************"
-    #     print pushes
-    #     print "****************************HERE************************"
-
-    #     return pushes, pose, reset_push
 
 
     def get_push(self, push_u_pos):
@@ -271,7 +204,7 @@ class BoxObject(object):
         bw = config['box_type']['length']*config['scale_adjust']
         bh = config['box_type']['breadth']*config['scale_adjust']
 
-        xz, side, _ = get_box_edge2(push_u_pos,bw,bh)  # w.r.t box frame
+        xz, side = get_box_edge2(push_u_pos,bw,bh)  # w.r.t box frame
 
         x_box, z_box = [xz[0],xz[1]]
 
@@ -315,10 +248,6 @@ class BoxObject(object):
 
         reset_displacement = (self._box_reset_pos0 - reset_pos)
         reset_push = {'poses': [{'pos': pre_reset_pos, 'ori': reset_q}, {'pos': reset_pos, 'ori': reset_q}], 'push_action': reset_displacement, 'name' : 'reset_spot'}
-            
-        print "**************************************************************************"
-        print pushes
-        print "****************************HERE************************"
 
         return pushes, pose, reset_push
 
@@ -423,12 +352,10 @@ def main():
 
     box = BoxObject()
     while not rospy.is_shutdown():
-        s = box.get_effect()
-        print s["box_pos"]
-         # _, box_pos, box_q = box.get_pose()
+         _, box_pos, box_q = box.get_pose()
 
 
-         # print box_pos, quat2eulerROS(box_q)*180.0/np.pi
+         print box_pos, quat2eulerROS(box_q)*180.0/np.pi
 
 
 
