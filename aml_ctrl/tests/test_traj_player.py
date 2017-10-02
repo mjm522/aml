@@ -59,7 +59,7 @@ if __name__ == '__main__':
     arm = BaxterArm(limb)
 
     demo_idx = None
-    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/' + limb + '_grasp_exp/' + limb + '_grasp_exp_02.pkl'
+    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/' + limb + '_grasp_exp/' + limb + '_grasp_exp_03.pkl'
 
     main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo)
 
