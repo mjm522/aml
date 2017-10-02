@@ -42,7 +42,7 @@ with tf.variable_scope('action_net'):
     precision = tf.placeholder("float", [None, dim_output,dim_output], name='precision')
     action = tf.placeholder("float", [None, dim_output], name='action')
 
-    fc2_input = tf.concat(concat_dim=1, values=[features_op, state_input])
+    fc2_input = tf.concat(axis=1, values=[features_op, state_input])
 
     fc2_output, weights_FC2, biases_FC2 = tf_model.get_mlp_layers(fc2_input, n_layers, dim_hidden)
     fc2_vars = weights_FC2 + biases_FC2

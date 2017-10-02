@@ -1,11 +1,11 @@
-from aml_robot.box2d.push_world import PushWorld
-from aml_robot.box2d.pygame_viewer import PyGameViewer
+from aml_robot.box2d.push_world.push_world import PushWorld
+from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_robot.box2d.config import config
 
-from aml_robot.box2d.data_manager import DataManager
+from aml_robot.box2d.core.data_manager import DataManager
 
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config import network_params, check_point_path
+from aml_dl.mdn.training.config import network_params_inv, check_point_path
 
 import tensorflow as tf
 import numpy as np
@@ -206,7 +206,7 @@ class TestModelPushWorld(PushWorld):
 
 
 push_world = TestModelPushWorld(config = config)
-viewer = PyGameViewer(push_world, config = config)
+viewer = Box2DViewer(push_world, config = config)
 
 
 viewer.loop()

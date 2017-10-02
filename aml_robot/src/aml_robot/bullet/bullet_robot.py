@@ -1,7 +1,7 @@
 import cv2
+import Box2D  # The main library
 import rospy
 import numpy as np
-import pybullet as pb
 from config import config
 
 class BulletRobot(object):

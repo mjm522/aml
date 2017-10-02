@@ -2,7 +2,8 @@
 \label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot}\index{aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+Robot@{aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+Robot}}
 
 
-Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+Robot\+:\nopagebreak
+Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+Robot\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,6 +16,11 @@ Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a0c93caf9f5746868f6e847c726dcc6c3}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a0c93caf9f5746868f6e847c726dcc6c3} 
 def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, xml\+\_\+path)
 \item 
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a0f18fbfdde2a14ca8a9721c5f3af7501}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a0f18fbfdde2a14ca8a9721c5f3af7501} 
+def {\bfseries set\+\_\+sampling\+\_\+rate} (self, rate=100)
+\item 
+def \hyperlink{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a36c6f2efeec6ef3e551ae098780c59bd}{robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index} (self, p\+\_\+start\+\_\+idx, p\+\_\+end\+\_\+idx, v\+\_\+start\+\_\+idx, v\+\_\+end\+\_\+idx)
+\item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a07867eb5e34c86e6b0c9933f7314f272}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a07867eb5e34c86e6b0c9933f7314f272} 
 def {\bfseries get\+\_\+ee\+\_\+pose} (self)
 \item 
@@ -23,6 +29,12 @@ def {\bfseries get\+\_\+compensation\+\_\+forces} (self)
 \item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a61055aa4cd93fe16ed9af7c2658db2b3}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a61055aa4cd93fe16ed9af7c2658db2b3} 
 def {\bfseries get\+\_\+ee\+\_\+velocity} (self)
+\item 
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_aa1a12e82381e4ab718cd5e8d7093e866}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_aa1a12e82381e4ab718cd5e8d7093e866} 
+def {\bfseries reset\+\_\+model} (self)
+\item 
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a2f61333a1fd8178f853066885b41ff7e}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a2f61333a1fd8178f853066885b41ff7e} 
+def {\bfseries untuck\+\_\+arm} (self)
 \item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_afb18971ecf340d803a366b1354ba215c}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_afb18971ecf340d803a366b1354ba215c} 
 def {\bfseries set\+\_\+qpos} (self, qpos)
@@ -46,6 +58,19 @@ def {\bfseries exec\+\_\+position\+\_\+cmd} (self, cmd)
 def {\bfseries exec\+\_\+position\+\_\+cmd\+\_\+delta} (self, cmd)
 \end{DoxyCompactItemize}
 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a36c6f2efeec6ef3e551ae098780c59bd}{}\label{classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot_a36c6f2efeec6ef3e551ae098780c59bd} 
+\index{aml\+\_\+robot\+::mujoco\+::mujoco\+\_\+robot\+::\+Mujoco\+Robot@{aml\+\_\+robot\+::mujoco\+::mujoco\+\_\+robot\+::\+Mujoco\+Robot}!robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index@{robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index}}
+\index{robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index@{robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index}!aml\+\_\+robot\+::mujoco\+::mujoco\+\_\+robot\+::\+Mujoco\+Robot@{aml\+\_\+robot\+::mujoco\+::mujoco\+\_\+robot\+::\+Mujoco\+Robot}}
+\subsubsection{\texorpdfstring{robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index()}{robot\_state\_set\_start\_end\_index()}}
+{\footnotesize\ttfamily def aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+robot.\+Mujoco\+Robot.\+robot\+\_\+state\+\_\+set\+\_\+start\+\_\+end\+\_\+index (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{p\+\_\+start\+\_\+idx,  }\item[{}]{p\+\_\+end\+\_\+idx,  }\item[{}]{v\+\_\+start\+\_\+idx,  }\item[{}]{v\+\_\+end\+\_\+idx }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}since mujoco provides a single array of all states of all objects in the scene, it becomes essential
+to give a start index and end index in that array which corresponds to the robot
+if the input arguments are none, then all values are returned
+\end{DoxyVerb}
+ 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 

@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 
 import rospy
+import matplotlib
 import numpy as np
 import tensorflow as tf
-import matplotlib
 import matplotlib.pyplot as plt
 from aml_dl.mdn.model.nn_push_fwd_model import NNPushFwdModel
+from aml_dl.mdn.model.siamese_push_model import SiamesePushModel
 from aml_dl.mdn.model.mdn_push_inv_model import MDNPushInverseModel
-from aml_dl.mdn.training.config import network_params_inv, network_params_fwd, check_point_path
 from aml_services.srv import PredictAction, PredictState, PredictStateResponse, PredictActionResponse
+
+
+################################################################################################################
+###########################################CHANGE THIS##########################################################
+from aml_dl.mdn.training.config_box2d import network_params_inv, fc_network_params_siam, network_params_siam
+################################################################################################################
 
 def predict_next_state_from_learned_model(req):
 
@@ -26,23 +32,28 @@ def predict_next_state_from_learned_model(req):
 def predict_action_from_learned_model(req):
     sess = tf.Session()
 
-    inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
-    inverse_model.init_model()
+    # inverse_model = MDNPushInverseModel(sess=sess, network_params=network_params_inv)
+    # inverse_model.init_model()
+    # input_x = np.expand_dims(np.r_[req.curr_state, req.tgt_state], 0)
 
+    inverse_model = SiamesePushModel(sess=sess, network_params=network_params_siam)
+    inverse_model.init_model(epoch=100)
 
-    input_x = np.expand_dims(np.r_[req.curr_state, req.tgt_state], 0)
-    mus = inverse_model.run_op('mu', input_x)[0]
-    sigma = inverse_model.run_op('sigma', input_x)[0]
-    pis = inverse_model.run_op('pi', input_x)[0]
+    #############################################THIS IS SPECIFIC TO SIAMESE MODEL####################################
+    ##TODO: FIX: For inputs without images, that is for MDNPushInverseModel, there should be a way to give the inputs!
+    image_t   = np.asarray(req.curr_state).reshape(1,len(req.curr_state))
+    image_t_1 = np.asarray(req.tgt_state).reshape(1,len(req.tgt_state))
 
+    mus = inverse_model.run_op(op_name='mdn_mu',      image_input_t=image_t, image_input_t_1=image_t_1)[0]
+    sigma = inverse_model.run_op(op_name='mdn_sigma', image_input_t=image_t, image_input_t_1=image_t_1)[0]
+    pis = inverse_model.run_op(op_name='mdn_pi',      image_input_t=image_t, image_input_t_1=image_t_1)[0]
 
-    # print "MUS: ", mus
-    # print "SIGMA: ", sigma
-    # print "PIs:", pis
-    #theta = inverse_model.sample_out_max_pi(input_x, 1)[0]
-    
-    pi_idx = inverse_model._max_pi_idx(pis)
-    
+    ###################################################################################################################
+    print "MUS: ", mus
+    print "SIGMA: ", sigma
+    print "PIs:", pis
+    #theta = inverse_model.sample_out_max_pi(input_x, 1)[0]   
+    pi_idx = np.argmax(pis, axis=0)
     # print "Sigma in prediction \t", sigma[pi_idx]
     action = mus[:,pi_idx]
 

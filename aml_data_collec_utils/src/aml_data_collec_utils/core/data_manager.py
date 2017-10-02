@@ -181,11 +181,13 @@ class DataManager(object):
         
 
 
-    def get_sample(self, idx, key):
+    def get_sample(self, idx, key=None):
         assert( idx >= 0 and idx < len(self._data) )
 
-        return self._data[idx][key]
-
+        if key is not None:
+            return self._data[idx][key]
+        else:
+            return self._data[idx]
 
     def get_last(self):
         if self.size() > 0:
@@ -232,9 +234,6 @@ class DataManager(object):
         #subkeys=[sub_key_1, [None]]
 
         data = []
-
-        if ids is None:
-            ids = [0]
         
         data_list = self.select_data(ids)
 
@@ -263,7 +262,7 @@ class DataManager(object):
                             else:
                                 packed_entry = np.r_[packed_entry, sample_entry[k]]
                 else:
-                    packed_entry =  sample_entry
+                    packed_entry.append(sample_entry)
 
             data.append(packed_entry)
 

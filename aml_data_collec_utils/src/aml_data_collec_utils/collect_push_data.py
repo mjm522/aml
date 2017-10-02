@@ -12,7 +12,6 @@ import camera_calib
 from aml_robot.baxter_robot import BaxterArm
 from aml_data_collec_utils.box_object import BoxObject
 from aml_data_collec_utils.core.sample import Sample
-from aml_data_collec_utils.core.data_manager import DataManager
 from aml_data_collec_utils.core.data_recorder import DataRecorder
 from aml_data_collec_utils.config import config
 from aml_data_collec_utils.baxter_reset_box import fsm_reset
@@ -29,11 +28,16 @@ def pisa_hand_service_send_pos_client(cmd):
 
 class PushMachine(object):
 
-    def __init__(self, robot_interface, sample_start_index=None):
+    def __init__(self, robot_interface, sample_start_index=None, mppi_data_collection=False, manual_reset=False):
 
-        print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
-        cmd = raw_input('Enter position command (between 0 and 1 to close)')
-        pisa_hand_service_send_pos_client(float(cmd))
+
+        self._manual_reset = manual_reset
+        self._mppi_data_collection = mppi_data_collection
+
+        if not self._manual_reset:
+            print "Making the reset procedure, take the reset stick and make it hold it pisa hand"
+            cmd = raw_input('Enter position command (between 0 and 1 to close)')
+            pisa_hand_service_send_pos_client(float(cmd))
 
         self._push_counter = 0
         self._box = BoxObject()
@@ -53,7 +57,7 @@ class PushMachine(object):
     def send_left_arm_away(self):
         self._robot.move_to_joint_position(np.array([ 0.21935925, -0.80380593,  0.06902914,  0.837937  ,  0.00421845, 1.34721863,  0.4314321 ]))
 
-    def compute_next_state(self,idx):
+    def compute_next_state(self, idx):
 
         # Decide next state
         if idx == 0 and self._push_counter > 0 and self._state != self._states['RESET']:
@@ -61,24 +65,24 @@ class PushMachine(object):
         else:
             self._state = self._states['PUSH']
 
-    def goto_next_state(self,idx,pushes, box_pose, reset_push):
+    def goto_next_state(self, idx, pushes, box_pose, reset_push, manual_reset=False):
 
         success = True
 
         # Take machine to next state
         if self._state == self._states['RESET']:
             print "RESETING WITH NEW POSE"
-            #success = self.reset_box(reset_push)
 
-            self.send_left_arm_away()
-
-            order_of_sweep = ['left', 'back', 'front', 'right']
-            fsm_reset(self._right_arm, order_of_sweep, rate=15)
-
-            self._robot.untuck_arm()
-            os.system("spd-say 'Reseting box without human supervision'")
-            #os.system("spd-say 'Please reset the box, Much appreciated dear human'")
-            #raw_input("Press enter to continue...")
+            if not self._manual_reset:
+                success = self.reset_box(reset_push)
+                self.send_left_arm_away()
+                order_of_sweep = ['left', 'back', 'front', 'right']
+                fsm_reset(self._right_arm, order_of_sweep, rate=15)
+                self._robot.untuck_arm()
+                os.system("spd-say 'Reseting box without human supervision'")
+            else:
+                os.system("spd-say 'Please reset the box, Much appreciated dear human'")
+                raw_input("Press enter to continue...")
 
         elif self._state == self._states['PUSH']:
             print "Moving to pre-push position ..."
@@ -88,16 +92,16 @@ class PushMachine(object):
 
             start = rospy.Time.now()
 
-            self._sample_recorder.start_record(task_action=pushes[idx])
+            # self._sample_recorder.start_record(task_action=pushes[idx])
 
             success = self.goto_goals(goals=goals, record=True, push = pushes[idx])
 
             goals.reverse()
-            success = self.goto_goals(goals[1:])
+            success = success and self.goto_goals(goals[1:]) 
 
             self._robot.untuck_arm()
 
-            self._sample_recorder.stop_record(task_status=True)
+            # self._sample_recorder.stop_record(task_status=success)
 
             timeelapsed = rospy.Time.now() - start
 
@@ -106,14 +110,21 @@ class PushMachine(object):
             if success:
                 self._push_counter += 1
             
-            idx = (idx+1)%(len(pushes))
+            if len(pushes) == 1:
+                idx = 0
+            else:
+                idx = (idx+1)%(len(pushes))
+
         else:
             print "UNKNOWN STATE"
 
 
         return idx, success
 
-    def pack_push_goals(self,push):
+    def pack_push_goals(self, push):
+
+        print push
+        print "*****************************************************************"
 
         goals = []
         for goal in push['poses']:
@@ -147,8 +158,6 @@ class PushMachine(object):
         
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
             
-
-
         return success
 
     def on_shutdown(self):
@@ -172,18 +181,20 @@ class PushMachine(object):
 
         rospy.on_shutdown(self.on_shutdown)
 
-
         while not rospy.is_shutdown():# and not finished:
 
             pushes = None
             box_pose = None
 
             print "Moving to neutral position ..."
-                        
-            
 
-            
-            pushes, box_pose, reset_push = self._box.get_pushes()
+                        
+            if self._mppi_data_collection:
+                push_seed = np.random.rand()
+                pushes, box_pose, reset_push = self._box.get_push(push_seed)
+            else:
+                pushes, box_pose, reset_push = self._box.get_pushes()
+
             self._box._last_pushes = pushes
 
             if pushes:
@@ -191,6 +202,10 @@ class PushMachine(object):
                 self.compute_next_state(idx)
 
                 idx, success = self.goto_next_state(idx, pushes, box_pose, reset_push)
+
+                print self._box.get_pose()
+
+                raw_input("Press to continue...")
 
             rate.sleep()
 
@@ -203,7 +218,7 @@ class PushMachine(object):
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)[0]
+        goal_ori = quaternion.as_float_array(goal_ori)
         success, js_pos = self._robot.ik(goal_pos,goal_ori)
 
         if success:
@@ -219,7 +234,6 @@ class PushMachine(object):
         for goal in reset_push['poses']:
 
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
-
 
         ee_pos, _ = self._robot.get_ee_pose()
 
@@ -239,10 +253,18 @@ if __name__ == "__main__":
     rospy.init_node('poke_box', anonymous=True)
     limb = 'left'
     arm = BaxterArm(limb)
-    
-    push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index)
 
-    print "calling run"
+    choice = raw_input("Do you want to enable manual reset? (y/n)")
+
+    if choice == 'y':
+        manual_reset = True
+        print "Manual reset enabled for the box..."
+    else:
+        manual_reset = False
+    
+    push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index, mppi_data_collection=True, manual_reset=manual_reset)
+
+    print "Calling run"
 
     push_machine.run()
    

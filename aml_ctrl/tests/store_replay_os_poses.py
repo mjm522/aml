@@ -27,7 +27,7 @@ def save_test_locations(arm, limb_idx, num_points=3):
         raw_input('Press enter to continue...')
 
         robot_state = arm._state
-        robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+        robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])
 
         arm_test_points.append(arm._state)
    

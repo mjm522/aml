@@ -1,0 +1,8 @@
+ <launch>
+
+ 	<node pkg="aml_services" type="pushing_service.py" name="pushing_service" output="screen"/>
+
+    <!-- start the stochastic push machine -->
+    <!-- <node pkg="aml_demos" type="general_pushing_machine.py" name="gpm" output="screen"/> -->
+
+</launch>

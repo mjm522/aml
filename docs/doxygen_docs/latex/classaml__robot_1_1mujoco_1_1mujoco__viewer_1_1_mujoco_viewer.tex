@@ -2,7 +2,8 @@
 \label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer}\index{aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+viewer.\+Mujoco\+Viewer@{aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+viewer.\+Mujoco\+Viewer}}
 
 
-Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+viewer.\+Mujoco\+Viewer\+:\nopagebreak
+Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+viewer.\+Mujoco\+Viewer\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,11 +13,11 @@ Collaboration diagram for aml\+\_\+robot.\+mujoco.\+mujoco\+\_\+viewer.\+Mujoco\
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a930dba8e19b822639a9ab630d13d0e96}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a930dba8e19b822639a9ab630d13d0e96} 
-def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, mujoco\+\_\+robot, update\+\_\+rate=100)
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_acb1d3d136b12aa50419d70f32b52edd2}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_acb1d3d136b12aa50419d70f32b52edd2} 
+def {\bfseries \+\_\+\+\_\+init\+\_\+\+\_\+} (self, mujoco\+\_\+robot, width=640, height=480, update\+\_\+rate=100)
 \item 
-\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ab077677732577ea18dfeecdf1b4eb380}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ab077677732577ea18dfeecdf1b4eb380} 
-def {\bfseries viewer\+\_\+setup} (self)
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_add7e7d8476d1d5b4c3b2fb46c8508c7b}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_add7e7d8476d1d5b4c3b2fb46c8508c7b} 
+def {\bfseries viewer\+\_\+setup} (self, cam\+\_\+pos=None)
 \item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ad19733ffbcfa3b0760655b1e2b1727c9}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ad19733ffbcfa3b0760655b1e2b1727c9} 
 def {\bfseries viewer\+\_\+end} (self)
@@ -24,14 +25,17 @@ def {\bfseries viewer\+\_\+end} (self)
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a7973520f13f58e7e1056050dcef13a13}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a7973520f13f58e7e1056050dcef13a13} 
 def {\bfseries viewer\+\_\+start} (self)
 \item 
-\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a3515aa760e7f554fe77a8f3ceea3b7c8}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a3515aa760e7f554fe77a8f3ceea3b7c8} 
-def {\bfseries viewer\+\_\+render} (self, mode=\textquotesingle{}human\textquotesingle{}, close=False)
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_aa160d2cc437f587d05662033b857fab7}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_aa160d2cc437f587d05662033b857fab7} 
+def {\bfseries get\+\_\+image} (self)
+\item 
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ad8b64993ac0eeda06da7e68fd58e993b}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_ad8b64993ac0eeda06da7e68fd58e993b} 
+def {\bfseries loop} (self)
 \item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_acbb6ddf0dde0b62b9a702d3fa71d643b}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_acbb6ddf0dde0b62b9a702d3fa71d643b} 
 def {\bfseries reset\+\_\+model} (self)
 \item 
-\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_af49847f19382cfdbd9e2e633e09efcda}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_af49847f19382cfdbd9e2e633e09efcda} 
-def {\bfseries configure} (self)
+\hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_aee9cdd2715eabf8d2c8d6f8b9f59d2fe}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_aee9cdd2715eabf8d2c8d6f8b9f59d2fe} 
+def {\bfseries configure} (self, cam\+\_\+pos=None)
 \item 
 \hypertarget{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a60de01cc08fbf120359e8e6070f9eb8e}{}\label{classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer_a60de01cc08fbf120359e8e6070f9eb8e} 
 def {\bfseries update} (self, event)

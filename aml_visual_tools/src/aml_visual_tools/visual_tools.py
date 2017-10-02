@@ -5,10 +5,11 @@ import numpy as np
 # import multiprocessing
 from functools import partial
 import matplotlib.pyplot as plt
+from sensor_msgs.msg import Image
 from mpl_toolkits.mplot3d import Axes3D
-from aml_io.convert_tools import string2image
-from cv_bridge import CvBridge, CvBridgeError
+from aml_io.convert_tools import string2image, rosimage2openCVimage
 
+import rospy
 
 def visualize_3D_data(data, fig_handle=None, axis_lim=None, color=None, label=None):
     '''
@@ -80,7 +81,7 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     if data.shape[0] == 1:
         data = np.vstack([range(data.shape[1]), data])
 
-    print data.shape
+    # print data.shape
 
     if color is None:
         color = 'g'
@@ -107,7 +108,10 @@ def visualize_2D_data_with_sigma(data, sigma, stddev=3.,fig_handle=None, axis_li
     if axis_lim is not None:
         ax.axis(axis_lim)
     ax.grid()
-    plt.show()
+    
+    if fig_handle is None:
+        plt.show()
+    
     return fig
 
 def continous_3D_plot(data, fig_handle=None, axis_lim=None, color=None):
@@ -141,25 +145,12 @@ def continous_3D_plot(data, fig_handle=None, axis_lim=None, color=None):
 
     return fig
 
-def continous_2D_plot(data, fig_handle=None, axis_lim=None, color=None):
+def continous_2D_plot(data, X = [], Y = [], fig_handle=None, axis_lim=None, color=None):
     if isinstance(data, np.ndarray):
         data = data.tolist()
 
     if color is None:
         color = 'g'
-
-    if fig_handle is None:    
-        fig = plt.figure()
-        plt.ion()
-        plt.show()
-        X = []
-        Y = []
-        rospy.Timer(0.001, partial(update_plot, X, Y, color))
-    else:
-        fig = fig_handle
-
-    X.append(data[0])
-    Y.append(data[1])
 
     def update_plot(X, Y, event):
         while not rospy.is_shutdown():
@@ -167,7 +158,19 @@ def continous_2D_plot(data, fig_handle=None, axis_lim=None, color=None):
             plt.pause(0.0001)
             plt.draw()
 
-    return fig
+    if fig_handle is None:    
+        fig = plt.figure()
+        plt.ion()
+        plt.show()
+        rospy.Timer(rospy.Duration(0.001), partial(update_plot, X, Y))
+    else:
+        fig = fig_handle
+
+    X.append(data[0])
+    Y.append(data[1])
+
+
+    return fig, X, Y
 
 
 def show_image(image_data, window_name=None):
@@ -175,11 +178,13 @@ def show_image(image_data, window_name=None):
     if window_name is None:
         window_name = 'Show image window'
 
-    if isinstance(image_data[0], str):
+    if isinstance(image_data, Image):
+        image = rosimage2openCVimage(image_data)
+    elif isinstance(image_data[0], str):
         image = string2image(image_data[0])
     else:
         image = image_data
-
+        
     cv2.imshow(window_name, image)
     cv2.waitKey(0)
 

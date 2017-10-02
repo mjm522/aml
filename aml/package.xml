@@ -39,6 +39,7 @@
   <run_depend>aml_dl</run_depend>
   <run_depend>aml_perception</run_depend>
   <run_depend>aml_calib</run_depend>
+  <run_depend>aml_ar</run_depend>
 
   <export>
    <metapackage/>

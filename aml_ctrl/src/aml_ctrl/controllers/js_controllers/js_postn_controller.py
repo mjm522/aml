@@ -75,7 +75,7 @@ class JSPositionController(JSController):
         return self._cmd
 
     def send_cmd(self,time_elapsed):
-        self._robot.move_to_joint_pos(self._cmd)
+        self._robot.exec_position_cmd(self._cmd) # changed to position cmd
 
 
     def set_active(self,is_active):

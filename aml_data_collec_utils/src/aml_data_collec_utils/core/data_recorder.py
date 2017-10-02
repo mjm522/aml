@@ -19,8 +19,6 @@ class DataRecorder(object):
     def __init__(self, robot_interface, task_interface, data_folder_path=None,  
                        data_name_prefix=None, num_samples_per_file=1000, record_rate = 20):
 
-
-
         self._robot            = robot_interface
 
         self._task             = task_interface
@@ -70,16 +68,13 @@ class DataRecorder(object):
         robot_state = copy.deepcopy(self._robot._state)
         task_state = self._task.get_effect()
 
-
-        
-
         if not self.check_sample(robot_state['timestamp']):
             aml_logging.warning("DataRecorder.record_once: check_sample failed")
             return 
 
         #np.quaternion causes problem, hence convert to array
         if isinstance(robot_state['ee_ori'], np.quaternion):
-            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])[0]
+            robot_state['ee_ori'] = quaternion.as_float_array(robot_state['ee_ori'])
         
         #compressing image
         if robot_state['rgb_image'] is not None:
@@ -144,7 +139,6 @@ class DataRecorder(object):
             self._sample.set_valid(task_status)
 
             # Setting last data point as terminal
-
 
             if self._sample.size > 0:
                 self._sample.set(-1,'terminal', True)

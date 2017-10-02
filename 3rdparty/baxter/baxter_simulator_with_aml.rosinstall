@@ -24,6 +24,11 @@
     version: release-1.1.1
 
 - git:
-    local-name: aml
+    local-name: AML
     uri: https://github.com/eaa3/aml.git
     version: aml_dev
+
+-git:
+    local-name: aruco_ros
+    uri:https://github.com/pal-robotics/aruco_ros.git
+    version: indigo_devel
