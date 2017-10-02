@@ -1,7 +1,7 @@
 var NAVTREE =
 [
   [ "Active Manipulation Learning", "index.html", [
-    [ "aml", "md__r_e_a_d_m_e.html", null ],
+    [ "Active Manipulation Learning (AML)", "md__r_e_a_d_m_e.html", null ],
     [ "Todo List", "todo.html", null ],
     [ "Namespaces", null, [
       [ "Namespace List", "namespaces.html", "namespaces" ],
@@ -35,9 +35,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classaml__data__collec__utils_1_1collect__push__data_1_1_push_machine.html",
-"classaml__lfd_1_1utilities_1_1store__demonstration_1_1_store_demonstration.html#af712a5bc7ae0793a53700c1f123aaf5f",
-"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a9b482e44d1f456a7212caf8b04a82623"
+"classaml__data__collec__utils_1_1collect__gravity__comp__data_1_1_collect_gravity_comp_data.html#aa9326f995b23f38beee734657b7b0463",
+"classaml__lfd_1_1lqr_1_1lqr__traj__follow_1_1_l_q_r_traj_follow.html#aec81ba9d2896a3077a502d5682588c6c",
+"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#a757e472952ec208820d9c6773f32e42a"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

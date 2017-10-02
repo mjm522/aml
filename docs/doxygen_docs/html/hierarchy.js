@@ -17,6 +17,7 @@ var hierarchy =
       [ "aml_robot.baxter_robot.BaxterArm", "classaml__robot_1_1baxter__robot_1_1_baxter_arm.html", null ]
     ] ],
     [ "aml_ctrl.utilities.lin_interp.LinInterp", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html", null ],
+    [ "src.aml_dl.mdn.utilities.get_pre_process_data.LoadPreprocessData", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1get__pre__process__data_1_1_load_preprocess_data.html", null ],
     [ "aml_lfd.lqr.lqr_traj_follow.LQRTrajFollow", "classaml__lfd_1_1lqr_1_1lqr__traj__follow_1_1_l_q_r_traj_follow.html", null ],
     [ "MarkerOdometry", "class_marker_odometry.html", null ],
     [ "aml_ctrl.utilities.min_jerk_interp.MinJerkInterp", "classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html", null ],
@@ -41,7 +42,8 @@ var hierarchy =
         [ "aml_ctrl.traj_generator.os_traj_generator.OSTrajGenerator", "classaml__ctrl_1_1traj__generator_1_1os__traj__generator_1_1_o_s_traj_generator.html", null ]
       ] ],
       [ "aml_data_collec_utils.box_object.BoxObject", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html", [
-        [ "aml_demos.stochastic_pushing_machine.StochasticPushMachine", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine.html", null ]
+        [ "aml_demos.stochastic_pushing_machine.StochasticPushMachine", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine.html", null ],
+        [ "src.aml_dl.mdn.utilities.testing_setup.TestSetup", "classsrc_1_1aml__dl_1_1mdn_1_1utilities_1_1testing__setup_1_1_test_setup.html", null ]
       ] ],
       [ "aml_data_collec_utils.collect_pretraining_data.AgentProxy", "classaml__data__collec__utils_1_1collect__pretraining__data_1_1_agent_proxy.html", null ],
       [ "aml_data_collec_utils.collect_push_data.PushMachine", "classaml__data__collec__utils_1_1collect__push__data_1_1_push_machine.html", null ],
@@ -68,16 +70,18 @@ var hierarchy =
       [ "aml_robot.mujoco.push_world.collect_push_data_sim.PushMachine", "classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_push_machine.html", null ],
       [ "aml_robot.mujoco.push_world.push_world.PushWorld", "classaml__robot_1_1mujoco_1_1push__world_1_1push__world_1_1_push_world.html", null ],
       [ "aml_robot.robot_interface.RobotInterface", "classaml__robot_1_1robot__interface_1_1_robot_interface.html", null ],
+      [ "src.aml_dl.mdn.model.mdn_push_fwd_model.MDNPushFwdModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__fwd__model_1_1_m_d_n_push_fwd_model.html", null ],
       [ "src.aml_dl.mdn.model.mdn_push_inv_model.MDNPushInverseModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__inv__model_1_1_m_d_n_push_inverse_model.html", null ],
       [ "src.aml_dl.mdn.model.nn_push_fwd_model.NNPushFwdModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html", null ],
       [ "src.aml_dl.mdn.model.siamese_push_model.SiamesePushModel", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model.html", null ],
+      [ "src.aml_dl.mdn.model.tf_gauss_regressor.GaussianRegressor", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__gauss__regressor_1_1_gaussian_regressor.html", null ],
       [ "src.aml_dl.mdn.model.tf_mdn_model.MixtureDensityNetwork", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network.html", null ],
       [ "test_record_sample.DummyTaskInterface", "classtest__record__sample_1_1_dummy_task_interface.html", null ],
       [ "test_record_sample.DummyTaskInterface", "classtest__record__sample_1_1_dummy_task_interface.html", null ]
     ] ],
     [ "PisaSoftHand", "class_pisa_soft_hand.html", null ],
-    [ "test_finger_hitting_box.PushMachine", "classtest__finger__hitting__box_1_1_push_machine.html", null ],
     [ "aml_robot.bullet.push_world.push_machine.PushMachine", "classaml__robot_1_1bullet_1_1push__world_1_1push__machine_1_1_push_machine.html", null ],
+    [ "test_finger_hitting_box.PushMachine", "classtest__finger__hitting__box_1_1_push_machine.html", null ],
     [ "aml_data_collec_utils.record_sample.RecordSample", "classaml__data__collec__utils_1_1record__sample_1_1_record_sample.html", null ],
     [ "aml_data_collec_utils.record_sample.Sample", "classaml__data__collec__utils_1_1record__sample_1_1_sample.html", null ],
     [ "tests.SomeObj", "classtests_1_1_some_obj.html", null ],
