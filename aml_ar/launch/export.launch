@@ -3,9 +3,9 @@
   <include file="$(find aml_ar)/launch/box_ar.launch">
   </include>
 
-  <node pkg="rosbag" type="play" name="rosbag" args="-s 0 /home/ermanoarruda/Projects/catkin_workspaces/baxter_ws/target_0_box2d_new.bag"/>
+  <node pkg="rosbag" type="play" name="rosbag" args="-s 0 /home/ermanoarruda/Projects/catkin_workspaces/baxter_ws/target_gp_1.bag"/>
   
   <node name="extract" pkg="image_view" type="extract_images" respawn="false" output="screen" cwd="ROS_HOME">
     <remap from="image" to="/box_ar/result_ar"/>
   </node>
-</launch>
+</launch>	

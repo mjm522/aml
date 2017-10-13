@@ -9,11 +9,11 @@
     <node pkg="rviz" type="rviz" name="rviz" 
     args="-d $(find aml_data_collec_utils)/rviz_configs/baxter_pushing.rviz"/>
 
-    <node pkg="aml_data_collec_utils" type="pushing_machine.py" name="pushing_machine" output="screen">
+    <node pkg="aml_services" type="mppi_pushing_service.py" name="mppi_pushing_service" args="-n 0" output="screen">
     </node>
 
     <!-- pisa soft hand interface -->
-	<arg name="hand_id" default="1"/>
+	<!--<arg name="hand_id" default="1"/>-->
 
 
 </launch>
