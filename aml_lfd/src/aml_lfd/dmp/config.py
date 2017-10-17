@@ -2,7 +2,7 @@
 D = 200.
 
 discrete_dmp_config = {
-		'end_time':1.0,
+        'end_time':1.0,
         'D':D,
         'K':D**2./4., 
         'rbf_num':500, # number of basis function per DMP

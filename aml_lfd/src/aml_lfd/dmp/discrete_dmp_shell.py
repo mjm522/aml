@@ -25,7 +25,7 @@ class DiscreteDMPShell():
         self._Ws = None
 
     def load_demo_trajectory(self, trajectory):
-        if trajectory.ndim != self._dof:
+        if trajectory.shape[1] != self._dof:
             raise("The trajectory does not have same number of dimensions as specified")
         self._demo_traj = np.vstack([trajectory, npm.repmat(trajectory[-1,:],20,1)])
         self._traj_data = self.process_trajectory()
@@ -38,14 +38,13 @@ class DiscreteDMPShell():
     def process_trajectory(self):
         
         traj_data = np.zeros([self._time_stamps.shape[0], self._dof+1])
-
         traj_data[:,0] = self._time_stamps
         
         for ID in range(self._dof):
 
             traj = self._demo_traj[:,ID]
             nsample = np.arange(0.,  len(traj)*self._dt, self._dt)
-            nnsample = np.arange(0., len(traj)*self._dt-self._dt,  (len(traj)*self._dt-self._dt) / (1./self._dt))
+            nnsample = np.arange(0., len(traj)*self._dt-2*self._dt,  (len(traj)*self._dt-2*self._dt) / (1./self._dt))
             traj_data[:,ID+1] = interp1d(nsample, traj)(nnsample)
         
         return traj_data
@@ -145,7 +144,7 @@ class DiscreteDMPShell():
             kf = self._kernel_fcn(np.array([[u]]))
 
             forces = np.dot(self._Ws.T, kf/np.sum(kf))
-            
+
             if  self._type == 1:
                 scaling = np.multiply((goals - config['y0']), 1./config['original_scaling'])
                 ddy = K * (goals - y) - D * dy + np.multiply(scaling, forces.T) * u
