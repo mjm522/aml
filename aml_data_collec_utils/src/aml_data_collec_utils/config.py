@@ -31,6 +31,16 @@ BOX_TYPE_3 = {
     'height':0.091,
 }
 
+
+### added for ICRA
+#cubic box
+BOX_TYPE_3 = {
+    'length': 0.084,
+    'breadth':0.084,
+    'height':0.091,
+}
+
+
 #the white table
 TABLE = {
     'length': 1.795,

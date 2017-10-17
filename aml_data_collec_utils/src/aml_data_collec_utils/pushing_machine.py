@@ -246,22 +246,40 @@ class PushMachine(object):
 
         
 
-    def goto_pose(self,goal_pos, goal_ori): 
+    def goto_pose(self,goal_pos, goal_ori, ntrials = 1, disturb_on_fail = True): 
 
         start_pos, start_ori = self._robot.get_ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
 
-        goal_ori = quaternion.as_float_array(goal_ori)
-        success, js_pos = self._robot.ik(goal_pos,goal_ori)
+        sucess = False
 
-        if success:
-            self._robot.move_to_joint_position(js_pos)
-        else:
-            print "Couldnt find a solution"
+        goal_pos_test = goal_pos
+        goal_ori = quaternion.as_float_array(goal_ori)
+        print "Type goal ", type(goal_pos_test), goal_pos_test.shape
+        for i in range(ntrials):
+
+            # goal_pos_test = (goal_pos + np.random.randn(3)*0.005).astype(float)
+            success, js_pos = self._robot.ik(goal_pos_test,goal_ori)
+
+            print "Trying to push... Status:", success
+
+            if success:
+                self._robot.move_to_joint_position(js_pos)
+
+                break
+            else:
+                noise = np.random.randn(3)*0.025
+                noise[2] = 0.0
+
+                goal_pos_test = goal_pos + noise
+                print "Type goal ", type(goal_pos_test), goal_pos_test.shape
+                print "Couldnt find a solution, trial %d disturb_flag: ", i, disturb_on_fail
 
         return success
+
+
 
     def reset_box(self,reset_push):
         success = True

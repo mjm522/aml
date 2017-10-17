@@ -149,10 +149,15 @@ class EnsambleMDN(object):
 
         return out
 
-    def forward(self, sess, xs):
+    def forward(self, sess, xs, get_full_list=False):
 
         mean_out = np.zeros((xs.shape[0],self._dim_output))
         var_out = np.zeros((xs.shape[0],self._dim_output))
+
+        if get_full_list:
+            mean_list = np.zeros((self._n_ensembles, xs.shape[0],self._dim_output))
+            var_list  = np.zeros((self._n_ensembles, xs.shape[0],self._dim_output))
+            ensemble_idx = 0
 
         for model in self._mdn_ensembles:
 
@@ -174,6 +179,11 @@ class EnsambleMDN(object):
             std = np.reshape(std,(-1,1))
             # print mu.shape
 
+            if get_full_list:
+                mean_list[ensemble_idx, :, :] = mu
+                var_list[ensemble_idx, :, :]  = std + np.reshape(np.sum(np.square(mu),axis=1),(-1,1))
+                ensemble_idx += 1
+
             # Correct only for the single kernel MDN case
             mean_out += mu
             var_out += std + np.reshape(np.sum(np.square(mu),axis=1),(-1,1))
@@ -181,13 +191,14 @@ class EnsambleMDN(object):
         mean_out /= len(self._mdn_ensembles)
         var_out /= len(self._mdn_ensembles)
 
-
         tmp = np.reshape(np.sum(np.square(mean_out),axis=1),(-1,1))
-
 
         var_out -= tmp
 
-        return mean_out, var_out
+        if not get_full_list:
+            return mean_out, var_out
+        else:
+            return mean_out, var_out, mean_list, var_list
 
     def get_model_path(self):
         if 'model_dir' in self._params:
