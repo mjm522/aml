@@ -91,33 +91,39 @@ class IKBaxter():
         except (rospy.ServiceException, rospy.ROSException), e:
             rospy.logerr("Service call failed: %s" % (e,))
 
-        # Check if result valid, and type of seed ultimately used to get solution
-        # convert rospy's string representation of uint8[]'s to int's
-        resp_seeds = struct.unpack('<%dB' % len(resp.result_type),
-                                   resp.result_type)
-        if (resp_seeds[0] != resp.RESULT_INVALID):
-            seed_str = {
-                        self.ikreq.SEED_USER: 'User Provided Seed',
-                        self.ikreq.SEED_CURRENT: 'Current Joint Angles',
-                        self.ikreq.SEED_NS_MAP: 'Nullspace Setpoints',
-                       }.get(resp_seeds[0], 'None')
-            print("SUCCESS - Valid Joint Solution Found from Seed Type: %s" %
-                  (seed_str,))
-            # Format solution into Limb API-compatible dictionary
-            limb_joints = dict(zip(resp.joints[0].name, resp.joints[0].position))
-            # print "\nIK Joint Solution:\n", limb_joints
 
-            success_flag = True
 
-            joint_names         = self.arm.joint_names()
+        try:
 
+            # Check if result valid, and type of seed ultimately used to get solution
+            # convert rospy's string representation of uint8[]'s to int's
+            resp_seeds = struct.unpack('<%dB' % len(resp.result_type),
+                                       resp.result_type)
+            if (resp_seeds[0] != resp.RESULT_INVALID):
+                seed_str = {
+                            self.ikreq.SEED_USER: 'User Provided Seed',
+                            self.ikreq.SEED_CURRENT: 'Current Joint Angles',
+                            self.ikreq.SEED_NS_MAP: 'Nullspace Setpoints',
+                           }.get(resp_seeds[0], 'None')
+                print("SUCCESS - Valid Joint Solution Found from Seed Type: %s" %
+                      (seed_str,))
+                # Format solution into Limb API-compatible dictionary
+                limb_joints = dict(zip(resp.joints[0].name, resp.joints[0].position))
+                # print "\nIK Joint Solution:\n", limb_joints
+
+                success_flag = True
+
+                joint_names         = self.arm.joint_names()
+
+                
+                def to_list(ls):
+                    return [ls[n] for n in joint_names]
+
+                limb_joints        = np.array(to_list(limb_joints))
             
-            def to_list(ls):
-                return [ls[n] for n in joint_names]
-
-            limb_joints        = np.array(to_list(limb_joints))
-        
-        else:
+            else:
+                print("INVALID POSE - No Valid Joint Solution Found.")
+        except:
             print("INVALID POSE - No Valid Joint Solution Found.")
 
         return success_flag, limb_joints

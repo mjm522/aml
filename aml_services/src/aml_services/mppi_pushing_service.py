@@ -24,7 +24,7 @@ class MPPIPushingService(object):
 
         self._arm = BaxterArm(limb)
         
-        self._push_machine = PushMachine(robot_interface=self._arm, sample_start_index=args.sample_start_index)
+        self._push_machine = PushMachine(robot_interface=self._arm, sample_start_index=0)
 
 
     def get_box_state(self, req):
@@ -63,13 +63,13 @@ class MPPIPushingService(object):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='Data collection for push manipulation')
+    # parser = argparse.ArgumentParser(description='Data collection for push manipulation')
     
-    parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
+    # parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    mppi_pushing_service = MPPIPushingService(limb='left', sample_start_index = args.sample_start_index)
+    mppi_pushing_service = MPPIPushingService(limb='left', sample_start_index = 0)
     
     print "calling run"
     mppi_pushing_service.run()

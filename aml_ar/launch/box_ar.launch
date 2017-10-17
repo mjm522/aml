@@ -17,7 +17,13 @@
     <!-- goal left: 0.8276729,-0.15015955,0.0613232 -->
     <!-- goal right:0.70064068, 0.76912946.  0.02922201 -->
     <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.70064068, 0.76912946 -0.093 0.589, 0.404, 0.713, 0.565 base box_goal 30" />
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="1.022 0.231 -0.093 0.589, 0.404, 0.413, 0.565 base box_goal 30" />-->
     
+    <!-- Bag file 10 -->
+    <!-- 0.8276729, -0.15015955, 0.0613232 -->
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.8276729 -0.15015955 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />-->
+    <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.7083 0.5866 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />
     <node pkg="aml_ar" type="box_ar_node" name="box_ar" output="screen">
         <remap from="/openni_rgb_camera_info" to="/camera/rgb/camera_info" />
         <remap from="/openni_rgb_rect_image" to="/camera/rgb/image_rect_color"/>

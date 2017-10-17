@@ -237,7 +237,14 @@ public:
     bool received_box_transform = getTransform("base","box",boxTransform);
 
     if(received_box_transform){
-      boxTransforms.push_back(boxTransform);
+
+      if(boxTransftormCount%100){
+        boxTransforms.push_back(boxTransform);
+
+      }
+
+      boxTransftormCount++;
+      
 
 
       ROS_INFO("Intermediate steps %d",(int)boxTransforms.size());
