@@ -28,31 +28,70 @@ def get_box_edge2(u_alpha, bw, bh):
 	p2 = np.array([bw,bh])
 	p3 = np.array([-bw,bh])
 
-	pts = np.vstack([p0,p1,p2,p3,p0])*0.5
+	p = None
+
+	pts = np.vstack([p0,p1,p2,p3,p0])#*0.5
 
 
 	ai = [a0,a1,a2,a3,1.0]
 
+	sides = [3, 1, 4, 2]
+
 
 	alpha = 0.0
-	side = 0
+	sidx = 0
+	if 0. < u_alpha <= 0.25:
+		sidx = 0
+		alpha = u_alpha/0.25
+		p = (1.0 - alpha)*p0 + alpha*p1
 
-	while side < len(ai) and u_alpha > ai[side]:
-		side += 1
+	elif 0.25 < u_alpha <= 0.5:
+		sidx = 1
+		alpha = (u_alpha-0.25)/0.25
+		p = (1.0 - alpha)*p2 + alpha*p1
+
+	elif 0.5 < u_alpha <= 0.75:
+		sidx = 2
+		alpha = (u_alpha-0.5)/0.25
+
+		p = (1.0 - alpha)*p2 + alpha*p3
+
+	elif 0.75 < u_alpha < 1.0:
+		sidx = 3
+		alpha = (u_alpha-0.75)/0.25
+
+		p = (1.0 - alpha)*p0 + alpha*p3
+
+	# elif 0.25 < u_alpha <= 0.5:
+	# 	side = 1
+	# 	alpha = (u_alpha-0.25)/0.25
+	# elif 0.5 < u_alpha <= 0.75:
+	# 	side = 2
+	# 	alpha = (u_alpha-0.5)/0.25
+	# elif 0.75 < u_alpha <= 1.:
+	# 	side = 3
+	# 	alpha = (u_alpha-0.75)/0.25
 
 
-	alpha = (u_alpha - ai[side-1])/(ai[side] - ai[side-1])
+	# alpha = 0.0
+	# side = 0
+
+	# while side < len(ai) and u_alpha > ai[side]:
+	# 	side += 1
 
 
-	p = (1.0 - alpha)*pts[side-1,:] + alpha*pts[side,:]
+	# alpha = (u_alpha - ai[sidx-1])/(ai[sidx] - ai[sidx-1])
 
-	edge_vector = pts[side,:] - pts[side-1,:]
 
-	return p, side, edge_vector
+	# p = (1.0 - alpha)*pts[sides[sidx],:] + alpha*pts[sides[sidx]-1,:]
+
+
+
+	return p, sides[sidx]
 
 def get_box_edge(u_alpha, bw, bh):
 
-	p, _, _ = get_box_edge2(u_alpha, bw, bh)
+	p, _ = get_box_edge2(u_alpha, bw, bh)
 
 
 
@@ -79,12 +118,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
-
-
-
-
-
-
-

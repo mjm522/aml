@@ -182,7 +182,8 @@ class PushMachine(object):
             success = self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
             if not success:
-                return False
+                print "failed to reach goal %d"%(i,)
+                # return False
 
         # Push is always the last
         goal = goals[len(goals)-1]
@@ -280,17 +281,17 @@ class PushMachine(object):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='Data collection for push manipulation')
+    # parser = argparse.ArgumentParser(description='Data collection for push manipulation')
     
-    parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
+    # parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
 
     rospy.init_node('poke_box', anonymous=True)
     limb = 'left'
     arm = BaxterArm(limb)
     
-    push_machine = PushMachine(robot_interface=arm, sample_start_index=args.sample_start_index)
+    push_machine = PushMachine(robot_interface=arm, sample_start_index=2)
 
     print "calling run"
 

@@ -16,24 +16,20 @@ from aml_data_collec_utils.ros_transform_utils import quat2euler
 
 class MPPIPushingService(object):
 
-
     def __init__(self, limb = 'left', sample_start_index = 1):
         rospy.init_node('mppi_push_service_server')
-
 
         self._get_box_state_srv  = rospy.Service('get_box_state',  BoxState,  self.get_box_state)
         self._apply_push_srv  = rospy.Service('apply_push',  PushAction,  self.apply_push)
 
         self._arm = BaxterArm(limb)
         
-        self._push_machine = PushMachine(robot_interface=self._arm, sample_start_index=args.sample_start_index)
+        self._push_machine = PushMachine(robot_interface=self._arm, sample_start_index=0)
 
 
     def get_box_state(self, req):
 
-
         state = self._push_machine._box.get_effect()
-
 
         bx = state['box_pos'][0]
         by = state['box_pos'][1]
@@ -67,13 +63,13 @@ class MPPIPushingService(object):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='Data collection for push manipulation')
+    # parser = argparse.ArgumentParser(description='Data collection for push manipulation')
     
-    parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
+    # parser.add_argument('-n', '--sample_start_index', type=int, help='start index of sample collection')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    mppi_pushing_service = MPPIPushingService(limb='left', sample_start_index = args.sample_start_index)
+    mppi_pushing_service = MPPIPushingService(limb='left', sample_start_index = 0)
     
     print "calling run"
     mppi_pushing_service.run()

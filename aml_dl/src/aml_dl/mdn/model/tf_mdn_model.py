@@ -213,3 +213,82 @@ class MixtureDensityNetwork(object):
 
         return out
 
+
+
+class MixtureOfGaussians(object):
+
+
+  def sample_pi_idx(self, x, pdf):
+    N = pdf.size
+    acc = 0
+
+    for i in range(0, N):
+      acc += pdf[i]
+      if (acc >= x):
+        return i
+
+        print 'failed to sample mixture weight index'
+
+
+    return -1
+
+
+  def max_pi_idx(self, pdf):
+
+    i = np.argmax(pdf)
+
+    return i
+
+  def sample_gaussian(self, rn, mu, std):
+
+
+    return mu + rn*std
+
+  def generate_mixture_samples_from_max_pi(self, out_pi, out_mu, out_sigma, m_samples=10):
+
+
+    # Number of test inputs
+
+    N = out_mu.shape[0]
+
+    M = m_samples
+
+    result = np.random.rand(N, M)
+    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
+
+    # Generates M samples from the mixture for each test input
+
+    for j in range(M):
+      for i in range(0, N):
+        idx = self.max_pi_idx(out_pi[i])
+        mu = out_mu[i, idx]
+        std = out_sigma[i, idx]
+        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
+
+
+    return result
+
+
+  def generate_mixture_samples(self, out_pi, out_mu, out_sigma, m_samples=10):
+
+
+    # Number of test inputs
+    N = out_mu.shape[0]
+    M = m_samples
+
+    result = np.random.rand(N, M) # initially random [0, 1]
+    rn  = np.random.randn(N, M) # normal random matrix (0.0, 1.0)
+    mu  = 0
+    std = 0
+    idx = 0
+
+    # Generates M samples from the mixture for each test input
+    for j in range(M):
+      for i in range(0, N):
+        idx = self.sample_pi_idx(result[i, j], out_pi[i])
+        mu = out_mu[i, idx]
+        std = out_sigma[i, idx]
+        result[i, j] = self.sample_gaussian(rn[i, j], mu, std)
+
+
+    return result
