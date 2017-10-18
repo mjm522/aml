@@ -30,7 +30,10 @@ aml_dl/src/aml_dl/mdn/training/tf_check_points
 
 *summary_*
 
+aml_dl/src/aml_dl/mdn/model/tests.py
+aml_dl/src/aml_dl/mdn/model/tests2.py
 *.a
 *.o
 
 .idea
+

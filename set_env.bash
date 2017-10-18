@@ -4,7 +4,7 @@ AML_DIR=$(pwd)
 
 AML_DATA='REPLACE THIS LINE WITH THE PATH TO AML_DATA'
 
-AML_DATA='/Users/michaelmathew/Documents/aml_data'
+AML_DATA='/home/ermanoarruda/Projects/aml_data' #gitignore
 
 echo "Default AML_DATA set to ${AML_DATA}, change? (y/n)"
 read answer

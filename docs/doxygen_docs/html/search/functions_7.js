@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['modecommandcallback',['modeCommandCallback',['../classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html#aff0207bdb9a7d00b791ce5edc6ee27b9',1,'baxter_gazebo_plugin::BaxterGazeboRosControlPlugin']]]
+  ['load_5fmodel',['load_model',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1siamese__push__model_1_1_siamese_push_model.html#a0dde84d311307cfbbc933759a1d2e7a9',1,'src::aml_dl::mdn::model::siamese_push_model::SiamesePushModel']]]
 ];

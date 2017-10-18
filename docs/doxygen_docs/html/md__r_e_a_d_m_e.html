@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Active Manipulation Learning: aml</title>
+<title>Active Manipulation Learning: Active Manipulation Learning (AML)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -80,21 +80,88 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">aml </div>  </div>
+<div class="title">Active Manipulation Learning (AML) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Active Manipulation Learning (AML)</p>
-<h2>Dependencies</h2>
+<div class="textblock"><h2>Dependencies</h2>
 <ul>
-<li>ROS (Indigo) - <a href="http://wiki.ros.org/indigo/Installation/Ubuntu">http://wiki.ros.org/indigo/Installation/Ubuntu</a></li>
-<li>BaxterSDK - <a href="http://sdk.rethinkrobotics.com/wiki/Hello_Baxter">http://sdk.rethinkrobotics.com/wiki/Hello_Baxter</a></li>
-<li>Baxter Simulator - <a href="http://sdk.rethinkrobotics.com/wiki/Simulator_Installation">http://sdk.rethinkrobotics.com/wiki/Simulator_Installation</a></li>
+<li><a href="http://wiki.ros.org/indigo/Installation/Ubuntu">ROS (Indigo)</a></li>
+<li><a href="http://sdk.rethinkrobotics.com/wiki/Hello_Baxter">BaxterSDK</a></li>
+<li><a href="http://sdk.rethinkrobotics.com/wiki/Simulator_Installation">Baxter Simulator</a></li>
 </ul>
 <h3>Python Libraries</h3>
 <ul>
-<li>numpy</li>
-<li><a href="https://pypi.python.org/pypi/numpy-quaternion">https://pypi.python.org/pypi/numpy-quaternion</a> </li>
+<li><a href="http://www.numpy.org/">numpy</a></li>
+<li><a href="https://pypi.python.org/pypi/numpy-quaternion">numpy-quaternion</a></li>
+<li><a href="http://www.pygame.org/download.shtml">pygame</a></li>
+<li><a href="https://pypi.python.org/pypi/PySide/1.2.4">PySide</a></li>
+<li><a href="https://github.com/pybox2d/pybox2d">pybox2d</a></li>
+<li><a href="https://pypi.python.org/pypi/Pillow/4.1.1">Pillow</a></li>
+<li><a href="https://pypi.python.org/pypi/scipy/0.19.0">Scipy</a></li>
+<li><a href="https://pypi.python.org/pypi/six/1.10.0">six</a></li>
+<li><a href="https://pypi.python.org/pypi/decorator/4.0.11">decorator</a></li>
+<li><a href="https://pypi.python.org/pypi/matplotlib/2.0.1">matplotlib</a></li>
+<li><a href="https://pypi.python.org/pypi/ipython/6.0.0">ipython</a></li>
 </ul>
+<h4>This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.</h4>
+<ol type="1">
+<li>Installing ROS - Indigo: Follow instructions on this <a href="http://wiki.ros.org/indigo/Installation/Ubuntu">page</a>. <b>Important Note:</b> install “desktop-full” version</li>
+<li>Installing virtual environment<ul>
+<li>Install packages ``` $sudo apt-get install python-setuptools $sudo easy_install pip $sudo apt-get install python-pip $sudo pip install virtualenv $sudo pip install virtualenvwrapper ```</li>
+<li>Add the following two lines in your ~/.bashrc script: ``` $export WORKON_HOME="$HOME/.virtualenvs" $source $HOME/bin/virtualenvwrapper_bashrc ```</li>
+<li>Close the bashrc file and source them: ``` $source ~/.bashrc $mkvirtualenv robotics $workon robotics ```</li>
+</ul>
+</li>
+<li><p class="startli">Install CUDA 8.0 and Cuda-NN 5.1</p>
+<p class="startli">You can get the compiled binary files from following websites:</p>
+<p class="startli">a. <a href="https://developer.nvidia.com/cuda-downloads">CUDA</a></p>
+<p class="startli">b. <a href="https://developer.nvidia.com/cudnn">CUDANN</a></p><ul>
+<li>You will have to create an account in Nvdia to download the libraries</li>
+<li>Goto "Download cuDNN v5.1 (Jan 20, 2017), for CUDA 8.0", Dowload cuDNN v5.1 Library for Linux</li>
+<li><p class="startli">From the terminal goto the download directory</p>
+<p class="startli">``` $tar -zxf cudnn-8.0-linux-x64-v5.1.tgz $cd cuda/ $sudo cp include/* /usr/local/cuda/include/ $sudo cp lib64/* /usr/local/cuda/lib64/ ```</p>
+</li>
+<li><p class="startli">Add the following bit to ~/.bashrc file</p>
+<p class="startli">``` export CUDA_HOME=/usr/local/cuda-8.0 export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 PATH=${CUDA_HOME}/bin:${PATH} export PATH ```</p>
+</li>
+</ul>
+</li>
+<li>Install tensorflow in virtual environment ``` $workon robotics $pip install &ndash;upgrade tensorflow-gpu ```</li>
+<li>Create a new workspace and clone aml repository in it ``` $mkdir ~/catkin_ws $cd catkin_ws $mkdir baxter_ws $cd baxter_ws $mkdir src $cd src $git clone <a href="https://github.com/RobotsLab/AML.git">https://github.com/RobotsLab/AML.git</a> ```</li>
+<li>Baxter simulator setup<ul>
+<li>Dependencies ``` $sudo apt-get install gazebo2 ros-indigo-qt-build ros-indigo-driver-common ros-indigo-gazebo-ros-control ros-indigo-gazebo-ros-pkgs ros-indigo-ros-control ros-indigo-control-toolbox ros-indigo-realtime-tools ros-indigo-ros-controllers ros-indigo-xacro python-wstool ros-indigo-tf-conversions ros-indigo-kdl-parser ```</li>
+<li>Simulator (specific versions) ``` $cd ~/catkin_workspaces/baxter_ws/src $wstool init . $wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty) baxter_simulator.rosinstall $wstool update ```</li>
+</ul>
+</li>
+</ol>
+<p>Check if any other unmet dependencies, run this line from ws folder ``` $rosdep install &ndash;from-path . &ndash;ignore-src &ndash;rosdistro indigo -y -r ```</p>
+<ul>
+<li>Final step ``` $cd ../ $catkin_make ```</li>
+</ul>
+<p>Few other dependencies</p>
+<p>``` $pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide ```</p>
+<ol type="1">
+<li>Installing pybox2d - follow instructions in this https://github.com/pybox2d/pybox2d/blob/master/INSTALL.md "page".</li>
+</ol>
+<h4>Possible Errors:</h4>
+<ol type="1">
+<li><p class="startli">Could not find any downloads that satisfy the requirement tensorflow</p>
+<p class="startli"><b>Solution:</b> <code>$pip install --upgrade pip</code></p>
+</li>
+<li><p class="startli">No module named catkin_pkg.package</p>
+<p class="startli"><b>Solution:</b> <code>$pip install catkin_pkg</code></p>
+</li>
+<li><p class="startli">No module named rospkg</p>
+<p class="startli"><b>Solution:</b> <code>$pip install -U rospkg</code></p>
+</li>
+<li><p class="startli">ImportError: No module named 'em'</p>
+<p class="startli"><b>Solution:</b> <code>$pip install empty</code></p>
+</li>
+<li><p class="startli">Could not stop controller 'left_joint_velocity_controller' since it is not running</p>
+<p class="startli"><b>Solution:</b> goto <code>$~/catkin_ws/baxter_ws/src/ baxter_gazebo/src/baxter_gazebo_ros_control_plugin.cpp</code> Edit lines:<code>::SwitchController::Request::STRICT to ::SwitchController::Request::BEST_EFFORT (This happens in two places)</code></p>
+</li>
+</ol>
+<p><em>Note:</em> You have to rebuild the catkin_make from $baxter_ws </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
