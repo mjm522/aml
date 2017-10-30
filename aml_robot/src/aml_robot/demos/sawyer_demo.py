@@ -41,7 +41,7 @@ print "GOALORI: ", goal_ori
 
 
 
-rate = rospy.Rate(1) # 10hz
+rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
 
@@ -49,6 +49,7 @@ while not rospy.is_shutdown():
 
 	print success, joints
 
+	print "CURRENT STATE:", limb.angles()
 	limb.exec_position_cmd(joints)
 
 	rate.sleep()

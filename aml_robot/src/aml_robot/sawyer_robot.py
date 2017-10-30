@@ -35,7 +35,7 @@ class SawyerArm(intera_interface.Limb):
     def __init__(self, limb = "right", on_state_callback=None):
 
         #Load aml_logo
-        load_aml_logo()
+        load_aml_logo("/robot/head_display")
 
         self._ready = False
 

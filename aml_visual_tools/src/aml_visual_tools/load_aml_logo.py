@@ -5,7 +5,7 @@ import cv_bridge
 from sensor_msgs.msg import Image
 from os.path import dirname, abspath
 
-def load_aml_logo():
+def load_aml_logo(display_topic = '/robot/xdisplay'):
     """
     Send the image located at the specified path to the head
     display on Baxter.
@@ -20,7 +20,7 @@ def load_aml_logo():
 
     img = cv2.imread(logo_file)
     msg = cv_bridge.CvBridge().cv2_to_imgmsg(img, encoding="bgr8")
-    pub = rospy.Publisher('/robot/xdisplay', Image, latch=True, queue_size=1)
+    pub = rospy.Publisher(display_topic, Image, latch=True, queue_size=1)
     pub.publish(msg)
     # Sleep to allow for image to be published.
     rospy.sleep(2)
