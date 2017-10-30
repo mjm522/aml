@@ -63,6 +63,8 @@ class IKBaxter():
         #incase of failure return back current joints
         limb_joints  = self.arm._state['position'] 
 
+        resp = None
+
         hdr = Header(stamp=rospy.Time.now(), frame_id='base')
         ik_msg = PoseStamped(
                 header=hdr,
@@ -81,6 +83,8 @@ class IKBaxter():
                 )
                 )
         self.ikreq.pose_stamp.append(ik_msg)
+
+
         try:
             rospy.wait_for_service(self.ns, 5.0)
             resp = self.iksvc(self.ikreq)
