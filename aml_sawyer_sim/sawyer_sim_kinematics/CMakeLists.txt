@@ -34,11 +34,11 @@ include_directories(include
 add_library(${PROJECT_NAME} src/arm_kinematics.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-add_executable(kinematics src/position_kinematics.cpp)
-target_link_libraries(kinematics ${catkin_LIBRARIES} ${PROJECT_NAME})
+add_executable(sawyer_kinematics src/position_kinematics.cpp)
+target_link_libraries(sawyer_kinematics ${catkin_LIBRARIES} ${PROJECT_NAME})
 
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
- add_dependencies(kinematics
+ add_dependencies(sawyer_kinematics
   ${catkin_EXPORTED_TARGETS}
   intera_core_msgs_gencpp
  )
