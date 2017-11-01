@@ -21,10 +21,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#)
 
 
 #############
