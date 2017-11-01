@@ -43,8 +43,8 @@
 
 //Sawyer Specific Messages
 #include <intera_core_msgs/AssemblyState.h>
-#include <intera_core_msgs/EndEffectorState.h>
-#include <intera_core_msgs/EndEffectorProperties.h>
+/* #include <intera_core_msgs/EndEffectorState.h> */
+/* #include <intera_core_msgs/EndEffectorProperties.h> */
 #include <intera_core_msgs/JointCommand.h>
 #include <intera_core_msgs/AnalogIOState.h>
 #include <intera_core_msgs/DigitalOutputCommand.h>
@@ -114,8 +114,8 @@ namespace sawyer_en {
 
         intera_core_msgs::HeadState head_msg;
         intera_core_msgs::AssemblyState assembly_state;
-        intera_core_msgs::EndEffectorState left_grip_st, right_grip_st;
-        intera_core_msgs::EndEffectorProperties left_grip_prop, right_grip_prop;
+        /* intera_core_msgs::EndEffectorState left_grip_st, right_grip_st; */
+        /* intera_core_msgs::EndEffectorProperties left_grip_prop, right_grip_prop; */
         intera_core_msgs::AnalogIOState left_ir_state, right_ir_state;
         intera_core_msgs::DigitalIOState leftIL_nav_light, leftOL_nav_light,
             torso_leftIL_nav_light, torso_leftOL_nav_light, rightIL_nav_light,
@@ -157,17 +157,17 @@ namespace sawyer_en {
          */
         void nav_light_cb(const intera_core_msgs::DigitalOutputCommand &msg);
 
-        /**
-         * Callback function to capture if the head is nodding
-         */
-        void head_nod_cb(const std_msgs::Bool &msg);
+        /* /\** */
+        /*  * Callback function to capture if the head is nodding */
+        /*  *\/ */
+        /* void head_nod_cb(const std_msgs::Bool &msg); */
 
         /**
          * Method that updates the gravity variable
          */
         void update_jnt_st(const sensor_msgs::JointState &msg);
 
-        void reset_head_nod(const ros::TimerEvent &t);
+        /* void reset_head_nod(const ros::TimerEvent &t); */
 
     };
 }  // namespace

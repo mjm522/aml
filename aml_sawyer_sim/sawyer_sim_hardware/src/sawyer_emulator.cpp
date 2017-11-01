@@ -122,44 +122,44 @@ bool sawyer_emulator::init() {
         intera_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;  // If stopped is                                       true, the source of the e-stop.
 
     //Default values for the left and right gripper end effector states
-    left_grip_st.timestamp.sec = 0;
-    left_grip_st.timestamp.nsec = 0;
-    left_grip_st.id = 131073;
-    left_grip_st.enabled = 1;
-    left_grip_st.calibrated = 1;
-    left_grip_st.ready = 1;
-    left_grip_st.moving = 0;
-    left_grip_st.gripping = 0;
-    left_grip_st.missed = 0;
-    left_grip_st.error = 0;
-    left_grip_st.position = 0.0;
-    left_grip_st.force = 0.0;
-    left_grip_st.state = "";
-    left_grip_st.command = "";
-    left_grip_st.command_sender = "";
-    left_grip_st.command_sequence = 0;
+    // left_grip_st.timestamp.sec = 0;
+    // left_grip_st.timestamp.nsec = 0;
+    // left_grip_st.id = 131073;
+    // left_grip_st.enabled = 1;
+    // left_grip_st.calibrated = 1;
+    // left_grip_st.ready = 1;
+    // left_grip_st.moving = 0;
+    // left_grip_st.gripping = 0;
+    // left_grip_st.missed = 0;
+    // left_grip_st.error = 0;
+    // left_grip_st.position = 0.0;
+    // left_grip_st.force = 0.0;
+    // left_grip_st.state = "";
+    // left_grip_st.command = "";
+    // left_grip_st.command_sender = "";
+    // left_grip_st.command_sequence = 0;
 
-    right_grip_st = left_grip_st;  // Sample values recorded on both the grippers to do the spoof
+    // right_grip_st = left_grip_st;  // Sample values recorded on both the grippers to do the spoof
 
-    //Default values for the left and the right gripper properties
-    left_grip_prop.id = 131073;
-    left_grip_prop.ui_type = 3;
-    left_grip_prop.manufacturer = "Rethink Research Robot";
-    left_grip_prop.product = "SDK End Effector";
-    left_grip_prop.serial_number = "";
-    left_grip_prop.hardware_rev = "";
-    left_grip_prop.firmware_rev = "";
-    left_grip_prop.firmware_date = "";
-    left_grip_prop.controls_grip = true;
-    left_grip_prop.senses_grip = true;
-    left_grip_prop.reverses_grip = true;
-    left_grip_prop.controls_force = true;
-    left_grip_prop.senses_force = true;
-    left_grip_prop.controls_position = true;
-    left_grip_prop.senses_position = true;
-    left_grip_prop.properties = "";
+    // //Default values for the left and the right gripper properties
+    // left_grip_prop.id = 131073;
+    // left_grip_prop.ui_type = 3;
+    // left_grip_prop.manufacturer = "Rethink Research Robot";
+    // left_grip_prop.product = "SDK End Effector";
+    // left_grip_prop.serial_number = "";
+    // left_grip_prop.hardware_rev = "";
+    // left_grip_prop.firmware_rev = "";
+    // left_grip_prop.firmware_date = "";
+    // left_grip_prop.controls_grip = true;
+    // left_grip_prop.senses_grip = true;
+    // left_grip_prop.reverses_grip = true;
+    // left_grip_prop.controls_force = true;
+    // left_grip_prop.senses_force = true;
+    // left_grip_prop.controls_position = true;
+    // left_grip_prop.senses_position = true;
+    // left_grip_prop.properties = "";
 
-    right_grip_prop = left_grip_prop;  // Sample values recorded on both the grippers to do the spoof
+    // right_grip_prop = left_grip_prop;  // Sample values recorded on both the grippers to do the spoof
 
     leftIL_nav_light.isInputOnly = false;
     leftOL_nav_light.isInputOnly = false;
@@ -180,8 +180,8 @@ bool sawyer_emulator::init() {
     torso_rightOL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
 
     head_msg.pan = 0;
-    head_msg.isPanning = false;
-    head_msg.isNodding = false;
+    head_msg.isTurning = false;
+    // head_msg.isNodding = false;
 
     isStopped = false;
 
@@ -201,14 +201,14 @@ bool sawyer_emulator::init() {
     // Initialize the publishers
     assembly_state_pub = n.advertise<intera_core_msgs::AssemblyState>(
                                                                       SAWYER_STATE_TOPIC, 1);
-    left_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
-                                                                       SAWYER_LEFT_GRIPPER_ST, 1);
-    right_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
-                                                                        SAWYER_RIGHT_GRIPPER_ST, 1);
-    left_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
-                                                                              SAWYER_LEFT_GRIPPER_PROP, 1);
-    right_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
-                                                                               SAWYER_RIGHT_GRIPPER_PROP, 1);
+    // left_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
+    //                                                                    SAWYER_LEFT_GRIPPER_ST, 1);
+    // right_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
+    //                                                                     SAWYER_RIGHT_GRIPPER_ST, 1);
+    // left_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
+    //                                                                           SAWYER_LEFT_GRIPPER_PROP, 1);
+    // right_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
+    //                                                                            SAWYER_RIGHT_GRIPPER_PROP, 1);
     left_ir_pub = n.advertise<sensor_msgs::Range>(SAWYER_LEFT_IR_TOPIC, 1);
     right_ir_pub = n.advertise<sensor_msgs::Range>(SAWYER_RIGHT_IR_TOPIC, 1);
     left_ir_state_pub = n.advertise<intera_core_msgs::AnalogIOState>(
@@ -258,11 +258,11 @@ bool sawyer_emulator::init() {
                                   &sawyer_emulator::right_laser_cb, this);
     nav_light_sub = n.subscribe(SAWYER_NAV_LIGHT_TOPIC, 100,
                                 &sawyer_emulator::nav_light_cb, this);
-    head_nod_sub = n.subscribe(SAWYER_HEAD_NOD_CMD_TOPIC, 100,
-                               &sawyer_emulator::head_nod_cb, this);
-    head_nod_timer = n.createTimer(ros::Duration(1),
-                                   &sawyer_emulator::reset_head_nod, this, true,
-                                   false);
+    // head_nod_sub = n.subscribe(SAWYER_HEAD_NOD_CMD_TOPIC, 100,
+    //                            &sawyer_emulator::head_nod_cb, this);
+    // head_nod_timer = n.createTimer(ros::Duration(1),
+    //                                &sawyer_emulator::reset_head_nod, this, true,
+    //                                false);
 }
 
 /**
@@ -293,10 +293,10 @@ void sawyer_emulator::publish(const std::string &img_path) {
     ROS_INFO("Simulator is loaded and started successfully");
     while (ros::ok()) {
         assembly_state_pub.publish(assembly_state);
-        left_grip_st_pub.publish(left_grip_st);
-        right_grip_st_pub.publish(right_grip_st);
-        left_grip_prop_pub.publish(left_grip_prop);
-        right_grip_prop_pub.publish(right_grip_prop);
+        // left_grip_st_pub.publish(left_grip_st);
+        // right_grip_st_pub.publish(right_grip_st);
+        // left_grip_prop_pub.publish(left_grip_prop);
+        // right_grip_prop_pub.publish(right_grip_prop);
         left_ir_pub.publish(left_ir);
         left_ir_state_pub.publish(left_ir_state);
         left_ir_int_pub.publish(left_ir_int);
@@ -446,19 +446,19 @@ void sawyer_emulator::nav_light_cb(
     }
 }
 
-void sawyer_emulator::head_nod_cb(const std_msgs::Bool &msg) {
-    if (msg.data) {
-        head_msg.isNodding = true;
-        if (!head_nod_timer.hasPending()) {
-            head_nod_timer.setPeriod(ros::Duration(1));
-            head_nod_timer.start();
-        }
-    }
-}
+// void sawyer_emulator::head_nod_cb(const std_msgs::Bool &msg) {
+//     if (msg.data) {
+//         head_msg.isNodding = true;
+//         if (!head_nod_timer.hasPending()) {
+//             head_nod_timer.setPeriod(ros::Duration(1));
+//             head_nod_timer.start();
+//         }
+//     }
+// }
 
-void sawyer_emulator::reset_head_nod(const ros::TimerEvent &t) {
-    head_msg.isNodding = false;
-}
+// void sawyer_emulator::reset_head_nod(const ros::TimerEvent &t) {
+//     head_msg.isNodding = false;
+// }
 
 void sawyer_emulator::update_jnt_st(const sensor_msgs::JointState &msg) {
     jstate_msg = msg;
@@ -472,9 +472,9 @@ void sawyer_emulator::update_jnt_st(const sensor_msgs::JointState &msg) {
     for (int i = 0; i < msg.name.size(); i++) {
         if (msg.name[i] == "head_pan") {
             if (fabs(float(head_msg.pan) - float(msg.position[i])) > threshold)
-                head_msg.isPanning = true;
+                head_msg.isTurning = true;
             else
-                head_msg.isPanning = false;
+                head_msg.isTurning = false;
             head_msg.pan = msg.position[i];
         }
         else {
