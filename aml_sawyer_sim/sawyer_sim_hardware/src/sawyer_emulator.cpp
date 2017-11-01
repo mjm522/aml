@@ -29,69 +29,69 @@
 
 /**
  *  \author Hariharasudan Malaichamee
- *  \desc   Node emulating the Baxter hardware interfaces for simulation
+ *  \desc   Node emulating the Sawyer hardware interfaces for simulation
  *      commands
  */
 
-#include <baxter_sim_hardware/baxter_emulator.h>
+#include <sawyer_sim_hardware/sawyer_emulator.h>
 
-namespace baxter_en {
+namespace sawyer_en {
 
 // Topics to subscribe and publish
-const std::string BAXTER_STATE_TOPIC = "robot/state";
-const std::string BAXTER_ENABLE_TOPIC = "robot/set_super_enable";
-const std::string BAXTER_STOP_TOPIC = "robot/set_super_stop";
-const std::string BAXTER_RESET_TOPIC = "robot/set_super_reset";
-const std::string BAXTER_DISPLAY_TOPIC = "robot/xdisplay";
+const std::string SAWYER_STATE_TOPIC = "robot/state";
+const std::string SAWYER_ENABLE_TOPIC = "robot/set_super_enable";
+const std::string SAWYER_STOP_TOPIC = "robot/set_super_stop";
+const std::string SAWYER_RESET_TOPIC = "robot/set_super_reset";
+const std::string SAWYER_DISPLAY_TOPIC = "robot/xdisplay";
 
-const std::string BAXTER_LEFT_GRIPPER_ST =
+const std::string SAWYER_LEFT_GRIPPER_ST =
     "robot/end_effector/left_gripper/state";
-const std::string BAXTER_RIGHT_GRIPPER_ST =
+const std::string SAWYER_RIGHT_GRIPPER_ST =
     "robot/end_effector/right_gripper/state";
-const std::string BAXTER_LEFT_GRIPPER_PROP =
+const std::string SAWYER_LEFT_GRIPPER_PROP =
     "robot/end_effector/left_gripper/properties";
-const std::string BAXTER_RIGHT_GRIPPER_PROP =
+const std::string SAWYER_RIGHT_GRIPPER_PROP =
     "robot/end_effector/right_gripper/properties";
-const std::string BAXTER_JOINT_TOPIC = "robot/joint_states";
-const std::string BAXTER_LEFT_LASER_TOPIC =
+const std::string SAWYER_JOINT_TOPIC = "robot/joint_states";
+const std::string SAWYER_LEFT_LASER_TOPIC =
     "sim/laserscan/left_hand_range/state";
-const std::string BAXTER_RIGHT_LASER_TOPIC =
+const std::string SAWYER_RIGHT_LASER_TOPIC =
     "sim/laserscan/right_hand_range/state";
-const std::string BAXTER_LEFT_IR_TOPIC = "robot/range/left_hand_range/state";
-const std::string BAXTER_RIGHT_IR_TOPIC = "robot/range/right_hand_range/state";
-const std::string BAXTER_LEFT_IR_STATE_TOPIC =
+const std::string SAWYER_LEFT_IR_TOPIC = "robot/range/left_hand_range/state";
+const std::string SAWYER_RIGHT_IR_TOPIC = "robot/range/right_hand_range/state";
+const std::string SAWYER_LEFT_IR_STATE_TOPIC =
     "robot/analog_io/left_hand_range/state";
-const std::string BAXTER_RIGHT_IR_STATE_TOPIC =
+const std::string SAWYER_RIGHT_IR_STATE_TOPIC =
     "robot/analog_io/right_hand_range/state";
-const std::string BAXTER_LEFT_IR_INT_TOPIC =
+const std::string SAWYER_LEFT_IR_INT_TOPIC =
     "robot/analog_io/left_hand_range/value_uint32";
-const std::string BAXTER_RIGHT_IR_INT_TOPIC =
+const std::string SAWYER_RIGHT_IR_INT_TOPIC =
     "robot/analog_io/right_hand_range/value_uint32";
 
-const std::string BAXTER_NAV_LIGHT_TOPIC = "robot/digital_io/command";
-const std::string BAXTER_LEFTIL_TOPIC =
+const std::string SAWYER_NAV_LIGHT_TOPIC = "robot/digital_io/command";
+const std::string SAWYER_LEFTIL_TOPIC =
     "robot/digital_io/left_itb_light_inner/state";
-const std::string BAXTER_LEFTOL_TOPIC =
+const std::string SAWYER_LEFTOL_TOPIC =
     "robot/digital_io/left_itb_light_outer/state";
-const std::string BAXTER_TORSO_LEFTIL_TOPIC =
+const std::string SAWYER_TORSO_LEFTIL_TOPIC =
     "robot/digital_io/torso_left_itb_light_inner/state";
-const std::string BAXTER_TORSO_LEFTOL_TOPIC =
+const std::string SAWYER_TORSO_LEFTOL_TOPIC =
     "robot/digital_io/torso_left_itb_light_outer/state";
-const std::string BAXTER_RIGHTIL_TOPIC =
+const std::string SAWYER_RIGHTIL_TOPIC =
     "robot/digital_io/right_itb_light_inner/state";
-const std::string BAXTER_RIGHTOL_TOPIC =
+const std::string SAWYER_RIGHTOL_TOPIC =
     "robot/digital_io/right_itb_light_outer/state";
-const std::string BAXTER_TORSO_RIGHTIL_TOPIC =
+const std::string SAWYER_TORSO_RIGHTIL_TOPIC =
     "robot/digital_io/torso_right_itb_light_inner/state";
-const std::string BAXTER_TORSO_RIGHTOL_TOPIC =
+const std::string SAWYER_TORSO_RIGHTOL_TOPIC =
     "robot/digital_io/torso_right_itb_light_outer/state";
 
-const std::string BAXTER_HEAD_STATE_TOPIC = "robot/head/head_state";
-const std::string BAXTER_HEAD_NOD_CMD_TOPIC =
+const std::string SAWYER_HEAD_STATE_TOPIC = "robot/head/head_state";
+const std::string SAWYER_HEAD_NOD_CMD_TOPIC =
     "robot/head/command_head_nod";
 
-const std::string BAXTER_LEFT_GRAVITY_TOPIC = "robot/limb/left/gravity_compensation_torques";
-const std::string BAXTER_RIGHT_GRAVITY_TOPIC = "robot/limb/right/gravity_compensation_torques";
+const std::string SAWYER_LEFT_GRAVITY_TOPIC = "robot/limb/left/gravity_compensation_torques";
+const std::string SAWYER_RIGHT_GRAVITY_TOPIC = "robot/limb/right/gravity_compensation_torques";
 
 const int IMG_LOAD_ON_STARTUP_DELAY = 35;  // Timeout for publishing a single RSDK image on start up
 
@@ -110,16 +110,16 @@ std::map<std::string, nav_light_enum> nav_light;
 /**
  * Method to initialize the default values for all the variables, instantiate the publishers and subscribers
  */
-bool baxter_emulator::init() {
+bool sawyer_emulator::init() {
 
 //Default values for the assembly state
     assembly_state.enabled = false;             // true if enabled
     assembly_state.stopped = false;          // true if stopped -- e-stop asserted
     assembly_state.error = false;  // true if a component of the assembly has an error
     assembly_state.estop_button =
-        baxter_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;  // button status
+        intera_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;  // button status
     assembly_state.estop_source =
-        baxter_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;  // If stopped is                                       true, the source of the e-stop.
+        intera_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;  // If stopped is                                       true, the source of the e-stop.
 
     //Default values for the left and right gripper end effector states
     left_grip_st.timestamp.sec = 0;
@@ -170,14 +170,14 @@ bool baxter_emulator::init() {
     torso_rightIL_nav_light.isInputOnly = false;
     torso_rightOL_nav_light.isInputOnly = false;
 
-    leftIL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    leftOL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    torso_leftIL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    torso_leftOL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    rightIL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    rightOL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    torso_rightIL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
-    torso_rightOL_nav_light.state = baxter_core_msgs::DigitalIOState::OFF;
+    leftIL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    leftOL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    torso_leftIL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    torso_leftOL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    rightIL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    rightOL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    torso_rightIL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
+    torso_rightOL_nav_light.state = intera_core_msgs::DigitalIOState::OFF;
 
     head_msg.pan = 0;
     head_msg.isPanning = false;
@@ -199,69 +199,69 @@ bool baxter_emulator::init() {
     nav_light["torso_right_itb_light_outer"] =torso_right_itb_light_outer;
 
     // Initialize the publishers
-    assembly_state_pub = n.advertise<baxter_core_msgs::AssemblyState>(
-                                                                      BAXTER_STATE_TOPIC, 1);
-    left_grip_st_pub = n.advertise<baxter_core_msgs::EndEffectorState>(
-                                                                       BAXTER_LEFT_GRIPPER_ST, 1);
-    right_grip_st_pub = n.advertise<baxter_core_msgs::EndEffectorState>(
-                                                                        BAXTER_RIGHT_GRIPPER_ST, 1);
-    left_grip_prop_pub = n.advertise<baxter_core_msgs::EndEffectorProperties>(
-                                                                              BAXTER_LEFT_GRIPPER_PROP, 1);
-    right_grip_prop_pub = n.advertise<baxter_core_msgs::EndEffectorProperties>(
-                                                                               BAXTER_RIGHT_GRIPPER_PROP, 1);
-    left_ir_pub = n.advertise<sensor_msgs::Range>(BAXTER_LEFT_IR_TOPIC, 1);
-    right_ir_pub = n.advertise<sensor_msgs::Range>(BAXTER_RIGHT_IR_TOPIC, 1);
-    left_ir_state_pub = n.advertise<baxter_core_msgs::AnalogIOState>(
-                                                                     BAXTER_LEFT_IR_STATE_TOPIC, 1);
-    right_ir_state_pub = n.advertise<baxter_core_msgs::AnalogIOState>(
-                                                                      BAXTER_RIGHT_IR_STATE_TOPIC, 1);
-    left_ir_int_pub = n.advertise<std_msgs::UInt32>(BAXTER_LEFT_IR_INT_TOPIC, 1);
-    right_ir_int_pub = n.advertise<std_msgs::UInt32>(BAXTER_RIGHT_IR_INT_TOPIC,
+    assembly_state_pub = n.advertise<intera_core_msgs::AssemblyState>(
+                                                                      SAWYER_STATE_TOPIC, 1);
+    left_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
+                                                                       SAWYER_LEFT_GRIPPER_ST, 1);
+    right_grip_st_pub = n.advertise<intera_core_msgs::EndEffectorState>(
+                                                                        SAWYER_RIGHT_GRIPPER_ST, 1);
+    left_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
+                                                                              SAWYER_LEFT_GRIPPER_PROP, 1);
+    right_grip_prop_pub = n.advertise<intera_core_msgs::EndEffectorProperties>(
+                                                                               SAWYER_RIGHT_GRIPPER_PROP, 1);
+    left_ir_pub = n.advertise<sensor_msgs::Range>(SAWYER_LEFT_IR_TOPIC, 1);
+    right_ir_pub = n.advertise<sensor_msgs::Range>(SAWYER_RIGHT_IR_TOPIC, 1);
+    left_ir_state_pub = n.advertise<intera_core_msgs::AnalogIOState>(
+                                                                     SAWYER_LEFT_IR_STATE_TOPIC, 1);
+    right_ir_state_pub = n.advertise<intera_core_msgs::AnalogIOState>(
+                                                                      SAWYER_RIGHT_IR_STATE_TOPIC, 1);
+    left_ir_int_pub = n.advertise<std_msgs::UInt32>(SAWYER_LEFT_IR_INT_TOPIC, 1);
+    right_ir_int_pub = n.advertise<std_msgs::UInt32>(SAWYER_RIGHT_IR_INT_TOPIC,
                                                      1);
 
-    left_itb_innerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                        BAXTER_LEFTIL_TOPIC, 1);
-    left_itb_outerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                        BAXTER_LEFTOL_TOPIC, 1);
-    torso_left_innerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                          BAXTER_TORSO_LEFTIL_TOPIC, 1);
-    torso_left_outerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                          BAXTER_TORSO_LEFTOL_TOPIC, 1);
+    left_itb_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                        SAWYER_LEFTIL_TOPIC, 1);
+    left_itb_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                        SAWYER_LEFTOL_TOPIC, 1);
+    torso_left_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                          SAWYER_TORSO_LEFTIL_TOPIC, 1);
+    torso_left_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                          SAWYER_TORSO_LEFTOL_TOPIC, 1);
 
-    right_itb_innerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                         BAXTER_RIGHTIL_TOPIC, 1);
-    right_itb_outerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                         BAXTER_RIGHTOL_TOPIC, 1);
-    torso_right_innerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                           BAXTER_TORSO_RIGHTIL_TOPIC, 1);
-    torso_right_outerL_pub = n.advertise<baxter_core_msgs::DigitalIOState>(
-                                                                           BAXTER_TORSO_RIGHTOL_TOPIC, 1);
+    right_itb_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                         SAWYER_RIGHTIL_TOPIC, 1);
+    right_itb_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                         SAWYER_RIGHTOL_TOPIC, 1);
+    torso_right_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                           SAWYER_TORSO_RIGHTIL_TOPIC, 1);
+    torso_right_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(
+                                                                           SAWYER_TORSO_RIGHTOL_TOPIC, 1);
 
-    left_grav_pub = n.advertise<baxter_core_msgs::SEAJointState>(BAXTER_LEFT_GRAVITY_TOPIC, 1);
-    right_grav_pub = n.advertise<baxter_core_msgs::SEAJointState>(BAXTER_RIGHT_GRAVITY_TOPIC, 1);
+    left_grav_pub = n.advertise<intera_core_msgs::SEAJointState>(SAWYER_LEFT_GRAVITY_TOPIC, 1);
+    right_grav_pub = n.advertise<intera_core_msgs::SEAJointState>(SAWYER_RIGHT_GRAVITY_TOPIC, 1);
 
-    head_pub = n.advertise<baxter_core_msgs::HeadState>(BAXTER_HEAD_STATE_TOPIC,
+    head_pub = n.advertise<intera_core_msgs::HeadState>(SAWYER_HEAD_STATE_TOPIC,
                                                         1);
 
     // Initialize the subscribers
-    enable_sub = n.subscribe(BAXTER_ENABLE_TOPIC, 100,
-                             &baxter_emulator::enable_cb, this);
-    stop_sub = n.subscribe(BAXTER_STOP_TOPIC, 100, &baxter_emulator::stop_cb,
+    enable_sub = n.subscribe(SAWYER_ENABLE_TOPIC, 100,
+                             &sawyer_emulator::enable_cb, this);
+    stop_sub = n.subscribe(SAWYER_STOP_TOPIC, 100, &sawyer_emulator::stop_cb,
                            this);
-    reset_sub = n.subscribe(BAXTER_RESET_TOPIC, 100, &baxter_emulator::reset_cb,
+    reset_sub = n.subscribe(SAWYER_RESET_TOPIC, 100, &sawyer_emulator::reset_cb,
                             this);
-    jnt_st = n.subscribe(BAXTER_JOINT_TOPIC, 100, &baxter_emulator::update_jnt_st,
+    jnt_st = n.subscribe(SAWYER_JOINT_TOPIC, 100, &sawyer_emulator::update_jnt_st,
                          this);
-    left_laser_sub = n.subscribe(BAXTER_LEFT_LASER_TOPIC, 100,
-                                 &baxter_emulator::left_laser_cb, this);
-    right_laser_sub = n.subscribe(BAXTER_RIGHT_LASER_TOPIC, 100,
-                                  &baxter_emulator::right_laser_cb, this);
-    nav_light_sub = n.subscribe(BAXTER_NAV_LIGHT_TOPIC, 100,
-                                &baxter_emulator::nav_light_cb, this);
-    head_nod_sub = n.subscribe(BAXTER_HEAD_NOD_CMD_TOPIC, 100,
-                               &baxter_emulator::head_nod_cb, this);
+    left_laser_sub = n.subscribe(SAWYER_LEFT_LASER_TOPIC, 100,
+                                 &sawyer_emulator::left_laser_cb, this);
+    right_laser_sub = n.subscribe(SAWYER_RIGHT_LASER_TOPIC, 100,
+                                  &sawyer_emulator::right_laser_cb, this);
+    nav_light_sub = n.subscribe(SAWYER_NAV_LIGHT_TOPIC, 100,
+                                &sawyer_emulator::nav_light_cb, this);
+    head_nod_sub = n.subscribe(SAWYER_HEAD_NOD_CMD_TOPIC, 100,
+                               &sawyer_emulator::head_nod_cb, this);
     head_nod_timer = n.createTimer(ros::Duration(1),
-                                   &baxter_emulator::reset_head_nod, this, true,
+                                   &sawyer_emulator::reset_head_nod, this, true,
                                    false);
 }
 
@@ -269,14 +269,14 @@ bool baxter_emulator::init() {
  * Method that publishes the emulated interfaces' states and data at 100 Hz
  * @param img_path that refers the path of the image that loads on start up
  */
-void baxter_emulator::publish(const std::string &img_path) {
+void sawyer_emulator::publish(const std::string &img_path) {
     ros::Rate loop_rate(100);
 
     arm_kinematics::Kinematics kin;
     kin.init_grav();
 
     image_transport::ImageTransport it(n);
-    image_transport::Publisher display_pub = it.advertise(BAXTER_DISPLAY_TOPIC,
+    image_transport::Publisher display_pub = it.advertise(SAWYER_DISPLAY_TOPIC,
                                                           1);
     // Read OpenCV Mat image and convert it to ROS message
     cv_bridge::CvImagePtr cv_ptr(new cv_bridge::CvImage);
@@ -288,7 +288,7 @@ void baxter_emulator::publish(const std::string &img_path) {
             display_pub.publish(cv_ptr->toImageMsg());
         }
     } catch (std::exception e) {
-        ROS_WARN("Unable to load the Startup picture on Baxter's display screen %s",e.what());
+        ROS_WARN("Unable to load the Startup picture on Sawyer's display screen %s",e.what());
     }
     ROS_INFO("Simulator is loaded and started successfully");
     while (ros::ok()) {
@@ -325,7 +325,7 @@ void baxter_emulator::publish(const std::string &img_path) {
 /**
  * Method to enable the robot
  */
-void baxter_emulator::enable_cb(const std_msgs::Bool &msg) {
+void sawyer_emulator::enable_cb(const std_msgs::Bool &msg) {
     if (msg.data && !isStopped) {
         assembly_state.enabled = true;
     }
@@ -335,22 +335,22 @@ void baxter_emulator::enable_cb(const std_msgs::Bool &msg) {
     }
     assembly_state.stopped = false;
     assembly_state.estop_button =
-        baxter_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
+        intera_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
     assembly_state.estop_source =
-        baxter_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;
+        intera_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;
     enable = assembly_state.enabled;
 }
 
 /**
  * Method to stop the robot and capture the source of the stop
  */
-void baxter_emulator::stop_cb(const std_msgs::Empty &msg) {
+void sawyer_emulator::stop_cb(const std_msgs::Empty &msg) {
     assembly_state.enabled = false;
     assembly_state.stopped = true;
     assembly_state.estop_button =
-        baxter_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
+        intera_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
     assembly_state.estop_source =
-        baxter_core_msgs::AssemblyState::ESTOP_SOURCE_UNKNOWN;
+        intera_core_msgs::AssemblyState::ESTOP_SOURCE_UNKNOWN;
     enable = false;
     isStopped = true;
 }
@@ -358,13 +358,13 @@ void baxter_emulator::stop_cb(const std_msgs::Empty &msg) {
 /**
  * Method resets all the values to False and 0s
  */
-void baxter_emulator::reset_cb(const std_msgs::Empty &msg) {
+void sawyer_emulator::reset_cb(const std_msgs::Empty &msg) {
     assembly_state.enabled = false;
     assembly_state.stopped = false;
     assembly_state.estop_button =
-        baxter_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
+        intera_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;
     assembly_state.estop_source =
-        baxter_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;
+        intera_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;
     assembly_state.error = false;
     enable = false;
     isStopped = false;
@@ -373,7 +373,7 @@ void baxter_emulator::reset_cb(const std_msgs::Empty &msg) {
 /**
  * Method to capture the laser data and pass it as IR data for the left arm
  */
-void baxter_emulator::left_laser_cb(const sensor_msgs::LaserScan &msg) {
+void sawyer_emulator::left_laser_cb(const sensor_msgs::LaserScan &msg) {
     left_ir.header = msg.header;
     left_ir.min_range = msg.range_min;
     left_ir.max_range = msg.range_max;
@@ -392,7 +392,7 @@ void baxter_emulator::left_laser_cb(const sensor_msgs::LaserScan &msg) {
 /**
  * Method to capture the laser data and pass it as IR data for the right arm
  */
-void baxter_emulator::right_laser_cb(const sensor_msgs::LaserScan &msg) {
+void sawyer_emulator::right_laser_cb(const sensor_msgs::LaserScan &msg) {
     right_ir.header = msg.header;
     right_ir.min_range = msg.range_min;
     right_ir.max_range = msg.range_max;
@@ -408,13 +408,13 @@ void baxter_emulator::right_laser_cb(const sensor_msgs::LaserScan &msg) {
     right_ir_int.data = right_ir.range;
 }
 
-void baxter_emulator::nav_light_cb(
-                                   const baxter_core_msgs::DigitalOutputCommand &msg) {
+void sawyer_emulator::nav_light_cb(
+                                   const intera_core_msgs::DigitalOutputCommand &msg) {
     int res;
     if (msg.value)
-        res = baxter_core_msgs::DigitalIOState::ON;
+        res = intera_core_msgs::DigitalIOState::ON;
     else
-        res = baxter_core_msgs::DigitalIOState::OFF;
+        res = intera_core_msgs::DigitalIOState::OFF;
     switch (nav_light.find(msg.name)->second) {
         case left_itb_light_inner:
             leftIL_nav_light.state = res;
@@ -446,7 +446,7 @@ void baxter_emulator::nav_light_cb(
     }
 }
 
-void baxter_emulator::head_nod_cb(const std_msgs::Bool &msg) {
+void sawyer_emulator::head_nod_cb(const std_msgs::Bool &msg) {
     if (msg.data) {
         head_msg.isNodding = true;
         if (!head_nod_timer.hasPending()) {
@@ -456,11 +456,11 @@ void baxter_emulator::head_nod_cb(const std_msgs::Bool &msg) {
     }
 }
 
-void baxter_emulator::reset_head_nod(const ros::TimerEvent &t) {
+void sawyer_emulator::reset_head_nod(const ros::TimerEvent &t) {
     head_msg.isNodding = false;
 }
 
-void baxter_emulator::update_jnt_st(const sensor_msgs::JointState &msg) {
+void sawyer_emulator::update_jnt_st(const sensor_msgs::JointState &msg) {
     jstate_msg = msg;
     float threshold = 0.0009;
     left_gravity.actual_position.resize(left_gravity.name.size());
@@ -499,10 +499,10 @@ void baxter_emulator::update_jnt_st(const sensor_msgs::JointState &msg) {
 }  //namespace
 
 int main(int argc, char *argv[]) {
-    ros::init(argc, argv, "baxter_emulator");
+    ros::init(argc, argv, "sawyer_emulator");
 
     std::string img_path = argc > 1 ? argv[1] : "";
-    baxter_en::baxter_emulator emulate;
+    sawyer_en::sawyer_emulator emulate;
     bool result = emulate.init();
     emulate.publish(img_path);
 

@@ -29,28 +29,28 @@
 
 /**
  *  \author Hariharasudan Malaichamee
- *  \desc   Node emulating the Baxter hardware interfaces for simulation
+ *  \desc   Node emulating the Sawyer hardware interfaces for simulation
  *      commands
  */
 
-#ifndef baxter_emulator_H_
-#define baxter_emulator_H_
+#ifndef sawyer_emulator_H_
+#define sawyer_emulator_H_
 
 #include "ros/ros.h"
 #include <std_msgs/Bool.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/UInt32.h>
 
-//Baxter Specific Messages
-#include <baxter_core_msgs/AssemblyState.h>
-#include <baxter_core_msgs/EndEffectorState.h>
-#include <baxter_core_msgs/EndEffectorProperties.h>
-#include <baxter_core_msgs/JointCommand.h>
-#include <baxter_core_msgs/AnalogIOState.h>
-#include <baxter_core_msgs/DigitalOutputCommand.h>
-#include <baxter_core_msgs/DigitalIOState.h>
-#include <baxter_core_msgs/HeadState.h>
-#include <baxter_core_msgs/SEAJointState.h>
+//Sawyer Specific Messages
+#include <intera_core_msgs/AssemblyState.h>
+#include <intera_core_msgs/EndEffectorState.h>
+#include <intera_core_msgs/EndEffectorProperties.h>
+#include <intera_core_msgs/JointCommand.h>
+#include <intera_core_msgs/AnalogIOState.h>
+#include <intera_core_msgs/DigitalOutputCommand.h>
+#include <intera_core_msgs/DigitalIOState.h>
+#include <intera_core_msgs/HeadState.h>
+#include <intera_core_msgs/SEAJointState.h>
 
 #include <sensor_msgs/JointState.h>
 
@@ -64,20 +64,20 @@
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/LaserScan.h>
 
-#include <baxter_sim_kinematics/arm_kinematics.h>
+#include <sawyer_sim_kinematics/arm_kinematics.h>
 #include <cmath>
 #include <map>
 
-namespace baxter_en {
+namespace sawyer_en {
 
-    class baxter_emulator {
+    class sawyer_emulator {
 
     public:
         /**
          * Method to initialize the default values for all the variables, instantiate the publishers and    * subscribers
          * @param img_path that refers the path of the image that loads on start up
          */
-        baxter_emulator() {
+        sawyer_emulator() {
         }
         bool init();
 
@@ -112,15 +112,15 @@ namespace baxter_en {
         ros::NodeHandle n;
         ros::Timer head_nod_timer;
 
-        baxter_core_msgs::HeadState head_msg;
-        baxter_core_msgs::AssemblyState assembly_state;
-        baxter_core_msgs::EndEffectorState left_grip_st, right_grip_st;
-        baxter_core_msgs::EndEffectorProperties left_grip_prop, right_grip_prop;
-        baxter_core_msgs::AnalogIOState left_ir_state, right_ir_state;
-        baxter_core_msgs::DigitalIOState leftIL_nav_light, leftOL_nav_light,
+        intera_core_msgs::HeadState head_msg;
+        intera_core_msgs::AssemblyState assembly_state;
+        intera_core_msgs::EndEffectorState left_grip_st, right_grip_st;
+        intera_core_msgs::EndEffectorProperties left_grip_prop, right_grip_prop;
+        intera_core_msgs::AnalogIOState left_ir_state, right_ir_state;
+        intera_core_msgs::DigitalIOState leftIL_nav_light, leftOL_nav_light,
             torso_leftIL_nav_light, torso_leftOL_nav_light, rightIL_nav_light,
             rightOL_nav_light, torso_rightIL_nav_light, torso_rightOL_nav_light;
-        baxter_core_msgs::SEAJointState left_gravity, right_gravity;
+        intera_core_msgs::SEAJointState left_gravity, right_gravity;
         sensor_msgs::JointState jstate_msg;
         sensor_msgs::Range left_ir, right_ir;
         std_msgs::UInt32 left_ir_int, right_ir_int;
@@ -155,7 +155,7 @@ namespace baxter_en {
         /**
          * Callback function to update the navigators' light values
          */
-        void nav_light_cb(const baxter_core_msgs::DigitalOutputCommand &msg);
+        void nav_light_cb(const intera_core_msgs::DigitalOutputCommand &msg);
 
         /**
          * Callback function to capture if the head is nodding
@@ -172,4 +172,4 @@ namespace baxter_en {
     };
 }  // namespace
 
-#endif /* BAXTER_EMULATOR_H_ */
+#endif /* SAWYER_EMULATOR_H_ */
