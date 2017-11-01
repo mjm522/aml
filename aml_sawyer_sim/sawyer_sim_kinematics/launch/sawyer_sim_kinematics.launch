@@ -9,7 +9,7 @@
 
   <!-- load left and right tip name -->
   <param name="right_tip_name" value="right_hand" />
-  <node name="sawyer_sim_kinematics_right" pkg="sawyer_sim_kinematics" type="kinematics" respawn="false" output="screen" args="right">
+  <node name="sawyer_sim_kinematics_right" pkg="sawyer_sim_kinematics" type="sawyer_kinematics" respawn="false" output="screen" args="right">
   </node>
 
 

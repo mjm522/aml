@@ -12,6 +12,7 @@
   <run_depend>sawyer_sim_description</run_depend>
   <run_depend>sawyer_gazebo</run_depend>
   <run_depend>sawyer_sim_hardware</run_depend>
+  <run_depend>sawyer_sim_kinematics</run_depend>
   <run_depend>sawyer_sim_controllers</run_depend>
   <run_depend>intera_tools_description</run_depend>
 
