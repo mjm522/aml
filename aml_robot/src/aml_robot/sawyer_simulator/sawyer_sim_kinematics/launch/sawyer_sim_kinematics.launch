@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="urdf"
+    command="cat '$(find sawyer_description)/urdf/sawyer.urdf'" />
+  <param name="root_name" value="base" />
+  <param name="grav_right_name" value="right_hand" />
+
+  <!-- load left and right tip name -->
+  <param name="right_tip_name" value="right_hand" />
+  <node name="sawyer_sim_kinematics_right" pkg="sawyer_sim_kinematics" type="kinematics" respawn="false" output="screen" args="right">
+  </node>
+
+
+</launch>

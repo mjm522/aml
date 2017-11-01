@@ -1,0 +1,54 @@
+robot:
+  # Publish all joint states
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Arm
+  joint0_controller:
+    type: effort_controllers/JointPositionController
+    # type: effort_controllers/JointVelocityController
+    # type: effort_controllers/JointEffortController
+    joint: right_j0
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint1_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j1
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint2_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j2
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint3_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j3
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint4_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j4
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint5_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j5
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  joint6_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_j6
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  # Head
+  head_pan_controller:
+    type: effort_controllers/JointPositionController
+    joint: head_pan
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  # Gripper
+  gripper_l_controller:
+    type: effort_controllers/JointPositionController
+    joint: r_gripper_l_finger_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  gripper_r_controller:
+    type: effort_controllers/JointPositionController
+    joint: r_gripper_r_finger_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
