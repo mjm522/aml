@@ -42,7 +42,7 @@ const std::string SAWYER_STATE_TOPIC = "robot/state";
 const std::string SAWYER_ENABLE_TOPIC = "robot/set_super_enable";
 const std::string SAWYER_STOP_TOPIC = "robot/set_super_stop";
 const std::string SAWYER_RESET_TOPIC = "robot/set_super_reset";
-const std::string SAWYER_DISPLAY_TOPIC = "robot/xdisplay";
+const std::string SAWYER_DISPLAY_TOPIC = "/robot/head_display";
 
 // const std::string SAWYER_LEFT_GRIPPER_ST =
 //     "robot/end_effector/left_gripper/state";
