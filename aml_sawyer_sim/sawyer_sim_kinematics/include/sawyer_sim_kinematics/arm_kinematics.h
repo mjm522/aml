@@ -49,7 +49,7 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Bool.h>
-#include <baxter_core_msgs/SEAJointState.h>
+#include <intera_core_msgs/SEAJointState.h>
 #include <gazebo_msgs/SetLinkProperties.h>
 #include <gazebo_msgs/GetLinkProperties.h>
 #include <algorithm>
@@ -99,7 +99,7 @@ namespace arm_kinematics {
          */
         //bool getGravityTorques(const sensor_msgs::JointState &joint_configuration,
         //std::vector<double> &torquesOut);
-        bool getGravityTorques(const sensor_msgs::JointState joint_configuration, baxter_core_msgs::SEAJointState &left_gravity, baxter_core_msgs::SEAJointState &right_gravity, bool isEnabled);
+        bool getGravityTorques(const sensor_msgs::JointState joint_configuration, intera_core_msgs::SEAJointState &left_gravity, intera_core_msgs::SEAJointState &right_gravity, bool isEnabled);
 
     private:
         ros::NodeHandle nh, nh_private;

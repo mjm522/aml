@@ -33,7 +33,7 @@
  */
 #include <cstring>
 #include <ros/ros.h>
-#include <baxter_sim_kinematics/arm_kinematics.h>
+#include <sawyer_sim_kinematics/arm_kinematics.h>
 
 namespace arm_kinematics {
 
@@ -305,7 +305,7 @@ bool Kinematics::readJoints(urdf::Model &robot_model) {
  *  @returns true is successful
  */
 bool arm_kinematics::Kinematics::getGravityTorques(
-                                                   const sensor_msgs::JointState joint_configuration, baxter_core_msgs::SEAJointState &left_gravity, baxter_core_msgs::SEAJointState &right_gravity, bool isEnabled) {
+                                                   const sensor_msgs::JointState joint_configuration, intera_core_msgs::SEAJointState &left_gravity, intera_core_msgs::SEAJointState &right_gravity, bool isEnabled) {
 
     bool res;
     KDL::JntArray torques_l, torques_r;

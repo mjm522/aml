@@ -29,10 +29,10 @@
 
 /**
  *  \author Hariharasudan Malaichamee
- *  \desc   Node to wrap/unwrap the messages and calculate the kinematics for the Simulated Baxter
+ *  \desc   Node to wrap/unwrap the messages and calculate the kinematics for the Simulated Sawyer
  */
 
-#include <baxter_sim_kinematics/position_kinematics.h>
+#include <sawyer_sim_kinematics/position_kinematics.h>
 #include <signal.h>
 
 namespace kinematics {
@@ -68,11 +68,11 @@ bool position_kinematics::init(std::string side) {
     //Subscribe and advertise the subscribers and publishers accordingly for the Forward Kinematics
     joint_states_sub = handle.subscribe < sensor_msgs::JointState
                                           > (JOINT_STATES, 100, &position_kinematics::FKCallback, this);
-    end_pointstate_pub = handle.advertise < baxter_core_msgs::EndpointState
+    end_pointstate_pub = handle.advertise < intera_core_msgs::EndpointState
                                             > (LIMB_ENDPOINT, 100);
 
     //Subscribe to the robot state
-    robot_state_sub = handle.subscribe < baxter_core_msgs::AssemblyState
+    robot_state_sub = handle.subscribe < intera_core_msgs::AssemblyState
                                          > (ROBOT_STATE, 100, &position_kinematics::stateCB, this);
 
     if (!handle.getParam("right_tip_name", right_tip_name)) {
@@ -98,7 +98,7 @@ bool position_kinematics::init(std::string side) {
  * Callback function that checks and sets the robot enabled flag
  */
 void position_kinematics::stateCB(
-                                  const baxter_core_msgs::AssemblyState msg) {
+                                  const intera_core_msgs::AssemblyState msg) {
     if (msg.enabled)
         is_enabled = true;
     else
@@ -110,7 +110,7 @@ void position_kinematics::stateCB(
  * to the endpoint_state topic
  */
 void position_kinematics::FKCallback(const sensor_msgs::JointState msg) {
-    baxter_core_msgs::EndpointState endpoint;
+    intera_core_msgs::EndpointState endpoint;
 
     sensor_msgs::JointState configuration;
 
@@ -158,8 +158,8 @@ geometry_msgs::PoseStamped position_kinematics::FKCalc(
  * Callback function for the IK service that responds with the appropriate joint configuration or error message if not found
  */
 bool position_kinematics::IKCallback(
-                                     baxter_core_msgs::SolvePositionIK::Request &req,
-                                     baxter_core_msgs::SolvePositionIK::Response &res) {
+                                     intera_core_msgs::SolvePositionIK::Request &req,
+                                     intera_core_msgs::SolvePositionIK::Response &res) {
     ros::Rate loop_rate(100);
     sensor_msgs::JointState joint_pose;
     res.joints.resize(req.pose_stamp.size());
@@ -170,19 +170,19 @@ bool position_kinematics::IKCallback(
         res.isValid[req_index]=0;
         int valid_inp=0;
 
-        if(!req.seed_angles.empty() && req.seed_mode != baxter_core_msgs::SolvePositionIKRequest::SEED_CURRENT) {
+        if(!req.seed_angles.empty() && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_CURRENT) {
             res.isValid[req_index] = m_kinematicsModel->getPositionIK(
                                                                       req.pose_stamp[req_index], req.seed_angles[req_index], &joint_pose);
             res.joints[req_index].name.resize(joint_pose.name.size());
-            res.result_type[req_index]=baxter_core_msgs::SolvePositionIKRequest::SEED_USER;
+            res.result_type[req_index]=intera_core_msgs::SolvePositionIKRequest::SEED_USER;
             valid_inp=1;
         }
 
-        if((!res.isValid[req_index]) && req.seed_mode != baxter_core_msgs::SolvePositionIKRequest::SEED_USER) {
+        if((!res.isValid[req_index]) && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_USER) {
             res.isValid[req_index] = m_kinematicsModel->getPositionIK(
                                                                       req.pose_stamp[req_index], joint, &joint_pose);
             res.joints[req_index].name.resize(joint_pose.name.size());
-            res.result_type[req_index]=baxter_core_msgs::SolvePositionIKRequest::SEED_CURRENT;
+            res.result_type[req_index]=intera_core_msgs::SolvePositionIKRequest::SEED_CURRENT;
             valid_inp=1;
         }
 
@@ -197,7 +197,7 @@ bool position_kinematics::IKCallback(
             res.joints[req_index].position = joint_pose.position;
         }
         else
-            res.result_type[req_index]=baxter_core_msgs::SolvePositionIKResponse::RESULT_INVALID;
+            res.result_type[req_index]=intera_core_msgs::SolvePositionIKResponse::RESULT_INVALID;
     }
     loop_rate.sleep();
 }
@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Usage: %s <left | right>\n", argv[0]);
         return 1;
     }
-    ros::init(argc, argv, "baxter_sim_kinematics_" + side);
+    ros::init(argc, argv, "sawyer_sim_kinematics_" + side);
 
     //capture signals and attempt to cleanup Node
     signal(SIGTERM, quitRequested);

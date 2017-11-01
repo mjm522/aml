@@ -29,7 +29,7 @@
 
 /**
  *  \author Hariharasudan Malaichamee
- *  \desc   Node to wrap/unwrap the messages and calculate the kinematics for the simulated Baxter
+ *  \desc   Node to wrap/unwrap the messages and calculate the kinematics for the simulated Sawyer
  */
 
 #ifndef POSITION_KINEMATICS_H_
@@ -38,12 +38,12 @@
 #include <ros/ros.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
-#include <baxter_core_msgs/SolvePositionIK.h>
-#include <baxter_core_msgs/JointCommand.h>
-#include <baxter_core_msgs/EndpointState.h>
-#include <baxter_core_msgs/AssemblyState.h>
-#include <baxter_core_msgs/SolvePositionIK.h>
-#include <baxter_sim_kinematics/arm_kinematics.h>
+#include <intera_core_msgs/SolvePositionIK.h>
+#include <intera_core_msgs/JointCommand.h>
+#include <intera_core_msgs/EndpointState.h>
+#include <intera_core_msgs/AssemblyState.h>
+#include <intera_core_msgs/SolvePositionIK.h>
+#include <sawyer_sim_kinematics/arm_kinematics.h>
 #include <sensor_msgs/JointState.h>
 
 namespace kinematics {
@@ -108,7 +108,7 @@ namespace kinematics {
         /**
          * Callback function that checks and sets the robot enabled flag
          */
-        void stateCB(const baxter_core_msgs::AssemblyState msg);
+        void stateCB(const intera_core_msgs::AssemblyState msg);
 
         /**
          * Method to pass the desired configuration of the joints and calculate the FK
@@ -119,8 +119,8 @@ namespace kinematics {
         /**
          * Callback function for the IK service that responds with the appropriate joint configuration or error message if not found
          */
-        bool IKCallback(baxter_core_msgs::SolvePositionIK::Request &req,
-                        baxter_core_msgs::SolvePositionIK::Response &res);
+        bool IKCallback(intera_core_msgs::SolvePositionIK::Request &req,
+                        intera_core_msgs::SolvePositionIK::Response &res);
 
         /**
          * Callback function for the FK subscriber that retrievs the appropriate FK from the Joint states and publishes it to the endpoint
