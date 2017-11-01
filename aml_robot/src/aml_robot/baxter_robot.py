@@ -207,6 +207,9 @@ class BaxterArm(baxter_interface.limb.Limb):
             return [ls[n] for n in joint_names]
 
         return np.array(to_list(joint_angles))
+
+    def get_state(self):
+        return self._state
         
 
     def _on_joint_states(self, msg):
