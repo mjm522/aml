@@ -62,10 +62,10 @@ bool Kinematics::init_grav() {
         ROS_FATAL("GenericIK: No tip name for gravity found on parameter server");
         return false;
     }
-    if (!nh.getParam("grav_left_name", grav_left_name)) {
-        ROS_FATAL("GenericIK: No tip name for gravity found on parameter server");
-        return false;
-    }
+    // if (!nh.getParam("grav_left_name", grav_left_name)) {
+    //     ROS_FATAL("GenericIK: No tip name for gravity found on parameter server");
+    //     return false;
+    // }
 
     //Service client to set the gravity false for the limbs
     ros::ServiceClient get_lp_client = nh.serviceClient<gazebo_msgs::GetLinkProperties>("/gazebo/get_link_properties");
@@ -125,45 +125,45 @@ bool Kinematics::init_grav() {
                                                   KDL::Vector(0.0, 0.0, -9.8));
 
     //Load the left chain and copy them to Right specific variable
-    tip_name = grav_left_name;
-    if (!loadModel(result)) {
-        ROS_FATAL("Could not load models!");
-        return false;
-    }
+    // tip_name = grav_left_name;
+    // if (!loadModel(result)) {
+    //     ROS_FATAL("Could not load models!");
+    //     return false;
+    // }
 
-    grav_chain_l = chain;
-    left_joint.clear();
-    left_joint.reserve(chain.getNrOfSegments());
-    //Update the left_joint with the fixed joints from the URDF. Get each of the link's properties from GetLinkProperties service and
-    //call the SetLinkProperties service with the same set of parameters except for the gravity_mode, which would be disabled. This is
-    //to disable the gravity in the links, thereby to eliminate the need for gravity compensation
-    for (int i = 0; i < chain.getNrOfSegments(); i++) {
-        std::string seg_name = chain.getSegment(i).getName();
-        std::string joint_name = chain.getSegment(i).getJoint().getName();
-        idx = std::find(info.joint_names.begin(), info.joint_names.end(), joint_name);
-        if (idx != info.joint_names.end()) {
-            left_joint.push_back(*idx);
-        }
-        getlinkproperties.request.link_name=chain.getSegment(i).getName();
-        std::string link_name = chain.getSegment(i).getName();
-        getlinkproperties.request.link_name=link_name;
-        setlinkproperties.request.link_name=link_name;
-        get_lp_client.call(getlinkproperties);
-        setlinkproperties.request.com = getlinkproperties.response.com;
-        setlinkproperties.request.mass = getlinkproperties.response.mass;
-        setlinkproperties.request.ixx = getlinkproperties.response.ixx;
-        setlinkproperties.request.iyy = getlinkproperties.response.iyy;
-        setlinkproperties.request.izz = getlinkproperties.response.izz;
-        setlinkproperties.request.ixy = getlinkproperties.response.ixy;
-        setlinkproperties.request.iyz = getlinkproperties.response.iyz;
-        setlinkproperties.request.ixz = getlinkproperties.response.ixz;
-        setlinkproperties.request.gravity_mode = false;
-        set_lp_client.call(setlinkproperties);
-    }
+    // grav_chain_l = chain;
+    // left_joint.clear();
+    // left_joint.reserve(chain.getNrOfSegments());
+    // //Update the left_joint with the fixed joints from the URDF. Get each of the link's properties from GetLinkProperties service and
+    // //call the SetLinkProperties service with the same set of parameters except for the gravity_mode, which would be disabled. This is
+    // //to disable the gravity in the links, thereby to eliminate the need for gravity compensation
+    // for (int i = 0; i < chain.getNrOfSegments(); i++) {
+    //     std::string seg_name = chain.getSegment(i).getName();
+    //     std::string joint_name = chain.getSegment(i).getJoint().getName();
+    //     idx = std::find(info.joint_names.begin(), info.joint_names.end(), joint_name);
+    //     if (idx != info.joint_names.end()) {
+    //         left_joint.push_back(*idx);
+    //     }
+    //     getlinkproperties.request.link_name=chain.getSegment(i).getName();
+    //     std::string link_name = chain.getSegment(i).getName();
+    //     getlinkproperties.request.link_name=link_name;
+    //     setlinkproperties.request.link_name=link_name;
+    //     get_lp_client.call(getlinkproperties);
+    //     setlinkproperties.request.com = getlinkproperties.response.com;
+    //     setlinkproperties.request.mass = getlinkproperties.response.mass;
+    //     setlinkproperties.request.ixx = getlinkproperties.response.ixx;
+    //     setlinkproperties.request.iyy = getlinkproperties.response.iyy;
+    //     setlinkproperties.request.izz = getlinkproperties.response.izz;
+    //     setlinkproperties.request.ixy = getlinkproperties.response.ixy;
+    //     setlinkproperties.request.iyz = getlinkproperties.response.iyz;
+    //     setlinkproperties.request.ixz = getlinkproperties.response.ixz;
+    //     setlinkproperties.request.gravity_mode = false;
+    //     set_lp_client.call(setlinkproperties);
+    // }
 
-    //Create a gravity solver for the left chain
-    gravity_solver_l = new KDL::ChainIdSolver_RNE(grav_chain_l,
-                                                  KDL::Vector(0.0, 0.0, -9.8));
+    // //Create a gravity solver for the left chain
+    // gravity_solver_l = new KDL::ChainIdSolver_RNE(grav_chain_l,
+    //                                               KDL::Vector(0.0, 0.0, -9.8));
     return true;
 }
 
@@ -310,34 +310,35 @@ bool arm_kinematics::Kinematics::getGravityTorques(
     bool res;
     KDL::JntArray torques_l, torques_r;
     KDL::JntArray jntPosIn_l, jntPosIn_r;
-    left_gravity.name = left_joint;
+    // left_gravity.name = left_joint;
     right_gravity.name = right_joint;
-    left_gravity.gravity_model_effort.resize(num_joints);
+    // left_gravity.gravity_model_effort.resize(num_joints);
     right_gravity.gravity_model_effort.resize(num_joints);
     if (isEnabled) {
-        torques_l.resize(num_joints);
+        // torques_l.resize(num_joints);
         torques_r.resize(num_joints);
-        jntPosIn_l.resize(num_joints);
+        // jntPosIn_l.resize(num_joints);
         jntPosIn_r.resize(num_joints);
 
         // Copying the positions of the joints relative to its index in the KDL chain
         for (unsigned int j = 0; j < joint_configuration.name.size(); j++) {
             for (unsigned int i = 0; i < num_joints; i++) {
-                if (joint_configuration.name[j] == left_joint.at(i)) {
-                    jntPosIn_l(i) = joint_configuration.position[j];
-                    break;
-                } else if (joint_configuration.name[j] == right_joint.at(i)) {
+                // if (joint_configuration.name[j] == left_joint.at(i)) {
+                //     jntPosIn_l(i) = joint_configuration.position[j];
+                //     break;
+                // } else if
+                if (joint_configuration.name[j] == right_joint.at(i)) {
                     jntPosIn_r(i) = joint_configuration.position[j];
                     break;
                 }
             }
         }
         KDL::JntArray jntArrayNull(num_joints);
-        KDL::Wrenches wrenchNull_l(grav_chain_l.getNrOfSegments(),
-                                   KDL::Wrench::Zero());
-        int code_l = gravity_solver_l->CartToJnt(jntPosIn_l, jntArrayNull,
-                                                 jntArrayNull, wrenchNull_l,
-                                                 torques_l);
+        // KDL::Wrenches wrenchNull_l(grav_chain_l.getNrOfSegments(),
+        //                            KDL::Wrench::Zero());
+        // int code_l = gravity_solver_l->CartToJnt(jntPosIn_l, jntArrayNull,
+        //                                          jntArrayNull, wrenchNull_l,
+        //                                          torques_l);
         KDL::Wrenches wrenchNull_r(grav_chain_r.getNrOfSegments(),
                                    KDL::Wrench::Zero());
         int code_r = gravity_solver_r->CartToJnt(jntPosIn_r, jntArrayNull,
@@ -345,23 +346,23 @@ bool arm_kinematics::Kinematics::getGravityTorques(
                                                  torques_r);
 
         //Check if the gravity was succesfully calculated by both the solvers
-        if (code_l >= 0 && code_r >= 0) {
+        if (code_r >= 0) {
 
             for (unsigned int i = 0; i < num_joints; i++) {
-                left_gravity.gravity_model_effort[i] = torques_l(i);
+                // left_gravity.gravity_model_effort[i] = torques_l(i);
                 right_gravity.gravity_model_effort[i] = torques_r(i);
             }
             return true;
         } else {
             ROS_ERROR_THROTTLE(
                                1.0,
-                               "KT: Failed to compute gravity torques from KDL return code for left and right arms %d %d",
-                               code_l, code_r);
+                               "KT: Failed to compute gravity torques from KDL return code for left and right arms %d",
+                               code_r);
             return false;
         }
     } else {
         for (unsigned int i = 0; i <  num_joints; i++) {
-            left_gravity.gravity_model_effort[i]=0;
+            // left_gravity.gravity_model_effort[i]=0;
             right_gravity.gravity_model_effort[i]=0;
         }
     }

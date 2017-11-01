@@ -79,10 +79,10 @@ bool position_kinematics::init(std::string side) {
         ROS_FATAL("GenericIK: No tip name for Right arm found on parameter server");
         return false;
     }
-    if (!handle.getParam("left_tip_name", left_tip_name)) {
-        ROS_FATAL("GenericIK: No tip name for Right arm found on parameter server");
-        return false;
-    }
+    // if (!handle.getParam("left_tip_name", left_tip_name)) {
+    //     ROS_FATAL("GenericIK: No tip name for Right arm found on parameter server");
+    //     return false;
+    // }
     no_jts=0;
     //Initialize the Parameter server with the root_name and tip_name of the Kinematic Chain based on the side
     if (side == "right")
