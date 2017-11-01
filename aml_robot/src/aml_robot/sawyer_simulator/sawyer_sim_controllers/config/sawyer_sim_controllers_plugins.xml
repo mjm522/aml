@@ -1,0 +1,35 @@
+<library path="lib/libsawyer_sim_controllers">
+
+  <class name="sawyer_sim_controllers/SawyerPositionController" 
+	 type="sawyer_sim_controllers::SawyerPositionController" 
+	 base_class_type="controller_interface::ControllerBase">
+    <description>
+      The SawyerPositionController tracks position commands for the entire Sawyer arm. It expects a EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+
+  <class name="sawyer_sim_controllers/SawyerVelocityController" 
+	 type="sawyer_sim_controllers::SawyerVelocityController" 
+	 base_class_type="controller_interface::ControllerBase">
+    <description>
+      The SawyerVelocityController tracks velocity commands for the entire Sawyer arm. It expects a EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+
+  <class name="sawyer_sim_controllers/SawyerEffortController" 
+	 type="sawyer_sim_controllers::SawyerEffortController" 
+	 base_class_type="controller_interface::ControllerBase">
+    <description>
+      The SawyerEffortController tracks effort commands for the Sawyer joints. It expects a EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+  
+    <class name="sawyer_sim_controllers/SawyerHeadController" 
+	 type="sawyer_sim_controllers::SawyerHeadController" 
+	 base_class_type="controller_interface::ControllerBase">
+    <description>
+      The SawyerHeadController tracks position commands for the Sawyer head. It expects a EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+
+</library>

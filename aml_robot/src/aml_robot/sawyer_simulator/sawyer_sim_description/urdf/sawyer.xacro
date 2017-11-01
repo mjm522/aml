@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<robot name="sawyer" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find sawyer_sim_description)/urdf/sawyer.urdf.xacro" />
+  <xacro:include filename="$(find sawyer_sim_description)/urdf/sawyer_stand.urdf.xacro" />
+  <xacro:include filename="$(find intera_tools_description)/urdf/electric_gripper/rethink_electric_gripper.xacro" />
+  <!--<xacro:include filename="$(find intera_tools_description)/urdf/pneumatic_gripper/rethink_pneumatic_gripper.xacro" />-->
+
+  <xacro:sawyer_robot real_mass="false"/>
+  <xacro:sawyer_stand />
+  <xacro:rethink_electric_gripper side="right"
+                                  l_finger="standard_narrow"
+                                  l_finger_slot="2"
+                                  l_finger_tip="paddle_tip"
+                                  l_finger_grasp="inner"
+                                  r_finger="standard_narrow"
+                                  r_finger_slot="2"
+                                  r_finger_tip="paddle_tip"
+                                  r_finger_grasp="inner"
+                                  use_connector_plate="True"/>
+  <!--<xacro:rethink_pneumatic_gripper side="right"/>-->
+
+  <!-- ros_control plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/robot</robotNamespace>
+    <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+
+</robot>

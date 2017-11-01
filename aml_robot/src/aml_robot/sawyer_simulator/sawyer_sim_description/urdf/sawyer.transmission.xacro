@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="sawyer_arm_transmission">
+
+    <transmission name="right_j0_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j0">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j0_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j1_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j1">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j1_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j2_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j2">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j2_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j3_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j3">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j3_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j4_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j4">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j4_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j5_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j5">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j5_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="right_j6_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="right_j6">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_j6_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <transmission name="head_pan_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="head_pan">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="head_pan_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  </xacro:macro>
+
+</robot>
