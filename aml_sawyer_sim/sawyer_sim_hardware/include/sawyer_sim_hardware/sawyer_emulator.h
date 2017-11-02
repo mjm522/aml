@@ -43,8 +43,6 @@
 
 //Sawyer Specific Messages
 #include <intera_core_msgs/AssemblyState.h>
-/* #include <intera_core_msgs/EndEffectorState.h> */
-/* #include <intera_core_msgs/EndEffectorProperties.h> */
 #include <intera_core_msgs/JointCommand.h>
 #include <intera_core_msgs/AnalogIOState.h>
 #include <intera_core_msgs/DigitalOutputCommand.h>
@@ -68,17 +66,21 @@
 #include <cmath>
 #include <map>
 
-namespace sawyer_en {
+namespace sawyer_en
+{
 
-    class sawyer_emulator {
+    class sawyer_emulator
+    {
 
     public:
         /**
          * Method to initialize the default values for all the variables, instantiate the publishers and    * subscribers
          * @param img_path that refers the path of the image that loads on start up
          */
-        sawyer_emulator() {
+        sawyer_emulator()
+        {
         }
+
         bool init();
 
         /**
@@ -91,39 +93,37 @@ namespace sawyer_en {
     private:
         bool enable;
         //Subscribers
-        ros::Subscriber enable_sub, stop_sub, reset_sub, left_laser_sub,
-            right_laser_sub, nav_light_sub, head_nod_sub, jnt_st;
+        ros::Subscriber enable_sub, stop_sub, reset_sub,
+            right_laser_sub, nav_light_sub, jnt_st;
 
-        // Gripper Publishers
-        ros::Publisher left_grip_st_pub, right_grip_st_pub, left_grip_prop_pub,
-            right_grip_prop_pub;
         // Infrared publishers
-        ros::Publisher left_ir_pub, right_ir_pub, left_ir_int_pub, right_ir_int_pub,
-            left_ir_state_pub, right_ir_state_pub;
+        ros::Publisher right_ir_pub, right_ir_int_pub, right_ir_state_pub;
+
         // Navigator publishers
-        ros::Publisher left_itb_innerL_pub, right_itb_innerL_pub,
-            torso_left_innerL_pub, torso_right_innerL_pub, left_itb_outerL_pub,
-            right_itb_outerL_pub, torso_left_outerL_pub, torso_right_outerL_pub;
+        ros::Publisher right_itb_innerL_pub,
+            torso_right_innerL_pub, right_itb_outerL_pub, torso_right_outerL_pub;
+
         // General state publishers
         ros::Publisher assembly_state_pub, head_pub;
+
         // Gravity Publishers
-        ros::Publisher left_grav_pub, right_grav_pub;
+        ros::Publisher right_grav_pub;
 
         ros::NodeHandle n;
         ros::Timer head_nod_timer;
 
         intera_core_msgs::HeadState head_msg;
         intera_core_msgs::AssemblyState assembly_state;
-        /* intera_core_msgs::EndEffectorState left_grip_st, right_grip_st; */
-        /* intera_core_msgs::EndEffectorProperties left_grip_prop, right_grip_prop; */
-        intera_core_msgs::AnalogIOState left_ir_state, right_ir_state;
-        intera_core_msgs::DigitalIOState leftIL_nav_light, leftOL_nav_light,
-            torso_leftIL_nav_light, torso_leftOL_nav_light, rightIL_nav_light,
+
+        intera_core_msgs::AnalogIOState right_ir_state;
+
+        intera_core_msgs::DigitalIOState rightIL_nav_light,
             rightOL_nav_light, torso_rightIL_nav_light, torso_rightOL_nav_light;
-        intera_core_msgs::SEAJointState left_gravity, right_gravity;
+
+        intera_core_msgs::SEAJointState right_gravity;
         sensor_msgs::JointState jstate_msg;
-        sensor_msgs::Range left_ir, right_ir;
-        std_msgs::UInt32 left_ir_int, right_ir_int;
+        sensor_msgs::Range right_ir;
+        std_msgs::UInt32 right_ir_int;
 
         bool isStopped;
 
@@ -143,11 +143,6 @@ namespace sawyer_en {
         void reset_cb(const std_msgs::Empty &msg);
 
         /**
-         * Callback function to update the left laser values
-         */
-        void left_laser_cb(const sensor_msgs::LaserScan &msg);
-
-        /**
          * Callback function to update the right laser values
          */
         void right_laser_cb(const sensor_msgs::LaserScan &msg);
@@ -157,18 +152,10 @@ namespace sawyer_en {
          */
         void nav_light_cb(const intera_core_msgs::DigitalOutputCommand &msg);
 
-        /* /\** */
-        /*  * Callback function to capture if the head is nodding */
-        /*  *\/ */
-        /* void head_nod_cb(const std_msgs::Bool &msg); */
-
         /**
          * Method that updates the gravity variable
          */
         void update_jnt_st(const sensor_msgs::JointState &msg);
-
-        /* void reset_head_nod(const ros::TimerEvent &t); */
-
     };
 }  // namespace
 

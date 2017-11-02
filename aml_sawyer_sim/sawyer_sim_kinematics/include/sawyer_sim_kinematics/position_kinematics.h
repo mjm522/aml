@@ -46,12 +46,14 @@
 #include <sawyer_sim_kinematics/arm_kinematics.h>
 #include <sensor_msgs/JointState.h>
 
-namespace kinematics {
-    class position_kinematics {
+namespace kinematics
+{
+    class position_kinematics
+    {
     protected:
-        position_kinematics() {
-        }
-        ;
+        position_kinematics()
+        {
+        };
 
         bool init(std::string side);
 
@@ -69,9 +71,11 @@ namespace kinematics {
          *
          * @return boost::shared_ptr
          */
-        static poskin_ptr create(std::string side) {
+        static poskin_ptr create(std::string side)
+        {
             poskin_ptr pk_ptr = poskin_ptr(new position_kinematics());
-            if (pk_ptr->init(side)) {
+            if (pk_ptr->init(side))
+            {
                 return pk_ptr;
             }
             return poskin_ptr();
@@ -81,7 +85,8 @@ namespace kinematics {
          * Method that serves as the main execution loop of the Node.  This is called in the main() function to 'run'
          * and only returns after exit or ros::shutdown is called.
          */
-        void run() {
+        void run()
+        {
             //just do spin here (blocks until shutdown), remove while loop
             ros::spin();
 
@@ -142,9 +147,8 @@ namespace kinematics {
         ros::Publisher end_pointstate_pub;
         sensor_msgs::JointState joint;
         ros::NodeHandle handle;
-        std::string left_tip_name, right_tip_name;
+        std::string right_tip_name;
         int no_jts;
-
     };
 
 }

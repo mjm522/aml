@@ -54,15 +54,18 @@
 #include <gazebo_msgs/GetLinkProperties.h>
 #include <algorithm>
 
-namespace arm_kinematics {
+namespace arm_kinematics
+{
 
 //Structures to pass the messages
-    typedef struct INFO {
+    typedef struct INFO
+    {
         std::vector<std::string> link_names;
         std::vector<std::string> joint_names;
     } KinematicSolverInfo;
 
-    class Kinematics {
+    class Kinematics
+    {
     public:
         Kinematics();
         bool init_grav();
@@ -72,9 +75,11 @@ namespace arm_kinematics {
          */
         bool init(std::string tip_name, int &no_jts);
         typedef boost::shared_ptr<Kinematics> Ptr;
-        static Ptr create(std::string tip_name, int &no_jts) {
+        static Ptr create(std::string tip_name, int &no_jts)
+        {
             Ptr parm_kinematics = Ptr(new Kinematics());
-            if (parm_kinematics->init(tip_name, no_jts)) {
+            if (parm_kinematics->init(tip_name, no_jts))
+            {
                 return parm_kinematics;
             }
             return Ptr();
@@ -99,27 +104,28 @@ namespace arm_kinematics {
          */
         //bool getGravityTorques(const sensor_msgs::JointState &joint_configuration,
         //std::vector<double> &torquesOut);
-        bool getGravityTorques(const sensor_msgs::JointState joint_configuration, intera_core_msgs::SEAJointState &left_gravity, intera_core_msgs::SEAJointState &right_gravity, bool isEnabled);
+        bool getGravityTorques(const sensor_msgs::JointState joint_configuration,
+                               intera_core_msgs::SEAJointState &right_gravity, bool isEnabled);
 
     private:
         ros::NodeHandle nh, nh_private;
-        std::string root_name, tip_name, grav_left_name, grav_right_name;
+        std::string root_name, tip_name, grav_right_name;
         KDL::JntArray joint_min, joint_max;
-        KDL::Chain chain, grav_chain_l, grav_chain_r;
+        KDL::Chain chain, grav_chain_r;
         unsigned int num_joints;
 
         KDL::ChainFkSolverPos_recursive* fk_solver;
         KDL::ChainIkSolverPos_NR_JL *ik_solver_pos;
         KDL::ChainIkSolverVel_pinv* ik_solver_vel;
-        KDL::ChainIdSolver_RNE *gravity_solver_l, *gravity_solver_r;
+        KDL::ChainIdSolver_RNE *gravity_solver_r;
 
         ros::ServiceServer ik_service, ik_solver_info_service;
         ros::ServiceServer fk_service, fk_solver_info_service;
 
         tf::TransformListener tf_listener;
         std::vector<int> indd;
-        std::vector<std::string> left_joint, right_joint;
-        KinematicSolverInfo info, grav_info_l, grav_info_r;
+        std::vector<std::string> right_joint;
+        KinematicSolverInfo info, grav_info_r;
 
         /* Method to load all the values from the parameter server
          *  @returns true is successful
@@ -141,6 +147,5 @@ namespace arm_kinematics {
          */
         int getKDLSegmentIndex(const std::string &name);
     };
-
 }
 #endif

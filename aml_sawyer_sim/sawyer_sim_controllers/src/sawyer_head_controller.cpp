@@ -25,157 +25,169 @@
  # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  # POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
+*********************************************************************/
 
 #include <sawyer_sim_controllers/sawyer_head_controller.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace sawyer_sim_controllers {
+namespace sawyer_sim_controllers
+{
 
 SawyerHeadController::SawyerHeadController()
     : new_command(true),
-      update_counter(0) {
+      update_counter(0)
+{
 }
 
-SawyerHeadController::~SawyerHeadController() {
-  head_command_sub.shutdown();
+SawyerHeadController::~SawyerHeadController()
+{
+    head_command_sub.shutdown();
 }
 
 bool SawyerHeadController::init(hardware_interface::EffortJointInterface *robot,
-                                ros::NodeHandle &nh) {
-  // Store nodehandle
-  nh_ = nh;
+                                ros::NodeHandle &nh)
+{
+    // Store nodehandle
+    nh_ = nh;
 
-  // Get joint sub-controllers
-  XmlRpc::XmlRpcValue xml_struct;
-  if (!nh_.getParam("joints", xml_struct)) {
-    ROS_ERROR("No 'joints' parameter in controller (namespace '%s')",
-              nh_.getNamespace().c_str());
-    return false;
-  }
-
-  // Make sure it's a struct
-  if (xml_struct.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
-    ROS_ERROR("The 'joints' parameter is not a struct (namespace '%s')",
-              nh_.getNamespace().c_str());
-    return false;
-  }
-
-  // Get number of joints
-  n_joints = xml_struct.size();
-  ROS_INFO_STREAM(
-      "Initializing SawyerHeadController with "<<n_joints<<" joints.");
-
-  head_controllers.resize(n_joints);
-
-  int i = 0;  // track the joint id
-  for (XmlRpc::XmlRpcValue::iterator joint_it = xml_struct.begin();
-      joint_it != xml_struct.end(); ++joint_it) {
-    // Get joint controller
-    if (joint_it->second.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
-      ROS_ERROR(
-          "The 'joints/joint_controller' parameter is not a struct (namespace '%s')",
-          nh_.getNamespace().c_str());
-      return false;
+    // Get joint sub-controllers
+    XmlRpc::XmlRpcValue xml_struct;
+    if (!nh_.getParam("joints", xml_struct))
+    {
+        ROS_ERROR("No 'joints' parameter in controller (namespace '%s')",
+                  nh_.getNamespace().c_str());
+        return false;
     }
 
-    // Get joint controller name
-    std::string joint_controller_name = joint_it->first;
-
-    // Get the joint-namespace nodehandle
+    // Make sure it's a struct
+    if (xml_struct.getType() != XmlRpc::XmlRpcValue::TypeStruct)
     {
-      ros::NodeHandle joint_nh(nh_, "joints/" + joint_controller_name);
-      ROS_INFO_STREAM_NAMED(
-          "init",
-          "Loading sub-controller '" << joint_controller_name << "', Namespace: " << joint_nh.getNamespace());
+        ROS_ERROR("The 'joints' parameter is not a struct (namespace '%s')",
+                  nh_.getNamespace().c_str());
+        return false;
+    }
 
-      head_controllers[i].reset(
-          new effort_controllers::JointPositionController());
-      head_controllers[i]->init(robot, joint_nh);
+    // Get number of joints
+    n_joints = xml_struct.size();
+    ROS_INFO_STREAM(
+                    "Initializing SawyerHeadController with "<<n_joints<<" joints.");
 
-    }  // end of joint-namespaces
+    head_controllers.resize(n_joints);
 
-    // Add joint name to map (allows unordered list to quickly be mapped to the ordered index)
-    joint_to_index_map.insert(
-        std::pair<std::string, std::size_t>(head_controllers[i]->getJointName(),
-                                            i));
+    int i = 0;  // track the joint id
+    for (XmlRpc::XmlRpcValue::iterator joint_it = xml_struct.begin();
+         joint_it != xml_struct.end(); ++joint_it)
+    {
+        // Get joint controller
+        if (joint_it->second.getType() != XmlRpc::XmlRpcValue::TypeStruct)
+        {
+            ROS_ERROR("The 'joints/joint_controller' parameter is not a struct (namespace '%s')",
+                      nh_.getNamespace().c_str());
+            return false;
+        }
 
-    // increment joint i
-    ++i;
-  }
+        // Get joint controller name
+        std::string joint_controller_name = joint_it->first;
 
-  // Get controller topic name that it will subscribe to
-  if (nh_.getParam("topic", topic_name)) { // They provided a custom topic to subscribe to
+        // Get the joint-namespace nodehandle
+        {
+            ros::NodeHandle joint_nh(nh_, "joints/" + joint_controller_name);
+            ROS_INFO_STREAM_NAMED("init", "Loading sub-controller '"
+                                  << joint_controller_name << "', Namespace: "
+                                  << joint_nh.getNamespace());
 
-    // Get a node handle that is relative to the base path
-    ros::NodeHandle nh_base("~");
+            head_controllers[i].reset(new effort_controllers::JointPositionController());
+            head_controllers[i]->init(robot, joint_nh);
 
-    // Create command subscriber custom to sawyer
-    head_command_sub = nh_base.subscribe<intera_core_msgs::HeadPanCommand>(
-        topic_name, 1, &SawyerHeadController::commandCB, this);
-  } else  // default "command" topic
-  {
-    // Create command subscriber custom to sawyer
-    head_command_sub = nh_.subscribe<intera_core_msgs::HeadPanCommand>(
-        "command", 1, &SawyerHeadController::commandCB, this);
-  }
+        }  // end of joint-namespaces
 
-  return true;
+        // Add joint name to map (allows unordered list to quickly be mapped to the ordered index)
+        joint_to_index_map.insert(std::pair<std::string, std::size_t>(head_controllers[i]->getJointName(),i));
+
+        // increment joint i
+        ++i;
+    }
+
+    // Get controller topic name that it will subscribe to
+    if (nh_.getParam("topic", topic_name))
+    { // They provided a custom topic to subscribe to
+
+        // Get a node handle that is relative to the base path
+        ros::NodeHandle nh_base("~");
+
+        // Create command subscriber custom to sawyer
+        head_command_sub = nh_base.subscribe<intera_core_msgs::HeadPanCommand>(topic_name, 1,
+                                                                               &SawyerHeadController::commandCB, this);
+    }
+    else  // default "command" topic
+    {
+        // Create command subscriber custom to sawyer
+        head_command_sub = nh_.subscribe<intera_core_msgs::HeadPanCommand>("command", 1, &SawyerHeadController::commandCB, this);
+    }
+
+    return true;
 }
 
-void SawyerHeadController::starting(const ros::Time& time) {
-  intera_core_msgs::HeadPanCommand initial_command;
+void SawyerHeadController::starting(const ros::Time& time)
+{
+    intera_core_msgs::HeadPanCommand initial_command;
 
-  // Fill in the initial command
-  for (int i = 0; i < n_joints; i++) {
-    initial_command.target = head_controllers[i]->getPosition();
-  }
-  head_command_buffer.initRT(initial_command);
-  new_command = true;
+    // Fill in the initial command
+    for (int i = 0; i < n_joints; i++)
+    {
+        initial_command.target = head_controllers[i]->getPosition();
+    }
+    head_command_buffer.initRT(initial_command);
+    new_command = true;
 }
 
-void SawyerHeadController::stopping(const ros::Time& time) {
+void SawyerHeadController::stopping(const ros::Time& time)
+{
 
 }
 
 void SawyerHeadController::update(const ros::Time& time,
-                                  const ros::Duration& period) {
-  // Debug info
-  update_counter++;
-  if (update_counter % 100 == 0)
+                                  const ros::Duration& period)
+{
+    // Debug info
+    update_counter++;
+    if (update_counter % 100 == 0)
 
-  updateCommands();
+        updateCommands();
 
-  // Apply joint commands
-  for (size_t i = 0; i < n_joints; i++) {
-    // Update the individual joint controllers
-    head_controllers[i]->update(time, period);
-  }
+    // Apply joint commands
+    for (size_t i = 0; i < n_joints; i++)
+    {
+        // Update the individual joint controllers
+        head_controllers[i]->update(time, period);
+    }
 }
 
-void SawyerHeadController::updateCommands() {
-  // Check if we have a new command to publish
-  if (!new_command)
-    return;
+void SawyerHeadController::updateCommands()
+{
+    // Check if we have a new command to publish
+    if (!new_command)
+    {
+        return;
+    }
 
-  // Go ahead and assume we have proccessed the current message
-  new_command = false;
+    // Go ahead and assume we have proccessed the current message
+    new_command = false;
 
-  // Get latest command
-  const intera_core_msgs::HeadPanCommand &command = *(head_command_buffer
-      .readFromRT());
+    // Get latest command
+    const intera_core_msgs::HeadPanCommand &command = *(head_command_buffer.readFromRT());
 
-  head_controllers[0]->setCommand(command.target);
+    head_controllers[0]->setCommand(command.target);
 }
 
-void SawyerHeadController::commandCB(
-    const intera_core_msgs::HeadPanCommandConstPtr& msg) {
-  // the writeFromNonRT can be used in RT, if you have the guarantee that
-  //  * no non-rt thread is calling the same function (we're not subscribing to ros callbacks)
-  //  * there is only one single rt thread
-  head_command_buffer.writeFromNonRT(*msg);
+void SawyerHeadController::commandCB(const intera_core_msgs::HeadPanCommandConstPtr& msg)
+{
+    // the writeFromNonRT can be used in RT, if you have the guarantee that
+    //  * no non-rt thread is calling the same function (we're not subscribing to ros callbacks)
+    //  * there is only one single rt thread
+    head_command_buffer.writeFromNonRT(*msg);
 
-  new_command = true;
+    new_command = true;
 }
 
 }  // namespace

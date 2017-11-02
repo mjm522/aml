@@ -49,10 +49,11 @@
 #include <intera_core_msgs/AssemblyState.h>
 #include <intera_core_msgs/HeadPanCommand.h>
 
-namespace sawyer_gazebo_plugin {
+namespace sawyer_gazebo_plugin
+{
 
-class SawyerGazeboRosControlPlugin :
-        public gazebo_ros_control::GazeboRosControlPlugin {
+class SawyerGazeboRosControlPlugin : public gazebo_ros_control::GazeboRosControlPlugin
+{
 private:
     ros::Subscriber right_command_mode_sub_;
     ros::Subscriber robot_state_sub_;

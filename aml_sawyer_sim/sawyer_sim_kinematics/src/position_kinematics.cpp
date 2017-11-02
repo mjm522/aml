@@ -35,7 +35,8 @@
 #include <sawyer_sim_kinematics/position_kinematics.h>
 #include <signal.h>
 
-namespace kinematics {
+namespace kinematics
+{
 
 static const std::string ref_frame_id = "base";
 static const std::string JOINT_STATES = "/robot/joint_states";
@@ -46,7 +47,8 @@ const int joint_id=6;//Modify this to get the FK of different joints
  * Method to initialize the publishing and subscribing topics, services and to acquire the resources required
  * @return true if succeeds.
  */
-bool position_kinematics::init(std::string side) {
+bool position_kinematics::init(std::string side)
+{
     //Robot would be disabled initially
     is_enabled = false;
 
@@ -66,50 +68,50 @@ bool position_kinematics::init(std::string side) {
                                            this);
 
     //Subscribe and advertise the subscribers and publishers accordingly for the Forward Kinematics
-    joint_states_sub = handle.subscribe < sensor_msgs::JointState
-                                          > (JOINT_STATES, 100, &position_kinematics::FKCallback, this);
-    end_pointstate_pub = handle.advertise < intera_core_msgs::EndpointState
-                                            > (LIMB_ENDPOINT, 100);
+    joint_states_sub
+        = handle.subscribe <sensor_msgs::JointState> (JOINT_STATES, 100,
+                                                      &position_kinematics::FKCallback,
+                                                      this);
+    end_pointstate_pub
+        = handle.advertise <intera_core_msgs::EndpointState> (LIMB_ENDPOINT, 100);
 
     //Subscribe to the robot state
     robot_state_sub = handle.subscribe < intera_core_msgs::AssemblyState
                                          > (ROBOT_STATE, 100, &position_kinematics::stateCB, this);
 
-    if (!handle.getParam("right_tip_name", right_tip_name)) {
+    if (!handle.getParam("right_tip_name", right_tip_name))
+    {
         ROS_FATAL("GenericIK: No tip name for Right arm found on parameter server");
         return false;
     }
-    // if (!handle.getParam("left_tip_name", left_tip_name)) {
-    //     ROS_FATAL("GenericIK: No tip name for Right arm found on parameter server");
-    //     return false;
-    // }
+
     no_jts=0;
-    //Initialize the Parameter server with the root_name and tip_name of the Kinematic Chain based on the side
-    if (side == "right")
-        m_kinematicsModel = arm_kinematics::Kinematics::create(right_tip_name, no_jts);
-    else
-        m_kinematicsModel = arm_kinematics::Kinematics::create(left_tip_name, no_jts);
+    m_kinematicsModel = arm_kinematics::Kinematics::create(right_tip_name, no_jts);
 
     return true;
-
 }
 
 /**
  * Callback function that checks and sets the robot enabled flag
  */
-void position_kinematics::stateCB(
-                                  const intera_core_msgs::AssemblyState msg) {
+void position_kinematics::stateCB(const intera_core_msgs::AssemblyState msg)
+{
     if (msg.enabled)
+    {
         is_enabled = true;
+    }
     else
+    {
         is_enabled = false;
+    }
 }
 
 /**
  * Callback function for the FK subscriber that retrievs the appropriate FK from the Joint states and publishes
  * to the endpoint_state topic
  */
-void position_kinematics::FKCallback(const sensor_msgs::JointState msg) {
+void position_kinematics::FKCallback(const sensor_msgs::JointState msg)
+{
     intera_core_msgs::EndpointState endpoint;
 
     sensor_msgs::JointState configuration;
@@ -125,15 +127,17 @@ void position_kinematics::FKCallback(const sensor_msgs::JointState msg) {
 /**
  * Method to Filter the names and positions of the initialized side from the remaining
  */
-void position_kinematics::FilterJointState(
-                                           const sensor_msgs::JointState *msg, sensor_msgs::JointState &res) {
+void position_kinematics::FilterJointState(const sensor_msgs::JointState *msg, sensor_msgs::JointState &res)
+{
     // Resize the result to hold the names and positions of the 7 joints
     res.name.resize(no_jts);
     res.position.resize(no_jts);
     int i = 0;
-    for (size_t ind = 0; ind < msg->name.size(); ind++) {
+    for (size_t ind = 0; ind < msg->name.size(); ind++)
+    {
         // Retain the names and positions of the joints of the initialized arm
-        if ((msg->name[ind]).std::string::find(m_limbName) != std::string::npos) {
+        if ((msg->name[ind]).std::string::find(m_limbName) != std::string::npos)
+        {
             res.name[i] = msg->name[ind];
             res.position[i] = msg->position[ind];
             i++;
@@ -145,59 +149,61 @@ void position_kinematics::FilterJointState(
  * Method to pass the desired configuration of the joints and calculate the FK
  * @return calculated FK
  */
-geometry_msgs::PoseStamped position_kinematics::FKCalc(
-                                                       const sensor_msgs::JointState configuration) {
+geometry_msgs::PoseStamped position_kinematics::FKCalc(const sensor_msgs::JointState configuration)
+{
     bool isV;
     geometry_msgs::PoseStamped fk_result;
-    isV = m_kinematicsModel->getPositionFK(ref_frame_id, configuration,
-                                           fk_result);
+    isV = m_kinematicsModel->getPositionFK(ref_frame_id, configuration, fk_result);
     return fk_result;
 }
 
 /**
  * Callback function for the IK service that responds with the appropriate joint configuration or error message if not found
  */
-bool position_kinematics::IKCallback(
-                                     intera_core_msgs::SolvePositionIK::Request &req,
-                                     intera_core_msgs::SolvePositionIK::Response &res) {
+bool position_kinematics::IKCallback(intera_core_msgs::SolvePositionIK::Request &req,
+                                     intera_core_msgs::SolvePositionIK::Response &res)
+{
     ros::Rate loop_rate(100);
     sensor_msgs::JointState joint_pose;
     res.joints.resize(req.pose_stamp.size());
-    // res.isValid.resize(req.pose_stamp.size());
     res.result_type.resize(req.pose_stamp.size());
-    for (size_t req_index = 0; req_index < req.pose_stamp.size(); req_index++) {
-
+    for (size_t req_index = 0; req_index < req.pose_stamp.size(); req_index++)
+    {
         int isValid=0;
         int valid_inp=0;
 
-        if(!req.seed_angles.empty() && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_CURRENT) {
-            isValid = m_kinematicsModel->getPositionIK(
-                                                                      req.pose_stamp[req_index], req.seed_angles[req_index], &joint_pose);
+        if (!req.seed_angles.empty() && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_CURRENT)
+        {
+            isValid = m_kinematicsModel->getPositionIK(req.pose_stamp[req_index], req.seed_angles[req_index], &joint_pose);
             res.joints[req_index].name.resize(joint_pose.name.size());
             res.result_type[req_index]=intera_core_msgs::SolvePositionIKRequest::SEED_USER;
             valid_inp=1;
         }
 
-        if((!isValid) && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_USER) {
-            isValid = m_kinematicsModel->getPositionIK(
-                                                                      req.pose_stamp[req_index], joint, &joint_pose);
+        if ((!isValid) && req.seed_mode != intera_core_msgs::SolvePositionIKRequest::SEED_USER)
+        {
+            isValid = m_kinematicsModel->getPositionIK(req.pose_stamp[req_index], joint, &joint_pose);
             res.joints[req_index].name.resize(joint_pose.name.size());
             res.result_type[req_index]=intera_core_msgs::SolvePositionIKRequest::SEED_CURRENT;
             valid_inp=1;
         }
 
-        if(!valid_inp) {
+        if (!valid_inp)
+        {
             ROS_ERROR("Not a valid request message to the IK service");
             return false;
         }
 
-        if (isValid) {
+        if (isValid)
+        {
             res.joints[req_index].position.resize(joint_pose.position.size());
             res.joints[req_index].name = joint_pose.name;
             res.joints[req_index].position = joint_pose.position;
         }
         else
+        {
             res.result_type[req_index]=intera_core_msgs::SolvePositionIKResponse::IK_FAILED;
+        }
     }
     loop_rate.sleep();
 }
@@ -209,9 +215,11 @@ bool position_kinematics::IKCallback(
 kinematics::position_kinematics::poskin_ptr g_pNode;
 
 //! Helper function for
-void quitRequested(int) {
+void quitRequested(int)
+{
     ROS_INFO("position_kinematics: Terminating program...");
-    if (g_pNode) {
+    if (g_pNode)
+    {
         g_pNode->exit();
         g_pNode.reset();
     }
@@ -221,10 +229,12 @@ void quitRequested(int) {
  * Entry point for program. Sets up Node, parses
  * command line arguments, then control loop (calling run() on Node)
  */
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     std::string side = argc > 1 ? argv[1] : "";
-    if (side != "left" && side != "right") {
-        fprintf(stderr, "Usage: %s <left | right>\n", argv[0]);
+    if (side != "right")
+    {
+        fprintf(stderr, "Usage: %s <right>\n", argv[0]);
         return 1;
     }
     ros::init(argc, argv, "sawyer_sim_kinematics_" + side);
@@ -237,10 +247,10 @@ int main(int argc, char* argv[]) {
     g_pNode = kinematics::position_kinematics::create(side);
 
     //test to see if pointer is valid
-    if (g_pNode) {
+    if (g_pNode)
+    {
         g_pNode->run();
     }
-
     //position_kinematics calls ros::shutdown upon exit, just return here
     return 0;
 }
