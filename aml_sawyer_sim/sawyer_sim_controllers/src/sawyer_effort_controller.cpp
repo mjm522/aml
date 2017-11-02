@@ -168,8 +168,8 @@ void SawyerEffortController::commandCB(const intera_core_msgs::JointCommandConst
 //Check if the number of joints and effort values are equal
     if( msg->effort.size() != msg->names.size() )
     {
-        ROS_ERROR_STREAM_NAMED("update","List of names does not match list of efforts size, "
-                               << msg->effort.size() << " != " << msg->names.size() );
+        // ROS_ERROR_STREAM_NAMED("update","List of names does not match list of efforts size, "
+        //                        << msg->effort.size() << " != " << msg->names.size() );
         return;
     }
 

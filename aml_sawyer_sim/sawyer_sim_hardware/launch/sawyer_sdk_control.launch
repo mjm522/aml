@@ -13,13 +13,13 @@
 
   <!-- load the default controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-	output="screen" ns="/robot" args="joint_state_controller" />
+	output="screen" ns="/robot" args="joint_state_controller
+					  right_joint_position_controller" />
 
   <!-- load the stopped controllers -->
   <node name="controller_spawner_stopped" pkg="controller_manager" type="spawner" respawn="false"
 	output="screen" ns="/robot" args=" --stopped
 					   head_position_controller
-					   right_joint_position_controller
 					   right_joint_velocity_controller
 					   right_joint_effort_controller
 					   " />  
@@ -34,4 +34,6 @@
   <rosparam param="/robot_config/assembly_names">[head, right, torso]</rosparam>
   <rosparam param="/manifest/robot_software/version/HLR_VERSION_STRING">5.1.0.173</rosparam>
   
+  <rosparam param="/named_poses/right/poses/neutral">[0.00, -1.18, 0.00, 2.18, 0.00, 0.57, 3.3161]</rosparam>
+  <rosparam param="/named_poses/head/poses/neutral">[0.00]</rosparam>
 </launch>
