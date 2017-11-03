@@ -35,7 +35,6 @@
           -J sawyer::head_pan 0.00" />
 
   <!-- ros_control sawyer launch file -->
-<!--   <include file="$(find sawyer_sim_hardware)/launch/sdk_control.launch" /> -->
   <include file="$(find sawyer_sim_hardware)/launch/sawyer_sdk_control.launch" />
 
 </launch>
