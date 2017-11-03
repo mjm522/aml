@@ -15,6 +15,7 @@ from std_msgs.msg import (
 
 import intera_interface
 from intera_interface import CHECK_VERSION
+import intera_external_devices
 
 from intera_core_msgs.msg import SEAJointState
 
@@ -27,6 +28,8 @@ from aml_perception import camera_sensor
 from aml_lfd.utilities.utilities import compute_omg
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
+
+
 
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
@@ -144,6 +147,15 @@ class SawyerArm(intera_interface.Limb):
 
         self._camera = camera_sensor.CameraSensor()
 
+
+        self._gripper = None
+
+        try:
+            self._gripper = intera_interface.Gripper(limb)
+        except ValueError:
+            rospy.logerr("Could not detect a gripper attached to the robot.")
+            return
+
     def _gravity_comp_callback(self, msg):
         self._h = msg.gravity_model_effort
         # print "commanded_effort \n",   msg.commanded_effort
@@ -158,6 +170,7 @@ class SawyerArm(intera_interface.Limb):
         # print "difference effort \n", np.array(msg.commanded_effort) - np.array(msg.actual_effort)
         # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
         # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
+
 
 
     def _update_state(self):
@@ -213,6 +226,47 @@ class SawyerArm(intera_interface.Limb):
 
     def get_state(self):
         return self._state
+
+
+    def get_gripper_state(self):
+        gripper_state = {}
+
+        if self._gripper is not None:
+            gripper_state['position'] = self._gripper.get_position()
+            gripper_state['force'] = self._gripper.get_force()
+            
+
+        return gripper_state
+
+    def exec_gripper_cmd(self, pos, force = None):
+
+        if self._gripper is None:
+            return
+
+        if force is not None:
+            holding_force = min(max(self._gripper.MIN_FORCE,force),self._gripper.MAX_FORCE)
+
+            self._gripper.set_holding_force(holding_force)
+
+        position = min(self._gripper.MAX_POSITION,max(self._gripper.MIN_POSITION,pos))
+
+        self._gripper.set_position(pos)
+
+    def exec_gripper_cmd_delta(self, pos_delta, force_delta = None):
+
+        if self._gripper is None:
+            return
+
+        if force_delta is not None:
+            force = self._gripper.get_force()
+            holding_force = min(max(self._gripper.MIN_FORCE,force+force_delta),self._gripper.MAX_FORCE)
+
+            self._gripper.set_holding_force(holding_force)
+
+        pos = self._gripper.get_position()
+        position = min(self._gripper.MAX_POSITION,max(self._gripper.MIN_POSITION,pos + pos_delta))
+        
+        self._gripper.set_position(position)
         
 
     def _on_joint_states(self, msg):
