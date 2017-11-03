@@ -32,4 +32,12 @@
     </description>
   </class>
 
+  <class name="sawyer_sim_controllers/SawyerGripperController"
+	 type="sawyer_sim_controllers::SawyerGripperController"
+	 base_class_type="controller_interface::ControllerBase">
+    <description>
+      The SawyerGripperController tracks gripper commands for the Sawyer end effector. It expects a EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+
 </library>

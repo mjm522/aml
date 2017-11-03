@@ -42,7 +42,13 @@ const std::string SAWYER_STATE_TOPIC = "robot/state";
 const std::string SAWYER_ENABLE_TOPIC = "robot/set_super_enable";
 const std::string SAWYER_STOP_TOPIC = "robot/set_super_stop";
 const std::string SAWYER_RESET_TOPIC = "robot/set_super_reset";
-const std::string SAWYER_DISPLAY_TOPIC = "robot/xdisplay";
+const std::string SAWYER_DISPLAY_TOPIC = "robot/head_display";
+
+const std::string SAWYER_RIGHT_GRIPPER_ST = "io/end_effector/state";
+const std::string SAWYER_RIGHT_GRIPPER_PROP = "io/end_effector/config";
+
+const std::string SAWYER_RIGHT_GRIPPER_ST_SUB = "io/end_effector/right_gripper/state";
+const std::string SAWYER_RIGHT_GRIPPER_PROP_SUB = "io/end_effector/right_gripper/config";
 
 const std::string SAWYER_JOINT_TOPIC = "robot/joint_states";
 
@@ -52,23 +58,25 @@ const std::string SAWYER_RIGHT_IR_STATE_TOPIC = "robot/analog_io/right_hand_rang
 const std::string SAWYER_RIGHT_IR_INT_TOPIC = "robot/analog_io/right_hand_range/value_uint32";
 
 const std::string SAWYER_NAV_LIGHT_TOPIC = "robot/digital_io/command";
-const std::string SAWYER_RIGHTIL_TOPIC = "robot/digital_io/right_itb_light_inner/state";
-const std::string SAWYER_RIGHTOL_TOPIC = "robot/digital_io/right_itb_light_outer/state";
-const std::string SAWYER_TORSO_RIGHTIL_TOPIC = "robot/digital_io/torso_right_itb_light_inner/state";
-const std::string SAWYER_TORSO_RIGHTOL_TOPIC = "robot/digital_io/torso_right_itb_light_outer/state";
+const std::string SAWYER_RIGHTIL_TOPIC = "robot/digital_io/right_inner_light/state";
+const std::string SAWYER_RIGHTOL_TOPIC = "robot/digital_io/right_outer_light/state";
+const std::string SAWYER_TORSO_RIGHTIL_TOPIC = "robot/digital_io/torso_right_inner_light/state";
+const std::string SAWYER_TORSO_RIGHTOL_TOPIC = "robot/digital_io/torso_right_outer_light/state";
 
 const std::string SAWYER_HEAD_STATE_TOPIC = "robot/head/head_state";
 
 const std::string SAWYER_RIGHT_GRAVITY_TOPIC = "robot/limb/right/gravity_compensation_torques";
 
-const int IMG_LOAD_ON_STARTUP_DELAY = 35;  // Timeout for publishing a single RSDK image on start up
+const std::string SAWYER_SIM_STARTED = "robot/sim/started";
+
+const int IMG_LOAD_ON_STARTUP_DELAY = 1;  // Timeout for publishing a single RSDK image on start up
 
 enum nav_light_enum
 {
-    right_itb_light_inner,
-    torso_right_itb_light_inner,
-    right_itb_light_outer,
-    torso_right_itb_light_outer
+    right_inner_light,
+    torso_right_inner_light,
+    right_outer_light,
+    torso_right_outer_light
 };
 
 std::map<std::string, nav_light_enum> nav_light;
@@ -83,6 +91,52 @@ bool sawyer_emulator::init()
     assembly_state.error = false;    // true if a component of the assembly has an error
     assembly_state.estop_button = intera_core_msgs::AssemblyState::ESTOP_BUTTON_UNPRESSED;  // button status
     assembly_state.estop_source = intera_core_msgs::AssemblyState::ESTOP_SOURCE_NONE;  // If stopped is true, the source of the e-stop.
+
+    //Default values for the right gripper end effector states
+    right_grip_st.signals.push_back(intera_core_msgs::IODataStatus());
+    right_grip_st.signals[0].name = "calibrate";
+    right_grip_st.signals[0].format =
+"{\n"
+"    \"type\": \"bool\",\n"
+"    \"role\": \"input\"\n"
+"}";
+    right_grip_st.signals[0].data = "[true]";
+    right_grip_st.signals[0].status = intera_core_msgs::IOStatus();
+    right_grip_st.signals[0].status.tag = "readay";
+    right_grip_st.signals[0].status.key = "io/ready";
+    right_grip_st.signals[0].status.msg = "";
+
+    right_grip_st.signals.push_back(intera_core_msgs::IODataStatus());
+    right_grip_st.signals[1].name = "position_m";
+    right_grip_st.signals[1].format =
+"{\n"
+"    \"type\": \"float\",\n"
+"    \"role\": \"input\"\n"
+"}";
+    right_grip_st.signals[1].data = "[0.0]";
+    right_grip_st.signals[1].status = intera_core_msgs::IOStatus();
+    right_grip_st.signals[1].status.tag = "readay";
+    right_grip_st.signals[1].status.key = "io/ready";
+    right_grip_st.signals[1].status.msg = "";
+
+    right_grip_st.signals.push_back(intera_core_msgs::IODataStatus());
+    right_grip_st.signals[2].name = "position_response_m";
+    right_grip_st.signals[2].format =
+"{\n"
+"    \"type\": \"float\",\n"
+"    \"role\": \"output\"\n"
+"}";
+    right_grip_st.signals[2].data = "[0.0]";
+    right_grip_st.signals[2].status = intera_core_msgs::IOStatus();
+    right_grip_st.signals[2].status.tag = "readay";
+    right_grip_st.signals[2].status.key = "io/ready";
+    right_grip_st.signals[2].status.msg = "";
+
+    right_grip_prop.devices.push_back(intera_core_msgs::IOComponentConfiguration());
+    right_grip_prop.devices[0].name = "right_gripper";
+    right_grip_prop.devices[0].config = "";
+
+    right_grip_dev.device.name = "right_gripper";
 
     rightIL_nav_light.isInputOnly = false;
     rightOL_nav_light.isInputOnly = false;
@@ -102,26 +156,35 @@ bool sawyer_emulator::init()
     right_gravity.header.frame_id="base";
 
     // Initialize the map that would be used in the nav_light_cb
-    nav_light["right_itb_light_inner"] = right_itb_light_inner;
-    nav_light["torso_right_itb_light_inner"] = torso_right_itb_light_inner;
-    nav_light["right_itb_light_outer"] = right_itb_light_outer;
-    nav_light["torso_right_itb_light_outer"] = torso_right_itb_light_outer;
+    nav_light["right_inner_light"] = right_inner_light;
+    nav_light["torso_right_inner_light"] = torso_right_inner_light;
+    nav_light["right_outer_light"] = right_outer_light;
+    nav_light["torso_right_outer_light"] = torso_right_outer_light;
 
     // Initialize the publishers
     assembly_state_pub = n.advertise<intera_core_msgs::AssemblyState>(SAWYER_STATE_TOPIC, 1);
+
+    right_grip_st_pub = n.advertise<intera_core_msgs::IODeviceStatus>(SAWYER_RIGHT_GRIPPER_ST, 1);
+    right_grip_prop_pub = n.advertise<intera_core_msgs::IONodeConfiguration>(SAWYER_RIGHT_GRIPPER_PROP, 1);
+
+    right_grip_st_sub_pub = n.advertise<intera_core_msgs::IODeviceStatus>(SAWYER_RIGHT_GRIPPER_ST_SUB, 1);
+    right_grip_prop_sub_pub = n.advertise<intera_core_msgs::IODeviceConfiguration>(SAWYER_RIGHT_GRIPPER_PROP_SUB, 1);
 
     right_ir_pub = n.advertise<sensor_msgs::Range>(SAWYER_RIGHT_IR_TOPIC, 1);
     right_ir_state_pub = n.advertise<intera_core_msgs::AnalogIOState>(SAWYER_RIGHT_IR_STATE_TOPIC, 1);
     right_ir_int_pub = n.advertise<std_msgs::UInt32>(SAWYER_RIGHT_IR_INT_TOPIC, 1);
 
-    right_itb_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_RIGHTIL_TOPIC, 1);
-    right_itb_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_RIGHTOL_TOPIC, 1);
-    torso_right_innerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_TORSO_RIGHTIL_TOPIC, 1);
-    torso_right_outerL_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_TORSO_RIGHTOL_TOPIC, 1);
+    right_inner_light_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_RIGHTIL_TOPIC, 1);
+    right_outer_light_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_RIGHTOL_TOPIC, 1);
+    torso_right_inner_light_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_TORSO_RIGHTIL_TOPIC, 1);
+    torso_right_outer_light_pub = n.advertise<intera_core_msgs::DigitalIOState>(SAWYER_TORSO_RIGHTOL_TOPIC, 1);
 
     right_grav_pub = n.advertise<intera_core_msgs::SEAJointState>(SAWYER_RIGHT_GRAVITY_TOPIC, 1);
 
     head_pub = n.advertise<intera_core_msgs::HeadState>(SAWYER_HEAD_STATE_TOPIC,1);
+
+    // Latched Simulator Started Publisher
+    sim_started_pub = n.advertise<std_msgs::Empty>(SAWYER_SIM_STARTED, 1, true);
 
     // Initialize the subscribers
     enable_sub = n.subscribe(SAWYER_ENABLE_TOPIC, 100, &sawyer_emulator::enable_cb, this);
@@ -129,7 +192,7 @@ bool sawyer_emulator::init()
     reset_sub = n.subscribe(SAWYER_RESET_TOPIC, 100, &sawyer_emulator::reset_cb, this);
     jnt_st = n.subscribe(SAWYER_JOINT_TOPIC, 100, &sawyer_emulator::update_jnt_st, this);
 
-    right_laser_sub = n.subscribe(SAWYER_RIGHT_LASER_TOPIC, 100, &sawyer_emulator::right_laser_cb, this);
+    // right_laser_sub = n.subscribe(SAWYER_RIGHT_LASER_TOPIC, 100, &sawyer_emulator::right_laser_cb, this);
     nav_light_sub = n.subscribe(SAWYER_NAV_LIGHT_TOPIC, 100, &sawyer_emulator::nav_light_cb, this);
 }
 
@@ -146,6 +209,7 @@ void sawyer_emulator::publish(const std::string &img_path)
 
     image_transport::ImageTransport it(n);
     image_transport::Publisher display_pub = it.advertise(SAWYER_DISPLAY_TOPIC, 1);
+
     // Read OpenCV Mat image and convert it to ROS message
     cv_bridge::CvImagePtr cv_ptr(new cv_bridge::CvImage);
     try
@@ -164,16 +228,27 @@ void sawyer_emulator::publish(const std::string &img_path)
     }
 
     ROS_INFO("Simulator is loaded and started successfully");
+    std_msgs::Empty started_msg;
+    sim_started_pub.publish(started_msg);
+
     while (ros::ok())
     {
         assembly_state_pub.publish(assembly_state);
+
+        right_grip_st_pub.publish(right_grip_st);
+        right_grip_prop_pub.publish(right_grip_prop);
+
+        right_grip_st_sub_pub.publish(right_grip_st);
+        right_grip_prop_sub_pub.publish(right_grip_dev);
+
         right_ir_pub.publish(right_ir);
         right_ir_state_pub.publish(right_ir_state);
         right_ir_int_pub.publish(right_ir_int);
-        right_itb_innerL_pub.publish(rightIL_nav_light);
-        right_itb_outerL_pub.publish(rightOL_nav_light);
-        torso_right_innerL_pub.publish(torso_rightIL_nav_light);
-        torso_right_outerL_pub.publish(torso_rightOL_nav_light);
+        right_inner_light_pub.publish(rightIL_nav_light);
+        right_outer_light_pub.publish(rightOL_nav_light);
+        torso_right_inner_light_pub.publish(torso_rightIL_nav_light);
+        torso_right_outer_light_pub.publish(torso_rightOL_nav_light);
+
         head_pub.publish(head_msg);
         kin.getGravityTorques(jstate_msg, right_gravity, assembly_state.enabled);
         right_gravity.header.stamp = ros::Time::now();
@@ -228,30 +303,6 @@ void sawyer_emulator::reset_cb(const std_msgs::Empty &msg)
     isStopped = false;
 }
 
-/**
- * Method to capture the laser data and pass it as IR data for the right arm
- */
-void sawyer_emulator::right_laser_cb(const sensor_msgs::LaserScan &msg)
-{
-    right_ir.header = msg.header;
-    right_ir.min_range = msg.range_min;
-    right_ir.max_range = msg.range_max;
-    right_ir.radiation_type = 1;
-    right_ir.field_of_view = 0.0872664600611;
-    if (msg.ranges[0] < msg.range_max && msg.ranges[0] > msg.range_min)
-    {
-        right_ir.range = msg.ranges[0];
-    }
-    else
-    {
-        right_ir.range = 65.5350036621;
-    }
-    right_ir_state.timestamp = right_ir.header.stamp;
-    right_ir_state.value = right_ir.range / 1000;
-    right_ir_state.isInputOnly = true;
-    right_ir_int.data = right_ir.range;
-}
-
 void sawyer_emulator::nav_light_cb(const intera_core_msgs::DigitalOutputCommand &msg)
 {
     int res;
@@ -266,16 +317,16 @@ void sawyer_emulator::nav_light_cb(const intera_core_msgs::DigitalOutputCommand 
 
     switch (nav_light.find(msg.name)->second)
     {
-        case right_itb_light_inner:
+        case right_inner_light:
             rightIL_nav_light.state = res;
             break;
-        case torso_right_itb_light_inner:
+        case torso_right_inner_light:
             torso_rightIL_nav_light.state = res;
             break;
-        case right_itb_light_outer:
+        case right_outer_light:
             rightOL_nav_light.state = res;
             break;
-        case torso_right_itb_light_outer:
+        case torso_right_outer_light:
             torso_rightOL_nav_light.state = res;
             break;
         default:
@@ -291,6 +342,7 @@ void sawyer_emulator::update_jnt_st(const sensor_msgs::JointState &msg)
     right_gravity.actual_position.resize(right_gravity.name.size());
     right_gravity.actual_velocity.resize(right_gravity.name.size());
     right_gravity.actual_effort.resize(right_gravity.name.size());
+
     for (int i = 0; i < msg.name.size(); i++)
     {
         if (msg.name[i] == "head_pan")
@@ -304,6 +356,13 @@ void sawyer_emulator::update_jnt_st(const sensor_msgs::JointState &msg)
                 head_msg.isTurning = false;
             }
             head_msg.pan = msg.position[i];
+        }
+        else if (msg.name[i] == "r_gripper_l_finger_joint")
+        {
+            std::ostringstream stm ;
+            stm << (msg.position[i]/0.020833)*100;
+            // intera_interface.gripper.get_position() will return "position_response_m"
+            right_grip_st.signals[2].data = std::string("[") + stm.str() + std::string("]");
         }
         else
         {

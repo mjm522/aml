@@ -43,6 +43,9 @@
 
 //Sawyer Specific Messages
 #include <intera_core_msgs/AssemblyState.h>
+#include <intera_core_msgs/IODeviceStatus.h>
+#include <intera_core_msgs/IONodeConfiguration.h>
+#include <intera_core_msgs/IODeviceConfiguration.h>
 #include <intera_core_msgs/JointCommand.h>
 #include <intera_core_msgs/AnalogIOState.h>
 #include <intera_core_msgs/DigitalOutputCommand.h>
@@ -96,12 +99,17 @@ namespace sawyer_en
         ros::Subscriber enable_sub, stop_sub, reset_sub,
             right_laser_sub, nav_light_sub, jnt_st;
 
+        // Gripper Publishers
+        ros::Publisher right_grip_st_pub, right_grip_prop_pub,
+            right_grip_st_sub_pub, right_grip_prop_sub_pub;
+
         // Infrared publishers
         ros::Publisher right_ir_pub, right_ir_int_pub, right_ir_state_pub;
 
         // Navigator publishers
-        ros::Publisher right_itb_innerL_pub,
-            torso_right_innerL_pub, right_itb_outerL_pub, torso_right_outerL_pub;
+        ros::Publisher right_inner_light_pub, right_outer_light_pub,
+            torso_right_inner_light_pub,
+            torso_right_outer_light_pub;
 
         // General state publishers
         ros::Publisher assembly_state_pub, head_pub;
@@ -109,11 +117,18 @@ namespace sawyer_en
         // Gravity Publishers
         ros::Publisher right_grav_pub;
 
+        // Simulator has Started notification Publisher
+        ros::Publisher sim_started_pub;
+
         ros::NodeHandle n;
         ros::Timer head_nod_timer;
 
         intera_core_msgs::HeadState head_msg;
         intera_core_msgs::AssemblyState assembly_state;
+
+        intera_core_msgs::IODeviceStatus right_grip_st;
+        intera_core_msgs::IONodeConfiguration right_grip_prop;
+        intera_core_msgs::IODeviceConfiguration right_grip_dev;
 
         intera_core_msgs::AnalogIOState right_ir_state;
 
@@ -141,11 +156,6 @@ namespace sawyer_en
          * Callback function to reset all the state values to False and 0s
          */
         void reset_cb(const std_msgs::Empty &msg);
-
-        /**
-         * Callback function to update the right laser values
-         */
-        void right_laser_cb(const sensor_msgs::LaserScan &msg);
 
         /**
          * Callback function to update the navigators' light values
