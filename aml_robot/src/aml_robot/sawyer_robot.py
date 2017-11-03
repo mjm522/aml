@@ -252,6 +252,18 @@ class SawyerArm(intera_interface.Limb):
 
         self._gripper.set_position(pos)
 
+    def set_gripper_speed(self, speed):
+
+         if self._gripper is not None:
+
+            self._gripper.set_speed(speed)
+
+    def set_arm_speed(self,speed):
+
+        self.set_joint_position_speed(speed)
+
+
+
     def exec_gripper_cmd_delta(self, pos_delta, force_delta = None):
 
         if self._gripper is None:

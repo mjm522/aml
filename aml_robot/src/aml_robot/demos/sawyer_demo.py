@@ -33,8 +33,6 @@ obj = SomeObj()
 limb = SawyerArm('right',partial(callback,obj))
 limb.untuck_arm()
 
-limb.exec_gripper_cmd(0)
-
 rospy.sleep(3)
 
 start_pos, start_ori = limb.get_ee_pose()
@@ -42,7 +40,6 @@ start_pos, start_ori = limb.get_ee_pose()
 goal_pos = start_pos + np.array([0.2,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
 print "GOALORI: ", goal_ori
-
 
 
 
@@ -54,7 +51,7 @@ while not rospy.is_shutdown():
 
 	print success, joints
 
-	print "CURRENT STATE:", limb.angles(), limb.get_gripper_state()
+	print "CURRENT STATE:", limb.angles()
 	limb.exec_position_cmd(joints)
 
 	rate.sleep()
