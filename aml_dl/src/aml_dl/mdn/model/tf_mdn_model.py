@@ -97,7 +97,8 @@ class MixtureDensityNetwork(object):
 
                 input_op = tf.nn.tanh(tf.matmul(input_op, Wh) + bh)
 
-                reg_terms.append(tf.norm(Wh, 2) + tf.norm(bh, 2))
+                get_reg_term = lambda input_tensor: tf.sqrt(tf.reduce_sum(tf.square(input_tensor)))
+                reg_terms.append(get_reg_term(Wh) + get_reg_term(bh))
 
             input_dim = input_op.get_shape().dims[1].value
 

@@ -48,15 +48,18 @@
 #include <intera_core_msgs/JointCommand.h>
 #include <intera_core_msgs/AssemblyState.h>
 #include <intera_core_msgs/HeadPanCommand.h>
+#include <intera_core_msgs/IOComponentCommand.h>
 
-namespace sawyer_gazebo_plugin {
+namespace sawyer_gazebo_plugin
+{
 
-class SawyerGazeboRosControlPlugin :
-        public gazebo_ros_control::GazeboRosControlPlugin {
+class SawyerGazeboRosControlPlugin : public gazebo_ros_control::GazeboRosControlPlugin
+{
 private:
     ros::Subscriber right_command_mode_sub_;
     ros::Subscriber robot_state_sub_;
     ros::Subscriber head_state_sub;
+    ros::Subscriber right_gripper_state_sub;
 
     // Rate to publish assembly state
     ros::Timer timer_;
@@ -68,7 +71,7 @@ private:
     intera_core_msgs::JointCommand right_command_mode_;
 
     boost::mutex mtx_;  // mutex for re-entrent calls to modeCommandCallback
-    bool enable_cmd, is_disabled, head_is_started;  // enabled tracks the current status of the robot that is being published & is_disabled keeps track of the action taken
+    bool enable_cmd, is_disabled, head_is_started, right_gripper_is_started;  // enabled tracks the current status of the robot that is being published & is_disabled keeps track of the action taken
 
 public:
 
@@ -89,6 +92,9 @@ public:
             = model_nh_.subscribe < intera_core_msgs::HeadPanCommand> ("/robot/head/command_head_pan",
                                                                        1, &SawyerGazeboRosControlPlugin::headCommandCallback, this);
 
+        model_nh_.subscribe < intera_core_msgs::IOComponentCommand> ("/io/end_effector/right_gripper/command",
+                                                                     1, &SawyerGazeboRosControlPlugin::rightEndEffectorCommandCallback, this);
+
         //Subscribe to the topic that publishes the robot's state
         robot_state_sub_
             = model_nh_.subscribe < intera_core_msgs::AssemblyState> ("/robot/state",
@@ -98,6 +104,7 @@ public:
         is_disabled = false;
         right_command_mode_.mode = -1;
         head_is_started = false;
+        right_gripper_is_started = false;
     }
 
     void enableCommandCallback(const intera_core_msgs::AssemblyState msg)
@@ -113,6 +120,7 @@ public:
             stop_controllers.push_back("right_joint_velocity_controller");
             stop_controllers.push_back("right_joint_position_controller");
             stop_controllers.push_back("head_position_controller");
+            stop_controllers.push_back("right_gripper_controller");
 
             if (!controller_manager_->switchController(start_controllers, stop_controllers,
                                                        controller_manager_msgs::SwitchController::Request::BEST_EFFORT))
@@ -127,8 +135,37 @@ public:
                 ROS_INFO("Gravity compensation was turned off");
                 right_command_mode_.mode = -1;
                 head_is_started=false;
+                right_gripper_is_started = false;
                 is_disabled = true;
             }
+        }
+    }
+
+    void rightEndEffectorCommandCallback(const intera_core_msgs::IOComponentCommand msg)
+    {
+        if (!right_gripper_is_started && enable_cmd)
+        {
+            std::vector < std::string > start_controllers;
+            std::vector < std::string > stop_controllers;
+
+            start_controllers.push_back("right_gripper_controller");
+            if (!controller_manager_->switchController(start_controllers, stop_controllers,
+                                                       controller_manager_msgs::SwitchController::Request::STRICT))
+            {
+                ROS_ERROR_STREAM_NAMED("sawyer_gazebo_ros_control_plugin",
+                                       "Failed to switch controllers");
+            }
+            else {
+                ROS_INFO("Robot is enabled");
+                ROS_INFO("Right Grippercontroller was successfully started");
+                ROS_INFO("Gravity compensation was turned on");
+                right_gripper_is_started=true;
+                is_disabled=false;
+            }
+        }
+        else
+        {
+            return;
         }
     }
 
