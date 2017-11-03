@@ -16,7 +16,7 @@
       </gravity>
     </physics>
 
-    <model name='table'>
+    <!-- <model name='table'>
       <include>
         <uri>model://table</uri>
       </include>
@@ -59,7 +59,7 @@
           </material>
         </visual>
       </link>
-    </model>
+    </model> -->
 
   </world>
 </sdf>
