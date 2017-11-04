@@ -44,7 +44,7 @@ class DiscreteDMPShell():
 
             traj = self._demo_traj[:,ID]
             nsample = np.arange(0.,  len(traj)*self._dt, self._dt)
-            nnsample = np.arange(0., len(traj)*self._dt-2*self._dt,  (len(traj)*self._dt-2*self._dt) / (1./self._dt))
+            nnsample = np.arange(0., len(traj)*self._dt-4*self._dt,  (len(traj)*self._dt-4*self._dt) / (1./self._dt))
             traj_data[:,ID+1] = interp1d(nsample, traj)(nnsample)
         
         return traj_data
