@@ -19,13 +19,13 @@ def gravity_comp_callback(msg):
 
     torques = limb.joint_efforts()
     # print torques
-    torques['right_j0'] = msg.gravity_model_effort[0]
-    torques['right_j1'] = msg.gravity_model_effort[1]
-    torques['right_j2'] = msg.gravity_model_effort[2]
-    torques['right_j3'] = msg.gravity_model_effort[3]
-    torques['right_j4'] = msg.gravity_model_effort[4]
-    torques['right_j5'] = msg.gravity_model_effort[5]
-    torques['right_j6'] = msg.gravity_model_effort[6]
+    torques['right_j0'] = 0.01*msg.gravity_model_effort[0]
+    torques['right_j1'] = 0.01*msg.gravity_model_effort[1]
+    torques['right_j2'] = 0.01*msg.gravity_model_effort[2]
+    torques['right_j3'] = 0.01*msg.gravity_model_effort[3]
+    torques['right_j4'] = 0.01*msg.gravity_model_effort[4]
+    torques['right_j5'] = 0.01*msg.gravity_model_effort[5]
+    torques['right_j6'] = 0.01*msg.gravity_model_effort[6]
     limb.set_joint_torques(torques)
 
 def listener():
