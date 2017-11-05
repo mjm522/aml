@@ -92,10 +92,11 @@ public:
             = model_nh_.subscribe < intera_core_msgs::HeadPanCommand> ("/robot/head/command_head_pan",
                                                                        1, &SawyerGazeboRosControlPlugin::headCommandCallback, this);
 
-        model_nh_.subscribe < intera_core_msgs::IOComponentCommand> ("/io/end_effector/right_gripper/command",
-                                                                     1, &SawyerGazeboRosControlPlugin::rightEndEffectorCommandCallback, this);
+        // right_gripper_state_sub
+        //     = model_nh_.subscribe < intera_core_msgs::IOComponentCommand> ("/io/end_effector/right_gripper/command",
+        //                                                                    1, &SawyerGazeboRosControlPlugin::rightEndEffectorCommandCallback, this);
 
-        //Subscribe to the topic that publishes the robot's state
+        // Subscribe to the topic that publishes the robot's state
         robot_state_sub_
             = model_nh_.subscribe < intera_core_msgs::AssemblyState> ("/robot/state",
                                                                       1, &SawyerGazeboRosControlPlugin::enableCommandCallback, this);
@@ -120,7 +121,7 @@ public:
             stop_controllers.push_back("right_joint_velocity_controller");
             stop_controllers.push_back("right_joint_position_controller");
             stop_controllers.push_back("head_position_controller");
-            stop_controllers.push_back("right_gripper_controller");
+            // stop_controllers.push_back("right_gripper_controller");
 
             if (!controller_manager_->switchController(start_controllers, stop_controllers,
                                                        controller_manager_msgs::SwitchController::Request::BEST_EFFORT))
@@ -141,33 +142,33 @@ public:
         }
     }
 
-    void rightEndEffectorCommandCallback(const intera_core_msgs::IOComponentCommand msg)
-    {
-        if (!right_gripper_is_started && enable_cmd)
-        {
-            std::vector < std::string > start_controllers;
-            std::vector < std::string > stop_controllers;
+    // void rightEndEffectorCommandCallback(const intera_core_msgs::IOComponentCommand msg)
+    // {
+    //     if (!right_gripper_is_started && enable_cmd)
+    //     {
+    //         std::vector < std::string > start_controllers;
+    //         std::vector < std::string > stop_controllers;
 
-            start_controllers.push_back("right_gripper_controller");
-            if (!controller_manager_->switchController(start_controllers, stop_controllers,
-                                                       controller_manager_msgs::SwitchController::Request::STRICT))
-            {
-                ROS_ERROR_STREAM_NAMED("sawyer_gazebo_ros_control_plugin",
-                                       "Failed to switch controllers");
-            }
-            else {
-                ROS_INFO("Robot is enabled");
-                ROS_INFO("Right Grippercontroller was successfully started");
-                ROS_INFO("Gravity compensation was turned on");
-                right_gripper_is_started=true;
-                is_disabled=false;
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
+    //         start_controllers.push_back("right_gripper_controller");
+    //         if (!controller_manager_->switchController(start_controllers, stop_controllers,
+    //                                                    controller_manager_msgs::SwitchController::Request::STRICT))
+    //         {
+    //             ROS_ERROR_STREAM_NAMED("sawyer_gazebo_ros_control_plugin",
+    //                                    "Failed to switch controllers");
+    //         }
+    //         else {
+    //             ROS_INFO("Robot is enabled");
+    //             ROS_INFO("Right Grippercontroller was successfully started");
+    //             ROS_INFO("Gravity compensation was turned on");
+    //             right_gripper_is_started=true;
+    //             is_disabled=false;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         return;
+    //     }
+    // }
 
     void headCommandCallback(const intera_core_msgs::HeadPanCommand msg)
     {
@@ -178,7 +179,7 @@ public:
 
             start_controllers.push_back("head_position_controller");
             if (!controller_manager_->switchController(start_controllers, stop_controllers,
-                                                       controller_manager_msgs::SwitchController::Request::BEST_EFFORT))
+                                                       controller_manager_msgs::SwitchController::Request::STRICT))
             {
                 ROS_ERROR_STREAM_NAMED("sawyer_gazebo_ros_control_plugin",
                                        "Failed to switch controllers");

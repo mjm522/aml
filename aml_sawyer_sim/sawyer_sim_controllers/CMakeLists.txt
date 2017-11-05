@@ -11,23 +11,12 @@ find_package(catkin
 )
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
-find_path(YAML_CPP_INCLUDE_DIR
-          NAMES yaml_cpp.h
-          PATHS ${YAML_CPP_INCLUDE_DIRS})
-find_library(YAML_CPP_LIBRARY
-             NAMES YAML_CPP
-             PATHS ${YAML_CPP_LIBRARY_DIRS})
-if(${YAML_CPP_VERSION} VERSION_LESS 0.5)
-  add_definitions(-DDEPRECATED_YAML_CPP_VERSION)
-endif()
 
 catkin_package(
   CATKIN_DEPENDS
   controller_interface
   control_toolbox
   effort_controllers
-  DEPENDS yaml-cpp
   intera_core_msgs
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
@@ -49,7 +38,6 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${YAML_CPP_LIBRARIES}
 )
 
 add_dependencies(${PROJECT_NAME}

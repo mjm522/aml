@@ -23,15 +23,14 @@
 
   <!-- ros_control plugin -->
   <gazebo>
-    <plugin name="sawyer_limb_control" filename="libgazebo_ros_control.so">
-    <robotNamespace>/robot</robotNamespace>
-    <!-- <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType> -->
+    <plugin name="sawyer_arm_control" filename="libsawyer_gazebo_ros_control.so">
+      <robotNamespace>/robot</robotNamespace>
     </plugin>
   </gazebo>
 
   <gazebo>
-    <plugin name="sawyer_effector_control" filename="libgazebo_ros_control.so">
-    <robotNamespace>/io</robotNamespace>
+    <plugin name="sawyer_effector_control" filename="libintera_gripper_gazebo_ros_control.so">
+      <robotNamespace>/io</robotNamespace>
     </plugin>
   </gazebo>
 
@@ -43,6 +42,36 @@
         <topicName>/robot/head_display</topicName>
       </plugin>
     </visual>
+  </gazebo>
+
+
+   <!-- Gazebo-Specific Link Properties -->
+  <gazebo reference="torso">
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="head_pan">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_0">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_1">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_2">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_3">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_4">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_5">
+    <implicitSpringDamper>1</implicitSpringDamper>
+  </gazebo>
+  <gazebo reference="right_6">
+    <implicitSpringDamper>1</implicitSpringDamper>
   </gazebo>
 
 </robot>

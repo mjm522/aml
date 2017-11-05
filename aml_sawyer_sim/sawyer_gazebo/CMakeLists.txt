@@ -52,6 +52,21 @@ add_dependencies(
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_library(intera_gripper_gazebo_ros_control
+  src/intera_gripper_ros_control_plugin.cpp
+)
+
+target_link_libraries(intera_gripper_gazebo_ros_control
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+  gazebo_ros_control
+)
+
+add_dependencies(
+  intera_gripper_gazebo_ros_control
+  ${catkin_EXPORTED_TARGETS}
+)
+
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
