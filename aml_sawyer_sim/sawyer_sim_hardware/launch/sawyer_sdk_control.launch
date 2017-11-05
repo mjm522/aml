@@ -1,41 +1,36 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="right_electric_gripper" default="true"/>
-
   <!-- sawyer_sim_kinematics launch file to do the Forward/Inverse Kinematics -->
   <include file="$(find sawyer_sim_kinematics)/launch/sawyer_sim_kinematics.launch" />
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find sawyer_sim_hardware)/config/sawyer_sim_controllers.yaml" command="load"/>
 
-  <rosparam if="$(arg right_electric_gripper)"
-	    file="$(find sawyer_sim_hardware)/config/sawyer_right_electric_gripper_controller.yaml" command="load"/>
+  <rosparam file="$(find sawyer_sim_hardware)/config/sawyer_right_electric_gripper_controller.yaml" command="load"/>
 
   <!-- load the sawyer_sim_hardware node -->
   <node name="sawyer_emulator" pkg="sawyer_sim_hardware" type="sawyer_emulator" respawn="false"
-	output="screen" args="$(find sawyer_sim_hardware)/images/researchsdk.png">
-    <param if="$(arg right_electric_gripper)" name="right_gripper_type" value="ELECTRIC_GRIPPER" />
-  </node>
+	output="screen" args="$(find sawyer_sim_hardware)/images/researchsdk.png"/>
 
   <!-- load the default controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
 	output="screen" ns="/robot" args="--shutdown-timeout -1
 					  joint_state_controller
-					  right_joint_position_controller" />
+					  "/>
 
   <!-- load the stopped controllers -->
   <node name="controller_spawner_stopped" pkg="controller_manager" type="spawner" respawn="false"
 	output="screen" ns="/robot" args="--shutdown-timeout -1 --stopped
 					  head_position_controller
+					  right_joint_position_controller
 					  right_joint_velocity_controller
-					  right_joint_effort_controller
-					  " />
+					  right_joint_effort_controller"/>
 
   <!-- load gripper controller -->
-  <node if="$(arg right_electric_gripper)" name="right_gripper_controller_spawner_stopped"
-	pkg="controller_manager" type="spawner" respawn="false"
-	output="screen" ns="/io" args="--shutdown-timeout -1 --stopped right_gripper_controller"/>
+  <node name="right_gripper_controller_spawner_stopped" pkg="controller_manager" type="spawner"
+	respawn="false" output="screen" ns="/io" args="--shutdown-timeout -1 --stopped
+						       right_gripper_controller"/>
 
   <!-- convert joint states to TF transforms -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
@@ -44,6 +39,7 @@
 
   <rosparam param="/robot_config/right_config/joint_names">[right_j0, right_j1, right_j2, right_j3, right_j4, right_j5, right_j6]</rosparam>
 
+  <rosparam param="/manifest/robot_class">sawyer</rosparam>
   <rosparam param="/robot_config/assembly_names">[head, right, torso]</rosparam>
   <rosparam param="/manifest/robot_software/version/HLR_VERSION_STRING">5.1.0.173</rosparam>
 

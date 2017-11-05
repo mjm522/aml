@@ -38,10 +38,6 @@ Gazebo simulation with emulated interfaces for the Sawyer robot
 
 ### TODO
 ---------------------------------------
-* sawyer_sim_hardware
-    * Enable/Disable robot
-* sawyer_sim_kinematics
-    * Gravity compensation
-* Controller for gripper
+* Gravity compensation (bug? urdf?)
 * Tuning pid gain in sawyer_sim_hardware/config/sawyer_sim_controllers.yaml
 * Sensor reading
