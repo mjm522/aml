@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 from aml_ctrl.controllers.os_controllers.os_postn_controller  import OSPositionController
 from aml_ctrl.controllers.js_controllers.js_postn_controller  import JSPositionController
@@ -47,11 +49,14 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
     gen_traj    = JSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
 
     traj = gen_traj.generate_traj()
-    if reverse_traj is True:
+
+    if reverse_traj:
+        print "Reversing trajectory"
         for key in traj.keys():
+            print traj[key].shape
             traj[key] = np.flipud(traj[key]) 
 
-    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=traj, rate=rate)
+    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=traj, timeout=timeout, rate=rate)
 
     traj_player.player()
 
@@ -60,21 +65,25 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Play trajectory')
 
+    parser.add_argument('-m','--name', type=str, default="trajectory player")
+
     parser.add_argument('-r', '--rate', type=int, default=100, help='max loop execution rate')
 
     parser.add_argument('-l', '--list_trajectories', action='store_true', help='list trajectories at $AML_DATA/aml_lfd/')
 
     parser.add_argument('-n', '--idx_trajectory', type=int, default=0, help='trajectory index from the list of trajectories at $AML_DATA/aml_lfd')
 
-    parser.add_argument('-t', '--timeout', type=float, default=1.0, help='trajectory player timeout per waypoint')
+    parser.add_argument('-t', '--timeout', type=float, default=0.01, help='trajectory player timeout per waypoint')
+
+    parser.add_argument('-s', '--arm_speed', type=float, default=1.0, help='Arm speed for position control')
 
     parser.add_argument('-d', '--demo_folder', type=str, default='', help='demo folder, e.g. sawyer_right or right_grasp_exp')
 
     parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
 
-    parser.add_argument('-b', '--backward_playback', type=bool, default=False, help='Play trajectory backwards? (True/False)')
+    parser.add_argument('-b', '--backward_playback', action='store_true', help='Play trajectory backwards.')
 
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv()[1:])
 
     rospy.init_node('trajectory_player')
     
@@ -86,7 +95,7 @@ if __name__ == '__main__':
     limb = 'right'
     
     arm = ArmInterface(limb)
-
+    arm.set_arm_speed(max(min(args.arm_speed,0.20),0.01)) # WARNING: max 0.2 rad/s for safety reasons
     arm.set_sampling_rate(sampling_rate=700) # Arm should report its state as fast as possible.
 
     # Trajectories have been recorded at 30 hz, we can play faster or slower than what was recorded by choosing a faster or slower execution rate

@@ -1,0 +1,22 @@
+<launch>
+
+    <arg name="demo_folder" default="right_sawyer"/>
+    <arg name="arm_interface" default="sawyer"/>
+    <arg name="backward_playback" default=""/> <!-- or <arg name="backward_playback" default=""/> -->
+    <arg name="control_loop_rate" default="100"/>
+    <arg name="timeout" default="0.1"/>
+    <arg name="arm_speed" default="0.1"/>
+
+    <node pkg="aml_ctrl" type="demo_trajectory_player.py" 
+          name="demo_trajectory_player" 
+          args="-d $(arg demo_folder) 
+                -i $(arg arm_interface) 
+                $(arg backward_playback) 
+                -r $(arg control_loop_rate) 
+                -t $(arg timeout) 
+                -s $(arg arm_speed)" output="screen">
+    </node>
+
+
+</launch>
+
