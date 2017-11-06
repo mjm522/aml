@@ -12,7 +12,7 @@ import numpy as np
 import argparse
 
 
-def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None, timeout = 1.0, rate = 100):
+def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None, timeout = 1.0, rate = 100, reverse_traj = False):
     '''
     the JSTrajGenerator expects either a demo index or a direct path to the demo
     do not pass both of them together. This could be fixed when we have multiple demos to be played out
@@ -46,7 +46,12 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
     # gen_traj = OSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
     gen_traj    = JSTrajGenerator(load_from_demo=load_from_demo, **kwargs)
 
-    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=gen_traj.generate_traj(), rate=rate)
+    traj = gen_traj.generate_traj()
+    if reverse_traj is True:
+        for key in traj.keys():
+            traj[key] = np.flipud(traj[key]) 
+
+    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=traj, rate=rate)
 
     traj_player.player()
 
@@ -59,25 +64,39 @@ if __name__ == '__main__':
 
     parser.add_argument('-l', '--list_trajectories', action='store_true', help='list trajectories at $AML_DATA/aml_lfd/')
 
-    parser.add_argument('-i', '--idx_trajectory', type=int, default=0, help='trajectory index from the list of trajectories at $AML_DATA/aml_lfd')
-    
+    parser.add_argument('-n', '--idx_trajectory', type=int, default=0, help='trajectory index from the list of trajectories at $AML_DATA/aml_lfd')
+
     parser.add_argument('-t', '--timeout', type=float, default=1.0, help='trajectory player timeout per waypoint')
+
+    parser.add_argument('-d', '--demo_folder', type=str, default='', help='demo folder, e.g. sawyer_right or right_grasp_exp')
+
+    parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
+
+    parser.add_argument('-b', '--backward_playback', type=bool, default=False, help='Play trajectory backwards? (True/False)')
 
     args = parser.parse_args()
 
     rospy.init_node('trajectory_player')
     
-    from aml_robot.baxter_robot import BaxterArm
+    if args.arm_interface == "baxter":
+        from aml_robot.baxter_robot import BaxterArm as ArmInterface
+    else:
+        from aml_robot.sawyer_robot import SawyerArm as ArmInterface
     
     limb = 'right'
     
-    arm = BaxterArm(limb)
+    arm = ArmInterface(limb)
 
     arm.set_sampling_rate(sampling_rate=700) # Arm should report its state as fast as possible.
 
     # Trajectories have been recorded at 30 hz, we can play faster or slower than what was recorded by choosing a faster or slower execution rate
     demo_idx = None
-    base_path = os.environ['AML_DATA'] + '/aml_lfd/' + limb + '_grasp_exp/'
+    demo_folder = limb + '_grasp_exp/'
+
+    if args.demo_folder is not None:
+        demo_folder = args.demo_folder + '/'
+
+    base_path = os.environ['AML_DATA'] + '/aml_lfd/' + demo_folder
     
     traj_list = os.listdir(base_path)
     traj_list.sort() # assuming lexicographic order
@@ -90,6 +109,6 @@ if __name__ == '__main__':
 
         print "Playing trajectory idx (%d): %s"%(args.idx_trajectory, traj_list[args.idx_trajectory])
         path_to_demo = base_path + traj_list[args.idx_trajectory]
-        main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo, timeout = args.timeout, rate = args.rate)
+        main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo, timeout = args.timeout, rate = args.rate, reverse_traj = args.backward_playback)
 
 
