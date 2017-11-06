@@ -29,6 +29,7 @@ from intera_core_msgs.srv import (
 )
 
 import intera_interface
+import intera_dataflow
 
 WITH_GRIPPER=True
 
@@ -51,16 +52,60 @@ class PickAndPlace(object):
         self._init_state = self._rs.state().enabled
         print("Enabling robot... ")
         self._rs.enable()
-        self._limb.set_joint_position_speed(speed=0.05)
         self._head.set_pan(0.0)
+
+        self._joint_names = self._limb.joint_names()
 
         head_display = intera_interface.HeadDisplay()
         rospack = rospkg.RosPack()
         images_dir = rospack.get_path('intera_examples') + '/share/images/'
         head_display.display_image(images_dir + "sawyer_sdk_research.png", False, 1.0)
 
+    def filtered_move_to_joint_positions(self, positions, timeout=15.0,
+                                         threshold=0.008726646, test=None):
+        """
+        See baxter_interface.limb & intera_interface.limb
+        """
+        cmd = self._limb.joint_angles()
+
+        def filtered_cmd():
+            # First Order Filter - 0.2 Hz Cutoff
+            for joint in positions.keys():
+                cmd[joint] = 0.012488 * positions[joint] + 0.98751 * cmd[joint]
+            return cmd
+
+        def genf(joint, angle):
+            def joint_diff():
+                return abs(angle - self._limb._joint_angle[joint])
+            return joint_diff
+
+        diffs = [genf(j, a) for j, a in positions.items() if
+                 j in self._limb._joint_angle]
+        fail_msg = "{0} limb failed to reach commanded joint positions.".format(
+                                                      self._limb.name.capitalize())
+
+        def test_collision():
+            if self._limb.has_collided():
+                rospy.logerr(' '.join(["Collision detected.", fail_msg]))
+                return True
+            return False
+
+        #self._limb.set_joint_positions(positions)
+        self._limb.set_joint_positions(filtered_cmd())
+        intera_dataflow.wait_for(
+            test=lambda: test_collision() or \
+                         (callable(test) and test() == True) or \
+                         (all(diff() < threshold for diff in diffs)),
+            timeout=timeout,
+            timeout_msg=fail_msg,
+            rate=100,
+            raise_on_error=False,
+            #body=lambda: self._limb.set_joint_positions(positions)
+            body=lambda: self._limb.set_joint_positions(filtered_cmd())
+            )
+
     def move_to_start(self, start_angles=None):
-        self._limb.set_joint_position_speed(0.01)
+        # self._limb.set_joint_position_speed(0.0) # Not work with gazebo
         print("Moving the {0} arm to start pose...".format(self._limb_name))
         if not start_angles:
             start_angles = dict(zip(self._joint_names, [0]*7))
@@ -94,16 +139,19 @@ class PickAndPlace(object):
 
     def _guarded_move_to_joint_position(self, joint_angles):
         if joint_angles:
-            self._limb.move_to_joint_positions(joint_angles,timeout=1.5)
+            #self._limb.move_to_joint_positions(joint_angles)
+            self.filtered_move_to_joint_positions(joint_angles)
         else:
             rospy.logerr("No Joint Angles provided for move_to_joint_positions. Staying put.")
 
     def gripper_open(self):
+        rospy.sleep(1.0)
         if WITH_GRIPPER==True:
             self._gripper.open()
         rospy.sleep(1.0)
 
     def gripper_close(self):
+        rospy.sleep(1.0)
         if WITH_GRIPPER==True:
             self._gripper.close()
         rospy.sleep(1.0)
@@ -141,28 +189,32 @@ class PickAndPlace(object):
         # servo above pose
         self._approach(pose)
         # servo to pose
+        rospy.sleep(1.0)
         self._servo_to_pose(pose)
         # close gripper
         self.gripper_close()
         # retract to clear object
         self._retract()
+        rospy.sleep(1.0)
 
     def place(self, pose):
         # servo above pose
         self._approach(pose)
         # servo to pose
+        rospy.sleep(1.0)
         self._servo_to_pose(pose)
         # open the gripper
         self.gripper_open()
         # retract to clear object
         self._retract()
+        rospy.sleep(1.0)
 
 def load_gazebo_models(table_pose=Pose(position=Point(x=1.0, y=0.0, z=0.0)),
                        table_reference_frame="world",
-                       block_pose=Pose(position=Point(x=0.6725, y=0.1265, z=0.7825)),
+                       block_pose=Pose(position=Point(x=0.7, y=0.15, z=0.7825)),
                        block_reference_frame="world"):
     # Get Models' Path
-    model_path = rospkg.RosPack().get_path('baxter_sim_examples')+"/models/"
+    model_path = rospkg.RosPack().get_path('sawyer_sim_examples')+"/models/"
     # Load Table SDF
     table_xml = ''
     with open (model_path + "cafe_table/model.sdf", "r") as table_file:
@@ -254,20 +306,20 @@ def main():
     # You may wish to replace these poses with estimates
     # from a perception node.
     block_poses.append(Pose(
-        position=Point(x=0.75, y=0.16, z=0.020),
+        position=Point(x=0.7, y=0.15, z=0.020),
         orientation=overhead_orientation))
     # Feel free to add additional desired poses for the object.
     # Each additional pose will get its own pick and place.
     block_poses.append(Pose(
-        position=Point(x=0.75, y=0.0, z=0.020),
+        position=Point(x=0.7, y=-0.15, z=0.020),
         orientation=overhead_orientation))
     # Move to the desired starting angles
     pnp.move_to_start(starting_joint_angles)
     idx = 0
     while not rospy.is_shutdown():
-        print("\nPicking...")
+        #print("\nPicking...")
         pnp.pick(block_poses[idx])
-        print("\nPlacing...")
+        #print("\nPlacing...")
         idx = (idx+1) % len(block_poses)
         pnp.place(block_poses[idx])
     return 0
