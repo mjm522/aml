@@ -5,6 +5,7 @@
     <arg name="backward_playback" default=""/> <!-- or <arg name="backward_playback" default=""/> -->
     <arg name="control_loop_rate" default="100"/>
     <arg name="timeout" default="0.1"/>
+    <arg name="traj_idx" default="0"/>
     <arg name="arm_speed" default="0.1"/>
 
     <node pkg="aml_ctrl" type="demo_trajectory_player.py" 
@@ -14,7 +15,8 @@
                 $(arg backward_playback) 
                 -r $(arg control_loop_rate) 
                 -t $(arg timeout) 
-                -s $(arg arm_speed)" output="screen">
+                -s $(arg arm_speed) 
+                -n $(arg traj_idx)" output="screen">
     </node>
 
 
