@@ -35,9 +35,9 @@ class EnsambleMDN(object):
         self._adv_epsilon = network_params['adv_epsilon']
         
         try:
-            self._batch_size = network_params['batch_size']
+            self._adv_batch_size = network_params['adv_batch_size']
         except:
-            self._batch_size = 5
+            self._adv_batch_size = 5
 
         self._mdn_ensembles = [MixtureDensityNetwork(network_params, tf_sumry_wrtr = tf_sumry_wrtr) for _ in range(self._n_ensembles)]
 
@@ -128,7 +128,7 @@ class EnsambleMDN(object):
                                                                  data_y = y_batch, 
                                                                  epsilon=self._adv_epsilon, 
                                                                  loss_grad=loss_grad, 
-                                                                 no_examples=batchsize)
+                                                                 no_examples=self._adv_batch_size)
                     
                     x_batch = copy.deepcopy(np.append(x_adv, x_batch, axis=0))
                     y_batch = copy.deepcopy(np.append(y_adv, y_batch, axis=0))
