@@ -79,11 +79,18 @@ class SawyerArm(intera_interface.Limb):
             print "Unknown limb idex"
             raise ValueError
 
-        # self._cuff = intera_interface.DigitalIO('%s_lower_cuff' % (limb,))
-        
-        # self._cuff.state_changed.connect(self.cuff_cb)
+        self._has_cuff = True
 
-        self._cuff_state = None
+        try:
+
+            self._cuff = intera_interface.DigitalIO('%s_lower_cuff' % (limb,))
+            
+            self._cuff.state_changed.connect(self.cuff_cb)
+
+            self._cuff_state = None
+        except Exception as e:
+            print e
+            self._has_cuff = False
             
         intera_interface.RobotEnable(CHECK_VERSION).enable()
 
@@ -92,9 +99,10 @@ class SawyerArm(intera_interface.Limb):
         self._time_now_old = self.get_time_in_seconds()
 
     def cuff_cb(self, value):
-        print "NOT IMPLEMENTED"
-        pass
-        # self._cuff_state = value
+        if self._has_cuff:
+            self._cuff_state = value
+        else:
+            print "CUFF NOT DETECTED"
 
     #this function returns self._cuff_state to be true
     #when arm is moved by a demonstrator, the moment arm stops 
@@ -103,9 +111,11 @@ class SawyerArm(intera_interface.Limb):
     #cuff button once
     @property
     def get_lfd_status(self):
-        print "NOT IMPLEMENTED"
-        pass
-        # return self._cuff_state
+        if self._has_cuff:
+            return self._cuff_state
+        else:
+            print "CUFF NOT DETECTED"
+            return None
 
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)

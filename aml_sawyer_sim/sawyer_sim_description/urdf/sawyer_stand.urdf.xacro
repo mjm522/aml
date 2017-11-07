@@ -38,6 +38,9 @@
         <inertia ixx="5.0635929" ixy="0.00103417" ixz="0.80199628" iyy="6.08689388" iyz="0.00105311" izz="4.96191932"/>
       </inertial>
     </link>
+    <gazebo reference="pedestal">
+      <material>Gazebo/FlatBlack</material>
+    </gazebo>
     <link name="controller_box">
       <collision>
         <origin rpy="0 0 0" xyz="-0.325 0 -0.38"/>

@@ -12,7 +12,7 @@ robot:
     joints:
           head_controller:
             joint: head_pan
-            pid: {p: 225.0, i: 0.01, d: 10.0}
+            pid: {p: 10.0, i: 0.01, d: 5.0}
 
   # Sawyer SDK Controllers: Position --------------------------
   right_joint_position_controller:
@@ -21,25 +21,25 @@ robot:
     joints:
       right_j0_controller:
         joint: right_j0
-        pid: {p: 100.0, i: 0.01, d: 10.0}
+        pid: {p: 700, i: 0.01, d: 100.0}
       right_j1_controller:
         joint: right_j1
-        pid: {p: 100.0, i: 0.01, d: 10.0}
+        pid: {p: 5000, i: 100, d: 100.0}
       right_j2_controller:
         joint: right_j2
-        pid: {p: 250.0, i: 0.01, d: 10.0}
+        pid: {p: 4500, i: 35, d: 30.0}
       right_j3_controller:
         joint: right_j3
-        pid: {p: 250.0, i: 0.01, d: 10.0}
+        pid: {p: 5500, i: 60, d: 30.0}
       right_j4_controller:
         joint: right_j4
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 1000, i: 30, d: 30.0}
       right_j5_controller:
         joint: right_j5
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 900, i: 0.1, d: 30.0}
       right_j6_controller:
         joint: right_j6
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 1000, i: 0.1, d: 30.0}
 
   # Sawyer SDK Controllers: Velocity --------------------------
   right_joint_velocity_controller:
@@ -48,55 +48,55 @@ robot:
     joints:
       right_j0_controller:
         joint: right_j0
-        pid: {p: 100.0, i: 0.01, d: 10.0}
+        pid: {p: 200, i: 0.01, d: 0.1}
       right_j1_controller:
         joint: right_j1
-        pid: {p: 100.0, i: 0.01, d: 10.0}
+        pid: {p: 800, i: 0.01, d: 0.1}
       right_j2_controller:
         joint: right_j2
-        pid: {p: 250.0, i: 0.01, d: 10.0}
+        pid: {p: 300, i: 0.01, d: 0.1}
       right_j3_controller:
         joint: right_j3
-        pid: {p: 250.0, i: 0.01, d: 10.0}
+        pid: {p: 500, i: 0.01, d: 0.1}
       right_j4_controller:
         joint: right_j4
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 200, i: 0.01, d: 0.1}
       right_j5_controller:
         joint: right_j5
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 100, i: 0.01, d: 0.1}
       right_j6_controller:
         joint: right_j6
-        pid: {p: 225.0, i: 0.01, d: 10.0}
+        pid: {p: 100, i: 0.01, d: 0.1}
 
   # Individual Joint Controllers: Position --------------------------
   right_j0_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j0
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+    pid: {p: 700,  i: 0.01, d: 100}
   right_j1_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j1
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+    pid: {p: 5000,  i: 100, d: 100}
   right_j2_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j2
-    pid: {p: 250.0, i: 0.01, d: 10.0}
+    pid: {p: 4500,  i: 35, d: 30}
   right_j3_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j3
-    pid: {p: 250.0, i: 0.01, d: 10.0}
+    pid: {p: 5500,  i: 60, d: 30}
   right_j4_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j4
-    pid: {p: 225.0, i: 0.01, d: 10.0}
+    pid: {p: 1000,  i: 30, d: 30}
   right_j5_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j5
-    pid: {p: 225.0, i: 0.01, d: 10.0}
+    pid: {p: 900,  i: 0.1, d: 30}
   right_j6_position_controller:
     type: effort_controllers/JointPositionController
     joint: right_j6
-    pid: {p: 225.0, i: 0.01, d: 10.0}
+    pid: {p: 1000,  i: 0.1, d: 30}
 
   # Sawyer SDK Controllers: Effort --------------------------
   right_joint_effort_controller:

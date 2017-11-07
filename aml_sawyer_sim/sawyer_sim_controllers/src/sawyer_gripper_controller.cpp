@@ -72,7 +72,6 @@ bool SawyerGripperController::init(hardware_interface::EffortJointInterface *rob
 
     // Get number of joints
     n_joints = xml_struct.size();
-    ROS_INFO_STREAM("Initializing SawyerGripperController with "<<n_joints<<" joints.");
 
     gripper_controllers.resize(n_joints);
     int i = 0;  // track the joint id
@@ -82,8 +81,7 @@ bool SawyerGripperController::init(hardware_interface::EffortJointInterface *rob
         // Get joint controller
         if (joint_it->second.getType() != XmlRpc::XmlRpcValue::TypeStruct)
         {
-            ROS_ERROR(
-                      "The 'joints/joint_controller' parameter is not a struct (namespace '%s')",
+            ROS_ERROR("The 'joints/joint_controller' parameter is not a struct (namespace '%s')",
                       nh_.getNamespace().c_str());
             return false;
         }
@@ -98,8 +96,7 @@ bool SawyerGripperController::init(hardware_interface::EffortJointInterface *rob
                                   "Loading sub-controller '" << joint_controller_name
                                   << "', Namespace: " << joint_nh.getNamespace());
 
-            gripper_controllers[i].reset(
-                                         new effort_controllers::JointPositionController());
+            gripper_controllers[i].reset(new effort_controllers::JointPositionController());
             gripper_controllers[i]->init(robot, joint_nh);
 
         }  // end of joint-namespaces
@@ -147,7 +144,6 @@ void SawyerGripperController::starting(const ros::Time& time)
 
 void SawyerGripperController::stopping(const ros::Time& time)
 {
-
 }
 
 void SawyerGripperController::update(const ros::Time& time,
@@ -181,30 +177,43 @@ void SawyerGripperController::updateCommands()
     // Get latest command
     const intera_core_msgs::IOComponentCommand &command = *(gripper_command_buffer.readFromRT());
 
-    ROS_DEBUG_STREAM("Gripper update commands " << command.op << " " << command.args);
-    if (command.op != "go")
-        return;
-
-    double cmd_position  = gripper_controllers[main_idx_]->getPosition();
-#ifndef DEPRECATED_YAML_CPP_VERSION
-    YAML::Node args = YAML::Load(command.args);
-    if (args["position"] )
+    if (command.op != "set")
     {
-        cmd_position = args["position"].as<double>();
-        // Check Command Limits:
-        if (cmd_position < 0.0)
-        {
-            cmd_position = 0.0;
-        }
-        else if (cmd_position > 100.0)
-        {
-            cmd_position = 100.0;
-        }
-        // cmd = ratio * range
-        cmd_position = (cmd_position/100.0) *
-                       (gripper_controllers[main_idx_]->joint_urdf_->limits->upper - gripper_controllers[main_idx_]->joint_urdf_->limits->lower);
+        // ROS_INFO("Gripper update command op : %s", command.op.c_str());
+        return;
     }
-#endif
+
+    // ROS_INFO("Gripper update command args : %s", command.args.c_str());
+
+    //Asuume single [] in args: e.g. signals": {"position_m": {"data": [99.9958333], "format": {"type": "float"}}}}
+    std::size_t start_pos = command.args.find('[');
+    std::size_t end_pos = command.args.find(']');
+    if (start_pos == std::string::npos || end_pos == std::string::npos)
+    {
+        ROS_INFO("Not found '[' or ']' in Gripper update command args: %s", command.args.c_str());
+        return;
+    }
+
+    double cmd_position = gripper_controllers[main_idx_]->getPosition();
+    cmd_position = atof(command.args.substr(start_pos+1, end_pos-start_pos-1).c_str());
+
+    // ROS_INFO("Gripper command str: %s value %3.5f",
+    //          command.args.substr(start_pos+1, end_pos-start_pos-1).c_str(), cmd_position);
+
+    // Check Command Limits:
+    if (cmd_position < gripper_controllers[main_idx_]->joint_urdf_->limits->lower)
+    {
+        cmd_position = gripper_controllers[main_idx_]->joint_urdf_->limits->lower;
+    }
+    else if (cmd_position > gripper_controllers[main_idx_]->joint_urdf_->limits->upper)
+    {
+        cmd_position = gripper_controllers[main_idx_]->joint_urdf_->limits->upper;
+    }
+
+    // cmd = ratio * range
+    // cmd_position = (cmd_position/100.0) *
+    //                (gripper_controllers[main_idx_]->joint_urdf_->limits->upper - gripper_controllers[main_idx_]->joint_urdf_->limits->lower);
+
     // Update the individual joint controllers
     ROS_DEBUG_STREAM(gripper_controllers[main_idx_]->joint_urdf_->name << "->setCommand(" << cmd_position << ")");
     gripper_controllers[main_idx_]->setCommand(cmd_position);
