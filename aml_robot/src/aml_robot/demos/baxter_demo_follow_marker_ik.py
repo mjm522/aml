@@ -41,10 +41,9 @@ def processFeedback(feedback):
 
     goal_ori = quaternion.as_float_array(start_ori)
     goal_pos = np.array([p.x,p.y,p.z])
-    current_ee_pos, current_ee_ori = limb.get_ee_pose()
-
-    success, goal_joint_angles = limb.ik(goal_pos,goal_ori)
-    limb.exec_position_cmd(goal_joint_angles)
+    if feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
+        success, goal_joint_angles = limb.ik(goal_pos,goal_ori)
+        limb.exec_position_cmd(goal_joint_angles)
     rate.sleep()
 
 def makeBox( msg ):
@@ -178,7 +177,7 @@ def switchArm(armfeedback):
         print "Left arm selected"
 
 # if __name__=="__main__":
-rospy.init_node("track_3d_marker")
+rospy.init_node("track_3d_marker_ik")
 
 _rs = baxter_interface.RobotEnable(CHECK_VERSION)
 _rs.enable()    
@@ -197,10 +196,10 @@ start_pos, start_ori = limb.get_ee_pose()
 
 # create an interactive marker server on the topic namespace basic_control
 server = InteractiveMarkerServer("basic_control")
-rate = rospy.Rate(5)
+rate = rospy.Rate(100)
 
 # create an interactive marker for our server
-position = Point( 3, 0, 0)
+position = Point( start_pos[0], start_pos[1], start_pos[2])
 marker = makeMarker( False, InteractiveMarkerControl.MOVE_3D, position, False)
 server.insert(marker, processFeedback)
 menu_handler.apply( server, marker.name )
