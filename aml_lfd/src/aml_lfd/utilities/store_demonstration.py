@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import tf# Needed for listening to and transforming robot state information.
 import copy
@@ -122,7 +124,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', '--demo_name', type=str, help='demo name-(give a name for demo collected)')
     
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv()[1:])
 
     if args.limb_name is None:
         print "Give limb option, -l left or -l right"

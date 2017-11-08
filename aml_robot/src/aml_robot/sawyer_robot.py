@@ -93,10 +93,6 @@ class SawyerArm(intera_interface.Limb):
 
         try:
 
-            self._cuff_io = intera_interface.DigitalIO('%s_lower_cuff' % (self._limb,))
-            
-            self._cuff_io.state_changed.connect(self.cuff_cb)
-
             self._cuff_state = None
 
 
@@ -176,7 +172,7 @@ class SawyerArm(intera_interface.Limb):
     @property
     def get_lfd_status(self):
         if self._has_cuff:
-            return self._cuff_state
+            return self._cuff.cuff_button()
         else:
             print "CUFF NOT DETECTED"
             return None
@@ -249,7 +245,7 @@ class SawyerArm(intera_interface.Limb):
 
         now                 = rospy.Time.now()
 
-        joint_angles        = self.joint_angles()
+        joint_angles        = self.angles()
         joint_velocities    = self.joint_velocities()
         joint_efforts       = self.joint_efforts()
 
@@ -259,7 +255,7 @@ class SawyerArm(intera_interface.Limb):
             return [ls[n] for n in joint_names]
 
         state = {}
-        state['position']        = np.array(to_list(joint_angles))
+        state['position']        = joint_angles
         state['velocity']        = np.array(to_list(joint_velocities))
         state['effort']          = np.array(to_list(joint_efforts))
         state['jacobian']        = self.get_jacobian_from_joints(None)
@@ -319,7 +315,7 @@ class SawyerArm(intera_interface.Limb):
 
          if self._gripper is not None:
 
-            self._gripper.set_speed(speed)
+            self._gripper.set_velocity(speed)
 
     def set_arm_speed(self,speed):
 

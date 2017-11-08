@@ -162,6 +162,7 @@ def get_js_traj(limb_name, demo_idx=None, demo_path=None):
     js_acc_traj =  np.diff(js_vel_traj, axis=0)
     js_acc_traj =  np.vstack([np.zeros_like(js_acc_traj[0]), js_acc_traj])*sampling_rate
 
+    print js_pos_traj[0]
     return js_pos_traj, js_vel_traj, js_acc_traj
 
 

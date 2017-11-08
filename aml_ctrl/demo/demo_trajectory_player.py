@@ -77,6 +77,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-s', '--arm_speed', type=float, default=1.0, help='Arm speed for position control')
 
+    parser.add_argument('-g', '--gripper_speed', type=float, default=1.0, help='Gripper speed for position control')
+
     parser.add_argument('-d', '--demo_folder', type=str, default='', help='demo folder, e.g. sawyer_right or right_grasp_exp')
 
     parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
@@ -96,8 +98,8 @@ if __name__ == '__main__':
     
     arm = ArmInterface(limb)
     arm.set_arm_speed(max(min(args.arm_speed,0.20),0.01)) # WARNING: max 0.2 rad/s for safety reasons
-    arm.set_sampling_rate(sampling_rate=700) # Arm should report its state as fast as possible.
-
+    arm.set_sampling_rate(sampling_rate=1000) # Arm should report its state as fast as possible.
+    arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
     # Trajectories have been recorded at 30 hz, we can play faster or slower than what was recorded by choosing a faster or slower execution rate
     demo_idx = None
     demo_folder = limb + '_grasp_exp/'
