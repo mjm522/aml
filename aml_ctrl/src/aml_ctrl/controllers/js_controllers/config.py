@@ -78,7 +78,7 @@ JS_POSTN_CNTLR_SAWYER = {
     'alpha': 0.0,
     'null_kp': 5.,
     'null_kd': 3.01,
-    'js_pos_error_thr' :0.05,
+    'js_pos_error_thr' :0.09,
     'deactivate_wait_time': 5,
 }
 
