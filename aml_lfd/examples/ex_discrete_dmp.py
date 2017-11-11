@@ -120,7 +120,7 @@ def main():
     trajectory = extract_js_traj(filename=path_to_demo, limb_name=limb)
 
     dmp = train_dmp(trajectory['pos_traj'])
-    test_traj = test_dmp(dmp, speed=1.)
+    test_traj = test_dmp(dmp, speed=5.,plot_trained=False)
     
     test_on_robot(robot_interface=arm,
                   des_path=test_traj)
