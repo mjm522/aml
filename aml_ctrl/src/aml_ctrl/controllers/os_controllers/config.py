@@ -95,3 +95,23 @@ OS_VELCTY_CNTLR = {
     'linear_error_thr': 0.12,
     'angular_error_thr': 0.1
 }
+
+
+OS_IMPEDANCE_CNTLR = {
+    'rate': 500,
+    'kp_p': 0.0001, #gains for position
+    'kd_p': np.eye(3)*0.01,
+    'kp_o': 0., #gains for orientation
+    'kd_o': np.sqrt(0.), #gains for orientation
+    'Md':np.eye(3),
+    'kd_q':np.eye(7)*0.01,
+    'alpha': 0.0,
+    'null_kp': 0.,
+    'null_kd': 3.01,
+    'use_orientation_ctrl': False,
+    'linear_error_thr': 0.12,
+    'angular_error_thr': 0.3,
+    'js_pos_error_thr' :0.1,
+    'pos_threshold': 0.01,
+    'deactivate_wait_time': 5,
+}

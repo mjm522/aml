@@ -9,7 +9,7 @@ import baxter_external_devices
 from std_msgs.msg import (
     UInt16,
 )
-from baxter_core_msgs.msg import SEAJointState
+from baxter_core_msgs.msg import SEAJointState, EndpointState
 from baxter_interface import CHECK_VERSION
 from baxter_kinematics import baxter_kinematics
 
@@ -132,6 +132,9 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', 
                                                SEAJointState, self._gravity_comp_callback)
+
+        self._ee_point_state = rospy.Subscriber('/robot/limb/'+ limb +'/endpoint_state',
+                                                EndpointState, self._ee_point_state_callback)
         #gravity + feed forward torques
         self._h = [0. for _ in range(7)]
 
@@ -140,6 +143,15 @@ class BaxterArm(baxter_interface.limb.Limb):
         self.set_command_timeout(0.2)
 
         self._camera = camera_sensor.CameraSensor()
+
+        self._ee_force = None
+        self._ee_torque = None
+
+
+    def _ee_point_state_callback(self, msg):
+        self._ee_force  = msg.wrench.force
+        self._ee_torque = msg.wrench.torque
+
 
     def _gravity_comp_callback(self, msg):
         self._h = msg.gravity_model_effort
@@ -180,6 +192,11 @@ class BaxterArm(baxter_interface.limb.Limb):
         state['depth_image']     = self._camera._curr_depth_image
         state['gravity_comp']    = np.array(self._h)
 
+        if self._ee_force is not None:
+            state['ee_force']        = np.array([self._ee_force.x, self._ee_force.y, self._ee_force.z])
+
+        if self._ee_torque is not None:
+            state['ee_torque']       = np.array([self._ee_torque.x, self._ee_torque.y, self._ee_torque.z])
 
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
@@ -192,6 +209,8 @@ class BaxterArm(baxter_interface.limb.Limb):
             state['ee_vel'],   state['ee_omg']  = self.get_ee_velocity()
         except:
             pass
+
+        
 
         # ee_velocity              = self.endpoint_velocity()['linear']
         # state['ee_velocity']     = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])

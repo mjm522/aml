@@ -31,3 +31,10 @@ def standard_shape_traj(curr_pos, no_set_points=16, shape='circle'):
         raise ValueError
 
     return np.vstack([x,y,z]).T
+
+
+def pseudo_inv(mat, eps=0.001):
+    U, s, V = np.linalg.svd(mat, full_matrices=True)
+    tolerance = eps# * np.max(mat, a.rows()) * svd.singularValues().array().abs()(0)
+    s[s<tolerance] = tolerance
+    return np.dot (V.transpose(), np.dot(np.diag(s**-1.), U.transpose()))
