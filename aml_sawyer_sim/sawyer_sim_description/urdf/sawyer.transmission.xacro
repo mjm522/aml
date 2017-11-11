@@ -91,28 +91,6 @@
       </actuator>
     </transmission>
 
-    <transmission name="r_gripper_l_finger_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="r_gripper_l_finger_joint">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-      </joint>
-      <actuator name="r_gripper_l_finger_motor">
-        <mechanicalReduction>1</mechanicalReduction>
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-      </actuator>
-    </transmission>
-
-    <transmission name="r_gripper_r_finger_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="r_gripper_r_finger_joint">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-      </joint>
-      <actuator name="r_gripper_r_finger_motor">
-        <mechanicalReduction>1</mechanicalReduction>
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-      </actuator>
-    </transmission>
-
   </xacro:macro>
 
 </robot>

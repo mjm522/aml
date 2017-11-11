@@ -44,8 +44,9 @@
 //Sawyer Specific Messages
 #include <intera_core_msgs/AssemblyState.h>
 #include <intera_core_msgs/IODeviceStatus.h>
-#include <intera_core_msgs/IONodeConfiguration.h>
 #include <intera_core_msgs/IODeviceConfiguration.h>
+#include <intera_core_msgs/IONodeStatus.h>
+#include <intera_core_msgs/IONodeConfiguration.h>
 #include <intera_core_msgs/JointCommand.h>
 #include <intera_core_msgs/AnalogIOState.h>
 #include <intera_core_msgs/DigitalOutputCommand.h>
@@ -127,8 +128,10 @@ namespace sawyer_en
         intera_core_msgs::AssemblyState assembly_state;
 
         intera_core_msgs::IODeviceStatus right_grip_st;
-        intera_core_msgs::IONodeConfiguration right_grip_prop;
         intera_core_msgs::IODeviceConfiguration right_grip_dev;
+
+        intera_core_msgs::IONodeStatus right_grip_node_st;
+        intera_core_msgs::IONodeConfiguration right_grip_prop;
 
         intera_core_msgs::AnalogIOState right_ir_state;
 
@@ -139,6 +142,8 @@ namespace sawyer_en
         sensor_msgs::JointState jstate_msg;
         sensor_msgs::Range right_ir;
         std_msgs::UInt32 right_ir_int;
+
+        int gripper_signal_index;
 
         bool isStopped;
 

@@ -1,9 +1,11 @@
 import rospy
 import numpy as np
 
+
+
 class TrajPlayer():
 
-    def __init__(self, robot_interface, controller, trajectory, timeout=1.0, rate=10):
+    def __init__(self, robot_interface, controller, trajectory, timeout=1.0, rate=100):
 
         self._ctrlr =  controller(robot_interface=robot_interface)
 

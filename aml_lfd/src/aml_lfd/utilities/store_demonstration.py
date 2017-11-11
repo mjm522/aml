@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import tf# Needed for listening to and transforming robot state information.
 import copy
@@ -36,12 +38,12 @@ class StoreDemonstration():
         self._robot.set_sampling_rate(sampling_rate=self._sampling_rate)
 
         if data_name_prefix is None:
-            data_name_prefix = robot_interface._limb + '_demo_data'
+            data_name_prefix = robot_interface._limb + '_demo_data_'
         else:
             data_name_prefix = robot_interface._limb + '_' + data_name_prefix
 
         if data_folder_path is None:
-            data_folder_path = os.environ['AML_DATA'] + '/aml_lfd/' + data_name_prefix
+            data_folder_path = os.environ['AML_DATA'] + '/aml_lfd/' + data_name_prefix + '/'
 
         if not os.path.exists(data_folder_path):
             os.makedirs(data_folder_path)
@@ -118,9 +120,11 @@ if __name__ == '__main__':
 
     parser.add_argument('-l', '--limb_name', type=str, help='limb index-(left/right)')
 
+    parser.add_argument('-i', '--arm_interface', type=str, help='arm_interface (sawyer/baxter)')
+
     parser.add_argument('-d', '--demo_name', type=str, help='demo name-(give a name for demo collected)')
     
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv()[1:])
 
     if args.limb_name is None:
         print "Give limb option, -l left or -l right"
@@ -131,10 +135,17 @@ if __name__ == '__main__':
     else:
         data_name_prefix = args.demo_name
 
+    if args.arm_interface is None:
+        print "Give arm_interface option, -i sawyer or -l baxter"
+        raise ValueError
+
     rospy.init_node('store_demo_node')
 
-    from aml_robot.baxter_robot import BaxterArm
+    if args.arm_interface == "baxter":
+        from aml_robot.baxter_robot import BaxterArm as ArmInterface
+    else:
+        from aml_robot.sawyer_robot import SawyerArm as ArmInterface
 
-    arm = BaxterArm(args.limb_name)
+    arm = ArmInterface(args.limb_name)
 
     main(robot_interface=arm, data_name_prefix=data_name_prefix)

@@ -1,8 +1,10 @@
 import os
 from aml_io.io_tools import get_aml_package_path
 
-data_storage_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
-data_storage_path = os.environ['AML_DATA'] + '/aml_dl/mppi_baxter_push_data/'
+# data_storage_path = os.environ['AML_DATA'] + '/aml_dl/baxter_push_data/'
+# data_storage_path = os.environ['AML_DATA'] + '/aml_dl/mppi_baxter_push_data/'
+
+data_storage_path = os.environ['AML_DATA'] + '/aml_lfd/sawyer_traj_exp/'
 
 print "Data storage path is:=\t", data_storage_path
 
