@@ -4,7 +4,7 @@
     <arg name="arm_interface" default="sawyer"/>
     <arg name="limb_name" default="right"/>
 
-    <node pkg="aml_lfd" type="store_demonstration.py" 
+    <node pkg="aml_lfd" type="record_robot_demo.py" 
           name="demo_store_demonstration" 
           args="-d $(arg demo_folder) 
                 -i $(arg arm_interface) 

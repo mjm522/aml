@@ -27,7 +27,7 @@ class Task():
 
         return dummy_task
 
-class StoreDemonstration():
+class RecordRobotDemo():
 
     def __init__(self, robot_interface, data_folder_path=None, data_name_prefix=None, sampling_rate=100):
 
@@ -109,7 +109,7 @@ class StoreDemonstration():
 
 def main(robot_interface, data_name_prefix):
 
-    lfd = StoreDemonstration(robot_interface=robot_interface, data_name_prefix=data_name_prefix)
+    lfd = RecordRobotDemo(robot_interface=robot_interface, data_name_prefix=data_name_prefix)
     
     lfd.save_demo_data()
 
