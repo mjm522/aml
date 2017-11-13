@@ -65,7 +65,12 @@ while not rospy.is_shutdown():
       marker_table.id = 2
       marker_table.action = Marker.ADD;
       marker_table.type = Marker.MESH_RESOURCE;
-      marker_table.mesh_use_embedded_materials = True
+      # marker_table.mesh_use_embedded_materials = True
+
+      marker_table.color.a = 0.7
+      marker_table.color.r = 0.7
+      marker_table.color.g = 0.7
+      marker_table.color.b = 0.5
 
       marker_table.pose.orientation.w = 1
       marker_table.pose.orientation.x = 0
