@@ -42,10 +42,13 @@ def make_box_marker(trans, ori, id = None, r = 0.5, g = 1.0, b = 0.5, a = 1.0, n
    dist = 0.0
    if id is None and prev_trans is not None:
       dist = np.linalg.norm(np.array(prev_trans)-np.array(trans))
+   elif id is None and prev_trans is None:
+      prev_trans = trans
 
-   if (id is None and dist > 0.04):
+   if (id is None and dist > 0.03):
       print "BOX MOVED"
       next_id += 1
+      prev_trans = translation
 
    if id is None:
       marker_box.id = next_id
@@ -97,7 +100,6 @@ while not rospy.is_shutdown():
       translation_goal, ori_goal = box_tf.lookupTransform('base', 'box_goal', time2)
 
       marker_box_traj = make_box_marker(trans = translation, ori = ori, id = None, r = 0.5, g = 1.0, b = 1.0, a = 1.0, ns = 'box_traj')
-      prev_trans = translation
 
       marker_box = make_box_marker(trans = translation, ori = ori, id = 0, r = 0.5, g = 1.0, b = 0.1, a = 1.0)
       
