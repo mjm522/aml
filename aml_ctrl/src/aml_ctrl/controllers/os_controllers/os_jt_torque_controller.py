@@ -1,7 +1,7 @@
-import numpy as np
-import quaternion
 import copy
 import rospy
+import numpy as np
+import quaternion
 from config import OS_JT_TORQUE_CNTLR
 from aml_ctrl.utilities.utilities import quatdiff
 from aml_ctrl.controllers.os_controller import OSController

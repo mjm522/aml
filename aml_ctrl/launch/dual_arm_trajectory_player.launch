@@ -1,0 +1,22 @@
+<launch>
+
+    <arg name="demo_name_r" default="right_dual_arm_right/right_dual_arm_right_01.pkl"/>
+    <arg name="limb_r" default="right"/>
+
+    <arg name="demo_name_l" default="left_dual_arm_left/left_dual_arm_left_01.pkl"/>
+    <arg name="limb_l" default="left"/>
+
+
+    <node pkg="aml_ctrl" type="ex_trajectory_player.py" 
+          name="ex_trajectory_player_right" 
+          args="-d $(arg demo_name_r) 
+                -l $(arg limb_r)" output="screen">
+    </node>
+
+    <node pkg="aml_ctrl" type="ex_trajectory_player.py" 
+          name="ex_trajectory_player_left" 
+          args="-d $(arg demo_name_l) 
+                -l $(arg limb_l)" output="screen">
+    </node>
+
+</launch>

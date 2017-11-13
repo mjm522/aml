@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 from aml_ctrl.controllers.os_controllers.os_postn_controller  import OSPositionController
 from aml_ctrl.controllers.js_controllers.js_postn_controller  import JSPositionController
@@ -8,6 +10,7 @@ from aml_ctrl.traj_player.traj_player import TrajPlayer
 
 import os
 import rospy
+import argparse
 import numpy as np
 
 def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None):
@@ -50,16 +53,26 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='Play trajectory')
+    parser.add_argument('-d', '--demo_name', type=str, default='', help='demo name from aml_lfd folder')
+    parser.add_argument('-l', '--limb', type=str, default='left', help='robot limb name, e.g. right or left')
+    args = parser.parse_args(rospy.myargv()[1:])
+    
     rospy.init_node('trajectory_player')
     
     from aml_robot.baxter_robot import BaxterArm
-    
-    limb = 'right'
-    
-    arm = BaxterArm(limb)
+
+    arm = BaxterArm(args.limb)
 
     demo_idx = None
-    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/' + limb + '_grasp_exp/' + limb + '_grasp_exp_03.pkl'
+
+    if args.demo_name is None:
+        raise Exception("demo name cannot be none")
+
+    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/' + args.demo_name
+
+    if not os.path.isfile(path_to_demo):
+        raise Exception("The given path to demo does not exist")
 
     main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo)
 

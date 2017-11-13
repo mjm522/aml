@@ -5,7 +5,7 @@ import argparse
 import numpy as np
 from aml_robot.baxter_robot import BaxterArm
 from aml_data_collec_utils.core.data_recorder import DataRecorder
-from aml_lfd.utilities.store_demonstration import StoreDemonstration
+from aml_lfd.utilities.record_robot_demo import RecordRobotDemo
 from aml_io.io_tools import save_data, load_data, get_aml_package_path
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 

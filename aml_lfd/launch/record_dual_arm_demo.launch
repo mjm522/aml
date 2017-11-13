@@ -1,0 +1,25 @@
+<launch>
+
+    <arg name="demo_name_prefix_1"  default="dual_arm_left"/>
+    <arg name="demo_name_prefix_2"  default="dual_arm_right"/>
+    <arg name="arm_interface" default="baxter"/>
+    <arg name="limb_name_1" default="left"/>
+    <arg name="limb_name_2" default="right"/>
+
+    <node pkg="aml_lfd" type="record_robot_demo.py" 
+          name="demo_store_demonstration_1" 
+          args="-d $(arg demo_name_prefix_1) 
+                -i $(arg arm_interface) 
+                -l $(arg limb_name_1)" output="screen">
+    </node>
+
+    <node pkg="aml_lfd" type="record_robot_demo.py" 
+          name="demo_store_demonstration_2" 
+          args="-d $(arg demo_name_prefix_2) 
+                -i $(arg arm_interface) 
+                -l $(arg limb_name_2)" output="screen">
+    </node>
+
+
+</launch>
+
