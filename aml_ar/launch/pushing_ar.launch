@@ -24,6 +24,5 @@
 
     <node pkg="aml_data_collec_utils" type="box_marker_publisher.py" name="pushing_markers_publisher" output="screen" />
 
-
 </launch>
 
