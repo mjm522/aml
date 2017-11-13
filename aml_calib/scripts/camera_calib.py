@@ -145,6 +145,8 @@ class BaxterEyeHandCalib():
             print "the openni_rgb_params \n"
             print "postion of the openni camera in robot base frame \t", np.around(calib_data['openni_rgb_camera_pos'],3)
             print "orientation of the openni camera in robot base frame \t", np.around(calib_data['openni_rgb_camera_ori'],3)
+
+            self.left_arm.untuck_arm()
         else:
             print "Calibration has failed!"
 
