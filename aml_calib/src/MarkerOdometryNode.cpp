@@ -336,6 +336,10 @@ public:
           tf::StampedTransform stampedTransformOpenniToBase(transformOpenniToBase, curr_stamp,
                                                 "base", "openni_rgb_camera");
           br.sendTransform(stampedTransformOpenniToBase);
+
+          tf::StampedTransform stampedTransformOpenniToBase2(transformOpenniToBase, curr_stamp,
+                                                "base", "camera_rgb_optical_frame");
+          br.sendTransform(stampedTransformOpenniToBase2);
         }
 
 
@@ -346,6 +350,9 @@ public:
           out_msg.header.stamp = curr_stamp;
           out_msg.encoding = sensor_msgs::image_encodings::RGB8;
           out_msg.image = inImage;
+          out_msg.header.frame_id = "camera_rgb_optical_frame";
+          // sensor_msgs::Image img_msg = out_msg.toImageMsg();
+          // img_msg.frame_id = "openni_rgb_camera";
           image_pub.publish(out_msg.toImageMsg());
         }
 

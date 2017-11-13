@@ -36,7 +36,7 @@ BOX_TYPE_3 = {
 
 ### added for ICRA
 #cubic box
-BOX_TYPE_3 = {
+BOX_TYPE_4 = {
     'length': 0.084,
     'breadth':0.084,
     'height':0.091,

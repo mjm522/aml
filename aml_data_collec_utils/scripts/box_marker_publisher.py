@@ -43,6 +43,7 @@ while not rospy.is_shutdown():
       translation, ori = box_tf.lookupTransform('base', 'box', time)
 
       marker_box = Marker()
+      marker_box.id = 0
       marker_box.header.frame_id = "base"
       marker_box.type = marker_box.CUBE  
       marker_box.scale.x = box_length
@@ -59,6 +60,28 @@ while not rospy.is_shutdown():
       marker_box.pose.position.x    =  translation[0]
       marker_box.pose.position.y    =  translation[1]
       marker_box.pose.position.z    =  translation[2] - box_height/2
+
+      marker_table = Marker()
+      marker_table.id = 2
+      marker_table.action = Marker.ADD;
+      marker_table.type = Marker.MESH_RESOURCE;
+      marker_table.mesh_use_embedded_materials = True
+
+      marker_table.pose.orientation.w = 1
+      marker_table.pose.orientation.x = 0
+      marker_table.pose.orientation.y = 0
+      marker_table.pose.orientation.z = 0
+      marker_table.pose.position.x    = 0.737279182646236
+      marker_table.pose.position.y    = 0.30313784831064317
+      marker_table.pose.position.z    = -0.55229382998687607
+      marker_table.scale.x = 1.0
+      marker_table.scale.y = 2.0
+      marker_table.scale.z = 0.5
+      marker_table.header.frame_id = "base"
+      marker_table.mesh_resource = 'package://sawyer_sim_examples/models/cafe_table/meshes/cafe_table.dae'
+      
+
+      markerArray.markers.append(marker_table)
 
       markerArray.markers.append(marker_box)
 
