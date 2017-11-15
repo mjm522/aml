@@ -1,5 +1,6 @@
-import numpy as np
+import os
 import quaternion
+import numpy as np
 from aml_io.io_tools import load_data
 from os.path import join, dirname, abspath
 
@@ -200,6 +201,34 @@ def plot_demo_data(limb_name, demo_idx):
         plot_no += 1
 
     plt.show()
+
+
+
+def get_next_possible_traj_index(storage_path, file_name_prefix=None):
+    '''
+    this function enumerates the number of trajectories in the folder and
+    says the next possible index
+    '''
+    next_index = 1
+
+    if not os.path.exists(storage_path):
+        print "The given path to demo does not exist, hence creating a folder"
+        os.makedirs(directory)
+    else:
+
+        file_list = os.listdir(storage_path)
+        file_list.sort() # assuming lexicographic order
+
+        if file_name_prefix is not None:
+            for file in file_list:
+                 if file.startswith(file_name_prefix):
+                    next_index += 1
+        else:
+            next_index = len(file_list) + 1
+
+    return next_index
+
+
 
 #quaternion utilities
 

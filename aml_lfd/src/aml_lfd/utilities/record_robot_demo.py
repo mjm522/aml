@@ -11,7 +11,6 @@ import quaternion
 from tf import TransformListener
 from aml_data_collec_utils.core.data_recorder import DataRecorder
 
-
 class Task():
 
     def __init__(self):
@@ -53,7 +52,7 @@ class RecordRobotDemo():
                                            data_folder_path=data_folder_path,
                                            data_name_prefix=data_name_prefix,
                                            num_samples_per_file=1, 
-                                           record_rate = 30)
+                                           record_rate = sampling_rate)
 
         self._start_record = False
 
