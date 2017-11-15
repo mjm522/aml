@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="demo_folder" default="sawyer2"/>
+    <arg name="demo_folder" default="sawyer_exp_test"/>
     <arg name="arm_interface" default="sawyer"/>
     <arg name="limb_name" default="right"/>
 

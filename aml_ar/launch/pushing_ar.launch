@@ -1,0 +1,28 @@
+<launch>
+
+    <!-- give a defulat value to arg -->
+
+
+    <!-- TODO:: how to give to different marker sizes ??-->
+    <arg name="box_markerSize"            default="0.124"/>    <!-- in m (old: 0.141), (decentralised marker was 0.122)-->
+    <arg name="marker_frame"              default="camera_link"/> <!-- camera_rgb_optical_frame -->
+    <arg name="ref_frame"                 default="marker"/>  <!-- leave empty and the pose will be published wrt param parent_name -->
+    <!-- camera_rgb_optical_frame -->
+
+    <!--  2.47314417  0.23107538  0.06962334 -->
+    <!-- goal left: 0.8276729,-0.15015955,0.0613232 -->
+    <!-- goal right:0.70064068, 0.76912946.  0.02922201 -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.70064068, 0.76912946 -0.093 0.589, 0.404, 0.713, 0.565 base box_goal 30" /> -->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="1.022 0.231 -0.093 0.589, 0.404, 0.413, 0.565 base box_goal 30" />-->
+    
+    <!-- Bag file 10 -->
+    <!-- 0.8276729, -0.15015955, 0.0613232 -->
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.8276729 -0.15015955 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />-->
+    
+    <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.7083 0.5866 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />
+
+    <node pkg="aml_data_collec_utils" type="box_marker_publisher.py" name="pushing_markers_publisher" output="screen" />
+
+</launch>
+
