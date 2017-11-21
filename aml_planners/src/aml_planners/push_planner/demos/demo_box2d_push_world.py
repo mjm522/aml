@@ -1,9 +1,10 @@
 import pylab
 import numpy as np
 import pygame as pg
-from config import config
+
 from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
+from aml_planners.push_planner.push_worlds.config import push_world_config as config
 
 
 def dynamics(x,u,dt, box):
@@ -55,7 +56,7 @@ def dynamics(x,u,dt, box):
 def main():
 
     # dt = 
-    world = PushWorld(config)
+    world = Box2DPushWorld(config)
 
     body_params = {'mass': world._box._dyn_body.mass }
 
