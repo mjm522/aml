@@ -260,15 +260,6 @@ def mppi_run(mppi_params):
 
             curr_dist_to_goal = np.linalg.norm(mppi_controller._x0-goal)
 
-            if update_rho:
-            
-                if (itr+1)%update_RhoN == 0:
-                    if curr_dist_to_goal < total_dist_to_goal:
-                        mppi_controller._rho = max(rhoMin, 0.8*mppi_controller._rho)
-                    else:
-                        mppi_controller._rho = min(rhoMax, 1.1*mppi_controller._rho)
-                    
-                    print "Current rho_value \t", mppi_controller._rho
 
             itr += 1
 

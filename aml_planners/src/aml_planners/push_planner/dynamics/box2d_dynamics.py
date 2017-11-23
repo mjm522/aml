@@ -23,7 +23,7 @@ class Box2DDynamics(Dynamics):
 
         # action, theta, f_mag, px, py, fx, fy = self._world.sample_push_action(action)
         action, pre_push_pos_x, pre_push_pos_y, fx, fy, push_pos_x, push_pos_y = self._world.sample_push_action2(action)
-        return [action, pre_push_pos_x, pre_push_pos_y, fx, fy, push_pos_x, push_pos_y]
+        return [[action, pre_push_pos_x, pre_push_pos_y, fx, fy, push_pos_x, push_pos_y]]
         # return [px,py,fx,fy]
 
 

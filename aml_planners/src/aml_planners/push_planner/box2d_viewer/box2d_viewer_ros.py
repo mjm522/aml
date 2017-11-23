@@ -5,9 +5,9 @@ import numpy as np
 from geometry_msgs.msg import Point
 from rospy_tutorials.msg import Floats
 
-from aml_planners.push_planner.push_worlds.config import config
 from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
+from aml_planners.push_planner.push_worlds.config import push_world_config as config
 
 
 class Box2DViewerROS(Box2DViewer):
@@ -24,12 +24,8 @@ class Box2DViewerROS(Box2DViewer):
         rospy.Subscriber("box2d_update_goal", Point, self.sub_update_goal_location)
         rospy.Subscriber("box2d_update_obstacle", Floats, self.sub_update_obs_location)
 
-        #in case we need to shift the plotting location 
-        self._x_offset = 0. 
-        self._y_offset = 0.
-
-        self._state = np.array([self._x_offset, self._y_offset, 0.,0.,0.,0.])
-        self._action = np.array([0.,0.,0.,0.,0.,0.,0.])
+        self._state = np.array([0., 0., 0.,0.,0.,0.])
+        self._action = [[0.,0.,0.,0.,0.,0.,0.] for _ in range(self._world._num_fingers)]
 
         self.visualize()
 
@@ -43,15 +39,11 @@ class Box2DViewerROS(Box2DViewer):
     def sub_world_state_callback(self, data):
         self._pose = data
         print "Received pose info \n", data
-        self._state = np.array([data.x+self._x_offset, data.y+self._y_offset, data.z, 0.,0.,0.])
+        self._state = np.array([data.x, data.y, data.z, 0.,0.,0.])
 
     def sub_action(self, data):
         self._action = list(data.data)
         print "Received action \n", self._action
-        self._action[1] += self._x_offset
-        self._action[2] += self._y_offset
-        self._action[5] += self._x_offset
-        self._action[6] += self._y_offset
 
     def visualize(self):
 

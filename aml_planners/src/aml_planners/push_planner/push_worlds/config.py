@@ -45,6 +45,7 @@ push_world_config = {
     'image_height': IMAGE_HEIGHT,
     'box_config':box_config,
     'fin_config':circle_fin_config,
+    'num_fins':1,
     'no_samples':20,
     'fps': 15,
     'dt': 0.01  ,#0.0167,
@@ -52,24 +53,5 @@ push_world_config = {
     'window_caption': 'BoxWorld',
     'pixels_per_meter': PIXELS_PER_METER,
     'push_mag': 0.05,
-    'pre_push_offset':0.05,
-}
-
-
-
-man_world_config = {
-
-    'image_width': IMAGE_WIDTH,
-    'image_height': IMAGE_HEIGHT,
-    'box_config':box_config,
-    'fin1_config':circle_fin_config,
-    'fin2_config':circle_fin_config,
-    'no_samples':20,
-    'fps': 15,
-    'dt': 0.05  ,#0.0167,
-    'steps_per_frame': 20,
-    'window_caption': 'Manipulated BoxWorld',
-    'pixels_per_meter': PIXELS_PER_METER,
-    'push_mag': 10.0,
     'pre_push_offset':0.05,
 }

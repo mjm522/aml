@@ -20,7 +20,7 @@ class Box2DPushWorld(object):
 
         self._config = config
 
-        self._last_push = [0,0,0,0] #px,py,F,theta
+        self._last_push = [[0,0,0,0]] #px,py,F,theta
         self._last_theta = 0
 
         self._clear_colour = (255,255,255)
@@ -35,9 +35,15 @@ class Box2DPushWorld(object):
         self._world = world(gravity=(0, 0), doSleep=True)
 
         self._box = Box(self._world, self._config['box_config'])
-        self._finger = Finger(self._world, self._config['fin_config'])
 
-        self._objects = [self._box, self._finger]
+        self._num_fingers = self._config['num_fins']
+
+        self._fingers = [Finger(self._world, self._config['fin_config'])  for _ in range(self._num_fingers)]
+
+        self._objects = [self._box]
+
+        for finger in self._fingers:
+            self._objects.append(finger)
 
         self._surface = pygame.Surface((config['image_width'], config['image_height']))
 
@@ -96,12 +102,15 @@ class Box2DPushWorld(object):
 
     def update(self, push_action):
 
-        self._finger.set_state((push_action[1], push_action[2], 0, 0, 0, 0))
+        if len(push_action) != self._num_fingers:
+            raise Exception("The number of fingers does not match push actions")
 
-        self._finger.apply_push2(0., 0., push_action[3], push_action[4])
+        for f in range(self._num_fingers):
 
-        #this is the push position in the world frame
-        self._last_push = [push_action[5], push_action[6], push_action[3], push_action[4]]
+            self._fingers[f].set_state((push_action[f][1], push_action[f][2], 0, 0, 0, 0))
+            self._fingers[f].apply_push2(0., 0., push_action[f][3], push_action[f][4])
+            #this is the push position in the world frame
+            self._last_push.append([push_action[f][5], push_action[f][6], push_action[f][3], push_action[f][4]])
 
 
     def step(self):
@@ -301,7 +310,7 @@ class Box2DPushWorld(object):
         fy = f_mag*np.sin(theta)
 
         # print self._push_counter
-        return action, theta, f_mag, px, py, fx, fy
+        return [action, theta, f_mag, px, py, fx, fy]
 
     def sample_push_action2(self, alpha=None):
 
@@ -310,6 +319,7 @@ class Box2DPushWorld(object):
 
         if isinstance(alpha, np.ndarray):
             alpha = float(alpha[0])
+        
         action = alpha
         # alpha = np.random.rand()
         # idx_0 = np.random.choice(len(vertices))
@@ -413,7 +423,24 @@ class Box2DPushWorld(object):
         fy = f_mag*fin_push_dir[1]
 
         # print self._push_counter
-        return action, pre_push_pos_world[0], pre_push_pos_world[1], fx, fy, push_pos_world[0], push_pos_world[1]
+        return [action, pre_push_pos_world[0], pre_push_pos_world[1], fx, fy, push_pos_world[0], push_pos_world[1]]
+
+
+    def sample_push_action3(self, alpha=[]):
+        push_actions = []
+        
+        if not alpha:
+            alpha = [self.get_push_action() for _ in range(self._num_fingers)]
+        else:
+            alpha = [None for _ in range(self._num_fingers)]
+
+        for f in range(self._num_fingers):
+            push_actions.append(self.sample_push_action2(alpha[f]))
+
+        return push_actions
+
+
+
 
 
 

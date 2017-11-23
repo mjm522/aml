@@ -51,8 +51,6 @@ def dynamics(x,u,dt, box):
     return x_next
 
 
-
-
 def main():
 
     # dt = 
@@ -63,7 +61,7 @@ def main():
     viewer = Box2DViewer(world, config, is_thread_loop=False)
 
     
-    action = world.sample_push_action2()
+    action = world.sample_push_action3()
     world.update(action)
     pc = 0
 
@@ -101,7 +99,8 @@ def main():
         pc += 1
 
         if pc >= 5:
-            action = world.sample_push_action2()
+            action = world.sample_push_action3()
+
             world.update(action)
             # world.reset()
             pc = 0
