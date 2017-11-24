@@ -16,7 +16,7 @@ base_params ={
 
 link1_params = {
         'type':'dynamic',
-        'pos':(base_params['pos'][0], base_params['pos'][1]+base_params['dim'][1]/2+FIN_LENGTH),
+        'pos':(base_params['pos'][0]-0.25*base_params['dim'][0], base_params['pos'][1]+base_params['dim'][1]/2+FIN_LENGTH),
         'ori':0.,
         'den':1,
         'mu':0.3,
@@ -95,11 +95,26 @@ man_config = {
     'joints':[joint1_params, joint2_params, joint3_params],
 }
 
+
+hole_config = {
+    'image_width': IMAGE_WIDTH,
+    'image_height': IMAGE_HEIGHT,
+    'pixels_per_meter': PIXELS_PER_METER,
+    'type':'static',
+    'pos':(base_params['pos'][0]+base_params['dim'][0], base_params['pos'][1]-base_params['dim'][1]),
+    'ori':0.,
+    'den':1,
+    'mu':0.3,
+    'vertices':[[(0,0),(6,0),(6,4),(0,4)],[(4,4),(6,4),(6,9),(4,9)], [(4,7),(4,9),(0,9),(0,7)]],
+    'color':(125,125,125,255),
+    'draw_corners':False,
+}
+
 box_config ={
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'pixels_per_meter': PIXELS_PER_METER,
-    'pos':(base_params['pos'][0]-5, base_params['pos'][1]-5),
+    'pos':(base_params['pos'][0]+2, base_params['pos'][1]+5),
     'ori':0,
     'dim':(1.,1.),
     'lin_damp':0.6,
@@ -107,19 +122,8 @@ box_config ={
     'awake':True,
     'den':1,
     'mu':0.3,
+    'color':(98,45,160,255),
     'draw_corners':True,
-}
-
-hole_config = {
-    'image_width': IMAGE_WIDTH,
-    'image_height': IMAGE_HEIGHT,
-    'pixels_per_meter': PIXELS_PER_METER,
-    'type':'static',
-    'pos':(base_params['pos'][0]+base_params['dim'][0], base_params['pos'][1]+5),
-    'ori':0.,
-    'vertices':[(-1.5,-0.5), (0.5,-1), (1,-0.5), (1,1.5), (0.5,1.5), (-0.5,1.3)],
-    'color':(125,125,125,255),
-    'draw_corners':False,
 }
 
 

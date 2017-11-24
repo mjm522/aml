@@ -27,7 +27,7 @@ class Box(object):
         self._box = self._dyn_body.CreatePolygonFixture(box=params['dim'], 
                                                         density=params['den'], 
                                                         friction=params['mu'])
-        self._colour = (125,125,125)
+        self._colour = self._config['color']
 
     def get_vertices_phys(self):
 

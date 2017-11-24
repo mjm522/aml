@@ -4,6 +4,7 @@ from Box2D import (b2_pi, b2Filter, b2FixtureDef, b2CircleShape, b2PolygonShape)
 from Box2D import (b2ContactListener, b2DestructionListener, b2DrawExtended)
 
 
+
 class Manipulator(object):
 
     def __init__(self, world, config):
