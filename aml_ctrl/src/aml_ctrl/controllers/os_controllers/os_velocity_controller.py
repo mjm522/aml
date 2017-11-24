@@ -34,6 +34,9 @@ class OSVelocityController(OSController):
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 
+        # temporary !!
+        self._old_time = self.get_time()
+
         
         self._qr_old   = self._robot._state['position']
 
@@ -41,6 +44,11 @@ class OSVelocityController(OSController):
 
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
+
+    def get_time(self):
+
+        time_now       = rospy.Time.now()
+        return time_now.secs + time_now.nsecs*1e-9
 
     def compute_cmd(self, time_elapsed):
 
@@ -63,7 +71,10 @@ class OSVelocityController(OSController):
         h              = robot_state['gravity_comp']
 
         # calculate the jacobian of the end effector
-        jac_ee         = robot_state['jacobian']
+        if self._orientation_ctrl:
+            jac_ee  = robot_state['jacobian']
+        else:
+            jac_ee  = robot_state['jacobian'][:3,:]
 
         # calculate the inertia matrix in joint space
         Mq             = robot_state['inertia']
@@ -77,19 +88,24 @@ class OSVelocityController(OSController):
 
         #pseudo inverse of jacobian
         jac_star       = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
+        # print jac_ee.shape
+        # print jac_star.shape
 
         #gradient of redundancy resolution function
         # grad_g         = 
 
-        curr_time      = rospy.Time.now(0)
+        curr_time      = self.get_time()
 
         dt             = curr_time - self._old_time
+        # print dt
+        if dt == 0.0:
+            dt = 0.0001
 
         self._old_time = curr_time
 
 
         #reference velocity
-        dxr            = goal_vel + self._kp_p(goal_pos-ee_pos)
+        dxr            = goal_vel + self._kp_p*(goal_pos-ee_pos)
 
         #reference_joint_velocity
         if self._integrate_jnt_velocity:
@@ -149,7 +165,10 @@ class OSVelocityController(OSController):
         a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
  
         # calculate desired force in (x,y,z) space
-        Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
+        if self._orientation_ctrl:
+            Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
+        else:
+            Fx                  = np.dot(Mx,x_des + 0.*a_g)
 
 
         # transform into joint space, add vel and gravity compensation
@@ -180,7 +199,6 @@ class OSVelocityController(OSController):
 
         # Never forget to update the error
         self._error = {'linear' : x_des, 'angular' : omg_des}
-
         return self._cmd
 
     def send_cmd(self,time_elapsed):
