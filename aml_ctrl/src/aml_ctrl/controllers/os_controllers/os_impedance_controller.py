@@ -19,7 +19,7 @@ class OSImpedanceController(OSController):
         #desired damping in the joint space
         self._kd_q       = self._config['kd_q']
         #desired task space impedance
-        self._Md         =  self._config['kd_p']
+        self._Md         =  self._config['Md']
         #proportional gain for orientation
         self._kp_o       = self._config['kp_o']
         #derivative gain for orientation
@@ -33,7 +33,7 @@ class OSImpedanceController(OSController):
 
         self._use_ori_control = self._config['use_orientation_ctrl']
 
-        self.initlialise()
+        self.initialise()
 
 
     def get_time(self):
@@ -42,7 +42,7 @@ class OSImpedanceController(OSController):
         return time_now.secs + time_now.nsecs*1e-9
 
 
-    def initlialise(self):
+    def initialise(self):
 
         robot_state    = self._robot._state
         self._t_old    = self.get_time()
@@ -58,6 +58,9 @@ class OSImpedanceController(OSController):
         t              = self.get_time()
 
         dt             = t - self._t_old
+
+        if dt == 0.0:
+            dt = 0.001
 
         self._t_old    = t
 
@@ -124,11 +127,11 @@ class OSImpedanceController(OSController):
         #from morteza slide
         xdd = np.zeros(3)
         tmp = np.dot(Mcart, Md_inv)
-        f = ee_force + np.dot(Mcart, xdd) + np.dot(tmp, (np.dot(self._kd_p, delta_pos) + np.dot(self._kd_p, delta_vel)) ) - np.dot(tmp, ee_force)
+        f = ee_force + np.dot(Mcart, xdd) + np.dot(tmp, (np.dot(self._kp_p, delta_pos) + np.dot(self._kd_p, delta_vel)) ) - np.dot(tmp, ee_force)
         tau_task = np.dot( np.dot(Jee.transpose(), Mcart),  f)
 
         self._cmd = tau_task + tau_pose
-        
+
         return self._cmd
 
     def compute_cmd_2(self, time_elapsed):
@@ -209,7 +212,7 @@ class OSImpedanceController(OSController):
         
         return self._cmd
 
-    def compute_command(self, time_elapsed):
+    def compute_cmd(self, time_elapsed):
         return self.compute_cmd_1(time_elapsed)
 
 
