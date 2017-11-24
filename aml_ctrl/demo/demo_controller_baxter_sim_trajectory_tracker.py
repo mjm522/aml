@@ -16,6 +16,7 @@ from aml_robot.baxter_robot import BaxterArm
 from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 from aml_ctrl.controllers.os_controllers.os_velocity_controller import OSVelocityController
+from aml_ctrl.controllers.os_controllers.os_impedance_controller import OSImpedanceController
 
 from aml_visual_tools.rviz_markers import RvizMarkers
 
@@ -76,6 +77,8 @@ def setController(controller_id, arm):
         controller = OSVelocityController(arm)
     elif controller_id == 3:
         controller = OSTorqueController(arm)
+    elif controller_id == 4:
+        controller = OSImpedanceController(arm)
 
     controller_defined = True
     return controller
@@ -91,6 +94,9 @@ def switchController(switch_control_feedback):
     if switch_control_feedback.menu_entry_id == 7:
         print "Switching to Torque Control"
         control_id = 3
+    if switch_control_feedback.menu_entry_id == 8:
+        print "Switching to Impedance Control"
+        control_id = 4
     ctrlr = setController(control_id,limb)
     ctrlr.set_active(True)
 
@@ -103,7 +109,7 @@ def init_menu():
     menu_handler.insert("Position Controller", parent = control_menu, callback =  switchController)
     menu_handler.insert("Velocity Controller", parent = control_menu, callback =  switchController)
     menu_handler.insert("Torque Controller", parent = control_menu, callback =  switchController)
-
+    menu_handler.insert("Impedance Controller", parent = control_menu, callback = switchController)
 
 if __name__=="__main__":
     if not len(sys.argv) == 2:
@@ -111,10 +117,10 @@ if __name__=="__main__":
             control_id = 1
             print "Using Position Control"
         else:
-            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n"
+            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
             sys.exit()
     else:
-        if float(sys.argv[1]) < 4 and float(sys.argv[1]) > 0:
+        if float(sys.argv[1]) < 5 and float(sys.argv[1]) > 0:
             control_id = float(sys.argv[1])
             if control_id == 1:
                 print "Using Position Controller"
@@ -122,9 +128,11 @@ if __name__=="__main__":
                 print "Using Velocity Controller"
             elif control_id == 3:
                 print "Using Torque Controller"
+            elif control_id == 4:
+                print "Using Impedance Controller"
         else:
             print "\nInvalid Control ID!"
-            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n"
+            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
             sys.exit()
 
     controller_defined = False
