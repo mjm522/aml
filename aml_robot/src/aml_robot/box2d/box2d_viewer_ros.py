@@ -5,7 +5,7 @@ import numpy as np
 from geometry_msgs.msg import Point
 from rospy_tutorials.msg import Floats
 
-from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
+from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
 from aml_planners.push_planner.push_worlds.config import push_world_config as config
 

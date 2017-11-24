@@ -2,7 +2,7 @@ import pylab
 import numpy as np
 import pygame as pg
 
-from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
+from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
 from aml_planners.push_planner.push_worlds.config import push_world_config as config
 

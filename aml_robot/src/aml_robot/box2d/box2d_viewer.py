@@ -3,18 +3,22 @@ import pygame
 import threading
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
-from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_r, K_f)
+
+from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_r, K_f, K_s, K_c, K_i, K_j, K_k, K_l)
 
 class Box2DViewer(object):
 
     def __init__(self, world, config, is_thread_loop = True):
+
+
+        pygame.init()
 
         self._config = config
 
         self._steps_per_frame = self._config['steps_per_frame']
 
         self._world = world
+
 
         # --- pygame setup ---
         # pygame.init()
@@ -28,6 +32,13 @@ class Box2DViewer(object):
         self._running = True
         self._loop_thread = None
         self._last_screen = None
+
+        self._clear_screen_enabled = True
+
+        if 'cam_pos' in self._config.keys():
+            self._cam_pos = self._config['cam_pos']
+        else:
+            self._cam_pos = (0., 0.)
 
         if is_thread_loop:
             self.threaded_loop()
@@ -72,12 +83,43 @@ class Box2DViewer(object):
                 self._steps_per_frame += 50
                 print "simulation steps per frame", self._steps_per_frame
 
+            elif  (event.type == KEYDOWN and event.key == K_s):
+                self._world.reset()
+                print "Reseting world"
+
+            elif  (event.type == KEYDOWN and event.key == K_c):
+                self._clear_screen_enabled = not self._clear_screen_enabled
+
+                self._world._clear_screen_enabled = self._clear_screen_enabled
+                print "Toggle clear screen: ", self._clear_screen_enabled
+
+            elif  (event.type == KEYDOWN and event.key == K_i):
+                self._cam_pos[1] = self._cam_pos[1] - 5
+
+                print "Camera pos", self._cam_pos
+
+            elif  (event.type == KEYDOWN and event.key == K_k):
+                self._cam_pos[1] = self._cam_pos[1] + 5
+
+                print "Camera pos", self._cam_pos
+
+            elif  (event.type == KEYDOWN and event.key == K_j):
+                self._cam_pos[0] = self._cam_pos[0] - 5
+
+                print "Camera pos", self._cam_pos
+
+            elif  (event.type == KEYDOWN and event.key == K_l):
+                self._cam_pos[0] = self._cam_pos[0] + 5
+
+                print "Camera pos", self._cam_pos
+
 
             self._world.handle_event(event)
 
 
     def clear_screen(self, color=(0,0,0,0)):
-        self._screen.fill(color)
+        if self._clear_screen_enabled:
+            self._screen.fill(color)
 
     def flip(self):
 
@@ -96,10 +138,10 @@ class Box2DViewer(object):
         self._last_screen = copy.deepcopy(img.transpose(1,0,2))
 
 
-    def draw(self, view_info=True):
+    def draw(self):
         # Draw the world
         #view_info to true to see the text, arrow as well as point of pushing
-        self._world.draw(self, view_info=view_info)
+        self._world.draw(self._screen, self._cam_pos)
         # self.save_screen()
         self.store_screen()
         self.flip()
@@ -125,11 +167,15 @@ class Box2DViewer(object):
 
         self.clear_screen(color=(255,255,255,255))
 
-        for i in range(self._steps_per_frame):
-            self._world.update(self)               
-            self._world.step()
 
-        self.draw(view_info=False)
+        # action = self._world.sample_push_action()
+
+        for i in range(self._steps_per_frame):
+            # self._world.update(self)               
+            self._world.step()
+            pass
+
+        self.draw()
 
 
 
