@@ -205,7 +205,7 @@ class OSImpedanceController(OSController):
         #from morteza slide
         xdd = np.zeros(3)
         tmp = np.dot(Mcart, Md_inv)
-        f = ee_force + np.dot(Mcart, xdd) + np.dot(tmp, (np.dot(self._kd_p, delta_pos) + np.dot(self._kd_p, delta_vel)) ) - np.dot(tmp, ee_force)
+        f = ee_force + np.dot(Mcart, xdd) + np.dot(tmp, (np.dot(self._kp_p, delta_pos) + np.dot(self._kd_p, delta_vel)) ) - np.dot(tmp, ee_force)
         tau_task = np.dot( np.dot(Jee.transpose(), Mcart),  f)
 
         self._cmd = tau_task + tau_pose

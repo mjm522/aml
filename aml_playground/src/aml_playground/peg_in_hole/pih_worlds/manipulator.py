@@ -4,6 +4,7 @@ from Box2D import (b2_pi, b2Filter, b2FixtureDef, b2CircleShape, b2PolygonShape)
 from Box2D import (b2ContactListener, b2DestructionListener, b2DrawExtended)
 
 
+
 class Manipulator(object):
 
     def __init__(self, world, config):
@@ -29,8 +30,7 @@ class Manipulator(object):
             self._link_color.append(link['color'])
             
             if link['type'] ==  'static':
-                self._bodies.append(self._world.CreateStaticBody(position=link['pos']))
-                self._links.append(self._bodies[-1].CreatePolygonFixture(box=link['dim']))
+                body = self._world.CreateStaticBody(position=link['pos'])
 
             elif link['type'] == 'dynamic':
                 body = self._world.CreateDynamicBody(position=link['pos'], 
@@ -38,16 +38,16 @@ class Manipulator(object):
                                                      linearDamping=link['lin_damp'],
                                                      angularDamping=link['ang_damp'],
                                                      awake=link['awake'])
-
-                shape = body.CreatePolygonFixture(box=link['dim'], 
-                                                  density=link['den'], 
-                                                  friction=link['mu'])
-                self._bodies.append(body)
-                self._links.append(shape)
-
-
             else:
                 raise Exception("Unknown type")
+
+
+            shape = body.CreatePolygonFixture(box=link['dim'], 
+                                  density=link['den'], 
+                                  friction=link['mu'])
+            
+            self._bodies.append(body)
+            self._links.append(shape)
 
         k = 0
         for joint in params['joints']:

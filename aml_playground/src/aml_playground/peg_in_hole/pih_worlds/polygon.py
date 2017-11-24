@@ -15,6 +15,12 @@ class Polygon(object):
 
         self._colour = self._config['color']
 
+        #box2d allows only convex polygons and hence to create non-convex polygons, 
+        #we have to create combination of convex polygons
+        self._num_polygons = len(config['vertices'])
+
+        self._body_shape = []
+
         if self._config['type'] == 'dynamic':
             # Create a dynamic body
             self._body = self._world.CreateDynamicBody(position=config['pos'], 
@@ -27,20 +33,21 @@ class Polygon(object):
                                                            awake=True)
 
 
-            
-
-            # And add a box fixture onto it (with a nonzero density, so it will move)
-            self._body_shape = self._body.CreatePolygonFixture(vertices=config['vertices'], 
-                                                               density=1, 
-                                                               friction=0.3, 
-                                                               filter=b2Filter(groupIndex=-8,))
         elif self._config['type'] == 'static':
 
             self._body       = self._world.CreateStaticBody(position=config['pos'])
-            self._body_shape = self._body.CreatePolygonFixture(vertices=config['vertices'])
+            # self._body_shape = self._body.CreatePolygonFixture(vertices=config['vertices'])
         
         else:
             raise Exception("Unknown type")
+
+
+        for k in range(self._num_polygons):
+            # And add a box fixture onto it (with a nonzero density, so it will move)
+            self._body_shape.append(self._body.CreatePolygonFixture(vertices=config['vertices'][k], 
+                                                                    density=config['den'], 
+                                                                    friction=config['mu'], 
+                                                                    filter=b2Filter(groupIndex=-8,)))
 
 
     def get_vertices_phys(self):
@@ -50,17 +57,17 @@ class Polygon(object):
 
         return vertices
 
-    def get_vertices_local(self):
+    def get_vertices_local(self, polygon_idx):
 
-        vertices = self._body_shape.shape.vertices
+        vertices = self._body_shape[polygon_idx].shape.vertices
 
         return vertices
 
-    def get_vertices(self, cam_pos = (0,0)):
+    def get_vertices(self, polygon_idx, cam_pos = (0,0)):
 
         # The fixture holds information like density and friction,
         # and also the shape.
-        shape = self._body_shape.shape
+        shape = self._body_shape[polygon_idx].shape
 
         # Naively assume that this is a polygon shape. (not good normally!)
         # We take the body's transform and multiply it with each
@@ -77,18 +84,18 @@ class Polygon(object):
 
     def draw(self, surface, cam_pos = (0,0)):
 
-        vertices = self.get_vertices(cam_pos)
+        for k in range(self._num_polygons):
 
-        #print vertices
+            vertices = self.get_vertices(k, cam_pos)
 
-        pygame.draw.polygon(surface, self._colour, vertices)
+            pygame.draw.polygon(surface, self._colour, vertices)
 
-        cs = [(125,0,0), (0,125,0), (0,0,125), (125,125,125)]
-        if self._config['draw_corners']:
-            for idx in range(len(vertices)):
-                v = vertices[idx]
-                c = cs[idx]
-                pygame.draw.circle(surface, c, (int(v[0]),int(v[1])), 5, 0)
+            cs = [(125,0,0), (0,125,0), (0,0,125), (125,125,125)]
+            if self._config['draw_corners']:
+                for idx in range(len(vertices)):
+                    v = vertices[idx]
+                    c = cs[idx]
+                    pygame.draw.circle(surface, c, (int(v[0]),int(v[1])), 5, 0)
 
 
     def get_angle(self):
@@ -144,9 +151,9 @@ class Polygon(object):
 
         return np.array([px,py])
 
-    def get_push_action(self):
+    def get_push_action(self, polygon_idx=0):
 
-        n_vertices = len(self.get_vertices_local())
+        n_vertices = len(self.get_vertices_local(polygon_idx))
         step = 1.0/n_vertices
         acc = 0.0
         push_actions = []
@@ -157,10 +164,10 @@ class Polygon(object):
         return push_actions[np.random.randint(0,len(push_actions))] #np.random.randint(0,4)
 
 
-    def get_centre_local(self):
-        return np.mean(self.get_vertices_local())
+    def get_centre_local(self, polygon_idx=0):
+        return np.mean(self.get_vertices_local(polygon_idx))
 
-    def sample_push_action(self, alpha = None, push_mag = 0.05, pre_push_offset = 0.05):
+    def sample_push_action(self, polygon_idx=0, alpha = None, push_mag = 0.05, pre_push_offset = 0.05):
 
         if alpha is None:
             alpha = self.get_push_action()
@@ -169,7 +176,7 @@ class Polygon(object):
             alpha = float(alpha[0])
         action = alpha
 
-        vertices = self.get_vertices_local()
+        vertices = self.get_vertices_local(polygon_idx)
 
 
         step = 1.0/len(vertices)

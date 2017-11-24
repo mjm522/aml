@@ -7,6 +7,7 @@ from plotter import Plotter
 from Box2D import (b2Filter,)
 from polygon import Polygon
 from manipulator import Manipulator
+from contact_sensor import ContactSensor
 from Box2D.b2 import (world, polygonShape, staticBody, dynamicBody)
 
 
@@ -28,7 +29,7 @@ class Box2DPIHWorld(object):
 
         # --- pybox2d world setup ---
         # Create the world
-        self._world = world(gravity=(0, 0), doSleep=True)
+        self._world = world(gravity=(0, 0), doSleep=True, contactListener=ContactSensor())
 
         self._box = Box(self._world, self._config['box_config'])
 
