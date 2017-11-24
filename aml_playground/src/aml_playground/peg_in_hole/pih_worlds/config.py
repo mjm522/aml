@@ -10,6 +10,8 @@ base_params ={
     'type':'static',
     'pos':(15,20),
     'dim':(4,0.5),
+    'den':1,
+    'mu':0.3,
     'color':(127, 127, 127, 255),
 }
 
