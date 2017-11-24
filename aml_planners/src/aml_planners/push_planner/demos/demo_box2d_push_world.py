@@ -2,7 +2,7 @@ import pylab
 import numpy as np
 import pygame as pg
 
-from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
+from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
 from aml_planners.push_planner.push_worlds.config import push_world_config as config
 
@@ -51,8 +51,6 @@ def dynamics(x,u,dt, box):
     return x_next
 
 
-
-
 def main():
 
     # dt = 
@@ -63,7 +61,7 @@ def main():
     viewer = Box2DViewer(world, config, is_thread_loop=False)
 
     
-    action = world.sample_push_action2()
+    action = world.sample_push_action3()
     world.update(action)
     pc = 0
 
@@ -101,7 +99,8 @@ def main():
         pc += 1
 
         if pc >= 5:
-            action = world.sample_push_action2()
+            action = world.sample_push_action3()
+
             world.update(action)
             # world.reset()
             pc = 0

@@ -2,22 +2,23 @@ import pylab
 import numpy as np
 import pygame as pg
 
-from aml_planners.push_planner.box2d_viewer.box2d_viewer import Box2DViewer
-from aml_planners.push_planner.push_worlds.box2d_man_world import Box2DManWorld
-from aml_planners.push_planner.push_worlds.config import man_world_config as config
+from aml_robot.box2d.box2d_viewer import Box2DViewer
+from aml_playground.peg_in_hole.pih_worlds.box2d_pih_world import Box2DPIHWorld
+from aml_playground.peg_in_hole.pih_worlds.config import pih_world_config as config
+
 
 def main():
 
     # dt = 
-    world = Box2DManWorld(config)
+    world = Box2DPIHWorld(config)
 
     body_params = {'mass': world._box._dyn_body.mass }
 
     viewer = Box2DViewer(world, config, is_thread_loop=False)
 
     
-    action_fin1, action_fin2 = world.sample_push_action3()
-    world.update2(action_fin1, action_fin2)
+    action = world.sample_action()
+    world.update(action)
     pc = 0
 
     while viewer._running:
@@ -54,8 +55,9 @@ def main():
         pc += 1
 
         if pc >= 5:
-            action_fin1, action_fin2 = world.sample_push_action3()
-            world.update2(action_fin1, action_fin2)
+            action = world.sample_action()
+
+            world.update(action)
             # world.reset()
             pc = 0
 
