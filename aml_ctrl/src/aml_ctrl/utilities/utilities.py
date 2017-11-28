@@ -3,14 +3,10 @@ import numpy as np
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 def quatdiff(quat_curr, quat_des):
-    #convert to array is the input arguments are of quaternion type
-    if isinstance(quat_des, np.quaternion):
-        quat_des = quaternion.as_float_array(quat_des)
 
-    if isinstance(quat_curr, np.quaternion):
-        quat_curr = quaternion.as_float_array(quat_curr)
-
-    return quat_des[0]*quat_curr[1:4] - quat_curr[0]*quat_des[1:4] + np.cross(quat_des[1:4],quat_curr[1:4])
+    qdiff = 2*(quat_curr*quat_des.conjugate()).log()
+    qdiff_array = quaternion.as_float_array(qdiff)
+    return qdiff_array[1:]
 
 def standard_shape_traj(curr_pos, no_set_points=16, shape='circle'):
     

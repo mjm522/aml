@@ -1,7 +1,7 @@
 from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
 from visualization_msgs.msg import *
-
+from geometry_msgs.msg import Quaternion
 
 class RvizMarkers():
 
@@ -26,10 +26,15 @@ class RvizMarkers():
         msg.controls.append( control )
         return control
 
-    def makeMarker( self, fixed, interaction_mode, position, show_6dof = False):
+    def makeMarker( self, fixed, interaction_mode, position, orientation, show_6dof = False):
         int_marker = InteractiveMarker()
         int_marker.header.frame_id = "base"
         int_marker.pose.position = position
+
+        init_orientation = Quaternion(orientation[1], orientation[2], orientation[3], orientation[0])
+
+        int_marker.pose.orientation = init_orientation
+
         int_marker.scale = 1
 
         int_marker.name = "marker"
@@ -57,9 +62,10 @@ class RvizMarkers():
         if show_6dof: 
             control = InteractiveMarkerControl()
             control.orientation.w = 1
-            control.orientation.x = 1
+            control.orientation.x = 0
             control.orientation.y = 0
             control.orientation.z = 0
+
             control.name = "rotate_x"
             control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
             if fixed:
@@ -67,10 +73,8 @@ class RvizMarkers():
             int_marker.controls.append(control)
 
             control = InteractiveMarkerControl()
-            control.orientation.w = 1
-            control.orientation.x = 1
-            control.orientation.y = 0
-            control.orientation.z = 0
+            control.orientation = init_orientation
+
             control.name = "move_x"
             control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
             if fixed:

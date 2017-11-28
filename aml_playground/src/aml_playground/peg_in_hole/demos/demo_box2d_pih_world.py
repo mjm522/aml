@@ -3,8 +3,8 @@ import numpy as np
 import pygame as pg
 
 from aml_robot.box2d.box2d_viewer import Box2DViewer
-from aml_playground.peg_in_hole.pih_worlds.box2d_pih_world import Box2DPIHWorld
-from aml_playground.peg_in_hole.pih_worlds.config import pih_world_config as config
+from aml_playground.peg_in_hole.pih_worlds.box2d.box2d_pih_world import Box2DPIHWorld
+from aml_playground.peg_in_hole.pih_worlds.box2d.config import pih_world_config as config
 
 
 def main():
