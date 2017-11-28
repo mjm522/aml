@@ -64,20 +64,12 @@ class OSPositionController(OSController):
 
         delta_vel      = goal_vel - curr_vel
 
-        print "Curr vel", curr_vel, np.linalg.norm(delta_pos)
-        # print "Delta pos", np.linalg.norm(delta_pos), np.linalg.norm(delta_pos)
-
 
         if np.linalg.norm(delta_pos) < self._pos_threshold:
             delta_pos = np.zeros(delta_pos.shape)
             delta_vel = np.zeros(delta_vel.shape)
 
-            print "dpos: ", delta_pos, " dvel: ", delta_vel
-
-
         if self._orientation_ctrl:
-
-            print "GOOD!"
             if goal_ori is None:
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
@@ -85,11 +77,10 @@ class OSPositionController(OSController):
             delta_ori       = quatdiff(goal_ori, curr_ori)
             delta_omg       = goal_omg - curr_omg
 
+
             if np.linalg.norm(delta_ori) < self._angular_threshold:
                 delta_ori = np.zeros(delta_ori.shape)
                 delta_omg = np.zeros(delta_omg.shape)
-
-                print "dori: ", delta_ori, " delta_omg: ", delta_omg
 
             delta           = np.hstack([self._kp_p*delta_pos + self._kd_p*delta_vel, 
                                          self._kp_o*delta_ori + self._kd_o*delta_omg])

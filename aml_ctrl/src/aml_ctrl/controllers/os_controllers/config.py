@@ -50,8 +50,8 @@ OS_VELCTY_CNTLR = {
 
 
 OS_JT_TORQUE_CNTLR = {
-    'rate': 500,
-    'kp_p': 0.0001, #gains for position
+    'rate': 200,
+    'kp_p': 0.5, #gains for position
     'kd_p': np.sqrt(0.),
     'kp_o': 0., #gains for orientation
     'kd_o': np.sqrt(0.), #gains for orientation
