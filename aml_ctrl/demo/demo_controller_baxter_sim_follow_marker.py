@@ -33,7 +33,7 @@ def processFeedback(feedback):
     print feedback.marker_name + "_marker is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z)
 
     goal_pos = np.array([p.x,p.y,p.z])
-    goal_ori = np.array([q.x,q.y,q.z,q.w])
+    goal_ori = np.quaternion(q.w, q.x,q.y,q.z)
     if feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
 
         ctrlr.set_active(True)
@@ -141,8 +141,7 @@ if __name__=="__main__":
     ctrlr = setController(control_id, limb)
 
     start_pos, start_ori = limb.get_ee_pose()
-    goal_ori = quaternion.as_float_array(start_ori)
-    print start_ori
+    goal_ori = start_ori#quaternion.as_float_array(start_ori)
     ctrlr.set_active(True)
 
     # create an interactive marker server on the topic namespace basic_control
@@ -151,7 +150,7 @@ if __name__=="__main__":
 
     # create an interactive marker for our server
     position = Point( start_pos[0], start_pos[1], start_pos[2])
-    marker = destinationMarker.makeMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, True)
+    marker = destinationMarker.makeMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, quaternion.as_float_array(start_ori), True)
     server.insert(marker, processFeedback)
     menu_handler.apply( server, marker.name )
 

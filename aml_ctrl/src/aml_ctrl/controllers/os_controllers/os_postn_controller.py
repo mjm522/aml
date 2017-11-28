@@ -26,7 +26,9 @@ class OSPositionController(OSController):
         #null space control gain
         self._alpha    = self._config['alpha']
 
-        self._pos_threshold = self._config['pos_threshold']
+        self._pos_threshold = self._config['linear_error_thr']
+
+        self._angular_threshold = self._config['angular_error_thr']
 
         self._dt = self._config['dt']
 
@@ -62,17 +64,35 @@ class OSPositionController(OSController):
 
         delta_vel      = goal_vel - curr_vel
 
+        print "Curr vel", curr_vel, np.linalg.norm(delta_pos)
+        # print "Delta pos", np.linalg.norm(delta_pos), np.linalg.norm(delta_pos)
+
+
+        if np.linalg.norm(delta_pos) < self._pos_threshold:
+            delta_pos = np.zeros(delta_pos.shape)
+            delta_vel = np.zeros(delta_vel.shape)
+
+            print "dpos: ", delta_pos, " dvel: ", delta_vel
+
 
         if self._orientation_ctrl:
+
+            print "GOOD!"
             if goal_ori is None:
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
 
-            delta_ori       = quatdiff(quaternion.as_float_array(goal_ori), quaternion.as_float_array(curr_ori))
+            delta_ori       = quatdiff(goal_ori, curr_ori)
             delta_omg       = goal_omg - curr_omg
 
-            delta           = np.hstack([self._kp_p*delta_pos - self._kd_p*delta_vel, 
-                                         self._kp_o*delta_ori - self._kd_o*delta_omg])
+            if np.linalg.norm(delta_ori) < self._angular_threshold:
+                delta_ori = np.zeros(delta_ori.shape)
+                delta_omg = np.zeros(delta_omg.shape)
+
+                print "dori: ", delta_ori, " delta_omg: ", delta_omg
+
+            delta           = np.hstack([self._kp_p*delta_pos + self._kd_p*delta_vel, 
+                                         self._kp_o*delta_ori + self._kd_o*delta_omg])
         else:
 
             jac_ee          = jac_ee[0:3,:]
@@ -91,7 +111,7 @@ class OSPositionController(OSController):
 
         self._cmd           = (u_null + u_err)*self._dt
 
-        if np.any(np.isnan(self._cmd)) or np.linalg.norm(delta_pos) < self._pos_threshold:
+        if np.any(np.isnan(self._cmd)): #or 
             self._cmd       = np.zeros(self._robot._nu)
             
         # Never forget to update the error

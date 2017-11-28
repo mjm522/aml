@@ -69,17 +69,16 @@ OS_JT_TORQUE_CNTLR = {
 
 OS_POSTN_CNTLR = {
     'rate': 100,
-    'kp_p': 9., #gains for position
-    'kd_p': np.sqrt(5.),
-    'kp_o': 3.0, #gains for orientation
-    'kd_o': np.sqrt(3.0), #gains for orientation
+    'kp_p': 5., #gains for position
+    'kd_p': np.sqrt(1.)*0,
+    'kp_o': 8.0, #gains for orientation
+    'kd_o': np.sqrt(0.0)*0, #gains for orientation
     'alpha': 3.14,
-    'null_kp': 4.0,
-    'null_kd': 2.5,
+    'null_kp': 4.0*0,
+    'null_kd': 2.5*0,
     'use_orientation_ctrl': True,
-    'pos_threshold': 0.01,
     'linear_error_thr': 0.05, # error of 2 cm
-    'angular_error_thr': 0.3, # allowing angular errors of 0.3 radians
+    'angular_error_thr': 0.05, # allowing angular errors of 0.3 radians
     'js_pos_error_thr' :0.1,
     'dt' : 0.01
 }
