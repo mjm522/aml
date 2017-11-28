@@ -49,6 +49,9 @@ class Manipulator(object):
             self._bodies.append(body)
             self._links.append(shape)
 
+        if len(params['links']) - len(params['joints']) != 1:
+            raise Exception("There are not sufficient number of joints!")
+
         k = 0
         for joint in params['joints']:
             joint = self._world.CreateRevoluteJoint(
