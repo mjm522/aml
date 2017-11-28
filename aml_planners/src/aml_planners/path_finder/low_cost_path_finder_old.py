@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 from aml_io.io_tools import save_data, load_data
 
+np.random.seed(42)
+
 class LowCostPathFinder(object):
 
     def __init__(self, sg, heatmap_data_file, state_constraints, no_rollouts=100, no_timesteps=100):
@@ -73,9 +75,10 @@ class LowCostPathFinder(object):
         dy_traj_samples = np.random.randn(self._K, self._N, 1)
 
         for k in range(self._K):
-
+            
             x_traj_samples[k,:,:] = self.put_x_state_constraints( (x_traj + gain*dx_traj_samples[k,:,:]).flatten() )
             y_traj_samples[k,:,:] = self.put_y_state_constraints( (y_traj + gain*dy_traj_samples[k,:,:]).flatten()  )
+
             cost_traj_samples[k,:] = self.get_cost_traj(x_traj_samples[k,:,:], y_traj_samples[k,:,:])
 
         return x_traj_samples, y_traj_samples, dx_traj_samples, dy_traj_samples, cost_traj_samples
@@ -150,7 +153,11 @@ def main():
 
     heatmap_data_file = os.environ['AML_DATA'] + '/aml_planners/push_planner/single_push_planner/heat_maps/baxter_heatmap.pkl'
 
-    lcpf = LowCostPathFinder(sg=sg, state_constraints=state_constraints, heatmap_data_file=heatmap_data_file)
+    lcpf = LowCostPathFinder(sg=sg, 
+                             state_constraints=state_constraints, 
+                             heatmap_data_file=heatmap_data_file, 
+                             no_rollouts=100, 
+                             no_timesteps=100)
     lcpf.run()
 
 if __name__ == '__main__':
