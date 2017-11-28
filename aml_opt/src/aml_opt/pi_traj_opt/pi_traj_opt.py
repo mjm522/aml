@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 from aml_io.io_tools import save_data, load_data
 
-np.random.seed(42)
-
 class PITrajOpt(object):
 
     def __init__(self, config, cost_fn, visualize_fn=None):
@@ -22,11 +20,11 @@ class PITrajOpt(object):
         self._traj_min  = config['state_constraints']['min']
         self._traj_max  = config['state_constraints']['max']
 
+        self._init_traj = np.zeros([self._N, self._num_traj])
+
         if  config['init_traj'] is None:
-            _init_traj = []
             for k in range(self._num_traj):
-                _init_traj.append(np.linspace(config['start'][k], config['goal'][k], self._N))
-            self._init_traj = np.asarray(_init_traj)
+                self._init_traj[:, k] = np.linspace(config['start'][k], config['goal'][k], self._N)
         else:
             self._init_traj = config['init_traj']
 
@@ -37,14 +35,15 @@ class PITrajOpt(object):
         if self._init_traj.ndim == 1:
             self._init_traj = self._init_traj[None, :]
 
-        self._init_traj = self._init_traj.T
+        if self._init_traj.shape[0] != self._N:
+            self._init_traj = self._init_traj.T
 
     
     def put_state_constraints(self, traj):
 
         for k in range(self._num_traj):
-            traj[:,k][traj[:,k]<self._traj_min[k]] = self._traj_min[k]
-            traj[:,k][traj[:,k]>self._traj_max[k]] = self._traj_max[k]
+            traj[:,k][traj[:,k] < self._traj_min[k]] = self._traj_min[k]
+            traj[:,k][traj[:,k] > self._traj_max[k]] = self._traj_max[k]
 
         return traj
 
@@ -57,8 +56,8 @@ class PITrajOpt(object):
 
         for k in range(self._K):
             
-            traj_samples[k,:,:] = self.put_state_constraints( (traj[None, :, :] + gain*del_traj_samples[k,:,:]))
-
+            traj_samples[k,:,:] = self.put_state_constraints( (traj[None, :, :] + gain*del_traj_samples[k,:,:]).squeeze() )
+            
             cost_traj_samples[k,:] = self._cost(traj_samples[k,:,:])
 
         return traj_samples, del_traj_samples, cost_traj_samples
@@ -74,13 +73,13 @@ class PITrajOpt(object):
     def savitsky_gollay_filter(self, traj):
         return savgol_filter(x=traj, window_length=5, polyorder=2)
 
-    def modify_traj(self, traj):
+    def modify_traj(self, traj, traj_change_gain=1e-1):
 
         traj_samples, del_traj_samples, cost_traj_samples = self.get_traj_samples(traj)
 
         traj_change = self.compute_traj_change(cost_traj_samples, del_traj_samples)
 
-        tmp_traj =  self.put_state_constraints(  (traj + 1e-1*traj_change) )[1:self._N-1, :]
+        tmp_traj =  self.put_state_constraints(  (traj + traj_change_gain*traj_change) )[1:self._N-1, :]
 
         for k in range(self._num_traj):
             traj[1:self._N-1, k] = self.savitsky_gollay_filter(tmp_traj[:,k])

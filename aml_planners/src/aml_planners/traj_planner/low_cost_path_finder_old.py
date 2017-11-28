@@ -151,7 +151,7 @@ def main():
     }
 
 
-    heatmap_data_file = os.environ['AML_DATA'] + '/aml_planners/push_planner/single_push_planner/heat_maps/baxter_heatmap.pkl'
+    heatmap_data_file = os.environ['AML_DATA'] + '/aml_planners/traj_planner/heat_maps/heatmap_good.pkl'
 
     lcpf = LowCostPathFinder(sg=sg, 
                              state_constraints=state_constraints, 

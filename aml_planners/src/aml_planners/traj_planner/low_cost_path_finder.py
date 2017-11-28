@@ -6,6 +6,7 @@ from config import ex_config as config
 from aml_io.io_tools import save_data, load_data
 from aml_opt.pi_traj_opt.pi_traj_opt import PITrajOpt
 
+np.random.seed(42)
 
 class LowCostPathFinder(object):
 
@@ -32,15 +33,24 @@ class LowCostPathFinder(object):
         plt.colorbar()
         plt.plot(self._init_traj[0,:], self._init_traj[1,:], color='g', linewidth=3)
         plt.ion()
-
-    def visualize(self, traj):
+  
+    def visualize(self, traj, traj_samples=None):
         x_traj = traj[:,0]
         y_traj = traj[:,1]
         plt.clf()
         plt.imshow(self._heatmap_data_file, origin='lower', interpolation='none', extent=[self._x_min,self._x_max,
-                                                                                          self._y_min,self._y_max])
+                                                                                         self._y_min,self._y_max])
         plt.colorbar()
-        plt.plot(x_traj, y_traj, color='m', linewidth=3.)
+        
+        if (traj_samples is not None):
+            for i in range(traj_samples.shape[0]):
+                plt.plot(self._opt.savitsky_gollay_filter(traj_samples[i,:,0].flatten()), 
+                         self._opt.savitsky_gollay_filter(traj_samples[i,:,1].flatten()), alpha=0.2)
+
+        plt.plot(x_traj.flatten(), y_traj.flatten(), color='k', linewidth=8.)
+
+        plt.xlim(self._x_min, self._x_max)
+        plt.ylim(self._y_min, self._y_max)
         plt.draw()
         plt.pause(0.00001)
 
@@ -50,7 +60,7 @@ class LowCostPathFinder(object):
 
 def main():
 
-    heatmap_data_file = os.environ['AML_DATA'] + '/aml_planners/push_planner/single_push_planner/heat_maps/baxter_heatmap.pkl'
+    heatmap_data_file = os.environ['AML_DATA'] + '/aml_planners/traj_planner/heat_maps/heatmap_good.pkl'
 
     lcpf = LowCostPathFinder(config=config, heatmap_data_file=heatmap_data_file)
     lcpf.run()
