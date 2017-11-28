@@ -4,9 +4,8 @@ from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 def quatdiff(quat_curr, quat_des):
 
-    qdiff = (quat_curr*quat_des.conjugate()).log()
-    qdiff_array = quat_curr = quaternion.as_float_array(qdiff)
-    # print "qdiff: ", qdiff_array
+    qdiff = 2*(quat_curr*quat_des.conjugate()).log()
+    qdiff_array = quaternion.as_float_array(qdiff)
     return qdiff_array[1:]
 
 def standard_shape_traj(curr_pos, no_set_points=16, shape='circle'):
