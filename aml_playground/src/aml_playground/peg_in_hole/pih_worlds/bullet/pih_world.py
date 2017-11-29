@@ -26,6 +26,22 @@ class BoxObject(BulletRobot):
 
         return status
 
+class PegHole():
+
+    def __init__(self, hole_id, pos = [0. ,0. ,0.], ori = [0., 0., 0., 1]):
+
+        self._pos = pos
+        self._ori = ori
+        self._id = hole_id
+        self.set_default_pos(np.array(pos), np.array(ori))
+
+    def set_default_pos(self, pos, ori):
+
+        pb.resetBasePositionAndOrientation(self._id, pos, ori)
+        self._default_pos = pos
+        self._default_ori = ori
+
+
 class PIHWorld():
 
     def __init__(self, world_id, peg_id, hole_id, robot_id, config):
@@ -34,13 +50,15 @@ class PIHWorld():
 
         self._world_id = world_id
 
+        self._hole = PegHole(hole_id, [0,0,1], [0, 0, -0.707, 0.707])
+
         pb.resetBasePositionAndOrientation(self._world_id, np.array([0., 0., -0.5]), np.array([0.,0.,0.,1]))
 
-        self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=2, config=config_pih_world)
+        self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=3, config=config_pih_world)
 
-        # self._peg.configure_default_pos(np.array([0., 0., 0.]), np.array([0.,0.,0.,1]))
+        self._peg.configure_default_pos(np.array([0, -1.1, 1.5]), np.array([0., 0., 0., 1]))
 
-        # self._robot.configure_default_pos(np.array([1.25, 0.,0.]),  np.array([0.,0.,0.,1]))
+        self._robot.configure_default_pos(np.array([0, -1.3, 3.]),  np.array([0., 1, 0., 0]))
 
         self._config   = config
 
