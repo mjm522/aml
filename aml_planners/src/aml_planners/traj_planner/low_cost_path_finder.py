@@ -14,10 +14,8 @@ class LowCostPathFinder(object):
 
         config['start'] = config['start_goal']['start']
         config['goal']  = config['start_goal']['goal']
-        self._x_min = config['state_constraints']['min'][0]
-        self._x_max = config['state_constraints']['max'][0]
-        self._y_min = config['state_constraints']['min'][1]
-        self._y_max = config['state_constraints']['max'][1]
+        self._x_min, self._y_min = config['state_constraints']['min']
+        self._x_max, self._y_max = config['state_constraints']['max']
 
         self._heatmap_data_file = load_data(heatmap_data_file)
 

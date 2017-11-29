@@ -9,13 +9,13 @@ class Cost(object):
         pass
 
 
-    def get(self, x, u, du, sigma, t):
+    def get(self, traj):
 
         """ Not implemented """
 
         pass
 
 
-    def __call__(self, x, u, du, sigma, t):
+    def __call__(self, traj):
 
         return self.get(x, u, du, sigma, t)
