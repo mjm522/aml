@@ -1,8 +1,8 @@
-import time
-import rospy
 import pybullet as pb
-from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
+import rospy
+import time
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import config_pih_world
+from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 
 
 def main():
@@ -35,9 +35,6 @@ def main():
     velocity_array = [0, -0.05, -0.05]
 
     pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=velocity_array, forces=[500 for n in range(len(velocity_array))])
-
-    # print "Motors: ", motors
-    # print "INFO", pb.getJointInfo(manipulator,2)
 
     pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, config=config_pih_world)
 
