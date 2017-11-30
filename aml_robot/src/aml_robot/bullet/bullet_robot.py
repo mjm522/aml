@@ -23,7 +23,7 @@ class BulletRobot(object):
         self._force_torque_sensors_enabled = [False for n in self._joint_idx]
 
         if enable_force_torque_sensors:
-            self.enableForceTorqueSensors()
+            self.enable_force_torque_sensors()
 
         _update_period = rospy.Duration(1.0/update_rate)
 
@@ -77,7 +77,7 @@ class BulletRobot(object):
 
 
     # ----- If joint_idx is not specified, sensors for all joints are enabled
-    def enableForceTorqueSensors(self, joint_idx = -2):
+    def enable_force_torque_sensors(self, joint_idx = -2):
 
         if joint_idx == -2:
             joint_idx = self._joint_idx
@@ -90,7 +90,7 @@ class BulletRobot(object):
             self._force_torque_sensors_enabled[joint] = True
 
     # ----- If joint_idx is not specified, sensors for all joints are disabled
-    def disableForceTorqueSensors(self, joint_idx = -2):
+    def disable_force_torque_sensors(self, joint_idx = -2):
 
         if joint_idx == -2 or joint_idx == self._joint_idx:
             joint_idx = self._joint_idx
@@ -104,7 +104,7 @@ class BulletRobot(object):
 
     # --- Gives pos, vel, joint force, joint torque, motor torque values of all joints (unless joint_idx is specified). 
     # -------- If flag is set to 'all', the output (for each joint) is of the following format: [pos, vel, (fx, fy, fz, tx, ty, tz), motor_torque]
-    def getJointDetails(self, joint_idx = -2, flag = 'all'):
+    def get_joint_details(self, joint_idx = -2, flag = 'all'):
 
         if joint_idx == -2:
             joint_idx = self._joint_idx

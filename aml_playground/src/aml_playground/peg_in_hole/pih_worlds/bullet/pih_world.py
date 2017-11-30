@@ -77,7 +77,7 @@ class PIHWorld():
         #this if for saving files in case keyboard interrupt happens
         self._record_sample.save_data_now()
 
-    def getForceTorqueDetails(self):
+    def get_force_torque_details(self):
 
         ee_in_contact_with_box = False
         in_contact = False
@@ -94,7 +94,7 @@ class PIHWorld():
 
         if in_contact:
 
-            [fx,fy,fz], [tx,ty,tz] = self._robot.getJointDetails(joint_idx = self._robot._ee_link_idx, flag = 'force_torque')
+            [fx,fy,fz], [tx,ty,tz] = self._robot.get_joint_details(joint_idx = self._robot._ee_link_idx, flag = 'force_torque')
 
             if ee_in_contact_with_box:
 
@@ -120,7 +120,7 @@ class PIHWorld():
 
         while not rospy.is_shutdown():
 
-            self.getForceTorqueDetails()
+            self.get_force_torque_details()
 
             self.step()
 
