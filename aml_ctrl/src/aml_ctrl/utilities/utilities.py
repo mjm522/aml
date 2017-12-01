@@ -3,7 +3,7 @@ import numpy as np
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 def quatdiff(quat_curr, quat_des):
-
+    #difference between two quaternions computed in eucledian space
     qdiff = 2*(quat_curr*quat_des.conjugate()).log()
     qdiff_array = quaternion.as_float_array(qdiff)
     return qdiff_array[1:]

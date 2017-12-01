@@ -42,18 +42,27 @@ def fun_3(x, y, rtn_sn=True):
         return z
 
 
-def get_trajectory(fun, X, Y):
-    traj_x    = np.array([0.]) * np.ones(X.size)
+def get_trajectory(fun, X, Y, rtn_sn=False):
+    traj_x    = X.ravel()
     traj_y    = Y.ravel()
-    traj_z    = fun(traj_x, traj_y, False)
-    traj_z    = traj_z
-    return traj_x, traj_y, traj_z
+    traj_normals = []
+    if rtn_sn:
+        zs    = []
+        for x,y in zip(traj_x, traj_y):
+            z, surface_normal = fun(x,y)
+            zs.append(z)
+            traj_normals.append(surface_normal)
+        traj_z    = np.asarray(zs)
+    else:
+        traj_z    = fun(traj_x, traj_y, False)
+    
+    return traj_x, traj_y, traj_z, np.asarray(traj_normals)
 
 def mesh_surface(fun, lim, file_path=None):
 
     fig   = plt.figure()
     ax 	  = fig.add_subplot(111, projection='3d')
-    x = y = np.arange(lim[0], lim[1], 0.05)
+    x = y = np.arange(lim[0], lim[1], 0.5)
     X, Y  = np.meshgrid(x, y)
     zs    = []
     surface_normals = []
@@ -70,11 +79,14 @@ def mesh_surface(fun, lim, file_path=None):
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-
-    traj_x, traj_y, traj_z = get_trajectory(fun, X, Y)
-
     ax.hold(True)
-    ax.plot(traj_x, traj_y, traj_z, '--k')
+
+    #np.array([0.]) * np.ones(X.size)
+
+    for k in range(10):
+        tmp_X = np.random.randn(1)*np.ones(X.size)
+        traj_x, traj_y, traj_z, traj_normals = get_trajectory(fun, tmp_X, Y, True)
+        ax.plot(traj_x, traj_y, traj_z)
 
     if file_path is not None:
         save_data(np.vstack([np.ravel(X), np.ravel(Y), zs]).T, file_path+'surface.pkl')
