@@ -1,3 +1,4 @@
+import numpy as np
 import pybullet as pb
 import rospy
 import time
@@ -32,11 +33,13 @@ def main():
 
     motors = [n for n in range(pb.getNumJoints(manipulator))]
 
-    velocity_array = [0, -0.05, -0.05]
+    k = np.array([1,1,1])
 
-    pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=velocity_array, forces=[500 for n in range(len(velocity_array))])
+    velocity_array = k*np.array([0, -0.05, -0.05])
 
-    pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, config=config_pih_world)
+    pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=np.asarray(velocity_array), forces=[500 for n in range(len(velocity_array))])
+
+    pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, gains = np.asarray(k), config=config_pih_world)
 
     pm.run()
 

@@ -1,6 +1,7 @@
 import cv2
 import math
 import numpy as np
+import pandas as pd
 import pybullet as pb
 import rospy
 import random
@@ -44,7 +45,7 @@ class PegHole():
 
 class PIHWorld():
 
-    def __init__(self, world_id, peg_id, hole_id, robot_id, config):
+    def __init__(self, world_id, peg_id, hole_id, robot_id, config, gains = [1, 1, 1]):
 
         self._peg      = BoxObject(box_id=peg_id)
 
@@ -56,17 +57,17 @@ class PIHWorld():
 
         self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=2, config=config_pih_world, enable_force_torque_sensors = True)
 
-        self._peg.configure_default_pos(np.array([0, -1.1, 1.5]), np.array([0., 0., 0., 1]))
+        self._peg.configure_default_pos(np.array([0, -1, 1.5]), np.array([0., 0., 0., 1]))
 
         self._robot.configure_default_pos(np.array([0, -1.3, 3.]),  np.array([0., 1, 0., 0]))
 
         self._config   = config
 
-        self._record_sample = RecordSample(robot_interface=self._robot, 
-                                          task_interface=self._peg,
-                                          data_folder_path=self._config['data_folder_path'],
-                                          data_name_prefix='sim_pih_data',
-                                          num_samples_per_file=500)
+        self._gains = gains
+        
+        self._forces = []
+        self._torques = []
+        self._contact_points = []
 
     def step(self):
 
@@ -74,21 +75,33 @@ class PIHWorld():
 
     def on_shutdown(self):
 
-        #this if for saving files in case keyboard interrupt happens
-        self._record_sample.save_data_now()
+        d = {'contact point' : pd.Series(self._contact_points),
+             'forces'        : pd.Series(self._forces),
+             'torques'       : pd.Series(self._torques)}
+
+        self._forces = []; self._torques = []; self._contact_points = []
+
+        df = pd.DataFrame(d)
+        df = df.rename_axis('Gains: '+str(self._gains), axis=1)
+        file_name = self._config['data_folder_path']+'pih '+str(self._gains)+'.csv'
+        df.to_csv(file_name)
+        print df['contact point']
 
     def get_force_torque_details(self):
 
         ee_in_contact_with_box = False
         in_contact = False
 
-        contact_point = self._robot.get_contact_points()
+        [fx,fy,fz,tx,ty,tz] = [0,0,0,0,0,0]
+        contact_point = [0.,0.,0.]
 
-        if len(contact_point) > 4:
+        contact_details = self._robot.get_contact_points()
+
+        if len(contact_details) > 4:
 
             in_contact = True
 
-            if contact_point[2] == self._peg._id and contact_point[3] == self._robot._ee_link_idx:
+            if contact_details[2] == self._peg._id and contact_details[3] == self._robot._ee_link_idx:
 
                 ee_in_contact_with_box = True
 
@@ -98,13 +111,20 @@ class PIHWorld():
 
             if ee_in_contact_with_box:
 
-                print "\n\nForce: ", fx, fy, fz
-                print "\nTorque: ", tx, ty, tz
+                # print "\n\nForce: ", fx, fy, fz
+                # print "\nTorque: ", tx, ty, tz
+                contact_point = contact_details[5]
 
             else:
-                print "Robot in contact with other object. Object ID:", "Square_Hole_Table" if contact_point[2] == self._hole._id else contact_point[2]
+                print "Robot in contact with other object. Object ID:", "Square_Hole_Table" if contact_details[2] == self._hole._id else contact_details[2]
                 print "Force: ", fx, fy, fz
                 print "Torque: ", tx, ty, tz
+
+        self._forces.append((fx,fy,fz))
+        self._torques.append((tx,ty,tz))
+        self._contact_points.append(contact_point)
+
+        # print len(self._forces), len(self._torques), len(self._contact_points)
         
     def run(self):
 
@@ -117,6 +137,8 @@ class PIHWorld():
         time.sleep(1)
 
         rospy.on_shutdown(self.on_shutdown)
+
+        # self._record_sample.start_record(task_action=pushes[idx])
 
         while not rospy.is_shutdown():
 

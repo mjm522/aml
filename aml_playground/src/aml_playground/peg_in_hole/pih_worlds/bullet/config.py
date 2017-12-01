@@ -1,8 +1,9 @@
+import os
 import os.path
 from aml_io.io_tools import get_aml_package_path
 
 model_folder_path  = get_aml_package_path('aml_playground') + '/src/aml_playground/peg_in_hole/pih_worlds/bullet/models/pih_setup/'
-data_storage_path  = get_aml_package_path('aml_data_collec_utils') + '/data/simulation/'
+data_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/'
 
 
 if not os.path.exists(data_storage_path):
