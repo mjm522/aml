@@ -1,8 +1,9 @@
+import os
 import os.path
 from aml_io.io_tools import get_aml_package_path
 
 model_folder_path  = get_aml_package_path('aml_playground') + '/src/aml_playground/peg_in_hole/pih_worlds/bullet/models/pih_setup/'
-data_storage_path  = get_aml_package_path('aml_data_collec_utils') + '/data/simulation/'
+data_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/'
 
 
 if not os.path.exists(data_storage_path):
@@ -56,13 +57,6 @@ config_pih_world = {
 	'training_data_file': 'data_test.pkl',
 	'steps_per_frame': 5,
 	'camera_pos': [0.0, 0.0, 1.65, 1., -90., 90.],
-	'push_force_magnitude':40,
-	'reset_spot_offset':[0.,0.,0.],
-	'end_effector_tip_offset':[0.,0.,0.],
-	'pre_push_offsets':[1.25, 1.25, 0.4],
-	'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
-	'reset_spot_offset': [0.0, 0.0, 0.0], # w.r.t to box frame
-	'box_center_offset':[0.,0.,0.],
 	'box_type':BOX_TYPE_1,
 	'work_space_limits':WORK_SPACE_LIMITS,
 }

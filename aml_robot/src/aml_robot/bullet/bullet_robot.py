@@ -6,7 +6,7 @@ from config import config
 
 class BulletRobot(object):
 
-    def __init__(self, robot_id, ee_link_idx=-1, update_rate=100, config=config):
+    def __init__(self, robot_id, ee_link_idx=-1, update_rate=100, config=config, enable_force_torque_sensors = False):
 
         self._config = config
 
@@ -17,6 +17,13 @@ class BulletRobot(object):
         self.configure_camera()
 
         self._ee_link_idx = ee_link_idx
+
+        self._joint_idx = [n for n in range(pb.getNumJoints(self._id))]
+
+        self._force_torque_sensors_enabled = [False for n in self._joint_idx]
+
+        if enable_force_torque_sensors:
+            self.enable_force_torque_sensors()
 
         _update_period = rospy.Duration(1.0/update_rate)
 
@@ -69,6 +76,91 @@ class BulletRobot(object):
         return rgba_image, depth_image
 
 
+    # ----- If joint_idx is not specified, sensors for all joints are enabled
+    def enable_force_torque_sensors(self, joint_idx = -2):
+
+        if joint_idx == -2:
+            joint_idx = self._joint_idx
+
+        if isinstance(joint_idx, int) and joint_idx not in self._joint_idx:
+            raise Exception("Invalid Joint ID")
+
+        for joint in joint_idx:
+            pb.enableJointForceTorqueSensor(self._id, joint, 1)
+            self._force_torque_sensors_enabled[joint] = True
+
+    # ----- If joint_idx is not specified, sensors for all joints are disabled
+    def disable_force_torque_sensors(self, joint_idx = -2):
+
+        if joint_idx == -2 or joint_idx == self._joint_idx:
+            joint_idx = self._joint_idx
+
+        if isinstance(joint_idx, int) and joint_idx not in self._joint_idx:
+            raise Exception("Invalid Joint ID")
+
+        for joint in joint_idx:
+            pb.enableJointForceTorqueSensor(self._id, joint, 0)
+            self._force_torque_sensors_enabled[joint] = False
+
+    # --- Gives pos, vel, joint force, joint torque, motor torque values of all joints (unless joint_idx is specified). 
+    # -------- If flag is set to 'all', the output (for each joint) is of the following format: [pos, vel, (fx, fy, fz, tx, ty, tz), motor_torque]
+    def get_joint_details(self, joint_idx = -2, flag = 'all'):
+
+        if joint_idx == -2:
+            joint_idx = self._joint_idx
+
+        if isinstance(joint_idx, int):
+
+            if joint_idx not in self._joint_idx:
+                raise Exception("Invalid Joint ID")
+
+            details = pb.getJointState(self._id, joint_idx)
+            force_torque_sensor_status = self._force_torque_sensors_enabled[joint_idx]
+            joint_pos = details[0]
+            joint_vel = details[1]
+            force_vals = details[2][:3]
+            torque_vals = details[2][3:]
+            motor_torque = details[3]
+
+        else:
+            details = pb.getJointStates(self._id, joint_idx)
+            force_torque_sensor_status = []
+            joint_pos = []
+            joint_vel = []
+            force_vals = []
+            torque_vals = []
+            motor_torque = []
+            for joint in joint_idx:
+                force_torque_sensor_status.append(self._force_torque_sensors_enabled[joint])
+                joint_pos.append(details[joint][0])
+                joint_vel.append(details[joint][1])
+                force_vals.append(details[joint][2][:3])
+                torque_vals.append(details[joint][2][3:])
+                motor_torque.append(details[joint][3])
+
+        if flag == 'force_torque_sensor_status':
+            return force_torque_sensor_status
+
+        elif flag == 'joint_pos':
+            return joint_pos
+        elif flag == 'joint_vel':
+            return joint_vel
+
+        elif flag == 'force':
+            return force_vals
+
+        elif flag == 'torque':
+            return torque_vals
+
+        elif flag == 'motor_torque_applied':
+            return motor_torque
+
+        elif flag == 'force_torque':
+            return force_vals, torque_vals
+
+        elif flag == 'all':
+            return details
+
     def _update_state(self, event):
 
         state = {}
@@ -97,17 +189,31 @@ class BulletRobot(object):
 
         if self._ee_link_idx == -1:
 
-            pos, ori = self.get_pos_ori()
+            pos, ori = self.get_base_pos_ori()
 
         else:
 
-            link_state = pb.getLinkState(self._id, self._ee_link_idx)
-            pos = np.asarray(link_state[0]) 
-            ori = np.asarray(link_state[1])
+            pos, ori = self.get_link_pose(self._id, self._ee_link_idx)
 
         return pos, ori 
 
-    def get_pos_ori(self):
+    # ----- If link_id is not specified, end effector pose is returned
+    def get_link_pose(self, link_id = -3):
+
+        if link_id not in self._joint_idx:
+            raise Exception("Invalid Link ID")        
+
+        if link_id == -3:
+            self._ee_link_idx
+
+        link_state = pb.getLinkState(self._id, link_id)
+        pos = np.asarray(link_state[0]) 
+        ori = np.asarray(link_state[1])
+
+        return pos, ori 
+
+
+    def get_base_pos_ori(self):
 
         pos, ori = pb.getBasePositionAndOrientation(self._id)
 
@@ -186,3 +292,7 @@ class BulletRobot(object):
         else:
 
             pb.applyExternalTorque(self._id, link_idx, force, point , pb.WORLD_FRAME)
+
+
+
+

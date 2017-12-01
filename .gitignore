@@ -4,6 +4,8 @@ aml_calib/scripts/calib_data.npy
 aml_calib/scripts/camera_calib.pyc
 checkpoints
 
+aml_data
+
 *.pkl
 
 MUJOCO_LOG.TXT
