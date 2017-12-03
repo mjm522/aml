@@ -38,7 +38,7 @@ class Box2DViewer(object):
         if 'cam_pos' in self._config.keys():
             self._cam_pos = self._config['cam_pos']
         else:
-            self._cam_pos = (0., 0.)
+            self._cam_pos = [0., 0.]
 
         if is_thread_loop:
             self.threaded_loop()

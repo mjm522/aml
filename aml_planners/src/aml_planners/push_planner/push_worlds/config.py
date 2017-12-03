@@ -45,7 +45,7 @@ push_world_config = {
     'image_height': IMAGE_HEIGHT,
     'box_config':box_config,
     'fin_config':circle_fin_config,
-    'num_fins':1,
+    'num_fins':2,
     'no_samples':20,
     'fps': 15,
     'dt': 0.01  ,#0.0167,

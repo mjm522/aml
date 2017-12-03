@@ -4,6 +4,7 @@ import rospy
 import numpy as np
 from geometry_msgs.msg import Point
 from rospy_tutorials.msg import Floats
+from aml_robot.msg import Box2dRosViewerAction
 
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_planners.push_planner.push_worlds.box2d_push_world import Box2DPushWorld
@@ -20,7 +21,7 @@ class Box2DViewerROS(Box2DViewer):
 
         rospy.init_node('box2d_viewer_ros', anonymous=True)
         rospy.Subscriber("box2d_world_pose", Point, self.sub_world_state_callback)
-        rospy.Subscriber("box2d_action", Floats, self.sub_action)
+        rospy.Subscriber("box2d_action", Box2dRosViewerAction, self.sub_action)
         rospy.Subscriber("box2d_update_goal", Point, self.sub_update_goal_location)
         rospy.Subscriber("box2d_update_obstacle", Floats, self.sub_update_obs_location)
 
@@ -38,12 +39,18 @@ class Box2DViewerROS(Box2DViewer):
 
     def sub_world_state_callback(self, data):
         self._pose = data
-        print "Received pose info \n", data
         self._state = np.array([data.x, data.y, data.z, 0.,0.,0.])
 
     def sub_action(self, data):
-        self._action = list(data.data)
-        print "Received action \n", self._action
+        self._num_fins = data.num_fins
+
+        assert self._num_fins==self._world._num_fingers
+        
+        self._single_action_len = data.single_action_len
+        tmp = list(data.actions)
+        self._action = []
+        for k in range(self._num_fins):
+            self._action.append(tmp[k*self._single_action_len:(k+1)*self._single_action_len])
 
     def visualize(self):
 

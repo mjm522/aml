@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -23,6 +24,18 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+##for msg generation
+add_message_files(
+  DIRECTORY msg 
+  FILES Box2dRosViewerAction.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+catkin_package(CATKIN_DEPENDS message_runtime )
 
 #############
 ## Install ##
