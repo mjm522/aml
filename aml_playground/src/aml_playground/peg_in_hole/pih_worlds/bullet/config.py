@@ -1,13 +1,16 @@
 import os
-import os.path
 from aml_io.io_tools import get_aml_package_path
 
 model_folder_path  = get_aml_package_path('aml_playground') + '/src/aml_playground/peg_in_hole/pih_worlds/bullet/models/pih_setup/'
-data_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/'
+data_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/bullet/'
+# demo_storage_path  = data_storage_path + 'demos/'
 
 
 if not os.path.exists(data_storage_path):
     os.makedirs(data_storage_path)
+
+# if not os.path.exists(demo_storage_path):
+#     os.makedirs(demo_storage_path)
 
 CAM_INFO ={
 	'up':[0.,0.,1.],
