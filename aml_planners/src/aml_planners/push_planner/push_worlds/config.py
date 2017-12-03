@@ -1,6 +1,14 @@
+import os
+
 IMAGE_WIDTH  = 1280
 IMAGE_HEIGHT = 960
 PIXELS_PER_METER = 180.
+
+
+#for recording demonstrations
+demo_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d_demos/'
+if not os.path.exists(demo_storage_path):
+    os.makedirs(demo_storage_path)
 
 box_config = {
     
@@ -54,4 +62,6 @@ push_world_config = {
     'pixels_per_meter': PIXELS_PER_METER,
     'push_mag': 0.05,
     'pre_push_offset':0.05,
+    'demo_storage_path':demo_storage_path,
+    'save_demo':True,
 }
