@@ -1,15 +1,19 @@
 import pygame
 import numpy as np
+from aml_playground.peg_in_hole.utilities.pykdl_box2d import PyKDLBox2d
 from Box2D import (b2_pi, b2Filter, b2FixtureDef, b2CircleShape, b2PolygonShape)
 from Box2D import (b2ContactListener, b2DestructionListener, b2DrawExtended)
 
 
-
-class Manipulator(object):
+class Manipulator(PyKDLBox2d):
 
     def __init__(self, world, config):
 
+        super(Manipulator, self).__init__(config)
+
         self._config = config
+
+        self._dt    = self._config['dt']
 
         self._world = world
 
@@ -43,8 +47,8 @@ class Manipulator(object):
 
 
             shape = body.CreatePolygonFixture(box=link['dim'], 
-                                  density=link['den'], 
-                                  friction=link['mu'])
+                                              density=link['den'], 
+                                              friction=link['mu'])
             
             self._bodies.append(body)
             self._links.append(shape)
@@ -70,8 +74,27 @@ class Manipulator(object):
 
 
     def set_joint_speed(self, joint_speed):
+
         for k in range(len(self._joints)):
             self._joints[k].motorSpeed = joint_speed[k]
+
+    def compute_os_ctrlr_cmd(self, os_set_point, gain=0.1):
+        state = self.get_state()
+        error = np.dot(np.linalg.pinv(state['ee_jac'], rcond=1e-4), (os_set_point - state['ee_pos']))
+
+        return gain*error
+
+
+    def set_max_joit_torque(self, joint_torques):
+
+        for k in range(len(self._joints)):
+            self._joints[k].maxMotorTorque = joint_torques[k]
+
+    # def set_joint_position(self, joint_pos):
+    #     #this is on the assumption that joint frames and body frames are alligned
+    #     #the first body = base is a static body
+    #     for k in range(1,len(self._bodies)):
+    #         self._bodies[k].angle = joint_pos[k]
     
     def get_vertices_phys(self):
 
@@ -112,12 +135,6 @@ class Manipulator(object):
             pygame.draw.polygon(surface, self._link_color[k], vertices)
 
 
-    def get_angle(self):
-
-        return self._dyn_body.angle
-
-
-
     def get_state(self):
 
         link_pos = []
@@ -125,7 +142,9 @@ class Manipulator(object):
  
         joint_state = [joint.angle for joint in self._joints]
         joint_velocity = [joint.speed for joint in self._joints]
-        joint_torques = [joint.GetMotorTorque for joint in self._joints]
+        joint_torques = [joint.GetMotorTorque(self._dt) for joint in self._joints]
+
+        self.update_chain(joint_state)
 
         #assuming first link to be base link
         for k in range(1,len(self._bodies)):
@@ -142,6 +161,8 @@ class Manipulator(object):
                   'j_torq':np.asarray(joint_torques),
                   'link_pos':np.asarray(link_pos),
                   'link_vel': np.asarray(link_vel),
+                  'ee_pos': self.compute_fwd_kinematics(),
+                  'ee_jac': self.compute_jacobian(),
                 }
 
         return state

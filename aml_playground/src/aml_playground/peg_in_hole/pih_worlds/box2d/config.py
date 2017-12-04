@@ -19,7 +19,7 @@ FIN_LENGTH = 2
 
 base_params ={
     'type':'static',
-    'pos':(15,20),
+    'pos':(0,0),
     'dim':(4,0.5),
     'den':1,
     'mu':0.3,
@@ -29,8 +29,9 @@ base_params ={
 
 link1_params = {
         'type':'dynamic',
-        'pos':(base_params['pos'][0]-0.25*base_params['dim'][0], base_params['pos'][1]+base_params['dim'][1]/2+FIN_LENGTH),
-        'ori':0.,
+        # 'pos':(base_params['pos'][0]-0.25*base_params['dim'][0], base_params['pos'][1]+ 0.5*base_params['dim'][1]+FIN_LENGTH),
+        'pos':(base_params['pos'][0], base_params['pos'][1]+FIN_LENGTH),
+        'ori':0.01,
         'den':1,
         'mu':0.3,
         'dim':(FIN_WIDTH,FIN_LENGTH),
@@ -42,8 +43,8 @@ link1_params = {
 
 link2_params = {
         'type':'dynamic',
-        'pos':(link1_params['pos'][0], link1_params['pos'][1]+1.75*FIN_LENGTH),
-        'ori':0.,
+        'pos':(link1_params['pos'][0], link1_params['pos'][1]+2*FIN_LENGTH),
+        'ori':0.01,
         'den':1,
         'mu':0.3,
         'dim':(FIN_WIDTH,FIN_LENGTH),
@@ -56,8 +57,8 @@ link2_params = {
 
 link3_params = {
         'type':'dynamic',
-        'pos':(link2_params['pos'][0], link2_params['pos'][1]+1.75*FIN_LENGTH),
-        'ori':0.,
+        'pos':(link2_params['pos'][0], link2_params['pos'][1]+2*FIN_LENGTH),
+        'ori':0.01,
         'den':1,
         'mu':0.3,
         'dim':(FIN_WIDTH,FIN_LENGTH),
@@ -73,28 +74,28 @@ joint1_params = {
     'lowerAngle':-0.5 ** 3.1415, # -90 degrees
     'upperAngle':0.5 ** 3.1415, #  45 degrees
     'enableLimit':False,
-    'maxMotorTorque':10,
+    'maxMotorTorque':10.,
     'motorSpeed':0.0,
     'enableMotor':True,
     }
 
 joint2_params = {
-    'anchor':(joint1_params['anchor'][0], joint1_params['anchor'][1]+1.75*FIN_LENGTH),
+    'anchor':(joint1_params['anchor'][0], joint1_params['anchor'][1]+2*FIN_LENGTH),
     'lowerAngle':-0.5 ** 3.1415, # -90 degrees
     'upperAngle':0.5 ** 3.1415, #  45 degrees
     'enableLimit':False,
-    'maxMotorTorque':0.0,
+    'maxMotorTorque':10.0,
     'motorSpeed':0.,
     'enableMotor':True,
     }
 
 
 joint3_params = {
-    'anchor':(joint2_params['anchor'][0], joint2_params['anchor'][1]+1.75*FIN_LENGTH),
+    'anchor':(joint2_params['anchor'][0], joint2_params['anchor'][1]+2*FIN_LENGTH),
     'lowerAngle':-0.5 ** 3.1415, # -90 degrees
     'upperAngle':0.5 ** 3.1415, #  45 degrees
     'enableLimit':False,
-    'maxMotorTorque':0.0,
+    'maxMotorTorque':10.0,
     'motorSpeed':0.,
     'enableMotor':True,
     }
@@ -106,6 +107,7 @@ man_config = {
     'pixels_per_meter': PIXELS_PER_METER,
     'links':[base_params, link1_params,link2_params, link3_params],
     'joints':[joint1_params, joint2_params, joint3_params],
+    'dt':0.01, #needed for torque computation
 }
 
 
@@ -114,7 +116,7 @@ hole_config = {
     'image_height': IMAGE_HEIGHT,
     'pixels_per_meter': PIXELS_PER_METER,
     'type':'static',
-    'pos':(base_params['pos'][0]+base_params['dim'][0], base_params['pos'][1]-base_params['dim'][1]),
+    'pos':(base_params['pos'][0]+1.5*base_params['dim'][0], base_params['pos'][1]-base_params['dim'][1]),
     'ori':0.,
     'den':1,
     'mu':0.3,
@@ -157,4 +159,5 @@ pih_world_config = {
     'pre_push_offset':0.05,
     'demo_storage_path':demo_storage_path,
     'save_demo':True,
+    'cam_pos':[-425, 355],#pixels
 }

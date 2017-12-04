@@ -27,6 +27,8 @@ class Box2DPIHWorld(object):
 
         self._clear_screen_enabled = True
 
+        self._config['man_config']['dt'] = self._dt
+
         # --- pybox2d world setup ---
         # Create the world
         self._world = world(gravity=(0, 0), doSleep=True, contactListener=ContactSensor())

@@ -1,0 +1,144 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from aml_io.io_tools import load_data
+from config import box2d_dmp_config
+from aml_robot.box2d.box2d_viewer import Box2DViewer
+from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
+from aml_playground.peg_in_hole.pih_worlds.box2d.config import pih_world_config
+from aml_playground.peg_in_hole.pih_worlds.box2d.box2d_pih_world import Box2DPIHWorld
+
+
+class Box2dDMP():
+    def __init__(self, config):
+        self._config    = config
+        self._pih_world = Box2DPIHWorld(pih_world_config)
+        self._pih_manipulator = self._pih_world._manipulator
+        self._dmp_shell = DiscreteDMPShell(config=config)
+        self._viewer    = Box2DViewer(self._pih_world, pih_world_config, is_thread_loop=False)
+
+
+    def view_traj(self, trajectory):
+
+        trajectory *= self._viewer._config['pixels_per_meter']
+
+        trajectory[:,1] = self._viewer._config['image_height'] - trajectory[:,1]
+
+        self._viewer._demo_point_list = trajectory.astype(int)
+
+
+    def train_dmp(self):
+
+        self._dmp_shell.load_demo_trajectory(self._demo)
+        self._dmp_shell.train()
+
+    def load_demo(self, trajectory):
+        self._demo = trajectory
+
+    def test_dmp(self, speed=1., plot_traj=False):
+
+        test_config = self._config
+        test_config['dt'] = 0.001
+
+        # play with the parameters
+        start_offset = np.array([0.,0.])
+        goal_offset = np.array([.0, 0.])
+        external_force = np.array([0.,0.,0.,0.])
+        alpha_phaseStop = 20.
+
+        test_config['y0'] = self._dmp_shell._traj_data[0, 1:] + start_offset
+        test_config['dy'] = np.array([0., 0.])
+        test_config['goals'] = self._dmp_shell._traj_data[-1, 1:] + goal_offset
+        test_config['tau'] = 1./speed
+        test_config['ac'] = alpha_phaseStop
+        test_config['type'] = 1
+
+        if test_config['type'] == 3:
+            test_config['extForce'] = external_force
+        else:
+            test_config['extForce'] = np.array([0,0,0,0])
+
+        test_traj = self._dmp_shell.test(config=test_config)
+
+        if plot_traj:
+
+            plt.figure('x vs y demo_traj & test_traj')
+            demo_plt, = plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-', label='demo_traj')
+            traj_plt, = plt.plot(test_traj[:,1], test_traj[:,2], 'r--', label='test_traj')
+            plt.legend(handles=[demo_plt, traj_plt])
+
+            plt.figure('x-y vs time of test_traj')
+            x_traj_plt, = plt.plot(test_traj[:,0], test_traj[:,1], 'g-', label='x')
+            y_traj_plt, = plt.plot(test_traj[:,0], test_traj[:,2], 'm-', label='y')
+            plt.legend(handles=[x_traj_plt, y_traj_plt])
+            plt.show()
+
+
+        vel_traj =  np.diff(test_traj[:,1:], axis=0)
+        vel_traj =  np.vstack([np.zeros_like(vel_traj[0]), vel_traj])*test_config['dt']
+        acc_traj =  np.diff(vel_traj, axis=0)
+        acc_traj =  np.vstack([np.zeros_like(acc_traj[0]), acc_traj])*test_config['dt']
+
+        test_traj = {
+        'pos_traj': test_traj[:,1:],
+        'vel_traj':vel_traj,
+        'acc_traj':acc_traj
+        }
+        return test_traj
+    
+
+    def run(self):
+        
+        self.train_dmp()
+        test_traj = self.test_dmp(speed=1.)
+        des_path = test_traj['pos_traj']
+        k = -1
+        error = 100.
+        task_complete = False
+
+        self.view_traj(des_path)
+
+        while self._viewer._running and not task_complete:
+
+            k += 1
+
+            while error > 0.01:
+
+                set_point = np.hstack([des_path[k,:], 0.1])
+
+                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, gain=0.1)
+
+                self._pih_world.update(action)
+
+                for i in range(self._viewer._steps_per_frame): 
+                    self._pih_world.step()
+
+                self._viewer.draw()
+
+                if k == des_path.shape[1]:
+                    task_complete = True
+
+                manipulator_ee_pos = self._pih_world.get_state()['manipulator']['ee_pos']
+                error = np.linalg.norm(set_point - manipulator_ee_pos)
+
+                print "Computed cmd \t", np.round(action, 3)
+                print "Error \t", error
+
+
+def main():
+
+    data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/demos/' 
+    path_to_demo = data_storage_path + 'demo_1.pkl'
+
+    if not os.path.isfile(path_to_demo):
+        raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)
+
+    trajectory = np.asarray(load_data(path_to_demo))
+
+    dmp_box2d = Box2dDMP(box2d_dmp_config)
+    dmp_box2d.load_demo(trajectory)
+    dmp_box2d.run()
+
+
+if __name__ == '__main__':
+    main()
