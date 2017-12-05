@@ -96,15 +96,15 @@ class Manipulator(PyKDLBox2d):
     #     for k in range(1,len(self._bodies)):
     #         self._bodies[k].angle = joint_pos[k]
     
-    def get_vertices_phys(self):
+    def get_vertices_phys(self, body):
 
-        vertices = [(self._dyn_body.transform * v) for v in self._fin.shape.vertices]
+        vertices = [(self._dyn_body.transform * v) for v in body.shape.vertices]
 
         return vertices
 
-    def get_vertices_local(self):
+    def get_vertices_local(self, body):
 
-        vertices = self._fin.shape.vertices
+        vertices = body.shape.vertices
 
         return vertices
 
@@ -129,10 +129,14 @@ class Manipulator(PyKDLBox2d):
         return vertices
 
     def draw(self, surface, cam_pos = (0,0)):
+
+        ee_pos = self.get_state()['ee_pos']
         
         for k in range(len(self._links)):    
             vertices = self.get_vertices(link_idx=k, cam_pos=cam_pos)
             pygame.draw.polygon(surface, self._link_color[k], vertices)
+
+        pygame.draw.circle(surface, (0,0,0), (int(ee_pos[0] * self._ppm - cam_pos[0]),int( self._config['image_height'] - ee_pos[1] * self._ppm - cam_pos[1])), 10, 0)
 
 
     def get_state(self):

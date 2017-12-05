@@ -23,11 +23,10 @@ class PyKDLBox2d(object):
             self._chain.addSegment(Segment(Joint(Joint.RotZ),Frame(Vector(joint_pos[0]-prev_joint_pos[0],joint_pos[1]-prev_joint_pos[1],0.))))
 
         last_link_dim = self._config['links'][-1]['dim']
-        last_jnt_pos  = self._config['joints'][-1]['anchor']
 
-        ee_pos = (last_jnt_pos[0], last_jnt_pos[1]+2*last_link_dim[1])
-
+        ee_pos = (0, 2*last_link_dim[1])
         self._chain.addSegment(Segment(Joint(Joint.RotZ),Frame(Vector(ee_pos[0],ee_pos[1],0.))))
+        
         self._fwd_k = ChainFkSolverPos_recursive(self._chain)
         self._vel_ik= ChainIkSolverVel_pinv(self._chain)
         self._pos_ik= ChainIkSolverPos_NR(self._chain, self._fwd_k, self._vel_ik)
@@ -47,10 +46,11 @@ class PyKDLBox2d(object):
 
     def compute_fwd_kinematics(self, q=None):
 
-        joint_angles=JntArray(self._num_joints)
-        
         if q is not None:
             assert len(q) == self._num_joints
+            
+            joint_angles=JntArray(self._num_joints)
+            
             for k in range(self._num_joints):
                 joint_angles[k] = q[k]
         else:

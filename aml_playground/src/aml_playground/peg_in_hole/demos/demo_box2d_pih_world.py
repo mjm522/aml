@@ -27,10 +27,9 @@ def main():
 
         viewer.clear_screen(color=(255,255,255,255))
 
-        print world.get_state()['manipulator']['ee_jac']
         # print world._box.get_vertices_phys()
 
-        world._manipulator.set_joint_speed([-0.1,0.,0.])
+        world._manipulator.set_joint_speed([-0.,0.,0.])
 
         state0 = world.pack_box_state()
 

@@ -43,7 +43,7 @@ link1_params = {
 
 link2_params = {
         'type':'dynamic',
-        'pos':(link1_params['pos'][0], link1_params['pos'][1]+2*FIN_LENGTH),
+        'pos':(link1_params['pos'][0], link1_params['pos'][1]+(FIN_LENGTH+link1_params['dim'][1])),
         'ori':0.01,
         'den':1,
         'mu':0.3,
@@ -57,11 +57,11 @@ link2_params = {
 
 link3_params = {
         'type':'dynamic',
-        'pos':(link2_params['pos'][0], link2_params['pos'][1]+2*FIN_LENGTH),
+        'pos':(link2_params['pos'][0], link2_params['pos'][1]+(FIN_LENGTH/2+link2_params['dim'][1])),
         'ori':0.01,
         'den':1,
         'mu':0.3,
-        'dim':(FIN_WIDTH,FIN_LENGTH),
+        'dim':(FIN_WIDTH,FIN_LENGTH/2),
         'color':(127, 127, 255, 255),
         'lin_damp':0.6,
         'ang_damp':0.05,
@@ -70,9 +70,9 @@ link3_params = {
 
 
 joint1_params = {
-    'anchor':(link1_params['pos'][0], link1_params['pos'][1]-FIN_LENGTH),
-    'lowerAngle':-0.5 ** 3.1415, # -90 degrees
-    'upperAngle':0.5 ** 3.1415, #  45 degrees
+    'anchor':(link1_params['pos'][0], link1_params['pos'][1]-link1_params['dim'][1]),
+    'lowerAngle':-2.0 * 3.1415, # -90 degrees
+    'upperAngle':2.0 * 3.1415, #  45 degrees
     'enableLimit':False,
     'maxMotorTorque':10.,
     'motorSpeed':0.0,
@@ -80,9 +80,9 @@ joint1_params = {
     }
 
 joint2_params = {
-    'anchor':(joint1_params['anchor'][0], joint1_params['anchor'][1]+2*FIN_LENGTH),
-    'lowerAngle':-0.5 ** 3.1415, # -90 degrees
-    'upperAngle':0.5 ** 3.1415, #  45 degrees
+    'anchor':(joint1_params['anchor'][0], joint1_params['anchor'][1]+(FIN_LENGTH+link1_params['dim'][1])),
+    'lowerAngle':-2.0 * 3.1415, # -90 degrees
+    'upperAngle':2.0 * 3.1415, #  45 degrees
     'enableLimit':False,
     'maxMotorTorque':10.0,
     'motorSpeed':0.,
@@ -91,9 +91,9 @@ joint2_params = {
 
 
 joint3_params = {
-    'anchor':(joint2_params['anchor'][0], joint2_params['anchor'][1]+2*FIN_LENGTH),
-    'lowerAngle':-0.5 ** 3.1415, # -90 degrees
-    'upperAngle':0.5 ** 3.1415, #  45 degrees
+    'anchor':(joint2_params['anchor'][0], joint2_params['anchor'][1]+(FIN_LENGTH+link2_params['dim'][1])),
+    'lowerAngle':-2.0 * 3.1415, # -90 degrees
+    'upperAngle':2.0 * 3.1415, #  45 degrees
     'enableLimit':False,
     'maxMotorTorque':10.0,
     'motorSpeed':0.,

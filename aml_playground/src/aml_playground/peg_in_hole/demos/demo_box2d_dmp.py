@@ -18,6 +18,7 @@ class Box2dDMP():
         self._viewer    = Box2DViewer(self._pih_world, pih_world_config, is_thread_loop=False)
 
 
+
     def view_traj(self, trajectory):
 
         trajectory *= self._viewer._config['pixels_per_meter']
@@ -63,7 +64,7 @@ class Box2dDMP():
         if plot_traj:
 
             plt.figure('x vs y demo_traj & test_traj')
-            demo_plt, = plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-', label='demo_traj')
+            demo_plt, = plt.plot(self._dmp_shell._traj_data[:,1], self._dmp_shell._traj_data[:,2], 'b-', label='demo_traj')
             traj_plt, = plt.plot(test_traj[:,1], test_traj[:,2], 'r--', label='test_traj')
             plt.legend(handles=[demo_plt, traj_plt])
 
@@ -78,25 +79,25 @@ class Box2dDMP():
         vel_traj =  np.vstack([np.zeros_like(vel_traj[0]), vel_traj])*test_config['dt']
         acc_traj =  np.diff(vel_traj, axis=0)
         acc_traj =  np.vstack([np.zeros_like(acc_traj[0]), acc_traj])*test_config['dt']
-
-        test_traj = {
+        
+        test_result = {
         'pos_traj': test_traj[:,1:],
         'vel_traj':vel_traj,
         'acc_traj':acc_traj
         }
-        return test_traj
+        return test_result
     
 
     def run(self):
         
         self.train_dmp()
-        test_traj = self.test_dmp(speed=1.)
-        des_path = test_traj['pos_traj']
+        test_result = self.test_dmp(speed=1., plot_traj=False)
+        des_path = test_result['pos_traj']
         k = -1
         error = 100.
         task_complete = False
 
-        self.view_traj(des_path)
+        self.view_traj(des_path.copy())
 
         while self._viewer._running and not task_complete:
 
@@ -104,14 +105,14 @@ class Box2dDMP():
 
             while error > 0.01:
 
-                set_point = np.hstack([des_path[k,:], 0.1])
+                set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp_shell._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
-                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, gain=0.1)
+                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, gain=0.25)
 
                 self._pih_world.update(action)
 
-                for i in range(self._viewer._steps_per_frame): 
-                    self._pih_world.step()
+                # for i in range(self._viewer._steps_per_frame): 
+                self._pih_world.step()
 
                 self._viewer.draw()
 
@@ -121,6 +122,8 @@ class Box2dDMP():
                 manipulator_ee_pos = self._pih_world.get_state()['manipulator']['ee_pos']
                 error = np.linalg.norm(set_point - manipulator_ee_pos)
 
+                print "Set point \t", np.round(set_point, 3)
+                print "EE position \t", np.round(manipulator_ee_pos, 3)
                 print "Computed cmd \t", np.round(action, 3)
                 print "Error \t", error
 
@@ -128,7 +131,7 @@ class Box2dDMP():
 def main():
 
     data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/demos/' 
-    path_to_demo = data_storage_path + 'demo_1.pkl'
+    path_to_demo = data_storage_path + 'demo_2.pkl'
 
     if not os.path.isfile(path_to_demo):
         raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)

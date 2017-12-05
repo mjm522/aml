@@ -128,7 +128,7 @@ class Box2DViewer(object):
             elif (event.type == KEYDOWN and event.key == K_e):
                 self._start_demo_record = False
                 if self._config['save_demo']:
-                    save_data(self._demo_traj, self._config['demo_storage_path']+'demo.pkl')
+                    save_data(np.asarray(self._demo_traj), self._config['demo_storage_path']+'demo.pkl')
                     print "Saved demo in path:", self._config['demo_storage_path']
                 print "Demo recording ended!"
 
