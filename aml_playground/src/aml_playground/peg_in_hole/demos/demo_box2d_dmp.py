@@ -23,7 +23,9 @@ class Box2dDMP():
 
         trajectory *= self._viewer._config['pixels_per_meter']
 
-        trajectory[:,1] = self._viewer._config['image_height'] - trajectory[:,1]
+        trajectory[:, 0] -= self._viewer._config['cam_pos'][0]
+
+        trajectory[:,1] = self._viewer._config['image_height'] - self._viewer._config['cam_pos'][1] - trajectory[:,1]
 
         self._viewer._demo_point_list = trajectory.astype(int)
 
@@ -94,7 +96,7 @@ class Box2dDMP():
         test_result = self.test_dmp(speed=1., plot_traj=False)
         des_path = test_result['pos_traj']
         k = -1
-        error = 100.
+        
         task_complete = False
 
         self.view_traj(des_path.copy())
@@ -102,12 +104,13 @@ class Box2dDMP():
         while self._viewer._running and not task_complete:
 
             k += 1
+            error = 100.
 
-            while error > 0.01:
+            while error > 0.1:
 
                 set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp_shell._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
-                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, gain=0.25)
+                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=20)
 
                 self._pih_world.update(action)
 
@@ -116,7 +119,7 @@ class Box2dDMP():
 
                 self._viewer.draw()
 
-                if k == des_path.shape[1]:
+                if k == des_path.shape[0]:
                     task_complete = True
 
                 manipulator_ee_pos = self._pih_world.get_state()['manipulator']['ee_pos']
@@ -131,7 +134,7 @@ class Box2dDMP():
 def main():
 
     data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/demos/' 
-    path_to_demo = data_storage_path + 'demo_2.pkl'
+    path_to_demo = data_storage_path + 'demo.pkl'
 
     if not os.path.isfile(path_to_demo):
         raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)

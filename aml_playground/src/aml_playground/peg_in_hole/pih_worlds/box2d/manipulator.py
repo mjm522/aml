@@ -78,11 +78,11 @@ class Manipulator(PyKDLBox2d):
         for k in range(len(self._joints)):
             self._joints[k].motorSpeed = joint_speed[k]
 
-    def compute_os_ctrlr_cmd(self, os_set_point, gain=0.1):
+    def compute_os_ctrlr_cmd(self, os_set_point, Kp=0.1):
         state = self.get_state()
-        error = np.dot(np.linalg.pinv(state['ee_jac'], rcond=1e-4), (os_set_point - state['ee_pos']))
+        error = Kp*np.dot(np.linalg.pinv(state['ee_jac'], rcond=1e-4), (os_set_point - state['ee_pos'])) - np.sqrt(Kp)*state['j_vel']
 
-        return gain*error
+        return error
 
 
     def set_max_joit_torque(self, joint_torques):

@@ -129,7 +129,7 @@ box_config ={
     'image_width': IMAGE_WIDTH,
     'image_height': IMAGE_HEIGHT,
     'pixels_per_meter': PIXELS_PER_METER,
-    'pos':(base_params['pos'][0]+2, base_params['pos'][1]+5),
+    'pos':(base_params['pos'][0]+2, base_params['pos'][1]+15),
     'ori':0,
     'dim':(1.,1.),
     'lin_damp':0.6,

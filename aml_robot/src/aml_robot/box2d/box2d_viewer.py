@@ -141,7 +141,7 @@ class Box2DViewer(object):
                 x, y = event.pos
                 if (0 < x < self._config['image_width']-1) and (0 < y < self._config['image_height']-1):
                     self._demo_point_list.append([x,y])
-                    self._demo_traj.append([float(x)/self._config['pixels_per_meter'], float(self._config['image_height']-y)/self._config['pixels_per_meter']])
+                    self._demo_traj.append([float(x+self._config['cam_pos'][0])/self._config['pixels_per_meter'], float(self._config['image_height']-y-self._config['cam_pos'][1])/self._config['pixels_per_meter']])
 
             self._world.handle_event(event)
 
