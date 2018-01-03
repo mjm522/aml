@@ -84,6 +84,11 @@ class Manipulator(PyKDLBox2d):
 
         return error
 
+    def set_joint_pos(self, joint_pos):
+        for k in range(1, len(self._bodies)):
+            body = self._bodies[k]
+            body.angle = joint_pos[k-1]
+
 
     def set_max_joit_torque(self, joint_torques):
 

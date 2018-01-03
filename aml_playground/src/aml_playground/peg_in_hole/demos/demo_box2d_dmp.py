@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from aml_io.io_tools import load_data
+from aml_io.io_tools import save_data, load_data
 from config import box2d_dmp_config
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
@@ -99,23 +99,37 @@ class Box2dDMP():
         
         task_complete = False
 
+        manipulator_data = []
+
         self.view_traj(des_path.copy())
 
         while self._viewer._running and not task_complete:
 
-            k += 1
+            k += 100
             error = 100.
 
-            while error > 0.1:
+            while error > 0.5:
 
                 set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp_shell._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
-                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=20)
+                data = self._pih_manipulator.get_state()
+                data['set_point'] = set_point
 
-                self._pih_world.update(action)
+                manipulator_data.append(data)
 
-                # for i in range(self._viewer._steps_per_frame): 
-                self._pih_world.step()
+                print len(manipulator_data)
+
+                #hack to collect data
+                if len(manipulator_data) > 550:
+                    task_complete = True
+                    break
+
+                # action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=20)
+
+                # self._pih_world.update(action)
+
+                for i in range(self._viewer._steps_per_frame): 
+                    self._pih_world.step()
 
                 self._viewer.draw()
 
@@ -129,6 +143,8 @@ class Box2dDMP():
                 print "EE position \t", np.round(manipulator_ee_pos, 3)
                 print "Computed cmd \t", np.round(action, 3)
                 print "Error \t", error
+
+        save_data(manipulator_data, os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/man_data.pkl')
 
 
 def main():
