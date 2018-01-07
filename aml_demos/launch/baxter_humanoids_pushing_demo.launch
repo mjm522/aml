@@ -1,13 +1,10 @@
 <launch>
     
-    <include file="$(find aml_calib)/launch/calibrate.launch">
-    </include>
+    <include file="$(find aml_calib)/launch/calibrate.launch"></include>
     
-    <include file="$(find aml_ar)/launch/pushing_ar.launch">
-    </include>
+    <!-- <include file="$(find aml_ar)/launch/pushing_ar.launch"></include>-->
 
-    <node pkg="rviz" type="rviz" name="rviz" 
-    args="-d $(find aml_demos)/rviz_configs/baxter_humanoids_pushing_demo.rviz"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aml_demos)/rviz_configs/baxter_humanoids_pushing_demo.rviz"/>
 
     <node pkg="aml_services" type="mppi_pushing_service.py" name="aml_mppi_pushing_service"/>
 
