@@ -4,6 +4,7 @@ from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 def quatdiff(quat_curr, quat_des):
 
+    #quat_curr*quat_des.conjugate()
     qdiff = 2*(quat_curr*quat_des.conjugate()).log()
     qdiff_array = quaternion.as_float_array(qdiff)
     return qdiff_array[1:]
