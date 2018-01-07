@@ -23,6 +23,10 @@
     uri: https://github.com/RethinkRobotics/baxter_examples.git
     version: release-1.2.0
 - git:
+    local-name: baxter_pykdl
+    uri: https://github.com/RethinkRobotics/baxter_pykdl.git
+    version: master
+- git:
     local-name: sawyer_robot
     uri: https://github.com/RethinkRobotics/sawyer_robot.git
     version: master
