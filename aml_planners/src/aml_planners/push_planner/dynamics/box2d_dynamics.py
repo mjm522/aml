@@ -22,10 +22,8 @@ class Box2DDynamics(Dynamics):
     def convert_push_action(self, action):
 
         # action, theta, f_mag, px, py, fx, fy = self._world.sample_push_action(action)
-        action, pre_push_pos_x, pre_push_pos_y, fx, fy, push_pos_x, push_pos_y = self._world.sample_push_action2(action)
-        return [[action, pre_push_pos_x, pre_push_pos_y, fx, fy, push_pos_x, push_pos_y]]
-        # return [px,py,fx,fy]
-
+        push_actions = self._world.sample_push_action3(action)
+        return push_actions
 
     def dynamics(self, x, u):
 
@@ -56,11 +54,6 @@ class Box2DDynamics(Dynamics):
         self._world.reset()
 
         return final_state, 0.0, action # uncertainty is zero
-
-
-    def visualize(self, box_pose, fin_pose):
-        pass
-
 
 
 

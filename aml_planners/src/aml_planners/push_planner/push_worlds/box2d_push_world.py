@@ -426,10 +426,10 @@ class Box2DPushWorld(object):
         return [action, pre_push_pos_world[0], pre_push_pos_world[1], fx, fy, push_pos_world[0], push_pos_world[1]]
 
 
-    def sample_push_action3(self, alpha=[]):
+    def sample_push_action3(self, alpha=np.array([])):
         push_actions = []
-        
-        if not alpha:
+
+        if not alpha.size:
             alpha = [self.get_push_action() for _ in range(self._num_fingers)]
         else:
             alpha = [None for _ in range(self._num_fingers)]

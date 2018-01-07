@@ -27,9 +27,14 @@ def main():
 
         viewer.clear_screen(color=(255,255,255,255))
 
+        # print world._box.get_vertices_phys()
+
+        world._manipulator.set_joint_speed([-0.,0.,0.])
 
         state0 = world.pack_box_state()
 
+
+        # world._manipulator.set_joint_pos([-0., np.pi/4, np.pi/4])
 
         ## Controller selects push action (random sampling for simplicity now)
         # action = world.sample_push_action()
@@ -37,19 +42,15 @@ def main():
         ## Send action to world
         # world.update(action)
 
-
-
         ## Step the world for certain number of time steps
         for i in range(viewer._steps_per_frame):       
             world.step()
             pass
 
-
         statef = world.pack_box_state()
         # print "State0: ", state0, " Action: ", action, " StateF: ", statef, " SDiff: ", statef-state0
     
-        
-
+    
         viewer.draw()
 
         pc += 1
@@ -57,7 +58,7 @@ def main():
         if pc >= 5:
             action = world.sample_action()
 
-            world.update(action)
+            # world.update(action)
             # world.reset()
             pc = 0
 

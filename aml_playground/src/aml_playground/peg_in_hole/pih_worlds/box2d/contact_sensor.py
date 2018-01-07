@@ -13,7 +13,7 @@ class ContactSensor(b2ContactListener):
         pass
     def EndContact(self, contact):
         pass
-    def PreSolve(self, contact, old_manifold):
+    def PreSolve(self, contact, old_manifold, display=False):
         pass
 
     def PostSolve(self, contact, impulse):
@@ -28,8 +28,10 @@ class ContactSensor(b2ContactListener):
         self._normal_impulse_mag   = np.asarray(impulse.normalImpulses)
         self._tangent_impulse_mag  = np.asarray(impulse.tangentImpulses)
 
-        print "Normal point \t", self._local_contact_normal
-        print "Local  point \t", self._local_contact_point
+        # print "Normal point \t", self._local_contact_normal
+        # print "Local  point \t", self._local_contact_point
 
-        print "Normal impulse magnitude \t", self._tangent_impulse_mag
-        print "Tangent impulse magnitude \t", self._tangent_impulse_mag
+        # print "Normal impulse magnitude \t", self._tangent_impulse_mag
+        # print "Tangent impulse magnitude \t", self._tangent_impulse_mag
+
+        # return self._local_contact_normal, self._local_contact_point, self._tangent_impulse_mag, self._tangent_impulse_mag

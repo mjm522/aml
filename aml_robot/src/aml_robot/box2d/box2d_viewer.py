@@ -3,8 +3,8 @@ import pygame
 import threading
 import numpy as np
 from PIL import Image
-
-from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_r, K_f, K_s, K_c, K_i, K_j, K_k, K_l)
+from aml_io.io_tools import save_data
+from pygame.locals import (QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_r, K_f, K_s, K_c, K_i, K_j, K_k, K_l, K_d, K_e, K_w)
 
 class Box2DViewer(object):
 
@@ -38,10 +38,16 @@ class Box2DViewer(object):
         if 'cam_pos' in self._config.keys():
             self._cam_pos = self._config['cam_pos']
         else:
-            self._cam_pos = (0., 0.)
+            self._cam_pos = [0., 0.]
 
         if is_thread_loop:
             self.threaded_loop()
+
+        #for learning from demonstration
+        self._start_demo_record = False
+        self._demo_traj = []
+        self._demo_point_list = []
+        self._clear_demo = False
 
 
     def create_text_surface(self, text, colour = (255,255,0)):
@@ -113,6 +119,29 @@ class Box2DViewer(object):
 
                 print "Camera pos", self._cam_pos
 
+            elif (event.type == KEYDOWN and event.key == K_d):
+                self._start_demo_record = True
+                self._clear_demo = False
+
+                print "Demo recording started, move mouse ..."
+
+            elif (event.type == KEYDOWN and event.key == K_e):
+                self._start_demo_record = False
+                if self._config['save_demo']:
+                    save_data(np.asarray(self._demo_traj), self._config['demo_storage_path']+'demo.pkl')
+                    print "Saved demo in path:", self._config['demo_storage_path']
+                print "Demo recording ended!"
+
+            elif (event.type == KEYDOWN and event.key == K_w):
+                self._clear_demo = True
+                self._demo_point_list = []
+                self._demo_traj = []
+
+            elif (event.type == pygame.MOUSEMOTION) and self._start_demo_record:
+                x, y = event.pos
+                if (0 < x < self._config['image_width']-1) and (0 < y < self._config['image_height']-1):
+                    self._demo_point_list.append([x,y])
+                    self._demo_traj.append([float(x+self._config['cam_pos'][0])/self._config['pixels_per_meter'], float(self._config['image_height']-y-self._config['cam_pos'][1])/self._config['pixels_per_meter']])
 
             self._world.handle_event(event)
 
@@ -138,10 +167,19 @@ class Box2DViewer(object):
         self._last_screen = copy.deepcopy(img.transpose(1,0,2))
 
 
+    def draw_demo(self):
+        if self._clear_demo:
+            return
+        if len(self._demo_point_list) > 1:
+            # curr_frame = self._world.get_frame(self._cam_pos)  => needed?
+            pygame.draw.lines(self._screen, (255, 0, 0), False, self._demo_point_list, 3)
+            # self._screen.blit(curr_frame, (0, 0)) => needed?
+
     def draw(self):
         # Draw the world
         #view_info to true to see the text, arrow as well as point of pushing
         self._world.draw(self._screen, self._cam_pos)
+        self.draw_demo()
         # self.save_screen()
         self.store_screen()
         self.flip()

@@ -18,11 +18,9 @@ from aml_planners.push_planner.costs.cost_traj_following import CostTrajFollowin
 from aml_planners.push_planner.utilities.utils import get_circle, get_heatmap, sigmoid
 from aml_planners.push_planner.exp_params.experiment_params import experiment_config as econfig
 
-
-box2d_dynamics = None
-dynamics = None
 cost = None
-
+dynamics = None
+box2d_dynamics = None
 
 try:
     import rospy
@@ -34,10 +32,11 @@ else:
 if rospy_exist:
     from geometry_msgs.msg import Point
     from rospy_tutorials.msg import Floats
+    from aml_robot.msg import Box2dRosViewerAction
     #write a single message for all these!!!
     publish_box2d_pose   = rospy.Publisher('box2d_world_pose', Point)
     publish_box2d_goal   = rospy.Publisher('box2d_update_goal', Point)
-    publish_box2d_action = rospy.Publisher('box2d_action', Floats)
+    publish_box2d_action = rospy.Publisher('box2d_action', Box2dRosViewerAction)
     publish_box2d_obstacle = rospy.Publisher('box2d_update_obstacle', Floats)
 
 if econfig['dynamics_type'] == 'learnt_dyn':
@@ -71,9 +70,19 @@ def get_pose_message(data):
     msg.z = data[2]
     return msg
 
-def get_action_message(data):
+def get_obstacle_message(data):
     msg = Floats()
     msg.data = data
+    return msg
+
+def get_action_message(num_fins, single_action_len, actions):
+    msg = Box2dRosViewerAction()
+    msg.num_fins=num_fins
+    msg.single_action_len=single_action_len
+    data = []
+    for action in actions:
+        data += action
+    msg.actions = data
     return msg
 
 def transform(x0, angle):
@@ -104,7 +113,7 @@ def mppi_run(mppi_params):
         publish_box2d_goal.publish(msg)
 
         if mppi_params['obstacle'] is not None:
-            msg =  get_action_message(mppi_params['obstacle'])
+            msg =  get_obstacle_message(mppi_params['obstacle'])
             publish_box2d_obstacle.publish(msg)
         else:
             publish_box2d_obstacle.publish(Floats())
@@ -199,7 +208,7 @@ def mppi_run(mppi_params):
 
         if rospy_exist:
             ####### to send to box2d viewer
-            msg =  get_action_message(converted_action)
+            msg =  get_action_message(num_fins=1, single_action_len=7, actions=converted_action)
             publish_box2d_action.publish(msg)
             #######
 

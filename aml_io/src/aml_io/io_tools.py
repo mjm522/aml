@@ -1,6 +1,7 @@
+import time
 import pickle
-
-from os.path import join, dirname, abspath
+import warnings
+from os.path import exists, join, dirname, abspath
 
 def get_aml_package_path(aml_package_name=None):
 
@@ -17,6 +18,10 @@ def get_aml_package_path(aml_package_name=None):
 
 
 def save_data(data, filename, append_to_file = False):
+
+    if exists(filename):
+        warnings.warn("File exist by same name, renaming new file...")
+        filename = filename[:-4]+time.strftime("_%b_%d_%Y_%H_%M_%S", time.localtime())+'.pkl'
 
     file_opt = 'wb' if not append_to_file else 'ab'
     output = open(filename, 'wb')
