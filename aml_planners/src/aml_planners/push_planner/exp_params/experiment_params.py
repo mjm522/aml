@@ -4,7 +4,10 @@ import numpy as np
 
 from aml_planners.push_planner.forward_models.gp_model import GPModel
 from aml_planners.push_planner.forward_models.ensemble_model import EnsambleModel
-from aml_planners.push_planner.forward_models.simple_nn_model import SimpleNNModel
+try:
+    from aml_planners.push_planner.forward_models.simple_nn_model import SimpleNNModel
+except:
+    SimpleNNModel = EnsambleModel
 from aml_planners.push_planner.push_worlds.config import push_world_config as config
 
 EXP_NAME = 'exp_ensemble'
