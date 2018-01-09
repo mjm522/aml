@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DOCKER_IMAGE=$1
 WORK_DIR="${HOME}/Projects/"
