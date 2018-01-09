@@ -2,13 +2,12 @@ FROM osrf/ros:kinetic-desktop-full
 
 
 # nvidia-docker hooks
-LABEL com.nvidia.volumes.needed="nvidia_driver"
-ENV PATH /usr/local/nvidia/bin:${PATH}
-ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+# LABEL com.nvidia.volumes.needed="nvidia_driver"
+# ENV PATH /usr/local/nvidia/bin:${PATH}
+# ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 
 
 RUN apt-get update && \ 
-    apt-get -y install ros-kinetic-rviz && \
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-kinetic-convex-decomposition ros-kinetic-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs \
@@ -22,6 +21,7 @@ RUN apt-get update && \
                        ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control \
                        build-essential python-dev swig python-pygame && \
     rm -rf /var/lib/apt/lists/*
+
 
 RUN pip install --upgrade pip && \
     pip install protobuf
@@ -39,8 +39,6 @@ RUN pip install --upgrade pip && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
     pip install --upgrade tensorflow
 
-
-# RUN mkdir ~/Projects
 
 
 
