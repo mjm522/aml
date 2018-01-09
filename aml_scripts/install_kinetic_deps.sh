@@ -1,7 +1,16 @@
 #!/bin/bash
 
+##################################################################################
+######### What this script does ##################################################
+##################################################################################
+# 0) This scripts assumes: Ubuntu 16.04 with ROS kinetic-desktop-full installed
+# 1) installs dependencies for baxter & sawyer gazebo simulators 
+# 2) creates a python virtual env named 'robotics'
+# 3) installs all python2 dependences in the 'robotics' virtual env
+### 3.1) This includes tensorflow (the non-gpu version)
+
+
 sudo apt-get update
-sudo apt-get -y install ros-kinetic-rviz
 sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-kinetic-convex-decomposition ros-kinetic-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs \
@@ -19,8 +28,6 @@ sudo rm -rf /var/lib/apt/lists/*
 sudo pip install --upgrade pip 
 sudo pip install protobuf
 
-sudo apt-get install mesa-utils
-
 sudo pip install --upgrade pip 
 
 sudo pip install virtualenvwrapper
@@ -35,8 +42,8 @@ fi
 
 bash
 
-mkvirtualenv robotics_test
-workon robotics_test
+mkvirtualenv robotics
+workon robotics
 
 pip install git+git://github.com/pybox2d/pybox2d
 

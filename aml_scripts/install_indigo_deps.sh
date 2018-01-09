@@ -1,8 +1,16 @@
 #!/bin/bash
 
+##################################################################################
+######### What this script does ##################################################
+##################################################################################
+# 0) This scripts assumes: Ubuntu 14.04 with ROS indigo-desktop-full installed
+# 1) installs dependencies for baxter & sawyer gazebo simulators 
+# 2) creates a python virtual env named 'robotics'
+# 3) installs all python2 dependences in the 'robotics' virtual env
+### 3.1) This includes tensorflow (the non-gpu version)
+
 
 sudo apt-get update
-sudo apt-get -y install ros-indigo-rviz
 sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-indigo-convex-decomposition ros-indigo-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-indigo-control-msgs \
@@ -10,7 +18,7 @@ sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compile
                        ros-indigo-actionlib ros-indigo-actionlib-msgs ros-indigo-dynamic-reconfigure \
                        ros-indigo-trajectory-msgs ros-indigo-moveit \
                        ros-indigo-octomap-rviz-plugins \
-                       gazebo2 ros-indigo-qt-build ros-indigo-gazebo-ros-pkgs ros-indigo-control-toolbox \
+                       gazebo2 ros-indigo-qt-build ros-indigo-driver-common ros-indigo-gazebo-ros-pkgs ros-indigo-control-toolbox \
                        ros-indigo-realtime-tools ros-indigo-ros-controllers \
                        ros-indigo-tf-conversions ros-indigo-kdl-parser \
                        ros-indigo-ros-control ros-indigo-ros-controllers ros-indigo-gazebo-ros-control \
@@ -19,8 +27,6 @@ sudo rm -rf /var/lib/apt/lists/*
 
 sudo pip install --upgrade pip 
 sudo pip install protobuf
-
-sudo apt-get install mesa-utils
 
 sudo pip install --upgrade pip 
 

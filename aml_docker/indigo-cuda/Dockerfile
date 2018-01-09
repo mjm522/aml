@@ -50,9 +50,6 @@ RUN apt-get update && apt-get install -y \
 # setup entrypoint, need entrypoint.sh in the same folder with Dockerfile
 COPY ./ros_entrypoint.sh /
 
-ENTRYPOINT ["/ros_entrypoint.sh"]
-CMD ["bash"]
-
 # Dependencies for baxter and sawyer simulator
 RUN apt-get update && \ 
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
@@ -72,14 +69,18 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install protobuf
 
-RUN bin/bash -c "cd /tmp && \
-                 git clone https://github.com/pybox2d/pybox2d && \
-                 cd pybox2d && \
-                 python setup.py build && \
-                 python setup.py install"
-RUN rm -rf /tmp/pybox2d*
+#RUN bin/bash -c "cd /tmp && \
+#                 git clone https://github.com/pybox2d/pybox2d && \
+#                 cd pybox2d && \
+#                 python setup.py build && \
+#                 python setup.py install"
+#RUN rm -rf /tmp/pybox2d*
 
 
-RUN pip install --upgrade pip && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
-    pip install --upgrade tensorflow-gpu
+#RUN pip install --upgrade pip && \
+#    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
+#    pip install --upgrade tensorflow-gpu
+
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]
