@@ -3,14 +3,27 @@
 ##################################################################################
 ######### What this script does ##################################################
 ##################################################################################
-# 0) This scripts assumes: Ubuntu 14.04 with ROS indigo-desktop-full installed
+# 0) This scripts assumes: fresh install of Ubuntu 14.04 
 # 1) installs dependencies for baxter & sawyer gazebo simulators 
 # 2) creates a python virtual env named 'robotics'
 # 3) installs all python2 dependences in the 'robotics' virtual env
 ### 3.1) This includes tensorflow (the non-gpu version)
 
+sudo apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
 
-sudo apt-get update
+# setup sources.list
+sudo echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list
+
+# installing ros-indigo-desktop-full
+sudo apt-get update 
+sudo apt-get install ros-indigo-desktop-full
+sudo rosdep init
+rosdep update
+sudo apt-get install python-rosinstall
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+# dependencies for baxter and sawyer gazebo simulators
 sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-indigo-convex-decomposition ros-indigo-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-indigo-control-msgs \
@@ -42,8 +55,8 @@ fi
 
 bash
 
-mkvirtualenv robotics_test
-workon robotics_test
+mkvirtualenv robotics
+workon robotics
 
 pip install git+git://github.com/pybox2d/pybox2d
 

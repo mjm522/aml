@@ -3,14 +3,25 @@
 ##################################################################################
 ######### What this script does ##################################################
 ##################################################################################
-# 0) This scripts assumes: Ubuntu 16.04 with ROS kinetic-desktop-full installed
+# 0) This scripts assumes: fresh install of Ubuntu 16.04
 # 1) installs dependencies for baxter & sawyer gazebo simulators 
 # 2) creates a python virtual env named 'robotics'
 # 3) installs all python2 dependences in the 'robotics' virtual env
 ### 3.1) This includes tensorflow (the non-gpu version)
 
 
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update
+sudo apt-get install ros-kinetic-desktop-full
+sudo rosdep init
+rosdep update
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+# dependencies for baxter and sawyer gazebo simulators
 sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-kinetic-convex-decomposition ros-kinetic-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs \

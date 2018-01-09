@@ -1,12 +1,5 @@
 FROM osrf/ros:kinetic-desktop-full
 
-
-# nvidia-docker hooks
-LABEL com.nvidia.volumes.needed="nvidia_driver"
-ENV PATH /usr/local/nvidia/bin:${PATH}
-ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
-
-
 RUN apt-get update && \ 
     apt-get -y install ros-kinetic-rviz && \
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
@@ -38,9 +31,6 @@ RUN rm -rf /tmp/pybox2d*
 RUN pip install --upgrade pip && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
     pip install --upgrade tensorflow
-
-
-# RUN mkdir ~/Projects
 
 
 

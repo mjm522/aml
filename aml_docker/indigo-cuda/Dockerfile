@@ -15,6 +15,26 @@ RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1
 # setup sources.list
 RUN echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list
 
+
+ENV ROS_DISTRO indigo
+
+# install ros core packages
+#RUN apt-get update && apt-get install -y \
+#    ros-indigo-ros-core=1.1.5-0* \
+#    && rm -rf /var/lib/apt/lists/*
+
+
+# install ros base packages
+# RUN apt-get update && apt-get install -y \
+#    ros-indigo-ros-base=1.1.5-0* \
+#    && rm -rf /var/lib/apt/lists/*
+
+# install ros desktop full packages
+RUN apt-get update && apt-get install -y \
+    ros-indigo-desktop-full=1.1.5-0* \
+    && rm -rf /var/lib/apt/lists/*
+
+
 # install bootstrap tools
 RUN apt-get update && apt-get install --no-install-recommends -y \
     python-rosdep \
@@ -30,22 +50,8 @@ ENV LC_ALL C.UTF-8
 RUN rosdep init \
     && sudo rosdep update
 
-# install ros core packages
-ENV ROS_DISTRO indigo
-RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-core=1.1.5-0* \
-    && rm -rf /var/lib/apt/lists/*
 
 
-# install ros base packages
-RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-base=1.1.5-0* \
-    && rm -rf /var/lib/apt/lists/*
-
-# install ros desktop full packages
-RUN apt-get update && apt-get install -y \
-    ros-indigo-desktop-full=1.1.5-0* \
-    && rm -rf /var/lib/apt/lists/*
 
 # setup entrypoint, need entrypoint.sh in the same folder with Dockerfile
 COPY ./ros_entrypoint.sh /
@@ -77,9 +83,9 @@ RUN pip install --upgrade pip && \
 #RUN rm -rf /tmp/pybox2d*
 
 
-#RUN pip install --upgrade pip && \
-#    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
-#    pip install --upgrade tensorflow-gpu
+RUN pip install --upgrade pip && \
+    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
+    pip install --upgrade tensorflow-gpu
 
 
 ENTRYPOINT ["/ros_entrypoint.sh"]

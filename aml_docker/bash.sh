@@ -35,7 +35,7 @@ nvidia-docker run -it \
 #        bash
 # xhost - (don't ever forget this)
 
-# Container execution with X11 access in OSX (requires bridge_display.bash to be run beforehand)
+# Container execution with X11 access in OSX (requires osx_bridge_display.bash to be run beforehand)
 # This does not support 3D rendering, i.e. we cannot run rviz (not hardware-accelerated)
 # Display host ip
 # DISPLAY_IP=192.168.0.9
