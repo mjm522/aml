@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-AML_DIR=$(pwd)
+AML_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 AML_DATA='REPLACE THIS LINE WITH THE PATH TO AML_DATA'
 
