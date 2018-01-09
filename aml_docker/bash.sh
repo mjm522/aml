@@ -6,8 +6,14 @@ WORK_DIR="${HOME}/Projects/"
 #192.168.0.9:0
 #192.168.0.9:0
 
-
-
+if [ -z "$DOCKER_IMAGE" ]
+then
+      echo "usage: ./bash.sh <docker-image-tag>"
+      echo "example: ./bash.sh dev:indigo-cuda"
+      echo "to list built docker images run: docker images"
+      exit 1
+fi
+#sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
 nvidia-docker run -it \
        --user=$(id -u) \

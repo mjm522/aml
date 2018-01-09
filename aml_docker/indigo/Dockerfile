@@ -37,7 +37,9 @@ RUN rm -rf /tmp/pybox2d*
 
 RUN pip install --upgrade pip && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
-    pip install --upgrade tensorflow
+    pip install --upgrade \
+    https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.1-cp27-none-linux_x86_64.whl
+# TENSOR FLOW *CPU*
 
 
 # RUN mkdir ~/Projects
