@@ -93,7 +93,7 @@ RUN pip install --upgrade pip && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
-# TENSOR FLOW *CPU*
+# TENSOR FLOW *GPU*
 
 # Fix paths so that CUDNN can be found
 # See https://github.com/tensorflow/tensorflow/issues/8264
