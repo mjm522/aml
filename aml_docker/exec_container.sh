@@ -7,5 +7,5 @@ fi
 
 echo 'Entering container:' $1
 nvidia-docker exec -it $1 \
-       bash -c "cd aml_ws && ./baxter_sim.sh"
+       bash -c "cd aml_ws && ./baxter.sh sim"
 # -c "source /opt/ros/kinetic/setup.bash && /bin/bash"

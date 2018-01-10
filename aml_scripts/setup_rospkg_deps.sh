@@ -25,5 +25,5 @@ wstool update
 rosdep install --from-path . --ignore-src --rosdistro kinetic -y -r
 cd ..
 catkin_make
-cp ./src/aml/3rdparty/baxter/baxter_sim.sh .
-cp ./src/aml/3rdparty/baxter/baxter_hdw.sh .
+cp ./src/aml/3rdparty/baxter.sh .
+cp ./src/aml/3rdparty/intera.sh .
