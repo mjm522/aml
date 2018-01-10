@@ -28,7 +28,7 @@ NV_GPU=0 nvidia-docker run -it \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="${WORK_DIR}:/home/Projects" \
        $DOCKER_IMAGE \
-       bash
+       python -c "import tensorflow as tf; s = tf.Session()"
 
 # Unsafe container execution with X11 access 
 # xhost +
@@ -37,7 +37,7 @@ NV_GPU=0 nvidia-docker run -it \
 #        --env="QT_X11_NO_MITSHM=1" \
 #        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 #        --volume="${WORK_DIR}:/home/Projects" \
-#        $DOCKER_IMAGE \
+#        $DOCKER_IMAGE
 #        bash
 # xhost - (don't ever forget this)
 
@@ -52,7 +52,7 @@ NV_GPU=0 nvidia-docker run -it \
 #        --env="QT_X11_NO_MITSHM=1" \
 #        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 #        --volume="${WORK_DIR}:/home/Projects" \
-#        $DOCKER_IMAGE \
+#        $DOCKER_IMAGE
 #        bash
 
 
