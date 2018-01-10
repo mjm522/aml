@@ -19,7 +19,7 @@ nvidia-docker run -it \
        --user=$(id -u) \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
-       --workdir="/home/$USER" \
+       --workdir="/home/$USER/Projects" \
        --volume="/home/$USER:/home/$USER" \
        --volume="/etc/group:/etc/group:ro" \
        --volume="/etc/passwd:/etc/passwd:ro" \
@@ -28,7 +28,7 @@ nvidia-docker run -it \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="${WORK_DIR}:/home/Projects" \
        $DOCKER_IMAGE \
-       bash
+       bash -c "cd aml_ws && ./baxter_sim.sh"
 
 # Unsafe container execution with X11 access 
 # xhost +

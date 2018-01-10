@@ -15,7 +15,7 @@ then
 fi
 #sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
-NV_GPU=0 nvidia-docker run -it \
+nvidia-docker run -it \
        --user=$(id -u) \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \

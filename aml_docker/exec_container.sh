@@ -6,5 +6,6 @@ if [ $# -ne 1 ]; then
 fi
 
 echo 'Entering container:' $1
-docker exec -it $1 \
-       bash -c "source /opt/ros/kinetic/setup.bash && /bin/bash"
+nvidia-docker exec -it $1 \
+       bash -c "cd aml_ws && ./baxter_sim.sh"
+# -c "source /opt/ros/kinetic/setup.bash && /bin/bash"
