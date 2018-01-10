@@ -27,6 +27,10 @@
     uri: https://github.com/RethinkRobotics/sawyer_robot.git
     version: master
 - git:
+    local-name: baxter_pykdl
+    uri: https://github.com/RethinkRobotics/baxter_pykdl.git
+    version: master
+- git:
     local-name: aruco_ros
     uri: https://github.com/eaa3/aruco_ros.git
     version: master
