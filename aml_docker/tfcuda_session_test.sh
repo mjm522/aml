@@ -13,6 +13,11 @@ then
       echo "to list built docker images run: docker images"
       exit 1
 fi
+
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
 #sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
 nvidia-docker run -it \
@@ -26,7 +31,7 @@ nvidia-docker run -it \
        --volume="/etc/shadow:/etc/shadow:ro" \
        --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="${WORK_DIR}:/home/Projects" \
+       --volume="${WORK_DIR}:/home/Projects" ${extra_params} \
        $DOCKER_IMAGE \
        python -c "import tensorflow as tf; s = tf.Session()"
 

@@ -4,13 +4,17 @@
 # Modify mounting location as you like
 # bash roscore.sh
 
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
 docker run -h moveit -it --rm \
        --net rosnet --name moveit\
        --env ROS_MASTER_URI=http://master:11311 \
        --env ROS_HOSTNAME=moveit \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
-       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" ${extra_params} \
        -w /root/work/catkin_ws \
        -v /home/ahayashi/work:/root/work \
        ros:indigo \

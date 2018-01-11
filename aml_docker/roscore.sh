@@ -11,10 +11,14 @@ then
       exit 1
 fi
 
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
 # docker network create rosnet
 
-docker run -h master -it --rm \
+xdocker run -h master -it --rm \
        --net rosnet --name master \
-       --env ROS_HOSTNAME=master \
+       --env ROS_HOSTNAME=master ${extra_params} \
        ${DOCKER_IMAGE} \
        roscore

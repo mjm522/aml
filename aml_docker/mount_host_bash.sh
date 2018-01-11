@@ -3,9 +3,14 @@
 # Don't forget: xhost +
 # Modify mounting location as you like
 
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
+
 docker run -it \
        --env="DISPLAY=192.168.0.9:0" \
-       --env="QT_X11_NO_MITSHM=1" \
+       --env="QT_X11_NO_MITSHM=1" ${extra_params} \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged \
        -v /Users/ermanoarruda/Projects/ros_ws/:/root/Projects/ros_ws/ \
        -w /root/Projects/ros_ws/ \

@@ -3,13 +3,17 @@
 # Don't forget: xhost +
 # Modify mounting location as you like
 
-docker run -h moveit -it --rm \
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
+xdocker run -h moveit -it --rm \
        --net rosnet --name moveit\
        --env ROS_MASTER_URI=http://master:11311 \
        --env ROS_HOSTNAME=moveit \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
-       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" ${extra_params} \
        -v /home/ahayashi/work:/root/work \
        -w /root/work/catkin_ws \
        ros:indigo \

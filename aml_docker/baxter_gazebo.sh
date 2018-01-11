@@ -13,9 +13,14 @@ then
       echo "to list built docker images run: docker images"
       exit 1
 fi
+
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ./aml_aliases.sh
+
 #sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
-nvidia-docker run -it \
+xdocker run -it \
        --user=$(id -u) \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
@@ -26,7 +31,7 @@ nvidia-docker run -it \
        --volume="/etc/shadow:/etc/shadow:ro" \
        --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="${WORK_DIR}:/home/Projects" \
+       --volume="${WORK_DIR}:/home/Projects" ${extra_params} \
        $DOCKER_IMAGE \
        bash -c "cd aml_ws && ./baxter.sh sim"
 
