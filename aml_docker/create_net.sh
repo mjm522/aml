@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
-docker network create -d bridge rosnet
+aml-docker network create -d bridge rosnet

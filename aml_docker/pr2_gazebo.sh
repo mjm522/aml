@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Don't forget: xhost +
 # bash roscore.sh

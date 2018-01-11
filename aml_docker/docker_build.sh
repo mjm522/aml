@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 DOCKER_FILE_PATH=$1
