@@ -19,7 +19,10 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install protobuf
 
-RUN apt-get update && apt-get install mesa-utils
+RUN \
+  apt-get update && \
+  apt-get -y install libgl1-mesa-glx libgl1-mesa-dri mesa-utils && \
+  rm -rf /var/lib/apt/lists/*
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \

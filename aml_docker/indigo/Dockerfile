@@ -1,11 +1,6 @@
 FROM osrf/ros:indigo-desktop-full
 
 
-# nvidia-docker hooks
-# LABEL com.nvidia.volumes.needed="nvidia_driver"
-# ENV PATH /usr/local/nvidia/bin:${PATH}
-# ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
-
 
 RUN apt-get update && \ 
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
@@ -26,7 +21,10 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install protobuf
 
-# RUN apt-get update && apt-get install mesa-utils
+RUN \
+  apt-get update && \
+  apt-get -y install libgl1-mesa-glx libgl1-mesa-dri mesa-utils && \
+  rm -rf /var/lib/apt/lists/*
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \
