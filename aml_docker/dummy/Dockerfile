@@ -1,5 +1,5 @@
-FROM busybox 
-
-# A dummy image for testing purposes
+FROM busybox
 
 CMD [ "ps", "faux" ]
+
+# A dummy image for testing purposes
