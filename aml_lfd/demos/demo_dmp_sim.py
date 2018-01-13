@@ -21,7 +21,7 @@ def test_dmp(dmp):
     # play with the parameters
     start_offset = np.array([0.,0.])
     goal_offset = np.array([.0, 0.])
-    speed = 1.
+    speed = 0.5
     external_force = np.array([0.,0.,0.,0.])
     alpha_phaseStop = 20.
 

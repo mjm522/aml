@@ -4,7 +4,7 @@ import numpy.matlib as npm
 from scipy.interpolate import interp1d
 
 
-class DiscreteDMPShell():
+class DiscreteDMPShell(object):
 
     def __init__(self, config):
         
@@ -59,7 +59,6 @@ class DiscreteDMPShell():
             res = np.zeros([centers.shape[1], q.shape[1]])
             for i in range(q.shape[1]):
                 qq = npm.repmat( q[:,i], 1, centers.shape[1])
-                df = np.sum( (qq-centers)**2, axis=0)
                 res[:,i] = np.exp( -0.5* np.multiply( np.sum( (qq-centers)**2, axis=0), D))     
             
             return res
@@ -82,7 +81,7 @@ class DiscreteDMPShell():
         # 1: Euler solution to exponential decreased canonical system
         for i in range(1, x.shape[1]):
             x[:,i] = x[:,i-1] + 1./tau * ax * x[:,i-1] * dt
-
+  
         # calculate weights directly
         phi = self._kernel_fcn(x)
         w = np.zeros([phi.shape[0], self._traj_data.shape[1]-1])
@@ -140,6 +139,8 @@ class DiscreteDMPShell():
         timestamps = np.array([0])
         t = 0
         while u > 1e-3:
+            print u
+            raw_input()
             id = id + 1
             kf = self._kernel_fcn(np.array([[u]]))
 

@@ -1,35 +1,42 @@
 import numpy as np
 from scipy.signal import lfilter
+from utilities import stack_tensor_dict_list, concat_tensor_dict_list, get_feature
 
-def rollout(env, agent, max_path_length=np.inf, speedup=1, always_return_paths=False):
+def rollout(env, policy, max_path_length=np.inf, speedup=1, always_return_paths=False):
+    states = []
     observations = []
     actions = []
     rewards = []
-    agent_infos = []
-    env_infos = []
-    o = env.reset()
-    agent.reset()
+    policy_vars = []
+    state = env.reset()
+    policy.reset()
     path_length = 0
+    features = []
 
     while path_length < max_path_length:
-        a, agent_info = agent.get_action(o)
-        next_o, r, d, env_info = env.step(a)
-        observations.append(o.flatten())
-        rewards.append(r)
-        actions.append(a.flatten())
-        agent_infos.append(agent_info)
-        env_infos.append(env_info)
+        
+        feature = get_feature(observation=state, reward=0.)
+        action, policy_var = policy.get_action(feature)
+        state, action, observation, reward = env.step(state, action)
+        
+        observations.append(observation.flatten())
+        states.append(state)
+        rewards.append(reward)
+        actions.append(action.flatten())
+        policy_vars.append(policy_var)
+
+        features.append(get_feature(observation=state, reward=reward))
+        
         path_length += 1
-        if d:
-            break
-        o = next_o
+        state = observation
+
 
     return dict(
         observations= np.array(observations),
         actions=np.array(actions),
         rewards=np.array(rewards),
-        agent_infos=None,#stack_tensor_dict_list(agent_infos),
-        env_infos=None,#stack_tensor_dict_list(env_infos),
+        policy_vars=stack_tensor_dict_list(policy_vars),
+        features=np.array(features)
     )
 
 
@@ -47,7 +54,7 @@ class BatchSampler(object):
         paths = []
 
         for k in range(self._num_samples):
-            paths.append(rollout(self.algo.env, self.algo.policy, self._path_length))
+            paths.append(rollout(self.algo._env, self.algo._policy, self._path_length))
   
         return paths
   
@@ -56,24 +63,19 @@ class BatchSampler(object):
         baselines = []
         returns = []
 
-        if hasattr(self.algo.baseline, "predict_n"):
-            all_path_baselines = self.algo.baseline.predict_n(paths)
-        else:
-            all_path_baselines = [self.algo.baseline.predict(path) for path in paths]
-
         for idx, path in enumerate(paths):
-            path_baselines = np.append(all_path_baselines[idx], 0)
-            deltas = path["rewards"] + \
-                     self.algo.discount * path_baselines[1:] - \
-                     path_baselines[:-1]
+     
+            # deltas = path["rewards"] + \
+            #          self.algo._discount * path_baselines[1:] - \
+            #          path_baselines[:-1]
+
+            deltas = path["rewards"]
+            
             #discout cumsum
-            path["advantages"] = lfilter([1], [1, float(-self.algo.discount * self.algo.gae_lambda)], deltas[::-1], axis=0)[::-1]
-            path["returns"]    = lfilter([1], [1, float(-self.algo.discount)], path["rewards"][::-1], axis=0)[::-1]
+            path["advantages"] = lfilter([1], [1, float(-self.algo._discount * self.algo._gae_lambda)], deltas[::-1], axis=0)[::-1]
+            path["returns"]    = lfilter([1], [1, float(-self.algo._discount)], path["rewards"][::-1], axis=0)[::-1]
 
-            baselines.append(path_baselines[:-1])
             returns.append(path["returns"])
-
-        # ev = explained_variance_1d( np.concatenate(baselines),np.concatenate(returns) )
 
         observations = np.concatenate([path["observations"] for path in paths], axis=0)
         actions = np.concatenate([path["actions"] for path in paths], axis=0)
@@ -81,13 +83,14 @@ class BatchSampler(object):
         returns = np.concatenate([path["returns"] for path in paths], axis=0)
         advantages = np.concatenate([path["advantages"] for path in paths], axis=0)
 
-        # env_infos = concat_tensor_dict_list([path["env_infos"] for path in paths])
-        # agent_infos = concat_tensor_dict_list([path["agent_infos"] for path in paths])
+        features  = np.concatenate([path['features'] for path in paths], axis=0)
 
-        if self.algo.center_adv:
+        policy_vars = concat_tensor_dict_list([path["policy_vars"] for path in paths])
+
+        if self.algo._center_adv:
             advantages = (advantages - np.mean(advantages)) / (advantages.std() + 1e-8)
 
-        if self.algo.positive_adv:
+        if self.algo._positive_adv:
             advantages = (advantages - np.min(advantages)) + 1e-8
 
         average_discounted_return = \
@@ -103,16 +106,18 @@ class BatchSampler(object):
             rewards=rewards,
             returns=returns,
             advantages=advantages,
-            env_infos=None,#env_infos,
-            agent_infos=None,#agent_infos,
+            policy_vars=policy_vars,
             paths=paths,
+            features=features,
         )
+
+        ##the following lines are for the base line linear feature fitting between features and reward
         
-        print("fitting baseline...")
-        if hasattr(self.algo.baseline, 'fit_with_samples'):
-            self.algo.baseline.fit_with_samples(paths, samples_data)
-        else:
-            self.algo.baseline.fit(paths)
-        print("fitted")
+        # print("fitting baseline...")
+        # if hasattr(self.algo.baseline, 'fit_with_samples'):
+        #     self.algo.baseline.fit_with_samples(paths, samples_data)
+        # else:
+        #     self.algo.baseline.fit(paths)
+        # print("fitted")
 
         return samples_data
