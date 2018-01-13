@@ -19,14 +19,15 @@ unset your_hostname
 # will be overwritten by any variables set here.
 
 # Specify Baxter's hostname
-baxter_hostname="011311P0010.local" #uncomment for hardware
-#baxter_hostname="baxter_hostname.local" #comment for hardware
+baxter_hostname="011311P0010.local" #"011401P0008.local" #011311P0010.local#011311P0010.local
 
 # Set *Either* your computers ip address or hostname. Please note if using
 # your_hostname that this must be resolvable to Baxter.
-your_ip="10.0.11.160" #uncomment for hardware
-#your_ip="127.0.0.1" #comment for hardware
-
+your_ip="10.0.11.188" #"192.168.1.3" #
+#"10.0.0.223" #"10.0.11.189" # localhost IRLAB: 10.0.11.167 # IRLAB2: 10.0.11.160
+if [ "${1}" == "sim" ]; then
+	your_ip="127.0.0.1"
+fi
 #your_hostname="my_computer.local"
 
 # Specify ROS distribution (e.g. indigo, hydro, etc.)

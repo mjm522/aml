@@ -149,7 +149,7 @@ if __name__=="__main__":
     ctrlr = setController(control_id, limb)
 
     start_pos, start_ori = limb.get_ee_pose()
-    goal_ori = quaternion.as_float_array(start_ori)
+    goal_ori = start_ori
 
     ctrlr.set_active(True)
 
@@ -159,7 +159,7 @@ if __name__=="__main__":
 
     # create an interactive marker for our server
     position = Point( start_pos[0], start_pos[1], start_pos[2])
-    marker = destinationMarker.makeMarker( False, InteractiveMarkerControl.MOVE_3D, position, False)
+    marker = destinationMarker.makeMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, quaternion.as_float_array(start_ori), True)
     server.insert(marker, processFeedback)
     menu_handler.apply( server, marker.name )
 

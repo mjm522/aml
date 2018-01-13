@@ -23,9 +23,17 @@
     uri: https://github.com/RethinkRobotics/baxter_examples.git
     version: release-1.1.1
 - git:
-    local-name: AML
-    uri: https://github.com/eaa3/aml.git
-    version: aml_dev
+    local-name: baxter_pykdl
+    uri: https://github.com/RethinkRobotics/baxter_pykdl.git
+    version: master
+- git:
+    local-name: sawyer_robot
+    uri: https://github.com/RethinkRobotics/sawyer_robot.git
+    version: master
+- git:
+    local-name: baxter_pykdl
+    uri: https://github.com/RethinkRobotics/baxter_pykdl.git
+    version: master
 - git:
     local-name: aruco_ros
     uri: https://github.com/eaa3/aruco_ros.git
