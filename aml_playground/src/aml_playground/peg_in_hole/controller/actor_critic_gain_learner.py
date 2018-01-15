@@ -1,6 +1,5 @@
 import collections
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 
 from aml_robot.box2d.box2d_viewer import Box2DViewer
@@ -23,14 +22,17 @@ class ActorCriticGainLearner(object):
         Constructor of the actor critic network
         """
 
+        #trajectory to be followed
+        self._traj2follow  = traj2follow
+
         #world
         self._env          = Box2DPIHWorld(pih_world_config)
 
         #visualizer
         self._viewer       = Box2DViewer(self._env, pih_world_config, is_thread_loop=False)
 
-        #trajectory to be followed
-        self._traj2follow  = traj2follow
+        #add the trajectory to the viewer
+        self.view_traj(self._traj2follow)
 
         #num steps
         self._time_steps   = self._traj2follow.shape[0]
@@ -43,6 +45,19 @@ class ActorCriticGainLearner(object):
         #stats
         self._episode_lengths = np.zeros(self._num_episodes)
         self._episode_rewards = np.zeros(self._num_episodes)
+
+    def view_traj(self, trajectory):
+        """
+        this funciton is specific for box2d viewer.
+        """
+
+        trajectory *= self._viewer._config['pixels_per_meter']
+
+        trajectory[:, 0] -= self._viewer._config['cam_pos'][0]
+
+        trajectory[:,1] = self._viewer._config['image_height'] - self._viewer._config['cam_pos'][1] - trajectory[:,1]
+
+        self._viewer._demo_point_list = trajectory.astype(int)
 
 
     def setup(self, sess):
@@ -68,7 +83,7 @@ class ActorCriticGainLearner(object):
                                            learning_rate=0.1)
 
 
-    def run(self, train=True):
+    def run(self, train=True, render=False):
 
         """
         main code that trains the network
@@ -80,7 +95,8 @@ class ActorCriticGainLearner(object):
         #start the iteration
         for i_episode in range(self._num_episodes):
             # Reset the environment and pick the fisrst action
-            state = self._env.reset()
+            #reseting to the first intial state without noise
+            state = self._env.reset(noise=0.)
 
             #get data from the manipulator object
             data  = self._env._manipulator.get_state()
@@ -96,6 +112,8 @@ class ActorCriticGainLearner(object):
                 # Take a step
                 Kp = self._actor_net.predict(state)
 
+                print "Kp value predicted \t", Kp[0]
+
                 set_point = np.hstack([self._traj2follow[t, :], 0.1])
 
                 action = self._env._manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=Kp) #20
@@ -105,11 +123,14 @@ class ActorCriticGainLearner(object):
                 for i in range(self._viewer._steps_per_frame): 
                     self._env.step()
 
+                if render:
+                    self._viewer.draw()
+
                 data       = self._env._manipulator.get_state()
 
                 next_state = np.hstack([data['j_pos'], data['j_vel']])
 
-                reward     = -np.linalg.norm(np.hstack([self._traj2follow[t+1, :], 0.1]) - data['j_pos'])
+                reward     = -0.01*np.linalg.norm(np.hstack([self._traj2follow[t+1, :], 0.1]) - data['j_pos'])
 
                 if train:
                 
@@ -121,7 +142,7 @@ class ActorCriticGainLearner(object):
                     self._episode_lengths[i_episode] = t
                     
                     # Calculate TD Target
-                    value_next = self._critic_net.predict(next_state)
+                    value_nexttf.contrib.distributions.Normal = self._critic_net.predict(next_state)
                     td_target = reward + self._discount_factor * value_next
                     #advantage computation
                     td_error = td_target - self._critic_net.predict(state)
@@ -132,7 +153,7 @@ class ActorCriticGainLearner(object):
                     # Update the policy estimator
                     # using the td error as our advantage estimate
                     self._actor_net.update(state, td_error, Kp)
-                    
+  
                     # Print out which step we're on, useful for debugging.
                     print("\rStep {} @ Episode {}/{} ({})".format(t, i_episode + 1, self._num_episodes, self._episode_rewards[i_episode - 1]))
 
@@ -140,10 +161,11 @@ class ActorCriticGainLearner(object):
 
                     print "Step \t", t
 
-                    self._viewer.draw()
+                state = next_state
 
-                    state = next_state
-
+            #execute the loop only once
+            #this is to see the environment alone
+            #working
             if not train:
 
                 break

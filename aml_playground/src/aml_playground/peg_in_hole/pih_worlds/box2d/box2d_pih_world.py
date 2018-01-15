@@ -175,9 +175,11 @@ class Box2DPIHWorld(object):
 
             # self._plotter.contour(X,Y,Z)
 
-    def reset(self):
+    def reset(self, noise=0.5):
 
-        self._box.reset()
+        self._box.reset(noise)
+
+        self._manipulator.reset(noise)
 
         self._world.ClearForces()
 

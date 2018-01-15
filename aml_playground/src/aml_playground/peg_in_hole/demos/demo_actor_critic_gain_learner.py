@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from aml_io.io_tools import save_data, load_data
@@ -61,7 +62,7 @@ with tf.device("/cpu:0"):
 
         print "Training ..."
 
-        episode_lengths, episode_rewards = acgl.run(train=True)
+        episode_lengths, episode_rewards = acgl.run(train=True, render=False)
 
 
 plot_episode_stats(episode_lengths, episode_rewards)

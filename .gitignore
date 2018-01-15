@@ -39,3 +39,7 @@ aml_dl/src/aml_dl/mdn/model/tests2.py
 
 .idea
 
+aml_policy_search/
+
+aml_playground/src/aml_playground/peg_in_hole/demos/episode_reward.txt
+
