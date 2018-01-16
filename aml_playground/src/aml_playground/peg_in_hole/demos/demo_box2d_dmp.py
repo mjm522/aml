@@ -1,10 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from aml_io.io_tools import save_data, load_data
 from config import box2d_dmp_config
+from aml_io.io_tools import save_data, load_data
+from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_robot.box2d.box2d_viewer import Box2DViewer
-from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
 from aml_playground.peg_in_hole.pih_worlds.box2d.config import pih_world_config
 from aml_playground.peg_in_hole.pih_worlds.box2d.box2d_pih_world import Box2DPIHWorld
 
@@ -14,7 +14,7 @@ class Box2dDMP():
         self._config    = config
         self._pih_world = Box2DPIHWorld(pih_world_config)
         self._pih_manipulator = self._pih_world._manipulator
-        self._dmp_shell = DiscreteDMPShell(config=config)
+        self._dmp = DiscreteDMP(config=config)
         self._viewer    = Box2DViewer(self._pih_world, pih_world_config, is_thread_loop=False)
 
 
@@ -32,8 +32,8 @@ class Box2dDMP():
 
     def train_dmp(self):
 
-        self._dmp_shell.load_demo_trajectory(self._demo)
-        self._dmp_shell.train()
+        self._dmp.load_demo_trajectory(self._demo)
+        self._dmp.train()
 
     def load_demo(self, trajectory):
         self._demo = trajectory
@@ -49,9 +49,9 @@ class Box2dDMP():
         external_force = np.array([0.,0.,0.,0.])
         alpha_phaseStop = 20.
 
-        test_config['y0'] = self._dmp_shell._traj_data[0, 1:] + start_offset
+        test_config['y0'] = self._dmp._traj_data[0, 1:] + start_offset
         test_config['dy'] = np.array([0., 0.])
-        test_config['goals'] = self._dmp_shell._traj_data[-1, 1:] + goal_offset
+        test_config['goals'] = self._dmp._traj_data[-1, 1:] + goal_offset
         test_config['tau'] = 1./speed
         test_config['ac'] = alpha_phaseStop
         test_config['type'] = 1
@@ -61,12 +61,12 @@ class Box2dDMP():
         else:
             test_config['extForce'] = np.array([0,0,0,0])
 
-        test_traj = self._dmp_shell.test(config=test_config)
+        test_traj = self._dmp.generate_trajectory(config=test_config)
 
         if plot_traj:
 
             plt.figure('x vs y demo_traj & test_traj')
-            demo_plt, = plt.plot(self._dmp_shell._traj_data[:,1], self._dmp_shell._traj_data[:,2], 'b-', label='demo_traj')
+            demo_plt, = plt.plot(self._dmp._traj_data[:,1], self._dmp._traj_data[:,2], 'b-', label='demo_traj')
             traj_plt, = plt.plot(test_traj[:,1], test_traj[:,2], 'r--', label='test_traj')
             plt.legend(handles=[demo_plt, traj_plt])
 
@@ -110,7 +110,7 @@ class Box2dDMP():
 
             while error > 0.5:
 
-                set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp_shell._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
+                set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
                 data = self._pih_manipulator.get_state()
                 data['set_point'] = set_point
