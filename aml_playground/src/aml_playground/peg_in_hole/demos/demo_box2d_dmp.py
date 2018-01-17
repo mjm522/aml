@@ -95,6 +95,11 @@ class Box2dDMP():
         self.train_dmp()
         test_result = self.test_dmp(speed=1., plot_traj=False)
         des_path = test_result['pos_traj']
+
+        indices = np.arange(0, len(des_path), 23)
+
+        des_path = des_path[indices, :]
+
         k = -1
         
         task_complete = False
@@ -105,28 +110,26 @@ class Box2dDMP():
 
         while self._viewer._running and not task_complete:
 
-            k += 100
+            k += 1
             error = 100.
 
-            while error > 0.5:
+            while error > 0.25:
 
-                set_point = np.hstack([des_path[k,:], 0.1])#np.hstack([self._dmp._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
+                set_point = np.hstack([des_path[k,:], 0.05])#np.hstack([self._dmp._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
                 data = self._pih_manipulator.get_state()
                 data['set_point'] = set_point
 
-                manipulator_data.append(data)
-
                 print len(manipulator_data)
 
-                #hack to collect data
-                if len(manipulator_data) > 550:
+                # hack to collect data
+                if len(manipulator_data) > 720:
                     task_complete = True
                     break
 
-                # action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=20)
+                action = self._pih_manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=20)
 
-                # self._pih_world.update(action)
+                self._pih_world.update(action)
 
                 for i in range(self._viewer._steps_per_frame): 
                     self._pih_world.step()
@@ -139,10 +142,17 @@ class Box2dDMP():
                 manipulator_ee_pos = self._pih_world.get_state()['manipulator']['ee_pos']
                 error = np.linalg.norm(set_point - manipulator_ee_pos)
 
+                data['set_point_index'] = k
+                data['ee_error'] = error
+                data['action']   = action
+
+
                 print "Set point \t", np.round(set_point, 3)
                 print "EE position \t", np.round(manipulator_ee_pos, 3)
                 print "Computed cmd \t", np.round(action, 3)
                 print "Error \t", error
+
+                manipulator_data.append(data)
 
         save_data(manipulator_data, os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/man_data.pkl')
 

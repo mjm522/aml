@@ -24,6 +24,7 @@ config_1 = {
 	'start_goal':sg,
 	'init_traj':None,
 	'cost_fn':None,
+	'smooth_traj':True,
 }
 
 ex_config = config_1

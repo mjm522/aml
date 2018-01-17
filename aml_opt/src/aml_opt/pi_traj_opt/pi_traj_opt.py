@@ -6,7 +6,34 @@ from aml_io.io_tools import save_data, load_data
 
 class PITrajOpt(object):
 
+    """
+    Class that utilizes PI2 algorithm to optimize a trajectory
+    The algorithm, starts from a initial trajectory and incrementally modifies 
+    it to find a lower cost trajectory
+    """
+
     def __init__(self, config, cost_fn, visualize_fn=None):
+        """
+        Constructor of the PITraj class.
+        Args: 
+        config: 
+                N: time steps of a trajectory
+                K: no of rollouts that should be performed to collect trajectories
+                h: the scalar tuning parameter of the PI2 algorithm
+                gain: the coefficient that determines the amount of mixing
+                max_iter: maximum number of iterations by the PI2 algorithm
+                num_traj: total number of trajectories in the optimizer
+                smooth_traj: whether to smooth a trajectory or not
+                state_constraints: given as a dict {'min':[], 'max':[]}
+                init_traj: optional input argument, gives an initial idea of the trajectory
+                start: start of the trajectory, the optimizer optimises point except start and end
+                goal: end point of the trajectory
+
+        cost_fn: handle to the cost function, this function accepts and entire trajecotry sample (array[no_dimension, time_steps])
+        and returns a scalar cost for the trajectory
+
+        visualize_fn: handle to the plotting tool, this function accepts and an entire trajectory sample to display it
+        """
         
         self._N        = config['timesteps']
         self._K        = config['no_rollouts']
@@ -14,6 +41,8 @@ class PITrajOpt(object):
         self._gain     = config['gain']
         self._max_iter = config['max_iter']
         self._num_traj = len(config['start'])
+
+        self._smooth_traj = config['smooth_traj']
 
         self._traj_file_name = None
 
@@ -40,6 +69,13 @@ class PITrajOpt(object):
 
     
     def put_state_constraints(self, traj):
+        """
+        this function enforces the state constraints on the trajectory
+        the exploration can lead to creation of trajectories that are outside the 
+        constraints, this function de-limits them
+        Args:
+        traj: input trajectory
+        """
 
         for k in range(self._num_traj):
             traj[:,k][traj[:,k] < self._traj_min[k]] = self._traj_min[k]
@@ -49,6 +85,12 @@ class PITrajOpt(object):
 
 
     def get_traj_samples(self, traj, gain=1e-0):
+        """
+        this function computes the trajectory samples for a given trajectory
+        Args: 
+        traj: a trajectory sample
+        gain: exploratory gain. High value of this can make the algorithm numerically unstable.
+        """
 
         traj_samples =  np.zeros([self._K, self._N, self._num_traj])
         cost_traj_samples = np.zeros([self._K, self._N])
@@ -63,6 +105,13 @@ class PITrajOpt(object):
         return traj_samples, del_traj_samples, cost_traj_samples
 
     def compute_traj_change(self, cost_samples, del_traj_samples):
+        """
+        this function compute the required trajectory change based on cost of each trajectory
+        low cost trajectories will be preferred to high cost trajectories
+        Args: 
+        cost_samples: cost values assosciated with each trajectory rollout
+        del_traj_samples: the exploratory trajectory change that was supplied 
+        """
         exp_cost_samples = np.exp(-self._h*cost_samples)
         denominators = np.sum(exp_cost_samples, axis=0)
         del_traj_samples = del_traj_samples/denominators[None,:,None]
@@ -71,9 +120,24 @@ class PITrajOpt(object):
         return np.sum(del_traj_samples, axis=0)
 
     def savitsky_gollay_filter(self, traj):
+        """
+        this is a smoothing filter that helps to make 
+        the exploratory trajectories smooth.
+        This is an optional part and is implemented depending on the self._smooth_traj variable
+        Args:
+        traj: input trajectory
+        """
         return savgol_filter(x=traj, window_length=5, polyorder=2)
 
     def modify_traj(self, traj, traj_change_gain=1e-1):
+        """
+        this function computes the stochastic incremental change to the existing path
+        depending on the forward rollouts
+        Args:
+        traj: input trajectory
+        traj_change_gain: the parameter that scales the change to a trajectory, this should not be a very large value
+        since it can make the convergence numerically unstable
+        """
 
         traj_samples, del_traj_samples, cost_traj_samples = self.get_traj_samples(traj)
 
@@ -82,7 +146,10 @@ class PITrajOpt(object):
         tmp_traj =  self.put_state_constraints(  (traj + traj_change_gain*traj_change) )[1:self._N-1, :]
 
         for k in range(self._num_traj):
-            traj[1:self._N-1, k] = self.savitsky_gollay_filter(tmp_traj[:,k])
+            if self._smooth_traj:
+                traj[1:self._N-1, k] = self.savitsky_gollay_filter(tmp_traj[:,k])
+            else:
+                traj[1:self._N-1, k] = tmp_traj[:,k]
 
         cost_traj = self._cost(traj)
 
@@ -92,6 +159,10 @@ class PITrajOpt(object):
         return traj, np.sum(cost_traj)
 
     def run(self):
+        """
+        the main function that runs the algorithm
+        Args: None
+        """
 
         traj_final =  self._init_traj.copy()
         

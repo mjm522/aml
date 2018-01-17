@@ -105,9 +105,6 @@ def main():
             action = action[0] + noise #Select action according to current policy and exploration noise
             print "Action at step", t ," :",action,"\n"
             
-            # observation,reward,done,info=env.step(action)
-
-
             set_point = np.hstack([traj2follow[t, :], 0.1])
 
             ctrl_cmd = env._manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
@@ -117,7 +114,7 @@ def main():
             for i in range(viewer._steps_per_frame): 
                 env.step()
 
-            data       = env._manipulator.get_state()
+            data        = env._manipulator.get_state()
 
             observation = np.hstack([data['j_pos'], data['j_vel']])
 
