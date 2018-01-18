@@ -27,3 +27,5 @@ cd ..
 catkin_make
 cp ./src/aml/3rdparty/baxter.sh .
 cp ./src/aml/3rdparty/intera.sh .
+
+cd $ROOT_DIR
