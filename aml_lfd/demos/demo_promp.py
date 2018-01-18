@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from aml_lfd.promp.discrete_promp_shell import DiscretePROMPShell
+# from aml_lfd.promp.discrete_promp import DiscretePROMP
 
-p_shell = DiscretePROMPShell()
+from aml_lfd.promp.promp_trial import DiscretePROMP
 
-plt.figure("DiscretePROMPShell")
+p_shell = DiscretePROMP()
+
+# plt.figure("DiscretePROMP")
 
 # Generate and plot trajectory Data
 x = np.arange(0,1.01,0.01)           # time points for trajectories
@@ -18,7 +20,7 @@ for traj in range(0, nrTraj):
     sample = np.dot(A + sigmaNoise * np.random.randn(1,4), X)[0]
     label = 'training' if traj==0 else ''
 
-    plt.plot(x, sample, 'b', label=label)
+    # plt.plot(x, sample, 'b', label=label)
     p_shell.add_demo_traj(sample)
 
 
@@ -30,9 +32,11 @@ p_shell.train()
 p_shell.set_start(0)
 p_shell.set_goal(0.2)
 
+p_shell.generate_trajectory()
+
 for i in np.arange(0,10):
     label = 'output' if i==0 else ''
-    plt.plot(p_shell._x, p_shell.generate_trajectory(tau=1.), 'r', label=label)
+    # plt.plot(p_shell._x, p_shell.generate_trajectory(tau=1.), 'r', label=label)
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()

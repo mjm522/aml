@@ -3,7 +3,7 @@ import numpy.matlib as npm
 from scipy.interpolate import interp1d
 
 
-class DiscretePROMPShell(object):
+class DiscretePROMP(object):
 
     def __init__(self,):
         #list to store all demo trajectories
@@ -33,14 +33,15 @@ class DiscretePROMPShell(object):
         #centers of the basis function
         self._bfs_centres = np.arange(0, self._n_bfs) / (self._n_bfs - 1.0)
 
-        #basis functions
+        # basis functions
         self._Phi = np.exp(-.5 * (np.array(map(lambda x: x - self._bfs_centres, np.tile(self._x, (self._n_bfs, 1)).T)).T ** 2 / (self._bfs_sigma ** 2)))
         
-        #normalize
+        # normalize
         self._Phi /= sum(self._Phi)
 
         #via points
         self._viapoints = []
+
 
     def add_demo_traj(self, traj):
         """
@@ -58,18 +59,6 @@ class DiscretePROMPShell(object):
 
     def canonical_system(self, tau=1., alpha=1.):
         # # canonical system
-        
-        # x = np.zeros(self._num_samples)
-
-        # dx = 1./tau * alpha
-
-        # for i in range(self._num_samples-1):
-        #     x[i+1] = x[i] + dx*self._dt
-
-        # x[0] = 1.
-        # # 1: Euler solution to exponential decreased canonical system
-        # for i in range(1, self._num_samples):
-        #     x[i] = x[i-1] + 1./tau * alpha * x[i-1] * self._dt
 
         x = np.linspace(0, 1, self._num_samples)
 
