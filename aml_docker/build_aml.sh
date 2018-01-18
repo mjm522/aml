@@ -28,4 +28,4 @@ docker run -it \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="${WORK_DIR}:/home/Projects" \
        $DOCKER_IMAGE \
-       bash -c "cd aml_ws/src/aml/aml_scripts && source setup_rospkg_deps.sh"
+       bash -c "cd aml_ws/src/aml/aml_scripts && source setup_rospkg_deps.sh && source ./configure_env.sh"
