@@ -1,13 +1,13 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_lfd.dmp.config import discrete_dmp_config
-from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
 
 
 def train_dmp(trajectory):
 
-    dmp = DiscreteDMPShell(config=discrete_dmp_config)
+    dmp = DiscreteDMP(config=discrete_dmp_config)
     dmp.load_demo_trajectory(trajectory)
     dmp.train()
 
@@ -21,7 +21,7 @@ def test_dmp(dmp):
     # play with the parameters
     start_offset = np.array([0.,0.])
     goal_offset = np.array([.0, 0.])
-    speed = 1.
+    speed = 0.5
     external_force = np.array([0.,0.,0.,0.])
     alpha_phaseStop = 20.
 
@@ -37,7 +37,7 @@ def test_dmp(dmp):
     else:
         test_config['extForce'] = np.array([0,0,0,0])
 
-    test_traj = dmp.test(config=test_config)
+    test_traj = dmp.generate_trajectory(config=test_config)
 
     plt.figure(1)
     plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')

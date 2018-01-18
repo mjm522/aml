@@ -2,9 +2,9 @@ import os
 import rospy
 import numpy as np
 import matplotlib.pyplot as plt
+from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_lfd.dmp.config import discrete_dmp_config
 from aml_ctrl.traj_player.traj_player import TrajPlayer
-from aml_lfd.dmp.discrete_dmp_shell import DiscreteDMPShell
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 from aml_ctrl.controllers.js_controllers.js_postn_controller import JSPositionController
 
@@ -38,7 +38,7 @@ def plot_traj(trajectories):
 
 def train_dmp(trajectory):
     discrete_dmp_config['dof'] = 7
-    dmp = DiscreteDMPShell(config=discrete_dmp_config)
+    dmp = DiscreteDMP(config=discrete_dmp_config)
     dmp.load_demo_trajectory(trajectory)
     dmp.train()
 
@@ -66,7 +66,7 @@ def test_dmp(dmp, speed=1., plot_trained=False):
         test_config['extForce'] = external_force
     else:
         test_config['extForce'] = np.zeros(discrete_dmp_config['dof'])
-    test_traj = dmp.test(config=test_config)
+    test_traj = dmp.generate_trajectory(config=test_config)
 
     if plot_trained:
         plot_traj([dmp._traj_data[:,1:], test_traj[:,1:]])

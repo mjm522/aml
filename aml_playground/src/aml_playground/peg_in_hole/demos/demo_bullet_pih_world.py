@@ -37,7 +37,7 @@ def main():
 
     velocity_array = k*np.array([0, -0.05, -0.05])
 
-    pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=np.asarray(velocity_array), forces=[500 for n in range(len(velocity_array))])
+    # pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=np.asarray(velocity_array), forces=[500 for n in range(len(velocity_array))])
 
     pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, gains = np.asarray(k), config=config_pih_world)
 

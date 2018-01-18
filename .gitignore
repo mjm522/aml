@@ -39,5 +39,10 @@ aml_dl/src/aml_dl/mdn/model/tests2.py
 
 .idea
 
-aml_opt/src/aml_opt/policy_opt/
-aml_opt/src/demos/
+aml_policy_search/
+
+aml_playground/src/aml_playground/peg_in_hole/demos/episode_reward.txt
+aml_lfd/src/aml_lfd/promp/promp_trial.py
+aml_playground/src/aml_playground/peg_in_hole/demos/analyse_data.py
+
+

@@ -42,6 +42,7 @@ class Manipulator(PyKDLBox2d):
                                                      linearDamping=link['lin_damp'],
                                                      angularDamping=link['ang_damp'],
                                                      awake=link['awake'])
+               
             else:
                 raise Exception("Unknown type")
 
@@ -183,28 +184,12 @@ class Manipulator(PyKDLBox2d):
         return joint_speed
 
 
-    def to_vec_world(self, theta):
-
-        return np.array([np.cos(theta + self._dyn_body.angle), np.sin(theta + self._dyn_body.angle)])
-
-
-    def get_point(self,local_point):
-        p = self._dyn_body.transform*local_point
-
-        return np.array([p[0],p[1]])
-
     def get_image_point(self,world_point):
         px = world_point[0]*self._ppm
         py = self._config['image_height'] - world_point[1]*self._ppm 
 
-
         return np.array([px,py])
 
-    def get_image_point2(self,local_point):
-        px, py = self._dyn_body.transform*local_point*self._ppm
-        py = self._config['image_height'] - py
-
-        return np.array([px,py])
 
     def get_image_point_norm(self,local_point):
         (px,py) = self.get_image_point2(local_point)
@@ -216,12 +201,27 @@ class Manipulator(PyKDLBox2d):
 
 
     def reset(self, noise = 0.5):
-        body = self._dyn_body
 
-        body.position = self._config['pos'] + np.random.randn(2)*np.sqrt(noise)
-        body.angle = self._config['ori']
-        body.linearVelocity = (0,0)
-        body.angularVelocity = 0
+        for body, link in zip(self._bodies, self._config['links']):
+            #incase we have to add noise into the manipulator position
+            #if not just set it to the default state
+
+            if link['type'] == 'static':
+                #the first body is a static body since it is the base
+                #hence first link corresponds to that,
+                #so we skip that and start with the next set of
+                #movable links
+                continue
+
+            #add noise if we want to
+            body_pos_noise = np.random.randn(2)*np.sqrt(noise)
+            body_ori_noise = np.random.randn(1)*np.sqrt(noise)
+
+            body.position = (link['pos'][0]+body_pos_noise[0], link['pos'][1]+body_pos_noise[1])
+            body.angle    = link['ori'] + body_ori_noise[0]
+            body.linearVelocity  = (0., 0.)
+            body.angularVelocity = 0.
+
 
     def set_state(self, state):
         '''

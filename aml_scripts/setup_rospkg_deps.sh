@@ -22,7 +22,8 @@ wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall
 wstool update
 wstool merge sawyer_robot/sawyer_robot.rosinstall
 wstool update
-rosdep install --from-path . --ignore-src --rosdistro kinetic -y -r
+rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
 catkin_make
-cp ./src/aml/3rdparty/baxter/baxter_sim.sh .
+cp ./src/aml/3rdparty/baxter.sh .
+cp ./src/aml/3rdparty/intera.sh .

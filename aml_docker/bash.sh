@@ -1,15 +1,31 @@
-#!/bin/sh
+#!/bin/bash
+
+# Description: starts container and opens an interactive bash shell using image tag passed as parameter
+# Usage: ./bash.sh <docker-image-tag>
+# Example: ./bash.sh dev:indigo-cuda
 
 DOCKER_IMAGE=$1
 WORK_DIR="${HOME}/Projects/"
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
 
 #192.168.0.9:0
 #192.168.0.9:0
 
+if [ -z "$DOCKER_IMAGE" ]
+then
+      echo "usage: ./bash.sh <docker-image-tag>"
+      echo "example: ./bash.sh dev:indigo-cuda"
+      echo "to list built docker images run: docker images"
+      exit 1
+fi
 
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ${ROOT_DIR}/aml_aliases.sh
 
+#sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
-nvidia-docker run -it \
+xdocker run -it \
        --user=$(id -u) \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
@@ -20,8 +36,8 @@ nvidia-docker run -it \
        --volume="/etc/shadow:/etc/shadow:ro" \
        --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="${WORK_DIR}:/home/Projects" \
-       $DOCKER_IMAGE
+       --volume="${WORK_DIR}:/home/Projects" ${extra_params} \
+       $DOCKER_IMAGE \
        bash
 
 # Unsafe container execution with X11 access 
@@ -31,7 +47,7 @@ nvidia-docker run -it \
 #        --env="QT_X11_NO_MITSHM=1" \
 #        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 #        --volume="${WORK_DIR}:/home/Projects" \
-#        $DOCKER_IMAGE
+#        $DOCKER_IMAGE \
 #        bash
 # xhost - (don't ever forget this)
 
@@ -46,9 +62,10 @@ nvidia-docker run -it \
 #        --env="QT_X11_NO_MITSHM=1" \
 #        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 #        --volume="${WORK_DIR}:/home/Projects" \
-#        $DOCKER_IMAGE
+#        $DOCKER_IMAGE \
 #        bash
 
 
 
 # --volume="path-in-my-computer:path-in-docker"
+

@@ -19,7 +19,10 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install protobuf
 
-RUN apt-get update && apt-get install mesa-utils
+RUN \
+  apt-get update && \
+  apt-get -y install libgl1-mesa-glx libgl1-mesa-dri mesa-utils && \
+  rm -rf /var/lib/apt/lists/*
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \
@@ -30,7 +33,9 @@ RUN rm -rf /tmp/pybox2d*
 
 RUN pip install --upgrade pip && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
-    pip install --upgrade tensorflow
+    pip install --upgrade \
+    https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.1-cp27-none-linux_x86_64.whl
+# TENSOR FLOW *CPU*
 
 
 

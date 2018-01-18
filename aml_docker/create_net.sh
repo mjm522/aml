@@ -1,3 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-docker network create -d bridge rosnet
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
+
+shopt -s expand_aliases
+source $HOME/.bashrc
+source ${ROOT_DIR}/aml_aliases.sh
+
+xdocker network create -d bridge rosnet
