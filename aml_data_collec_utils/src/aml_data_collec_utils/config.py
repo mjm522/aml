@@ -64,8 +64,8 @@ config_cubic_box = {
     #-0.11549958
     'reset_spot_offset': [0.0, 0.0, 0.0], # w.r.t to box frame
     'box_center_offset': [0.0,0.0,0.0],
-    'end_effector_tip_offset': [0.0, 0.16090282, 0.0], # w.r.t to box #[0.0, 0.16090282, 0.0]
-    'pre_push_offsets': [0.15, 0.12, 0.15], # w.r.t to box frame before: 0.096
+    'end_effector_tip_offset': [0.0, 0.21090282, 0.0], # w.r.t to box #[0.0, 0.16090282, 0.0]
+    'pre_push_offsets': [0.155, 0.14, 0.155], # w.r.t to box frame before: 0.096
     'pre_reset_offsets': [0.0, 0.20, 0.0], # w.r.t to box frame
     'box_type': BOX_TYPE_3,
     'scale_adjust': 0.5,

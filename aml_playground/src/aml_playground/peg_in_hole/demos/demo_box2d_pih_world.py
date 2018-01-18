@@ -34,6 +34,8 @@ def main():
         state0 = world.pack_box_state()
 
 
+        # world._manipulator.set_joint_pos([-0., np.pi/4, np.pi/4])
+
         ## Controller selects push action (random sampling for simplicity now)
         # action = world.sample_push_action()
 

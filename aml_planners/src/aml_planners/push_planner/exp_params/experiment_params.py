@@ -4,7 +4,10 @@ import numpy as np
 
 from aml_planners.push_planner.forward_models.gp_model import GPModel
 from aml_planners.push_planner.forward_models.ensemble_model import EnsambleModel
-from aml_planners.push_planner.forward_models.simple_nn_model import SimpleNNModel
+try:
+    from aml_planners.push_planner.forward_models.simple_nn_model import SimpleNNModel
+except:
+    SimpleNNModel = EnsambleModel
 from aml_planners.push_planner.push_worlds.config import push_world_config as config
 
 EXP_NAME = 'exp_ensemble'
@@ -766,7 +769,7 @@ mppi_params_8['start'] = np.array([0., 0., 0.026, 0., 0., 0.])
 # 0.70414078  0.6786803   0.00545824 (1.5683167)
 #0.70411289,  0.62161237, 1.5683167
 #0.69396412  0.67552775  1.63927054
-mppi_params_8['goal'] = np.array([0.69396412,  0.67552775,  1.63927054, 0., 0., 0.]) #goal on right side 1
+mppi_params_8['goal'] = np.array([0.7083, 0.5866, -0.094, 0., 0., 0.]) #goal on right side 1
 
 mppi_params_8['obstacle'] = None #np.hstack([0.5*(mppi_params_8['start'][:2]+mppi_params_8['goal'][:2]), 0.04])
 # mppi_params_8['obstacle'] = np.array([1.375, 1.375, 0.25]) #x,y, radius

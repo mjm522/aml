@@ -28,6 +28,7 @@ private:
   image_transport::Publisher debug_pub;
   ros::Publisher pose_pub;
   ros::Publisher transform_pub; 
+  ros::Publisher openni_rgb_cam_info_pub; 
   ros::Publisher position_pub;
   std::string marker_frame;
   std::string camera_frame;
@@ -45,6 +46,8 @@ private:
 
   tf::TransformListener _tfListener;
   tf::TransformBroadcaster br;
+
+  sensor_msgs::CameraInfo cam_info;
 
 public:
   MarkerOdometry()
@@ -72,12 +75,15 @@ public:
 
     openni_rgb_cam_info_sub = nh.subscribe("/openni_rgb_camera_info", 5, &MarkerOdometry::openni_rgb_cam_info_callback, this);
     openni_rgb_image_sub = it.subscribe("/openni_rgb_rect_image", 5, &MarkerOdometry::openni_rgb_image_callback, this);
+
     
     image_pub = it.advertise("result", 0);
     debug_pub = it.advertise("debug", 0);
     pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 100);
     transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
     position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
+
+    openni_rgb_cam_info_pub = nh.advertise<sensor_msgs::CameraInfo>("camera_info", 100);
 
     
 
@@ -337,9 +343,9 @@ public:
                                                 "base", "openni_rgb_camera");
           br.sendTransform(stampedTransformOpenniToBase);
 
-          tf::StampedTransform stampedTransformOpenniToBase2(transformOpenniToBase, curr_stamp,
-                                                "base", "camera_rgb_optical_frame");
-          br.sendTransform(stampedTransformOpenniToBase2);
+          // tf::StampedTransform stampedTransformOpenniToBase2(transformOpenniToBase, curr_stamp,
+          //                                       "base", "camera_rgb_optical_frame");
+          // br.sendTransform(stampedTransformOpenniToBase2);
         }
 
 
@@ -350,7 +356,14 @@ public:
           out_msg.header.stamp = curr_stamp;
           out_msg.encoding = sensor_msgs::image_encodings::RGB8;
           out_msg.image = inImage;
-          out_msg.header.frame_id = "camera_rgb_optical_frame";
+          out_msg.header.frame_id = "openni_rgb_camera";
+
+
+          sensor_msgs::CameraInfo cam_info_msg = cam_info;
+          cam_info_msg.header.stamp = curr_stamp;
+          cam_info_msg.header.frame_id = "openni_rgb_camera";
+          openni_rgb_cam_info_pub.publish(cam_info_msg);
+
           // sensor_msgs::Image img_msg = out_msg.toImageMsg();
           // img_msg.frame_id = "openni_rgb_camera";
           image_pub.publish(out_msg.toImageMsg());
@@ -377,6 +390,8 @@ public:
   void openni_rgb_cam_info_callback(const sensor_msgs::CameraInfo &msg)
   {
     openni_rgb_camParam = aruco_utils::rosCameraInfo2ArucoCamParams(msg, useRectifiedImages);
+
+    cam_info = msg;
 
     openni_rgb_cam_info_received = true;
     openni_rgb_cam_info_sub.shutdown();

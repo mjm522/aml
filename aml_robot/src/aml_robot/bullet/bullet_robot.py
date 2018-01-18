@@ -3,6 +3,7 @@ import rospy
 import numpy as np
 import pybullet as pb
 from config import config
+from aml_lfd.utilities.utilities import compute_omg
 
 class BulletRobot(object):
 
@@ -18,7 +19,7 @@ class BulletRobot(object):
 
         self._ee_link_idx = ee_link_idx
 
-        self._joint_idx = [n for n in range(pb.getNumJoints(self._id))]
+        self._joint_idx = self.get_movable_joints()
 
         self._force_torque_sensors_enabled = [False for n in self._joint_idx]
 
@@ -161,9 +162,7 @@ class BulletRobot(object):
         elif flag == 'all':
             return details
 
-    def _update_state(self, event):
-
-        state = {}
+    def _update_state(self, event = None):
 
         now                      = rospy.Time.now()
 
@@ -185,6 +184,62 @@ class BulletRobot(object):
 
         self._state = state
 
+
+    def get_state(self):
+        return self._state
+
+    def get_ee_velocity(self):
+        #this is a simple finite difference based velocity computation
+        #please note that this might produce a bug since self._goal_ori_old gets 
+        #updated only if get_ee_vel is called. 
+        #TODO : to update in get_ee_pose or find a better way to compute velocity
+        
+        time_now_new = self.get_time_in_seconds()
+        
+        ee_pos_new, ee_ori_new = self.get_ee_pose()  
+
+        dt = time_now_new-self._time_now_old
+
+        ee_vel = (ee_pos_new - self._ee_pos_old)/dt
+
+        ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
+
+        self._goal_ori_old = ee_ori_new
+        self._goal_pos_old = ee_pos_new
+        self._time_now_old = time_now_new
+        
+        return ee_vel, ee_omg
+
+    def get_ee_velocity_from_bullet(self):
+
+        if self._ee_link_idx == -1:
+
+            ee_vel, ee_omg = self.get_base_vel()
+
+        else:
+
+            ee_vel, ee_omg = self.get_link_velocity(self._ee_link_idx)
+
+        return ee_vel, ee_omg 
+
+    def get_base_vel(self):
+
+        return pb.getBaseVelocity(self._id)
+
+    def get_time_in_seconds(self):
+        time_now =  rospy.Time.now()
+        return time_now.secs + time_now.nsecs*1e-9
+
+
+    def get_movable_joints(self):
+        movable_joints = []
+        for i in range (pb.getNumJoints(self._id)):
+            jointInfo = pb.getJointInfo(self._id, i)
+            qIndex = jointInfo[3]
+            if qIndex > -1 and jointInfo[1] != "head_pan":
+                movable_joints.append(i)
+        return movable_joints
+
     def get_ee_pose(self):
 
         if self._ee_link_idx == -1:
@@ -193,24 +248,40 @@ class BulletRobot(object):
 
         else:
 
-            pos, ori = self.get_link_pose(self._id, self._ee_link_idx)
+            pos, ori = self.get_link_pose(self._ee_link_idx)
 
         return pos, ori 
 
     # ----- If link_id is not specified, end effector pose is returned
-    def get_link_pose(self, link_id = -3):
-
-        if link_id not in self._joint_idx:
-            raise Exception("Invalid Link ID")        
+    def get_link_pose(self, link_id = -3):        
 
         if link_id == -3:
             self._ee_link_idx
+
+        if link_id not in self._joint_idx:
+            raise Exception("Invalid Link ID")
 
         link_state = pb.getLinkState(self._id, link_id)
         pos = np.asarray(link_state[0]) 
         ori = np.asarray(link_state[1])
 
         return pos, ori 
+
+    def get_link_velocity(self, link_id = -3):
+
+        if link_id == -3:
+            self._ee_link_idx
+
+        if link_id not in self._joint_idx:
+            raise Exception("Invalid Link ID")
+
+        link_state = pb.getLinkState(self._id, link_id, computeLinkVelocity = 1)
+        # print "this====\n",link_state
+
+        lin_vel = np.asarray(link_state[6]) 
+        ang_vel = np.asarray(link_state[7])
+
+        return lin_vel, ang_vel
 
 
     def get_base_pos_ori(self):
@@ -240,28 +311,27 @@ class BulletRobot(object):
 
     def get_jnt_state(self):
 
-        num_jnts = pb.getNumJoints(self._id)
+        num_jnts = len(self._joint_idx)
 
-        jnt_pos = np.zeros(num_jnts)
-        jnt_vel = np.zeros(num_jnts)
-        jnt_reaction_forces =  np.zeros(num_jnts)
-        jnt_applied_torque  = np.zeros(num_jnts)
+        jnt_pos = []
+        jnt_vel = []
+        jnt_reaction_forces =  []
+        jnt_applied_torque  = []
 
-        for jnt_idx in range(num_jnts):
+        for jnt_idx in range(len(self._joint_idx)):
 
-            jnt_state = pb.getJointState(self._id, jnt_idx)
-
-            jnt_pos[jnt_idx] = jnt_state[0]
-            jnt_vel[jnt_idx] = jnt_state[1]
-            jnt_reaction_forces[jnt_idx]=jnt_state[2]
-            jnt_applied_torque[jnt_idx] = jnt_state[3]
+            jnt_state = pb.getJointState(self._id, self._joint_idx[jnt_idx])
+            jnt_pos.append(jnt_state[0])
+            jnt_vel.append(jnt_state[1])
+            jnt_reaction_forces.append(jnt_state[2])
+            jnt_applied_torque.append(jnt_state[3])
 
         return jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque
 
 
     def set_jnt_state(self, jnt_state):
 
-        num_jnts = pb.getNumJoints(self._id)
+        num_jnts = len(self._joint_idx)
 
         if len(jnt_state) < num_jnts:
             print "Pass %d values", num_jnts
@@ -269,8 +339,18 @@ class BulletRobot(object):
 
         else:
             for jnt_idx in range(num_jnts):
+                self.set_jnt_state(self._id, jnt_idx, jnt_state[jnt_idx])
+                
 
-                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
+    def set_jnt_state(self, jnt_id, jnt_state):
+
+        pb.resetJointState(self._id, jnt_id, jnt_state)
+
+
+    def move_using_pos_control(self, joints, des_joint_values):
+        vels = [0.0005 for n in range(len(joints))]
+        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.POSITION_CONTROL, targetPositions= des_joint_values, targetVelocities = vels )
+
 
     def apply_external_force(self, link_idx, force, point, local=True):
 
@@ -292,6 +372,35 @@ class BulletRobot(object):
         else:
 
             pb.applyExternalTorque(self._id, link_idx, force, point , pb.WORLD_FRAME)
+
+    def set_joint_velocities(self, cmd, joints = -3):
+
+        if joints == -3:
+            joints = self._joint_idx
+
+        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.VELOCITY_CONTROL, targetVelocities = cmd)
+
+    def set_joint_torques(self, cmd, joints = -3):
+
+        if joints == -3:
+            joints = self._joint_idx
+
+        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.TORQUE_CONTROL, forces = cmd)
+
+    def get_inertia_matrix(self, joints = None):
+
+        if joints == None:
+
+            joints = self._state['position']
+
+        elif len(joints) < len(self._joint_idx):
+            print "Pass %d values", len(self._joint_idx)
+            raise ValueError
+
+        return pb.calculateMassMatrix(self._id, joints)
+
+
+
 
 
 
