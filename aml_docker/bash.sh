@@ -1,7 +1,12 @@
 #!/bin/bash
 
+# Description: starts container and opens an interactive bash shell using image tag passed as parameter
+# Usage: ./bash.sh <docker-image-tag>
+# Example: ./bash.sh dev:indigo-cuda
+
 DOCKER_IMAGE=$1
 WORK_DIR="${HOME}/Projects/"
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
 
 #192.168.0.9:0
 #192.168.0.9:0
@@ -16,7 +21,7 @@ fi
 
 shopt -s expand_aliases
 source $HOME/.bashrc
-source ./aml_aliases.sh
+source ${ROOT_DIR}/aml_aliases.sh
 
 #sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way

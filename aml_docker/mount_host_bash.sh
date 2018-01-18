@@ -3,9 +3,11 @@
 # Don't forget: xhost +
 # Modify mounting location as you like
 
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
+
 shopt -s expand_aliases
 source $HOME/.bashrc
-source ./aml_aliases.sh
+source ${ROOT_DIR}/aml_aliases.sh
 
 
 docker run -it \
