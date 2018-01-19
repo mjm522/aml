@@ -36,3 +36,6 @@ RUN pip install --upgrade pip && \
     pip install --upgrade \
     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *CPU*
+
+# Install pybullet
+RUN pip install pybullet==1.8.3

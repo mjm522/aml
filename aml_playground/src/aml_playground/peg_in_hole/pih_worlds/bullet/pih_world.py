@@ -263,6 +263,9 @@ class PIHWorld():
         mouse_events = pb.getMouseEvents()
 
         #check the tuple only if its length is more than zero
+        ee_pos_array = []
+        ee_vel_array = []
+        
         if len(mouse_events) > 0:
 
             if mouse_events[0][0] == MOUSE_BUTTON_EVENT:
@@ -294,8 +297,13 @@ class PIHWorld():
 
                     traj_point_2, _ = self._manipulator.get_ee_pose()
 
+                    ee_vel = self._robot.get_ee_velocity_from_bullet()
+
                     print "traj_point", traj_point_2
 
+                    ee_pos_array.append(traj_point_2)
+                    ee_vel_array.append(ee_vel)
+ 
                     #draw the lines in specific interwal
                     if self._demo_point_count % demo_draw_interwal == 0:
 
@@ -310,6 +318,15 @@ class PIHWorld():
                 if self._demo_collection_start:
 
                     print "Stop collecting demo"
+                    d = {'ee position' : pd.Series(ee_pos_array),
+                         'ee velocity' : pd.Series(ee_vel_array)}
+
+                    ee_pos_array = [], ee_vel_array = []
+
+                    df = pd.DataFrame(d)
+                    df = df.rename_axis('time_step', axis=1)
+                    file_name = self._config['data_folder_path']+'pih_ee_pos_data'+'.csv'
+                    df.to_csv(file_name)
 
                     self._demo_collection_start = False
                     self._demo_point_count = 0 

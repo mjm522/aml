@@ -95,6 +95,9 @@ RUN pip install --upgrade pip && \
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
 
+# Install pybullet
+RUN pip install pybullet==1.8.3
+
 # Fix paths so that CUDNN can be found
 # See https://github.com/tensorflow/tensorflow/issues/8264
 #RUN mkdir /usr/lib/x86_64-linux-gnu/include/ && \
