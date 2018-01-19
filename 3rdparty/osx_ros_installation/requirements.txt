@@ -1,0 +1,7 @@
+jupyter==1.0.0
+matplotlib==1.5.1
+numpy==1.12.1
+protobuf==3.3.0
+PySide==1.2.4
+scipy==0.17.1
+tensorflow-gpu==1.1.0

@@ -2,6 +2,7 @@
 
 DOCKER_IMAGE=$1
 WORK_DIR="${HOME}/Projects/"
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
 
 if [ -z "$DOCKER_IMAGE" ]
 then
@@ -13,7 +14,7 @@ fi
 
 shopt -s expand_aliases
 source $HOME/.bashrc
-source ./aml_aliases.sh
+source ${ROOT_DIR}/aml_aliases.sh
 
 # xhost +
 

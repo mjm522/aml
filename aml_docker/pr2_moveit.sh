@@ -4,9 +4,11 @@
 # Modify mounting location as you like
 # bash roscore.sh
 
+ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
+
 shopt -s expand_aliases
 source $HOME/.bashrc
-source ./aml_aliases.sh
+source ${ROOT_DIR}/aml_aliases.sh
 
 docker run -h moveit -it --rm \
        --net rosnet --name moveit\
