@@ -1,15 +1,9 @@
-import cv2
-import math
 import numpy as np
 import pandas as pd
 import pybullet as pb
-import rospy
-import random
-import time
-
 from aml_robot.bullet.bullet_robot import BulletRobot
-from aml_playground.peg_in_hole.pih_worlds.bullet.config import config_pih_world
 from aml_data_collec_utils.record_sample import RecordSample
+from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 
 
 #global macros, how to access it from bullet directly?
@@ -24,7 +18,7 @@ class BoxObject(BulletRobot):
 
     def __init__(self, box_id):
 
-        super(BoxObject, self).__init__(robot_id=box_id, config=config_pih_world)
+        super(BoxObject, self).__init__(robot_id=box_id, config=pih_world_config)
 
     def get_effect(self):
         p, q   = self.get_pos_ori()
@@ -35,6 +29,10 @@ class BoxObject(BulletRobot):
         status['ori'] = np.array([q[3],q[0],q[1],q[2]])
 
         return status
+
+    def reset(self):
+        #implement this
+        pass
 
 class PegHole():
 
@@ -53,30 +51,74 @@ class PegHole():
 
 
 class PIHWorld():
+    """
+    Peg in the hole environment that makes use of the bullet physics engine
+    """
 
-    def __init__(self, world_id, peg_id, hole_id, robot_id, config, gains = [1, 1, 1]):
+    def __init__(self, config):
 
-        self._peg      = BoxObject(box_id=peg_id)
+        """
+        Constructor of the class
+        Args: 
+        config:
+                dt : time step of the simulation
+                world_path : path to the URDF file depicting the world
+                peg_path: path to the URDF file depicting the peg to be inserted
+                hole_path: path to the URDF of a static body that has a hole
+                robot_path: path to the URDF file of the manipulator
+                ctrl_type: specify what types of control scheme is to be use to control the manipulator
+        """
 
-        self._world_id = world_id
+        phys_id = pb.connect(pb.SHARED_MEMORY)
+        
+        if (phys_id<0):
+            phys_id = pb.connect(pb.GUI)
+        
+        pb.resetSimulation()
+        
+        pb.setTimeStep(config['dt'])
 
-        self._hole = PegHole(hole_id, [0,0,1], [0, 0, -0.707, 0.707])
+        pb.setGravity(0., 0.,-10.)
+
+        #load the world urdf file, returns an id
+        self._world_id = pb.loadURDF(config['world_path'])
+  
+        manipulator = 
+
+        pb.setRealTimeSimulation(0)
+
+        self._peg = BoxObject(box_id=pb.loadURDF(config['peg_path']))
+
+        self._hole = PegHole(hole_id=pb.loadURDF(config['hole_path'], 
+                             useFixedBase=True), 
+                             pos=[0,0,1], 
+                             ori=[0, 0, -0.707, 0.707])
+
+        
+        self._manipulator = BulletRobot(robot_id=pb.loadURDF(config['robot_path'], useFixedBase=True, globalScaling=1.5), 
+                                        ee_link_idx=2, 
+                                        config=pih_world_config, 
+                                        enable_force_torque_sensors = True)
 
         pb.resetBasePositionAndOrientation(self._world_id, np.array([0., 0., -0.5]), np.array([0.,0.,0.,1]))
 
-        self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=2, config=config_pih_world, enable_force_torque_sensors = True)
-
         self._peg.configure_default_pos(np.array([0, -1, 1.5]), np.array([0., 0., 0., 1]))
 
-        self._robot.configure_default_pos(np.array([0, -1.3, 3.]),  np.array([0., 1, 0., 0]))
+        self._manipulator.configure_default_pos(np.array([0, -1.3, 3.]),  np.array([0., 1, 0., 0]))
 
         self._config   = config
 
-        self._gains = gains
+        self._gains = [1, 1, 1]
         
         self._forces = []
         self._torques = []
         self._contact_points = []
+
+        #there are three control modes implemented in this file
+        #key word 'vel' : velocity control mode
+        #key word 'torq' : torque control mode
+        #key word 'pos' : position control mode
+        self._ctrlr_type = 'vel'
 
 
         #demo collecting variables
@@ -84,11 +126,71 @@ class PIHWorld():
         self._demo_collection_start = False
         self._demo_point_count = 0
         #variable required for correct operation
-        self._traj_point_1, _  = self._robot.get_ee_pose()
+        self._traj_point_1, _  = self._manipulator.get_ee_pose()
+
+
+    def reset(self, noise=0.01):
+        """
+        This function is very necessary for the RL setup
+        the first part resets the peg to the oiriginal part
+        the secodn part reset the manipulators to the original part added by an optional noise
+        Args:
+        noise = coefficient of the gain command
+        """
+
+        self._peg.reset()
+        self._manipulator.set_jnt_state([0.,0.,0.])
+
 
     def step(self):
 
         pb.stepSimulation()
+
+    def update(self, ctrl_cmd):
+        """
+        This function updates the control commands for the PIH world
+        the only entity that can be controlled is the manipulator
+        Args: 
+        ctrl_cmd = np.array, dimension: num_joint_states x 1
+        """
+
+        if self._ctrlr_type == 'vel':
+
+            self._manipulator.set_joint_velocities(ctrl_cmd)
+
+        elif self._ctrlr_type =='torq':
+
+            self._manipulator.set_joint_torques(ctrl_cmd)
+
+        elif self._ctrlr_type == 'pos':
+
+            self._manipulator.set_jnt_state(ctrl_cmd)
+
+        else:
+            raise Exception("Unknown type control")
+
+
+    def compute_os_ctrlr_cmd(self, os_set_point, Kp):
+        """
+        This function computes the control command for the manipulator
+        in the operational space
+        Args: 
+        os_set_point = desired operational space set point
+        Kp =  gains in the operational space
+        """
+
+        return np.multiply(Kp, np.array([0, -0.05, -0.05]))
+
+    def compute_js_ctrlr_cmd(self, js_set_point, Kp):
+        """
+        This function computes the control command for the manipulator 
+        in the joint space
+        Args:
+        js_set_point = desired joint setpoint
+        Kp = gains of the system
+        """
+
+        return np.multiply(Kp, np.array([0, -0.05, -0.05]))
 
     def on_shutdown(self):
 
@@ -112,19 +214,19 @@ class PIHWorld():
         [fx,fy,fz,tx,ty,tz] = [0,0,0,0,0,0]
         contact_point = [0.,0.,0.]
 
-        contact_details = self._robot.get_contact_points()
+        contact_details = self._manipulator.get_contact_points()
 
         if len(contact_details) > 4:
 
             in_contact = True
 
-            if contact_details[2] == self._peg._id and contact_details[3] == self._robot._ee_link_idx:
+            if contact_details[2] == self._peg._id and contact_details[3] == self._manipulator._ee_link_idx:
 
                 ee_in_contact_with_box = True
 
         if in_contact:
 
-            [fx,fy,fz], [tx,ty,tz] = self._robot.get_joint_details(joint_idx = self._robot._ee_link_idx, flag = 'force_torque')
+            [fx,fy,fz], [tx,ty,tz] = self._manipulator.get_joint_details(joint_idx = self._manipulator._ee_link_idx, flag = 'force_torque')
 
             if ee_in_contact_with_box:
 
@@ -141,12 +243,10 @@ class PIHWorld():
         self._torques.append((tx,ty,tz))
         self._contact_points.append(contact_point)
 
-        # print len(self._forces), len(self._torques), len(self._contact_points)
-
 
     def draw_trajectory(self, point_1, point_2, colour=[1,0,0], line_width=1.5):
         """
-        this function adds colour line between points point_1 and point_2 in the bullet
+        This function adds colour line between points point_1 and point_2 in the bullet
         Args:
         point_1: starting point => [x,y,z]
         point_2: ending_point => [x,y,z]
@@ -154,6 +254,11 @@ class PIHWorld():
         pb.addUserDebugLine(point_1, point_2, lifeTime=0, lineColorRGB=colour, lineWidth=line_width)
 
     def collect_demo(self, demo_draw_interwal=10):
+        """
+        This function is for collecting the demo trajectory
+        Args: 
+        demo_draw_interwal = this parameter decides at what interwal the plot needs to be updated
+        """
         #get the tuple of mouse events
         mouse_events = pb.getMouseEvents()
 
@@ -187,7 +292,7 @@ class PIHWorld():
                     #start collecting demo point
                     self._demo_point_count += 1
 
-                    traj_point_2, _ = self._robot.get_ee_pose()
+                    traj_point_2, _ = self._manipulator.get_ee_pose()
 
                     print "traj_point", traj_point_2
 
@@ -209,31 +314,3 @@ class PIHWorld():
                     self._demo_collection_start = False
                     self._demo_point_count = 0 
             
-        
-    def run(self):
-
-        self.rate = rospy.Rate(100)
-
-        pb.setRealTimeSimulation(0)
-
-        import time
-
-        time.sleep(1)
-
-        rospy.on_shutdown(self.on_shutdown)
-
-        # self._record_sample.start_record(task_action=pushes[idx])
-
-        while not rospy.is_shutdown():
-
-            self.collect_demo()
-            # self.get_force_torque_details()
-
-            self.step()
-
-            self.rate.sleep()
-
-        pb.setRealTimeSimulation(1)
-
-
-

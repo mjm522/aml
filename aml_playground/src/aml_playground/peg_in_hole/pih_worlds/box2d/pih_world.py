@@ -11,7 +11,7 @@ from contact_sensor import ContactSensor
 from Box2D.b2 import (world, polygonShape, staticBody, dynamicBody)
 
 
-class Box2DPIHWorld(object):
+class PIHWorld(object):
 
     def __init__(self, config):
 

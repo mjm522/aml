@@ -6,15 +6,15 @@ from aml_io.io_tools import save_data, load_data
 from aml_robot.box2d.box2d_viewer import Box2DViewer
 from aml_playground.peg_in_hole.policy_search.ddpg import DDPG
 from aml_playground.peg_in_hole.policy_search.ou_noise import OUNoise
-from aml_playground.peg_in_hole.pih_worlds.box2d.pih_world import PIHWorld
-from aml_playground.peg_in_hole.pih_worlds.box2d.config import pih_world_config
+from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
+from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 
 
 def get_demo():
     """
     load the demo trajectory from the file
     """
-    data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/box2d/demos/' 
+    data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/bullet/demos/' 
     path_to_demo = data_storage_path + 'demo.pkl'
 
     if not os.path.isfile(path_to_demo):
@@ -39,7 +39,7 @@ def view_traj(self, trajectory=get_demo()):
 
 
 
-render = True
+render = False
 #specify parameters here:
 episodes=10000
 
@@ -47,18 +47,8 @@ is_batch_norm = False #batch normalization switch
 
 sess = tf.InteractiveSession()
 
-env          = PIHWorld(pih_world_config)
+env = PIHWorld(pih_world_config)
 
-#visualizer
-if render:
-    viewer   = Box2DViewer(env, pih_world_config, is_thread_loop=False)
-
-
-# import matplotlib.pyplot as plt
-# plt.figure("rewards")
-# plt.show()
-
-# raw_input()
 
 def main():
 
@@ -77,10 +67,10 @@ def main():
     reward_per_episode = 0    
     total_reward=0
     num_states  = 6
-    num_actions = 1  
+    num_actions = 3 
 
     agent = DDPG(sess=sess, state_dim=num_states, action_dim=num_actions, 
-                 action_max=[50.], action_min=[1.], is_batch_norm=is_batch_norm)
+                 action_max=[50., 50, 50], action_min=[1., 1., 1.], is_batch_norm=is_batch_norm)
 
     print "Number of States:", num_states
     print "Number of Actions:", num_actions
@@ -95,10 +85,10 @@ def main():
         env.reset(noise=0.)
 
         #get data from the manipulator object
-        data  = env._manipulator.get_state()
+        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque  = env._manipulator.get_jnt_state()
 
         #stack position and velocity
-        observation = np.hstack([data['j_pos'], data['j_vel']])
+        observation = np.hstack([jnt_pos, jnt_vel])
         
         reward_per_episode = 0
 
@@ -116,18 +106,18 @@ def main():
             
             set_point = np.hstack([traj2follow[t, :], 0.1])
 
-            ctrl_cmd = env._manipulator.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
+            ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
 
             env.update(ctrl_cmd)
 
             for _ in range(pih_world_config['steps_per_frame']): 
                 env.step()
 
-            data        = env._manipulator.get_state()
+            jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque  = env._manipulator.get_jnt_state()
 
-            observation = np.hstack([data['j_pos'], data['j_vel']])
+            observation = np.hstack([jnt_pos, jnt_vel])
 
-            reward      = -0.01*np.linalg.norm(np.hstack([traj2follow[t+1, :], 0.1]) - data['j_pos'])
+            reward      = -0.01*np.linalg.norm(np.hstack([traj2follow[t+1, :], 0.1]) - jnt_vel)
 
             # if np.linalg.norm(data['j_pos'] - traj2follow[-1, :]) < 0.0
 

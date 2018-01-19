@@ -8,8 +8,8 @@ import tensorflow as tf
 class grad_inverter:
     def __init__(self, sess, action_bounds):
 
-        self._tf_sess = sess       
-        
+        self._tf_sess = sess
+
         self.action_size = len(action_bounds[0])
         
         self.action_input = tf.placeholder(tf.float32, [None, self.action_size])

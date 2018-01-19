@@ -44,7 +44,7 @@ WORK_SPACE_LIMITS ={
 }
 
 
-config_pih_world = {
+pih_world_config = {
 	'cam':CAM_INFO,
 	'image_width': 640,
 	'image_height': 480,
@@ -55,11 +55,12 @@ config_pih_world = {
 	'hole_path':model_folder_path+'square_hole.urdf',
 	'robot_path':model_folder_path+'3_link_planar_arm.urdf',
 	'data_folder_path':data_storage_path,
-	'dt': 0.0167,
+	'dt': 0.01,
 	'record_training_data': True,
 	'training_data_file': 'data_test.pkl',
 	'steps_per_frame': 5,
 	'camera_pos': [0.0, 0.0, 1.65, 1., -90., 90.],
+	'ctrl_type':'vel', #'torq' , 'pos'
 	'box_type':BOX_TYPE_1,
 	'work_space_limits':WORK_SPACE_LIMITS,
 }

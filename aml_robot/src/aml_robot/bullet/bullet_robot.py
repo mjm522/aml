@@ -339,13 +339,8 @@ class BulletRobot(object):
 
         else:
             for jnt_idx in range(num_jnts):
-                self.set_jnt_state(self._id, jnt_idx, jnt_state[jnt_idx])
+                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
                 
-
-    def set_jnt_state(self, jnt_id, jnt_state):
-
-        pb.resetJointState(self._id, jnt_id, jnt_state)
-
 
     def move_using_pos_control(self, joints, des_joint_values):
         vels = [0.0005 for n in range(len(joints))]

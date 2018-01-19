@@ -5,14 +5,15 @@ from config import box2d_dmp_config
 from aml_io.io_tools import save_data, load_data
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_robot.box2d.box2d_viewer import Box2DViewer
+from aml_playground.peg_in_hole.pih_worlds.box2d.pih_world import PIHWorld
 from aml_playground.peg_in_hole.pih_worlds.box2d.config import pih_world_config
-from aml_playground.peg_in_hole.pih_worlds.box2d.box2d_pih_world import Box2DPIHWorld
+
 
 
 class Box2dDMP():
     def __init__(self, config):
         self._config    = config
-        self._pih_world = Box2DPIHWorld(pih_world_config)
+        self._pih_world = PIHWorld(pih_world_config)
         self._pih_manipulator = self._pih_world._manipulator
         self._dmp = DiscreteDMP(config=config)
         self._viewer    = Box2DViewer(self._pih_world, pih_world_config, is_thread_loop=False)
