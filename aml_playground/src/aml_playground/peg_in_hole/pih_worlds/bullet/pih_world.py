@@ -11,6 +11,15 @@ from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import config_pih_world
 from aml_data_collec_utils.record_sample import RecordSample
 
+
+#global macros, how to access it from bullet directly?
+
+MOUSE_MOVE_EVENT = 1
+MOUSE_BUTTON_EVENT = 2
+KEY_IS_DOWN = 3
+KEY_WAS_RELEASED = 4
+
+
 class BoxObject(BulletRobot):
 
     def __init__(self, box_id):
@@ -69,6 +78,11 @@ class PIHWorld():
         self._torques = []
         self._contact_points = []
 
+
+        #demo collecting variables
+        self._left_button_down = False
+        self._demo_collection_start = False
+
     def step(self):
 
         pb.stepSimulation()
@@ -125,6 +139,76 @@ class PIHWorld():
         self._contact_points.append(contact_point)
 
         # print len(self._forces), len(self._torques), len(self._contact_points)
+
+
+    def draw_trajectory(self, point_1, point_2, colour=[1,0,0], line_width=1.5):
+        """
+        this function adds colour line between points point_1 and point_2 in the bullet
+        Args:
+        point_1: starting point => [x,y,z]
+        point_2: ending_point => [x,y,z]
+        """
+        pb.addUserDebugLine(point_1, point_2, lifeTime=0, lineColorRGB=colour, lineWidth=line_width)
+
+    def collect_demo(self, demo_draw_interwal=10):
+        #get the tuple of mouse events
+        mouse_events = pb.getMouseEvents()
+
+        #variable required for correct operation
+        self._demo_point_count = 0
+        self._traj_point_1, _  = self._robot.get_ee_pose()
+        
+        #check the tuple only if its length is more than zero
+        if len(mouse_events) > 0:
+
+            if mouse_events[0][0] == MOUSE_BUTTON_EVENT:
+                
+                #left button
+                if mouse_events[0][3] == 0:
+
+                    #button is down
+                    if mouse_events[0][4] == KEY_IS_DOWN:
+
+                        self._left_button_down = True
+
+                    #button is released
+                    if mouse_events[0][4] == KEY_WAS_RELEASED:
+
+                        self._left_button_down = False
+
+            #collect the demo only if the button was pressed
+            if self._left_button_down:
+
+                if mouse_events[0][0] == MOUSE_MOVE_EVENT:
+
+                    self._demo_collection_start = True
+
+                    print "Start collecting demo"
+
+                    #start collecting demo point
+                    self._demo_point_count += 1
+
+                    traj_point_2, _ = self._robot.get_ee_pose()
+
+                    print "traj_point", traj_point_2
+
+                    #draw the lines in specific interwal
+                    if self._demo_point_count % demo_draw_interwal == 0:
+
+                        self.draw_trajectory(point_1=self._traj_point_1, point_2=traj_point_2)
+
+                        #store the previous value to draw from this point
+                        self._traj_point_1 = traj_point_2
+            
+            else:
+
+                #stop the collection only if it was started
+                if self._demo_collection_start:
+
+                    print "Stop collecting demo"
+
+                    self._demo_collection_start = False
+            
         
     def run(self):
 
@@ -142,7 +226,8 @@ class PIHWorld():
 
         while not rospy.is_shutdown():
 
-            self.get_force_torque_details()
+            self.collect_demo()
+            # self.get_force_torque_details()
 
             self.step()
 

@@ -42,27 +42,37 @@ def view_traj(self, trajectory=get_demo()):
 
 
 
-
-
-env          = Box2DPIHWorld(pih_world_config)
-#visualizer
-viewer       = Box2DViewer(env, pih_world_config, is_thread_loop=False)
-
+render = True
 #specify parameters here:
 episodes=10000
+
 is_batch_norm = False #batch normalization switch
 
 sess = tf.InteractiveSession()
 
+env          = Box2DPIHWorld(pih_world_config)
+
+#visualizer
+if render:
+    viewer   = Box2DViewer(env, pih_world_config, is_thread_loop=False)
+
+
+# import matplotlib.pyplot as plt
+# plt.figure("rewards")
+# plt.show()
+
+# raw_input()
+
 def main():
 
-    render = True
+    reward_list = []
 
     traj2follow = get_demo()
     steps = traj2follow.shape[0]
 
     #add the trajectory to the viewer
-    view_traj(traj2follow)
+    if render:
+        view_traj(traj2follow)
 
     #Randomly initialize critic,actor,target critic, target actor network  and replay buffer
     exploration_noise = OUNoise(1) #env.action_space.shape[0]
@@ -94,6 +104,7 @@ def main():
         observation = np.hstack([data['j_pos'], data['j_vel']])
         
         reward_per_episode = 0
+
         for t in xrange(steps-1):
             #rendering environmet (optional)            
             if render:
@@ -103,6 +114,7 @@ def main():
             action = agent.evaluate_actor(np.reshape(x,[1,num_states]))
             noise  = exploration_noise.noise()
             action = action[0] + noise #Select action according to current policy and exploration noise
+            
             print "Action at step", t ," :",action,"\n"
             
             set_point = np.hstack([traj2follow[t, :], 0.1])
@@ -111,7 +123,7 @@ def main():
 
             env.update(ctrl_cmd)
 
-            for i in range(viewer._steps_per_frame): 
+            for _ in range(pih_world_config['steps_per_frame']): 
                 env.step()
 
             data        = env._manipulator.get_state()
@@ -119,6 +131,8 @@ def main():
             observation = np.hstack([data['j_pos'], data['j_vel']])
 
             reward      = -0.01*np.linalg.norm(np.hstack([traj2follow[t+1, :], 0.1]) - data['j_pos'])
+
+            # if np.linalg.norm(data['j_pos'] - traj2follow[-1, :]) < 0.0
 
             if t == (steps-2):
                 done = True
@@ -149,6 +163,13 @@ def main():
                 np.savetxt('episode_reward.txt',reward_st, newline="\n")
                 print '\n\n'
                 break
+
+
+        print reward_per_episode
+
+        # plt.plot(reward_list)
+        # plt.pause(0.0001)
+        # plt.draw()
 
     total_reward+=reward_per_episode            
     print "Average reward per episode {}".format(total_reward / episodes)    
