@@ -82,6 +82,9 @@ class PIHWorld():
         #demo collecting variables
         self._left_button_down = False
         self._demo_collection_start = False
+        self._demo_point_count = 0
+        #variable required for correct operation
+        self._traj_point_1, _  = self._robot.get_ee_pose()
 
     def step(self):
 
@@ -154,10 +157,6 @@ class PIHWorld():
         #get the tuple of mouse events
         mouse_events = pb.getMouseEvents()
 
-        #variable required for correct operation
-        self._demo_point_count = 0
-        self._traj_point_1, _  = self._robot.get_ee_pose()
-        
         #check the tuple only if its length is more than zero
         if len(mouse_events) > 0:
 
@@ -208,6 +207,7 @@ class PIHWorld():
                     print "Stop collecting demo"
 
                     self._demo_collection_start = False
+                    self._demo_point_count = 0 
             
         
     def run(self):
