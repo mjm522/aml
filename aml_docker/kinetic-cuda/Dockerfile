@@ -95,6 +95,9 @@ RUN pip install --upgrade pip && \
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
 
+# Install pybullet
+RUN pip install pybullet==1.8.3
+
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]

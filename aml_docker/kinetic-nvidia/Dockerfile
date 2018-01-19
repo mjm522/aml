@@ -42,6 +42,9 @@ RUN pip install --upgrade pip && \
 # TENSOR FLOW *CPU*
 
 
+# Install pybullet
+RUN pip install pybullet==1.8.3
+
 
 
 ##########################################################################
