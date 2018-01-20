@@ -13,12 +13,14 @@ def main():
 
     while True:
 
-        jnt_pos, jnt_vel, _, _ =  pm._manipulator.get_jnt_state()
+        # jnt_pos, jnt_vel, _, _ =  pm._manipulator.get_jnt_state()
 
-        pm.update(velocity_array)
+        # pm.update(velocity_array)
 
-        print "Joint position is \t", jnt_pos
-        print  "Joint vel is \t",  jnt_vel
+        pm.collect_demo()
+
+        # print "Joint position is \t", jnt_pos
+        # print  "Joint vel is \t",  jnt_vel
 
         pm.step()
 

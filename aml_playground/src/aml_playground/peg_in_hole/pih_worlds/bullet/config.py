@@ -3,14 +3,14 @@ from aml_io.io_tools import get_aml_package_path
 
 model_folder_path  = get_aml_package_path('aml_playground') + '/src/aml_playground/peg_in_hole/pih_worlds/bullet/models/pih_setup/'
 data_storage_path  = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/bullet/'
-# demo_storage_path  = data_storage_path + 'demos/'
+demo_storage_path  = data_storage_path + 'demos/'
 
 
 if not os.path.exists(data_storage_path):
     os.makedirs(data_storage_path)
 
-# if not os.path.exists(demo_storage_path):
-#     os.makedirs(demo_storage_path)
+if not os.path.exists(demo_storage_path):
+    os.makedirs(demo_storage_path)
 
 CAM_INFO ={
 	'up':[0.,0.,1.],
@@ -55,6 +55,7 @@ pih_world_config = {
 	'hole_path':model_folder_path+'square_hole.urdf',
 	'robot_path':model_folder_path+'3_link_planar_arm.urdf',
 	'data_folder_path':data_storage_path,
+	'demo_folder_path':demo_storage_path,
 	'dt': 0.01,
 	'record_training_data': True,
 	'training_data_file': 'data_test.pkl',

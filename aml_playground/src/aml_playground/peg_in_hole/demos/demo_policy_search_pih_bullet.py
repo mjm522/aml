@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from gym.spaces import Box, Discrete
 from aml_io.io_tools import save_data, load_data
@@ -14,15 +15,20 @@ def get_demo():
     """
     load the demo trajectory from the file
     """
-    data_storage_path = os.environ['AML_DATA'] + '/aml_playground/pih_worlds/bullet/demos/' 
-    path_to_demo = data_storage_path + 'demo.pkl'
+    path_to_demo = pih_world_config['demo_folder_path'] + 'pih_ee_pos_data.csv'
 
     if not os.path.isfile(path_to_demo):
         raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)
 
-    trajectory = np.asarray(load_data(path_to_demo))
+    data_frame  = pd.DataFrame.from_csv(path_to_demo)
 
-    return trajectory
+    demo_data  = np.asarray(data_frame['ee_position'])
+    
+    print demo_data
+
+    raw_input()
+
+    return demo_data
 
 def view_traj(self, trajectory=get_demo()):
         """
@@ -104,7 +110,8 @@ def main():
             
             print "Action at step", t ," :",action,"\n"
             
-            set_point = np.hstack([traj2follow[t, :], 0.1])
+            # set_point = np.hstack([traj2follow[t, :], 0.1])
+            set_point = traj2follow[t]
 
             ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
 
@@ -117,7 +124,11 @@ def main():
 
             observation = np.hstack([jnt_pos, jnt_vel])
 
-            reward      = -0.01*np.linalg.norm(np.hstack([traj2follow[t+1, :], 0.1]) - jnt_vel)
+            print type(traj2follow[t+1])
+
+            raw_input()
+
+            reward      = -0.01*np.linalg.norm(traj2follow[t+1] - jnt_vel)
 
             # if np.linalg.norm(data['j_pos'] - traj2follow[-1, :]) < 0.0
 

@@ -83,8 +83,6 @@ class PIHWorld():
         #load the world urdf file, returns an id
         self._world_id = pb.loadURDF(config['world_path'])
   
-        manipulator = 
-
         pb.setRealTimeSimulation(0)
 
         self._peg = BoxObject(box_id=pb.loadURDF(config['peg_path']))
@@ -127,6 +125,10 @@ class PIHWorld():
         self._demo_point_count = 0
         #variable required for correct operation
         self._traj_point_1, _  = self._manipulator.get_ee_pose()
+
+        #for saving data
+        self._ee_pos_array = []
+        self._ee_vel_array = []
 
 
     def reset(self, noise=0.01):
@@ -255,7 +257,9 @@ class PIHWorld():
 
     def collect_demo(self, demo_draw_interwal=10):
         """
-        This function is for collecting the demo trajectory
+        This function is for collecting the demo trajectory. It works with the help of mouse events.
+        To record a demo, click the left button on the mouse and drag the end effector of the manipulator.
+        To stop and save the recorded demo, simply release the left button press.
         Args: 
         demo_draw_interwal = this parameter decides at what interwal the plot needs to be updated
         """
@@ -263,8 +267,6 @@ class PIHWorld():
         mouse_events = pb.getMouseEvents()
 
         #check the tuple only if its length is more than zero
-        ee_pos_array = []
-        ee_vel_array = []
         
         if len(mouse_events) > 0:
 
@@ -297,12 +299,12 @@ class PIHWorld():
 
                     traj_point_2, _ = self._manipulator.get_ee_pose()
 
-                    ee_vel = self._robot.get_ee_velocity_from_bullet()
+                    ee_vel = self._manipulator.get_ee_velocity_from_bullet()
 
                     print "traj_point", traj_point_2
 
-                    ee_pos_array.append(traj_point_2)
-                    ee_vel_array.append(ee_vel)
+                    self._ee_pos_array.append(traj_point_2)
+                    self._ee_vel_array.append(ee_vel)
  
                     #draw the lines in specific interwal
                     if self._demo_point_count % demo_draw_interwal == 0:
@@ -318,16 +320,17 @@ class PIHWorld():
                 if self._demo_collection_start:
 
                     print "Stop collecting demo"
-                    d = {'ee position' : pd.Series(ee_pos_array),
-                         'ee velocity' : pd.Series(ee_vel_array)}
-
-                    ee_pos_array = [], ee_vel_array = []
+                    d = {'ee_position' : pd.Series(self._ee_pos_array),
+                         'ee_velocity' : pd.Series(self._ee_vel_array)}
 
                     df = pd.DataFrame(d)
                     df = df.rename_axis('time_step', axis=1)
-                    file_name = self._config['data_folder_path']+'pih_ee_pos_data'+'.csv'
+                    file_name = self._config['demo_folder_path']+'pih_ee_pos_data'+'.csv'
                     df.to_csv(file_name)
 
                     self._demo_collection_start = False
-                    self._demo_point_count = 0 
+                    self._demo_point_count = 0
+
+                    self._ee_pos_array = []
+                    self._ee_vel_array = []
             
