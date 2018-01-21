@@ -92,8 +92,9 @@ class PIHWorld():
                              pos=[0,0,1], 
                              ori=[0, 0, -0.707, 0.707])
 
-        
-        self._manipulator = BulletRobot(robot_id=pb.loadURDF(config['robot_path'], useFixedBase=True, globalScaling=1.5), 
+        self._robot_id = pb.loadURDF(config['robot_path'], useFixedBase=True, globalScaling=1.5)
+
+        self._manipulator = BulletRobot(robot_id=self._robot_id,
                                         ee_link_idx=2, 
                                         config=pih_world_config, 
                                         enable_force_torque_sensors = True)
@@ -172,6 +173,65 @@ class PIHWorld():
             raise Exception("Unknown type control")
 
 
+    def compute_os_imp_ctrlr_cmd(self, os_set_point, Kp):
+        """
+        This function computes the operation space impedance controller
+        according to the slides of Morteza
+        """
+
+        ee_pos, ee_ori = self._manipulator.get_ee_pose()
+        ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
+        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
+
+        delta_pos      = os_set_point - ee_pos
+        delta_vel      = np.zeros(3) - ee_vel
+
+        ee_force = np.zeros(3)
+
+        #compute the jacobian
+        #note: the objVeolocities and objAccelerations have to be list and not numpy array
+        linearJacobian, angularJacobian = pb.calculateJacobian(bodyUniqueId=self._robot_id, 
+                                                               linkIndex=self._manipulator._ee_link_idx,
+                                                               localPosition=ee_pos,
+                                                               objPositions=jnt_pos,
+                                                               objVelocities=np.zeros(3).tolist(),
+                                                               objAccelerations=np.zeros(3).tolist())
+
+        linearJacobian  = np.asarray(linearJacobian)
+        angularJacobian = np.asarray(angularJacobian)
+
+
+
+        #compute mass matrix
+        Mq = np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id,
+                                               objPositions=jnt_pos))
+
+        #Compute cartesian space inertia matrix
+        Mq_inv    = np.linalg.inv(Mq)
+        Mcart_inv = np.dot(np.dot(linearJacobian, Mq_inv), linearJacobian.transpose())
+        Mcart     = np.linalg.pinv(Mcart_inv, rcond=1e-3)
+
+
+        #inertia shaping, as same as eee inertia
+        Md_inv  = Mcart_inv #(np.linalg.inv(self._Md))
+
+
+        # #secondary pose torque
+        # tau_pose = np.zeros_like(q) - np.dot(self._kd_q, dq)
+        # tau_pose = np.dot(null_proj, tau_pose)
+
+
+        #from morteza slide
+        xdd = np.zeros(3)
+        tmp = np.dot(Mcart, Md_inv)
+        f = ee_force + np.dot(Mcart, xdd) + np.dot(tmp, (np.multiply(Kp, delta_pos) + np.multiply(np.sqrt(Kp), delta_vel)) ) - np.dot(tmp, ee_force)
+        tau_task = np.dot( np.dot(linearJacobian.transpose(), Mcart),  f)
+
+        cmd = tau_task 
+
+        return cmd
+
+
     def compute_os_ctrlr_cmd(self, os_set_point, Kp):
         """
         This function computes the control command for the manipulator
@@ -181,7 +241,30 @@ class PIHWorld():
         Kp =  gains in the operational space
         """
 
-        return np.multiply(Kp, np.array([0, -0.05, -0.05]))
+        ee_pos, ee_ori = self._manipulator.get_ee_pose()
+        ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
+        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
+
+        #compute the jacobian
+        #note: the objVeolocities and objAccelerations have to be list and not numpy array
+        linearJacobian, angularJacobian = pb.calculateJacobian(bodyUniqueId=self._robot_id, 
+                                                               linkIndex=self._manipulator._ee_link_idx,
+                                                               localPosition=ee_pos,
+                                                               objPositions=jnt_pos,
+                                                               objVelocities=np.zeros(3).tolist(),
+                                                               objAccelerations=np.zeros(3).tolist())
+
+        linearJacobian  = np.asarray(linearJacobian)
+        angularJacobian = np.asarray(angularJacobian)
+
+
+        #proportional term * error in setpoint - derivative term * ee_velocity
+        error_term = np.multiply(Kp, os_set_point-ee_pos) - np.multiply(np.sqrt(Kp), ee_vel)
+
+        ctrl_cmd = np.dot(np.linalg.pinv(linearJacobian, rcond=1e-3), error_term)
+
+        #converts nan to zero
+        return np.nan_to_num(ctrl_cmd)
 
     def compute_js_ctrlr_cmd(self, js_set_point, Kp):
         """
@@ -192,7 +275,11 @@ class PIHWorld():
         Kp = gains of the system
         """
 
-        return np.multiply(Kp, np.array([0, -0.05, -0.05]))
+        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
+
+        error_term = np.multiply(Kp, js_set_point-jnt_pos) - np.multiply(np.sqrt(Kp), jnt_vel)
+
+        return error_term
 
     def on_shutdown(self):
 
@@ -255,6 +342,19 @@ class PIHWorld():
         """
         pb.addUserDebugLine(point_1, point_2, lifeTime=0, lineColorRGB=colour, lineWidth=line_width)
 
+
+    def get_observation(self):
+
+        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
+
+        ee_pos, ee_ori = self._manipulator.get_ee_pose()
+
+        ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
+
+        # np.hstack([jnt_pos, jnt_vel, ee_pos, ee_ori, ee_vel, ee_omg])
+
+        return np.hstack([jnt_pos, jnt_vel, ee_pos, ee_vel])
+
     def collect_demo(self, demo_draw_interwal=10):
         """
         This function is for collecting the demo trajectory. It works with the help of mouse events.
@@ -299,7 +399,7 @@ class PIHWorld():
 
                     traj_point_2, _ = self._manipulator.get_ee_pose()
 
-                    ee_vel = self._manipulator.get_ee_velocity_from_bullet()
+                    ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
 
                     print "traj_point", traj_point_2
 
@@ -320,13 +420,11 @@ class PIHWorld():
                 if self._demo_collection_start:
 
                     print "Stop collecting demo"
-                    d = {'ee_position' : pd.Series(self._ee_pos_array),
-                         'ee_velocity' : pd.Series(self._ee_vel_array)}
 
-                    df = pd.DataFrame(d)
-                    df = df.rename_axis('time_step', axis=1)
+                    data = np.hstack([np.round(np.asarray(self._ee_pos_array).squeeze(), 3), np.round(np.asarray(self._ee_vel_array).squeeze(), 3),])
                     file_name = self._config['demo_folder_path']+'pih_ee_pos_data'+'.csv'
-                    df.to_csv(file_name)
+
+                    np.savetxt(file_name, data, delimiter=",")
 
                     self._demo_collection_start = False
                     self._demo_point_count = 0

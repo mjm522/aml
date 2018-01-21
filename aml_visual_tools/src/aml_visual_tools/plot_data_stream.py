@@ -6,7 +6,11 @@ from geometry_msgs.msg import (Point, Quaternion, Pose, Vector3, Transform, Wren
 
 
 class PlotDataStream():
+    """
+    This class helps in continous data plotting
+    """
     def __init__(self, plot_title=None, plot_size=None, max_plot_length=20):
+        
         self._data = deque([])
         self._max_plot_length = max_plot_length
         self._plot_colors = ['r', 'g', 'b', 'm', 'c', 'k']
@@ -17,21 +21,35 @@ class PlotDataStream():
         plt.figure(plot_title, plot_size)
         plt.ion()
 
+
     def add_data(self, data):
+        """
+        This function adds more data to the queue
+        Args:
+        data: scalar or vector
+        """
         self._data.append(data)
         if len(self._data) > self._max_plot_length:
             self._data.popleft()
 
     def update_plot(self):
         plt.clf()
-        data = np.asarray(self._data)
-        sub_plot_indx = data.shape[1]*100+11
-        for k in range(data.shape[1]):
-            plt.subplot(sub_plot_indx)
-            sub_plot_indx += 1
-            plt.plot(data[:,k], linewidth=3, color=self._plot_colors[k%len(self._plot_colors)])
-        plt.pause(0.0001)
-        plt.draw()
+
+        if len(self._data) > 1:
+
+            data = np.asarray(self._data)
+
+            if data.ndim == 1:
+                data = data[:, None]
+
+            sub_plot_indx = data.shape[1]*100+11
+
+            for k in range(data.shape[1]):
+                plt.subplot(sub_plot_indx)
+                sub_plot_indx += 1
+                plt.plot(data[:,k], linewidth=3, color=self._plot_colors[k%len(self._plot_colors)])
+            plt.pause(0.0001)
+            plt.draw()
 
 
 class VisualizeROStopic():

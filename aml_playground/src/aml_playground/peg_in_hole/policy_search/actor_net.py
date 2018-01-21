@@ -13,8 +13,19 @@ N_HIDDEN_1 = 400
 N_HIDDEN_2 = 300
 
 class ActorNet(object):
+    """
+    This is the function approximator class for the actor network
+    """
 
     def __init__(self, sess, state_dim, action_dim, do_batch_norm=False):
+        """
+        Constructor for the actor networ
+        Args:
+        sess : valid tf session
+        state_dim : dimensionality of the state
+        action_dim : dimensionallity of the action
+        do_batch_norm : should batch normalisation be performed
+        """
 
         self._tf_sess = sess
 
@@ -94,17 +105,53 @@ class ActorNet(object):
 
 
     def evaluate_actor(self,state_t):
+        """
+        This function is to evaluate the actor
+        """
         return self._tf_sess.run(self._actor_model, feed_dict={self._state:state_t})        
         
         
     def evaluate_target_actor(self, state_t_1):
+        """
+        This function is evaluate the target network
+        """
         return self._tf_sess.run(self._actor_model_tgt, feed_dict={self._state_tgt: state_t_1})
         
     def train_actor(self,actor_state_in,q_gradient_input):
+        """
+        This function runs one loop of training of the network
+        """
         self._tf_sess.run([self._optimizer], 
                                          feed_dict={ self._state: actor_state_in,
                                                      self._state_tgt: actor_state_in, 
                                                      self._q_gradient_input: q_gradient_input})
         
     def update_target_actor(self):
-        self._tf_sess.run(self._update_target_actor_op) 
+        """
+        This fucntion updates the target actor network once in a while
+        """
+        self._tf_sess.run(self._update_target_actor_op)
+
+
+    def get_params(self):
+        """
+        this function is to get all the variables of the network
+        this will enable to save a snapshot of the parameters over the time
+        """
+
+        params = {
+        'w1':self._w1,
+        'w2':self._w2,
+        'w3':self._w3,
+        'b1':self._b1,
+        'b2':self._b2,
+        'b3':self._b3,
+        'w1_tgt':self._w1_tgt,
+        'w2_tgt':self._w2_tgt,
+        'w3_tgt':self._w3_tgt,
+        'b1_tgt':self._b1_tgt,
+        'b2_tgt':self._b2_tgt,
+        'b3_tgt':self._b3_tgt,
+        }
+
+        return params

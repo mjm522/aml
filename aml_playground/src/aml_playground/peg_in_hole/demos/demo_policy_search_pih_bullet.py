@@ -1,15 +1,30 @@
 import os
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from gym.spaces import Box, Discrete
 from aml_io.io_tools import save_data, load_data
 from aml_robot.box2d.box2d_viewer import Box2DViewer
+from aml_visual_tools.plot_data_stream import PlotDataStream
 from aml_playground.peg_in_hole.policy_search.ddpg import DDPG
 from aml_playground.peg_in_hole.policy_search.ou_noise import OUNoise
 from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 
+np.random.seed(123)
+
+render = True
+#specify parameters here:
+episodes=10000
+
+show_reward_traj = False
+
+is_batch_norm = False #batch normalization switch
+
+sess = tf.InteractiveSession()
+
+env = PIHWorld(pih_world_config)
+
+reward_plotter = PlotDataStream(plot_title="reward_plot", plot_size=None, max_plot_length=20000)
 
 def get_demo():
     """
@@ -20,40 +35,23 @@ def get_demo():
     if not os.path.isfile(path_to_demo):
         raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)
 
-    data_frame  = pd.DataFrame.from_csv(path_to_demo)
-
-    demo_data  = np.asarray(data_frame['ee_position'])
-    
-    print demo_data
-
-    raw_input()
+    demo_data  = np.genfromtxt(path_to_demo, delimiter=',')
 
     return demo_data
 
 def view_traj(self, trajectory=get_demo()):
         """
-        this funciton is specific for box2d viewer.
+        this funciton is to load trajectory into the bullet viewer.
+        the state is a list of 6 values, only the x,y,z values are taken
         """
+        for k in range(len(trajectory)-1):
 
-        trajectory *=  viewer._config['pixels_per_meter']
-
-        trajectory[:, 0] -=  viewer._config['cam_pos'][0]
-
-        trajectory[:,1] =  viewer._config['image_height'] - viewer._config['cam_pos'][1] - trajectory[:,1]
-
-        viewer._demo_point_list = trajectory.astype(int)
+            env.draw_trajectory(point_1=trajectory[k, :3], point_2=trajectory[k+1, :3], colour=[0,0,1], line_width=2.5)
 
 
-
-render = False
-#specify parameters here:
-episodes=10000
-
-is_batch_norm = False #batch normalization switch
-
-sess = tf.InteractiveSession()
-
-env = PIHWorld(pih_world_config)
+def update_reward_plot(reward):
+    reward_plotter.add_data(reward)
+    reward_plotter.update_plot()
 
 
 def main():
@@ -72,11 +70,14 @@ def main():
     counter=0
     reward_per_episode = 0    
     total_reward=0
-    num_states  = 6
+    num_states  = 12
     num_actions = 3 
 
     agent = DDPG(sess=sess, state_dim=num_states, action_dim=num_actions, 
-                 action_max=[50., 50, 50], action_min=[1., 1., 1.], is_batch_norm=is_batch_norm)
+                 action_max=[50., 50, 50], action_min=[1., 1., 1.], 
+                 is_batch_norm=is_batch_norm,
+                 snapshot_path=pih_world_config['train_data_storage_path'],
+                 restore_model=False)
 
     print "Number of States:", num_states
     print "Number of Actions:", num_actions
@@ -91,52 +92,44 @@ def main():
         env.reset(noise=0.)
 
         #get data from the manipulator object
-        jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque  = env._manipulator.get_jnt_state()
-
-        #stack position and velocity
-        observation = np.hstack([jnt_pos, jnt_vel])
+        observation  = env.get_observation()
         
         reward_per_episode = 0
 
         for t in xrange(steps-1):
-            #rendering environmet (optional)            
-            if render:
-                viewer.draw()
 
+            done = False
+    
             x = observation
             action = agent.evaluate_actor(np.reshape(x,[1,num_states]))
-            noise  = exploration_noise.noise()
+            noise  = np.abs(exploration_noise.noise())
+
             action = action[0] + noise #Select action according to current policy and exploration noise
             
-            print "Action at step", t ," :",action,"\n"
-            
-            # set_point = np.hstack([traj2follow[t, :], 0.1])
-            set_point = traj2follow[t]
+            # print "Action at step", t ," :",action,"\n"
+    
+            #position setpoint
+            set_point = traj2follow[t, :3]
 
-            ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
+            # ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
+            ctrl_cmd = env.compute_os_imp_ctrlr_cmd(os_set_point=set_point, Kp=action[0])
 
             env.update(ctrl_cmd)
 
-            for _ in range(pih_world_config['steps_per_frame']): 
-                env.step()
+            env.step()
 
-            jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque  = env._manipulator.get_jnt_state()
+            observation = env.get_observation()
 
-            observation = np.hstack([jnt_pos, jnt_vel])
+            reward      = -0.01*np.linalg.norm(traj2follow[t+1, :3] - observation[6:9])
 
-            print type(traj2follow[t+1])
-
-            raw_input()
-
-            reward      = -0.01*np.linalg.norm(traj2follow[t+1] - jnt_vel)
-
-            # if np.linalg.norm(data['j_pos'] - traj2follow[-1, :]) < 0.0
-
+            #the done is only done if the agent was able to reach the specified 
+            #done after right number of steps
             if t == (steps-2):
-                done = True
-            else:
-                done = False
-            
+
+                if np.linalg.norm(traj2follow[-1, :3] - observation[6:9]) < 0.01:
+                    done = True
+
+       
             #add s_t,s_t+1,action,reward to experience memory
             agent.add_experience(observation_1=x,
                                  observation_2=observation,
@@ -153,7 +146,7 @@ def main():
             counter+=1
 
             #check if episode ends:
-            if (done or (t == steps-1)):
+            if (done or (t == steps-2)):
                 print 'EPISODE: ',i,' Steps: ',t,' Total Reward: ',reward_per_episode
                 print "Printing reward to file"
                 exploration_noise.reset() #reinitializing random noise for action exploration
@@ -162,12 +155,14 @@ def main():
                 print '\n\n'
                 break
 
+        if show_reward_traj:
 
-        print reward_per_episode
+            update_reward_plot(reward_per_episode)
 
-        # plt.plot(reward_list)
-        # plt.pause(0.0001)
-        # plt.draw()
+        #save the parameters of the network every
+        #100th episode
+        if (i%100 == 0) and (i > 0):
+            agent.save_snapshot(epi_num=i)
 
     total_reward+=reward_per_episode            
     print "Average reward per episode {}".format(total_reward / episodes)    

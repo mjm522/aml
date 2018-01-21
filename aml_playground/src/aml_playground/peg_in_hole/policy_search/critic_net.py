@@ -12,12 +12,23 @@ N_HIDDEN_1 = 400
 N_HIDDEN_2 = 300
 
 class CriticNet(object):
+    """
+    This is the function approximator class for the critic network
+    """
 
     def __init__(self, sess, state_dim, action_dim, do_batch_norm=False):
+        """
+        Constructor for the critic networ
+        Args:
+        sess : valid tf session
+        state_dim : dimensionality of the state
+        action_dim : dimensionallity of the action
+        do_batch_norm : should batch normalisation be performed
+        """
 
         self._tf_sess = sess
 
-        #creating actor network
+        #creating critic network
         self._state    = tf.placeholder("float",[None, state_dim])
         self._action   = tf.placeholder("float",[None, action_dim])
 
@@ -50,7 +61,7 @@ class CriticNet(object):
         self._critic_model = tf.matmul(hidden_layer_2, self._w3) + self._b3
         
 
-        #creating target actor network
+        #creating target critic network
         self._state_tgt    = tf.placeholder("float",[None, state_dim])
         self._action_tgt   = tf.placeholder("float",[None, action_dim])
         
@@ -144,4 +155,30 @@ class CriticNet(object):
     def update_target_critic(self):
 
         self._tf_sess.run(self._update_target_actor_op)
+
+
+    def get_params(self):
+        """
+        this function is to get all the variables of the network
+        this will enable to save a snapshot of the parameters over the time
+        """
+
+        params = {
+        'w1':self._w1,
+        'w2':self._w2,
+        'w3':self._w3,
+        'b1':self._b1,
+        'b2':self._b2,
+        'b3':self._b3,
+        'w1_tgt':self._w1_tgt,
+        'w2_tgt':self._w2_tgt,
+        'w3_tgt':self._w3_tgt,
+        'b1_tgt':self._b1_tgt,
+        'b2_tgt':self._b2_tgt,
+        'b3_tgt':self._b3_tgt,
+        'w2_action':self._w2_action,
+        'w2_action_tgt':self._w2_action_tgt,
+        }
+
+        return params
 
