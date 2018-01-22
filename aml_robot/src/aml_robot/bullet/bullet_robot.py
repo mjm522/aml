@@ -26,9 +26,9 @@ class BulletRobot(object):
         if enable_force_torque_sensors:
             self.enable_force_torque_sensors()
 
-        _update_period = rospy.Duration(1.0/update_rate)
+        # _update_period = rospy.Duration(1.0/update_rate)
 
-        rospy.Timer(_update_period, self._update_state)
+        # rospy.Timer(_update_period, self._update_state)
 
         
     def configure_default_pos(self, pos, ori):
@@ -232,12 +232,14 @@ class BulletRobot(object):
 
 
     def get_movable_joints(self):
+
         movable_joints = []
         for i in range (pb.getNumJoints(self._id)):
             jointInfo = pb.getJointInfo(self._id, i)
             qIndex = jointInfo[3]
             if qIndex > -1 and jointInfo[1] != "head_pan":
                 movable_joints.append(i)
+
         return movable_joints
 
     def get_ee_pose(self):
@@ -258,8 +260,8 @@ class BulletRobot(object):
         if link_id == -3:
             self._ee_link_idx
 
-        if link_id not in self._joint_idx:
-            raise Exception("Invalid Link ID")
+        # if link_id not in self._joint_idx:
+        #     raise Exception("Invalid Link ID")
 
         link_state = pb.getLinkState(self._id, link_id)
         pos = np.asarray(link_state[0]) 
@@ -272,8 +274,8 @@ class BulletRobot(object):
         if link_id == -3:
             self._ee_link_idx
 
-        if link_id not in self._joint_idx:
-            raise Exception("Invalid Link ID")
+        # if link_id not in self._joint_idx:
+        #     raise Exception("Invalid Link ID")
 
         link_state = pb.getLinkState(self._id, link_id, computeLinkVelocity = 1)
         # print "this====\n",link_state

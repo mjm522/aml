@@ -85,23 +85,24 @@ class PIHWorld():
   
         pb.setRealTimeSimulation(0)
 
-        self._peg = BoxObject(box_id=pb.loadURDF(config['peg_path']))
+        # self._peg = BoxObject(box_id=pb.loadURDF(config['peg_path']))
 
-        self._hole = PegHole(hole_id=pb.loadURDF(config['hole_path'], 
-                             useFixedBase=True), 
-                             pos=[0,0,1], 
-                             ori=[0, 0, -0.707, 0.707])
+        # self._hole = PegHole(hole_id=pb.loadURDF(config['hole_path'], 
+        #                      useFixedBase=True), 
+        #                      pos=[0,0,1], 
+        #                      ori=[0, 0, -0.707, 0.707])
 
         self._robot_id = pb.loadURDF(config['robot_path'], useFixedBase=True, globalScaling=1.5)
 
         self._manipulator = BulletRobot(robot_id=self._robot_id,
-                                        ee_link_idx=2, 
+                                        ee_link_idx=3, 
                                         config=pih_world_config, 
                                         enable_force_torque_sensors = True)
 
+
         pb.resetBasePositionAndOrientation(self._world_id, np.array([0., 0., -0.5]), np.array([0.,0.,0.,1]))
 
-        self._peg.configure_default_pos(np.array([0, -1, 1.5]), np.array([0., 0., 0., 1]))
+        # self._peg.configure_default_pos(np.array([0, -1, 1.5]), np.array([0., 0., 0., 1]))
 
         self._manipulator.configure_default_pos(np.array([0, -1.3, 3.]),  np.array([0., 1, 0., 0]))
 
@@ -130,6 +131,8 @@ class PIHWorld():
         #for saving data
         self._ee_pos_array = []
         self._ee_vel_array = []
+        self._js_pos_array = []
+        self._js_vel_array = []
 
 
     def reset(self, noise=0.01):
@@ -141,7 +144,7 @@ class PIHWorld():
         noise = coefficient of the gain command
         """
 
-        self._peg.reset()
+        # self._peg.reset()
         self._manipulator.set_jnt_state([0.,0.,0.])
 
 
@@ -188,15 +191,16 @@ class PIHWorld():
 
         ee_force = np.zeros(3)
 
+
         #compute the jacobian
         #note: the objVeolocities and objAccelerations have to be list and not numpy array
         linearJacobian, angularJacobian = pb.calculateJacobian(bodyUniqueId=self._robot_id, 
-                                                               linkIndex=self._manipulator._ee_link_idx,
+                                                               linkIndex= self._manipulator._ee_link_idx,
                                                                localPosition=ee_pos,
-                                                               objPositions=jnt_pos,
-                                                               objVelocities=np.zeros(3).tolist(),
-                                                               objAccelerations=np.zeros(3).tolist())
-
+                                                               objPositions=jnt_pos+[0], #last inactive joint
+                                                               objVelocities=np.zeros(4).tolist(),
+                                                               objAccelerations=np.zeros(4).tolist())
+        #the return is of type tuple, so convert it to array
         linearJacobian  = np.asarray(linearJacobian)
         angularJacobian = np.asarray(angularJacobian)
 
@@ -204,7 +208,8 @@ class PIHWorld():
 
         #compute mass matrix
         Mq = np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id,
-                                               objPositions=jnt_pos))
+                                               objPositions=jnt_pos+[0])) #last inactive joint
+
 
         #Compute cartesian space inertia matrix
         Mq_inv    = np.linalg.inv(Mq)
@@ -245,6 +250,7 @@ class PIHWorld():
         ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
         jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
 
+
         #compute the jacobian
         #note: the objVeolocities and objAccelerations have to be list and not numpy array
         linearJacobian, angularJacobian = pb.calculateJacobian(bodyUniqueId=self._robot_id, 
@@ -273,7 +279,41 @@ class PIHWorld():
         Args:
         js_set_point = desired joint setpoint
         Kp = gains of the system
+
+
+        for the inbuilt function:
+            targetVelocities = optional
+            linkIndices = to which force has to be applied = joint indices
+            controlMode = pb.POSITION_CONTROL, pb.TORQUE_CONTROL, pb.VELOCITY_CONTROL
         """
+        #torque = bullet.calculateInverseDynamics(id_robot, obj_pos, obj_vel, obj_acc)
+        # actions = pi.act(obs)
+    
+        #print(" ".join(["%+0.2f"%x for x in obs]))
+        #print("Motors")
+        #print(motors)
+
+        #for m in range(len(motors)):
+            #print("motor_power")
+            #print(motor_power[m])
+            #print("actions[m]")
+            #print(actions[m])
+        #p.setJointMotorControl2(human, motors[m], controlMode=p.TORQUE_CONTROL, force=motor_power[m]*actions[m]*0.082)
+        #p.setJointMotorControl2(human1, motors[m], controlMode=p.TORQUE_CONTROL, force=motor_power[m]*actions[m]*0.082)
+            
+        # forces = [0.] * len(motors)
+        # for m in range(len(motors)):
+        #     forces[m] = motor_power[m]*actions[m]*0.082
+        # pb.setJointMotorControlArray(human, motors,controlMode=p.TORQUE_CONTROL, forces=forces)
+
+        # pb.setJointMotorControlArray(bodyUniqueId=,
+        #                              linkIndices=,
+        #                              controlMode=,
+        #                              targetPositions=,
+        #                              targetVelocities=,
+        #                              forces=,
+        #                              positionGains=,
+        #                              velocityGains=)
 
         jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
 
@@ -333,7 +373,7 @@ class PIHWorld():
         self._contact_points.append(contact_point)
 
 
-    def draw_trajectory(self, point_1, point_2, colour=[1,0,0], line_width=1.5):
+    def draw_trajectory(self, point_1, point_2, colour=[1,0,0], line_width=4.5):
         """
         This function adds colour line between points point_1 and point_2 in the bullet
         Args:
@@ -401,10 +441,14 @@ class PIHWorld():
 
                     ee_vel, ee_omg = self._manipulator.get_ee_velocity_from_bullet()
 
+                    jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
+
                     print "traj_point", traj_point_2
 
                     self._ee_pos_array.append(traj_point_2)
                     self._ee_vel_array.append(ee_vel)
+                    self._js_pos_array.append(jnt_pos)
+                    self._js_vel_array.append(jnt_vel)
  
                     #draw the lines in specific interwal
                     if self._demo_point_count % demo_draw_interwal == 0:
@@ -421,8 +465,12 @@ class PIHWorld():
 
                     print "Stop collecting demo"
 
-                    data = np.hstack([np.round(np.asarray(self._ee_pos_array).squeeze(), 3), np.round(np.asarray(self._ee_vel_array).squeeze(), 3),])
-                    file_name = self._config['demo_folder_path']+'pih_ee_pos_data'+'.csv'
+                    data = np.hstack([np.round(np.asarray(self._js_pos_array).squeeze() ,3), 
+                                      np.round(np.asarray(self._js_vel_array).squeeze() ,3), 
+                                      np.round(np.asarray(self._ee_pos_array).squeeze(), 3), 
+                                      np.round(np.asarray(self._ee_vel_array).squeeze(), 3),])
+
+                    file_name = self._config['demo_folder_path']+'pih_js_ee_pos_data'+'.csv'
 
                     np.savetxt(file_name, data, delimiter=",")
 

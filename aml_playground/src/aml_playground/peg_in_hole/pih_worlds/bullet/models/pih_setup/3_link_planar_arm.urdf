@@ -68,6 +68,28 @@
     </inertial>
   </link>
 
+  <link name="eePoint">
+    <visual>
+      <geometry>
+        <sphere  radius="0.05"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0. 0. 0. 1"/>
+      </material>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    </collision>
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+
   <joint name="joint1" type="continuous">
     <parent link="base_link"/>
     <child link="link1"/>
@@ -87,6 +109,12 @@
     <child link="link3"/>
     <origin xyz="0 0 0.5" rpy="0 0 0" />
     <axis xyz = "1 0 0" />
-  </joint>  
+  </joint>
+
+  <joint name="joint4" type="fixed">
+    <parent link="link3"/>
+    <child link="eePoint"/>
+    <origin xyz="0. 0. 0.5"/>
+  </joint>
 
 </robot>
