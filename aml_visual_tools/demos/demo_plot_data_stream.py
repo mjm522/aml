@@ -1,25 +1,14 @@
 import numpy as np
-# import multiprocessing
-# from threading import Thread
-from aml_visual_tools.plot_data_stream import PlotDataStream
-
+from aml_visual_tools.master_client_plotter import ClientPlotter
 
 
 def main():
 
-    plotter = PlotDataStream(plot_title="reward_plot", plot_size=None, max_plot_length=200)
-
-    # thread = Thread(target=)
-    # thread.start()
-
-    # simulate = multiprocessing.Process(None, plotter.update_plot)
-    # simulate.start()
+    client_plot = ClientPlotter()
 
     while True:
 
-        plotter.add_data(np.random.randn(1))
-        # plotter.update_plot()
-
+        client_plot.send_data_master(np.random.randn(1))
 
 if __name__ == '__main__':
     main()

@@ -20,6 +20,7 @@ class PlotDataStream():
             plot_size = (10,5)
         plt.figure(plot_title, plot_size)
         plt.ion()
+        self.update_plot()
 
 
     def add_data(self, data):

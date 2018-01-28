@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pybullet as pb
 import tensorflow as tf
 from gym.spaces import Box, Discrete
 from aml_io.io_tools import save_data, load_data
@@ -11,12 +12,13 @@ from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 
 np.random.seed(123)
+tf.set_random_seed(123)
 
 render = True
 #specify parameters here:
 episodes=10000
 
-show_reward_traj = False
+show_reward_traj = True
 
 is_batch_norm = False #batch normalization switch
 
@@ -24,13 +26,14 @@ sess = tf.InteractiveSession()
 
 env = PIHWorld(pih_world_config)
 
-reward_plotter = PlotDataStream(plot_title="reward_plot", plot_size=None, max_plot_length=20000)
+# reward_plotter = PlotDataStream(plot_title="reward_plot", plot_size=None, max_plot_length=20000)
+loss_plotter  = PlotDataStream(plot_title="loss_plot", plot_size=None, max_plot_length=20000)
 
 def get_demo():
     """
     load the demo trajectory from the file
     """
-    path_to_demo = pih_world_config['demo_folder_path'] + 'pih_ee_pos_data.csv'
+    path_to_demo = pih_world_config['demo_folder_path'] + 'pih_js_ee_pos_data.csv'
 
     if not os.path.isfile(path_to_demo):
         raise Exception("The given path to demo does not exist, given path: \n" + path_to_demo)
@@ -46,12 +49,16 @@ def view_traj(self, trajectory=get_demo()):
         """
         for k in range(len(trajectory)-1):
 
-            env.draw_trajectory(point_1=trajectory[k, :3], point_2=trajectory[k+1, :3], colour=[0,0,1], line_width=2.5)
+            env.draw_trajectory(point_1=trajectory[k, 6:9], point_2=trajectory[k+1, 6:9], colour=[0,0,1], line_width=5.5)
 
 
 def update_reward_plot(reward):
     reward_plotter.add_data(reward)
     reward_plotter.update_plot()
+
+def update_loss_plot(loss):
+    loss_plotter.add_data(loss)
+    loss_plotter.update_plot()
 
 
 def main():
@@ -74,17 +81,18 @@ def main():
     num_actions = 3 
 
     agent = DDPG(sess=sess, state_dim=num_states, action_dim=num_actions, 
-                 action_max=[50., 50, 50], action_min=[1., 1., 1.], 
+                 action_max=[46.1, 46.1, 46.1], action_min=[0., 0., 0.], 
                  is_batch_norm=is_batch_norm,
                  snapshot_path=pih_world_config['train_data_storage_path'],
-                 restore_model=False)
+                 restore_model= True)
 
     print "Number of States:", num_states
     print "Number of Actions:", num_actions
     print "Number of Steps per episode:", steps
     #saving reward:
     reward_st = np.array([0])
-      
+    
+    loss_list_episode = []
     
     for i in xrange(episodes):
         print "==== Starting episode no:",i,"====","\n"
@@ -96,6 +104,8 @@ def main():
         
         reward_per_episode = 0
 
+        loss_list = []
+
         for t in xrange(steps-1):
 
             done = False
@@ -105,29 +115,56 @@ def main():
             noise  = np.abs(exploration_noise.noise())
 
             action = action[0] + noise #Select action according to current policy and exploration noise
+
+            # print "Action is \t", action
             
             # print "Action at step", t ," :",action,"\n"
     
             #position setpoint
             set_point = traj2follow[t, :3]
+            set_point_vel = traj2follow[t, 3:6]
 
-            # ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
-            ctrl_cmd = env.compute_os_imp_ctrlr_cmd(os_set_point=set_point, Kp=action[0])
+            error = np.linalg.norm(set_point - observation[6:9])
 
-            env.update(ctrl_cmd)
+            # while error > 0.05:
+
+                # ctrl_cmd = env.compute_os_ctrlr_cmd(os_set_point=set_point, Kp=action[0]) #20
+                # ctrl_cmd = env.compute_os_imp_ctrlr_cmd(os_set_point=set_point, Kp=action[0])
+            # ctrl_cmd = env.compute_js_ctrlr_cmd(js_set_point=set_point, Kp=action[0])
+
+            pb.setJointMotorControlArray(env._robot_id, 
+                             env._manipulator._joint_idx, 
+                             controlMode=pb.POSITION_CONTROL,
+                             targetPositions=set_point,
+                             targetVelocities=set_point_vel,
+                             positionGains=action.tolist(),
+                             velocityGains=np.sqrt(action).tolist())
+
+            # env.update(ctrl_cmd)
+
+                # error = np.linalg.norm(traj2follow[t+1, :3] - observation[:3])
 
             env.step()
 
             observation = env.get_observation()
 
-            reward      = -0.01*np.linalg.norm(traj2follow[t+1, :3] - observation[6:9])
+                # print "step \t", t, "error \t", error
+
+            reward      = -0.01*np.linalg.norm(traj2follow[t+1, :3] - observation[:3])
 
             #the done is only done if the agent was able to reach the specified 
             #done after right number of steps
             if t == (steps-2):
 
-                if np.linalg.norm(traj2follow[-1, :3] - observation[6:9]) < 0.01:
+                error = np.linalg.norm(traj2follow[-1, :3] - observation[:3])
+
+                if error < 0.01:
                     done = True
+                    reward = 10.
+                    print "Wow... done!"
+                else:
+                    print "Final error \t", error
+                    reward = -10.
 
        
             #add s_t,s_t+1,action,reward to experience memory
@@ -140,7 +177,9 @@ def main():
 
 
             if counter > 64: 
-                agent.train()
+                loss = agent.train()
+
+                loss_list.append(loss)
 
             reward_per_episode+=reward
             counter+=1
@@ -157,7 +196,10 @@ def main():
 
         if show_reward_traj:
 
-            update_reward_plot(reward_per_episode)
+            if loss_list:
+                update_loss_plot(np.sum(np.asarray(loss_list)))
+
+            # update_reward_plot(reward_per_episode)
 
         #save the parameters of the network every
         #100th episode

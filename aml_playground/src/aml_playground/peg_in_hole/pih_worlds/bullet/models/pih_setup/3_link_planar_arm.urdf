@@ -5,7 +5,7 @@
   <link name="link1">
     <visual>
       <geometry>
-        <cylinder length="0.2" radius="0.05"/>
+        <capsule length="0.2" radius="0.05"/>
       </geometry>
       <material name="red">
         <color rgba="0.8 0 0 1"/>
@@ -14,7 +14,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.2" radius="0.05"/>
+        <capsule length="0.2" radius="0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.1"/>
     </collision>
@@ -27,7 +27,7 @@
   <link name="link2">
     <visual>
       <geometry>
-        <cylinder length="0.5" radius="0.05"/>
+        <capsule length="0.5" radius="0.05"/>
       </geometry>
       <material name="green">
         <color rgba="0 0.8 0 1"/>
@@ -36,7 +36,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.5" radius="0.05"/>
+        <capsule length="0.5" radius="0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
     </collision>
@@ -49,7 +49,7 @@
   <link name="link3">
     <visual>
       <geometry>
-        <cylinder length="0.5" radius="0.05"/>
+        <capsule length="0.5" radius="0.05"/>
       </geometry>
       <material name="blue">
         <color rgba="0 0 0.8 1"/>
@@ -58,7 +58,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.5" radius="0.05"/>
+        <capsule length="0.5" radius="0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
     </collision>

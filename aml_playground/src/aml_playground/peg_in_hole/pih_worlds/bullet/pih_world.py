@@ -3,6 +3,7 @@ import pandas as pd
 import pybullet as pb
 from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_data_collec_utils.record_sample import RecordSample
+from aml_lfd.utilities.smooth_demo_traj import SmoothDemoTraj
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 
 
@@ -78,7 +79,7 @@ class PIHWorld():
         
         pb.setTimeStep(config['dt'])
 
-        pb.setGravity(0., 0.,-10.)
+        pb.setGravity(0., 0.,-9.8)
 
         #load the world urdf file, returns an id
         self._world_id = pb.loadURDF(config['world_path'])
@@ -118,7 +119,7 @@ class PIHWorld():
         #key word 'vel' : velocity control mode
         #key word 'torq' : torque control mode
         #key word 'pos' : position control mode
-        self._ctrlr_type = 'vel'
+        self._ctrlr_type = 'pos'
 
 
         #demo collecting variables
@@ -146,6 +147,8 @@ class PIHWorld():
 
         # self._peg.reset()
         self._manipulator.set_jnt_state([0.,0.,0.])
+        self._manipulator.set_joint_velocities([0., 0., 0.])
+        self._manipulator.set_joint_torques([0.,0.,0.])
 
 
     def step(self):
@@ -470,9 +473,13 @@ class PIHWorld():
                                       np.round(np.asarray(self._ee_pos_array).squeeze(), 3), 
                                       np.round(np.asarray(self._ee_vel_array).squeeze(), 3),])
 
+                    #the data is smoothed using savitsky_gollay_filter
+                    smooth_demo_data = SmoothDemoTraj(data)
+
                     file_name = self._config['demo_folder_path']+'pih_js_ee_pos_data'+'.csv'
 
-                    np.savetxt(file_name, data, delimiter=",")
+                    #save the smoothed data
+                    np.savetxt(file_name, smooth_demo_data._smoothed_traj, delimiter=",")
 
                     self._demo_collection_start = False
                     self._demo_point_count = 0
