@@ -1,49 +1,68 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# from aml_lfd.promp.discrete_promp import DiscretePROMP
+from aml_lfd.promp.discrete_promp import DiscretePROMP
+from aml_io.io_tools import load_data
 
-from aml_lfd.promp.promp_trial import DiscretePROMP
 from aml_lfd.promp.promp_ctrl import PROMPCtrl
-
 
 np.random.seed(0)
 
+def demo_generate_traj(create_data=False):
 
-def demo_generate_traj():
+    """
+    Note: the create data generates a data 
+    but something is wrong. It doesn't work like the
+    demo_list available in demos/data/
+    The system performs better if the PhiT in the generate trajectory
+    is made time based instead of phase based. -> why? Something else is wrong?
+    """
 
     plt.figure("DiscretePROMP")
 
-    # Generate and plot trajectory Data
-    x = np.arange(0,1.01,0.01)           # time points for trajectories
-    nrTraj=30                            # number of trajectoreis for training
-    sigmaNoise=0.2                       # noise on training trajectories
-    A = np.array([.2, .2, .01, -.05])
-    X = np.vstack( (np.sin(5*x), x**2, x, np.ones((1,len(x))) ))
-    Y = np.zeros( (nrTraj,len(x)) )
+    if create_data:
 
-    demos_list = []
-    for traj in range(0, nrTraj):
-        sample = np.dot(A + sigmaNoise * np.random.randn(1,4), X)[0]
-        demos_list.append(sample)
+        # Generate and plot trajectory Data
+        x = np.arange(0,1.01,0.01)           # time points for trajectories
+        nrTraj=30                            # number of trajectoreis for training
+        sigmaNoise=0.02                       # noise on training trajectories
+        A = np.array([.2, .2, .01, -.05])
+        X = np.vstack( (np.sin(5*x), x**2, x, np.ones((1,len(x))) ))
+        Y = np.zeros( (nrTraj,len(x)) )
 
+        demos_list = []
+        for traj in range(0, nrTraj):
+            sample = np.dot(A + sigmaNoise * np.random.randn(1,4), X)[0]
+            demos_list.append(sample)
+
+    else:
+        """
+        generated data, taken from .mat file given
+        in promp lib
+        """
+        demos_list = load_data('./data/data_demo_promp.pkl')
+
+    for traj in demos_list:
+        plt.plot(traj, 'k', alpha=0.2)
 
     #create a promb object by passing the data
     d_promp = DiscretePROMP(data=demos_list)
     d_promp.train()
 
-    #add a via point
-    d_promp.add_viapoint(0.7, 5)
-
     #set the start and goal, the spatial scaling
-    d_promp.set_start(0)
+    d_promp.set_start(0.1)
     d_promp.set_goal(0.2)
 
-    for _ in  range(100):
+    #add a via point
+    d_promp.add_viapoint(0.3, 2.5)
+    d_promp.add_viapoint(0.6, 2.5)
 
-        plt.plot( d_promp.generate_trajectory(phase_speed=0.5, randomness=1e1), 'r')
-        plt.plot( d_promp.generate_trajectory(phase_speed=1., randomness=1e1), 'g')
-        plt.plot(d_promp.generate_trajectory(phase_speed=1.25, randomness=1e1), 'b')
-    plt.legend()
+
+    for _ in  range(1):
+
+        plt.plot(d_promp.generate_trajectory(phase_speed=0.8, randomness=1e-3), 'r')
+        plt.plot(d_promp.generate_trajectory(phase_speed=1., randomness=1e-3), 'g')
+        plt.plot(d_promp.generate_trajectory(phase_speed=1.03, randomness=1e-3), 'b')
+
     plt.show()
 
 

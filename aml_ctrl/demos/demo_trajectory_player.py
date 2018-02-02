@@ -89,15 +89,19 @@ if __name__ == '__main__':
 
     rospy.init_node('trajectory_player')
     
+    max_speed = 0.20
+    min_speed = 0.01
     if args.arm_interface == "baxter":
         from aml_robot.baxter_robot import BaxterArm as ArmInterface
+        max_speed = 10.0
     else:
         from aml_robot.sawyer_robot import SawyerArm as ArmInterface
     
     limb = 'right'
     
     arm = ArmInterface(limb)
-    arm.set_arm_speed(max(min(args.arm_speed,0.20),0.01)) # WARNING: max 0.2 rad/s for safety reasons
+
+    arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
     arm.set_sampling_rate(sampling_rate=1000) # Arm should report its state as fast as possible.
     arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
     # Trajectories have been recorded at 30 hz, we can play faster or slower than what was recorded by choosing a faster or slower execution rate

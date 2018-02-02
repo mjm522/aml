@@ -2,10 +2,49 @@ import numpy as np
 import numpy.matlib as npm
 from scipy.interpolate import interp1d
 
+class Phase():
+    """
+    Utility funciton to generate phase of a
+    trajectory
+    """
+
+    def __init__(self, dt=0.01, phase_speed=1., time_steps=200):
+
+        self._dt =  dt
+        self._phase_start = -dt
+        self._time_steps = time_steps
+        self._phase_end = self._phase_start + self._time_steps*dt
+
+        #derivative of phase variable
+        Dz  = np.ones(time_steps)*phase_speed
+
+        z   = np.cumsum(Dz)*dt
+        
+        #phase variable
+        # z   = np.arange(self._phase_start, self._phase_end, dt)
+
+        # Dz  = np.diff(z)/dt
+        # Dz  = np.hstack([Dz, Dz[-1]])
+        #second derivative of phase variable
+        DDz = np.diff(Dz)/dt
+        DDz = np.hstack([DDz, DDz[-1]])
+
+        self._z   = z
+        self._Dz  = Dz
+        self._DDz = DDz
+
+    def get_phase_from_time(self, time_steps):
+        return time_steps/self._phase_end
+
+    def __call__(self):
+        return self
 
 class DiscretePROMP(object):
+    """
+    Discrete PROMP
+    """
 
-    def __init__(self, data, num_bfs=30, bfs_sigma=0.05):
+    def __init__(self, data, num_bfs=35, bfs_sigma=0.0286, num_centers_outside_range=2.):
 
         """
         Constructor of the class
@@ -21,10 +60,12 @@ class DiscretePROMP(object):
         #number of demos available
         self._num_demos = len(self._demo_trajs)
         #lenght of each demonstrations
+
+        self._num_centers_out_range = num_centers_outside_range
         
         self._traj_len  = len(self._demo_trajs[0])
         #time step
-        self._dt  = 1./self._traj_len
+        self._dt  = 0.005
         
         #list to store all demo traj velocities
         self._Ddemo_trajs = self.compute_velocities()
@@ -39,23 +80,24 @@ class DiscretePROMP(object):
         #list that stores all the weights
         self._W = []
 
+        #phase variable
+        self._phase = self.compute_phase(dt=self._dt, phase_speed=1.)
+
         #mean and sigma of the weights
         self._mean_W  = None
         self._sigma_W = None
 
         #compute the basis functions
-        self._Phi, self._PhiD, self._PhiDD, self._phase = self.generate_basis_function(tau=1.)
+        self._Phi, self._PhiD, self._PhiDD  = self.generate_basis_function(phase_z=self._phase._z, phase_zd=self._phase._Dz, phase_zdd=self._phase._DDz)
 
         #via points
         self._viapoints = []
 
 
-    def generate_basis_function(self, tau):
-
-        phase = self.compute_phase(tau=tau)
+    def generate_basis_function(self, phase_z, phase_zd, phase_zdd):
 
         # basis functions
-        phase_minus_centre = np.array(map(lambda x: x - self._bfs_centres, np.tile(phase._z, (self._n_bfs, 1)).T)).T
+        phase_minus_centre = np.array(map(lambda x: x - self._bfs_centres, np.tile(phase_z, (self._n_bfs, 1)).T)).T
 
         #basis function
         Phi   = np.exp(-0.5 *np.power(phase_minus_centre/self._bfs_sigma, 2)) / (np.sqrt(2.*np.pi)*self._bfs_sigma)
@@ -84,10 +126,10 @@ class DiscretePROMP(object):
         PhiDD_normalized = tmp2 * (1./(np.power(sum_bfs, 3)))
 
         #adding phase dependency
-        PhiDD_normalized = PhiDD_normalized * np.power(phase._Dz, 2)  + PhiD_normalized * phase._DDz
-        PhiD_normalized  = PhiD_normalized * phase._Dz
+        PhiDD_normalized = PhiDD_normalized * np.power(phase_zd, 2)  + PhiD_normalized * phase_zdd
+        PhiD_normalized  = PhiD_normalized * phase_zd
 
-        return Phi_normalized, PhiD_normalized, PhiDD_normalized, phase
+        return Phi_normalized, PhiD_normalized, PhiDD_normalized
 
 
     def compute_velocities(self):
@@ -105,33 +147,16 @@ class DiscretePROMP(object):
             Ddemo_trajs.append(d_traj)
 
 
-    def compute_phase(self, tau):
+    def compute_phase(self, dt, phase_speed):
         """
         This function is for adding the temporal scalability for 
         the basis function
         """
+        num_time_steps = int(self._traj_len / phase_speed)
 
-        class Phase():
+        phase = Phase(dt=self._dt, phase_speed=phase_speed, time_steps=num_time_steps)
 
-            def __init__(self, dt, tau):
-
-                #phase variable
-                z   = np.arange(dt, (1.+dt)*tau, dt)
-                #derivative of phase variable
-                Dz  = np.diff(z)/dt
-                Dz  = np.hstack([Dz, Dz[-1]])
-                #second derivative of phase variable
-                DDz = np.diff(Dz)/dt
-                DDz = np.hstack([DDz, DDz[-1]])
-
-                self._z   = z
-                self._Dz  = Dz
-                self._DDz = DDz
-
-            def __call__(self):
-                return self
-
-        return Phase(self._dt, tau=tau)
+        return phase
 
 
     def train(self):
@@ -140,16 +165,22 @@ class DiscretePROMP(object):
         given demonstration by first interpolating them
         to 0-1 range and then finding the kernel weights
         corresponding to each trajectory
-        """
 
+        import matplotlib.pyplot as plt
+        for k in range(35):
+            plt.plot(self._Phi[k, :])
+        plt.show()
+        """
+        
         for demo_traj in self._demo_trajs:
-            #linear interpolation of the demonstrated trajectory
-            interpolate = interp1d(np.linspace(0, 1, len(demo_traj)), demo_traj, kind='cubic')
+
+            interpolate = interp1d(self._phase._z, demo_traj, kind='cubic')
+
             #strech the trajectory to fit 0 to 1
             stretched_demo = interpolate(self._phase._z)[None,:]
 
             #compute the weights of the trajectory using the basis function
-            w_demo_traj = np.dot(np.linalg.inv(np.dot(self._Phi, self._Phi.T)), np.dot(self._Phi, stretched_demo.T)).T  # weights for each trajectory
+            w_demo_traj = np.dot(np.linalg.inv(np.dot(self._Phi, self._Phi.T) + 1e-12*np.eye(self._n_bfs) ), np.dot(self._Phi, stretched_demo.T)).T  # weights for each trajectory
             
             #append the weights to the list
             self._W.append(w_demo_traj.copy())
@@ -236,7 +267,7 @@ class DiscretePROMP(object):
         return mean - std, mean + std
 
 
-    def generate_trajectory(self, tau=1., randomness=1e-4):
+    def generate_trajectory(self, phase_speed=1., randomness=1e-4):
         """
         Outputs a trajectory
         :param randomness: float between 0. (output will be the mean of gaussians) and 1. (fully randomized inside the variance)
@@ -245,29 +276,29 @@ class DiscretePROMP(object):
         new_mean_W   = self._mean_W
         new_sigma_W  = self._sigma_W
 
+        phase = self.compute_phase(dt=self._dt, phase_speed=phase_speed)
+
+        #create new basis functions
+        Phi, PhiD, PhiDD  = self.generate_basis_function(phase_z=phase._z, phase_zd=phase._Dz, phase_zdd=phase._DDz)
+
+        #loop for all viapoints, to transform 
+        #the mean and covariance
         for viapoint in self._viapoints:
             # basis functions at observed time points
-            time_stamps = np.tile(viapoint['t']*tau, (self._n_bfs, 1)).T
 
-            PhiT = np.exp(-.5 * (np.array(map(lambda x: x - self._bfs_centres, time_stamps)).T ** 2 / (self._bfs_sigma ** 2)))
-            PhiT = PhiT / sum(PhiT)
+            t =  viapoint['t']
+            phase_t = phase.get_phase_from_time(t)
+
+            PhiT, _, _ = self.generate_basis_function(phase_z=phase_t, phase_zd=phase_speed, phase_zdd=0.)
+            # PhiT, _, _ = self.generate_basis_function(phase_z=t, phase_zd=phase_speed, phase_zdd=0.)
 
             # Conditioning
             aux = viapoint['traj_point_sigma'] + np.dot(np.dot(PhiT.T, new_sigma_W), PhiT)
-            new_mean_W = new_mean_W + np.dot(np.dot(new_sigma_W, PhiT) * 1 / aux, (viapoint['traj_point'] - np.dot(PhiT.T, new_mean_W)))  # new weight mean conditioned on observations
+            new_mean_W  = new_mean_W  + np.dot(np.dot(new_sigma_W, PhiT) * 1 / aux, (viapoint['traj_point'] - np.dot(PhiT.T, new_mean_W)))  # new weight mean conditioned on observations
             new_sigma_W = new_sigma_W - np.dot(np.dot(new_sigma_W, PhiT) * 1 / aux, np.dot(PhiT.T, new_sigma_W))
 
+        #get a weight sample from the weight distribution
         sample_W = np.random.multivariate_normal(new_mean_W, randomness*new_sigma_W, 1).T
 
-        return np.dot(self._Phi.T, sample_W)
-
-
-    def temporal_scaling(self, tau=1., randomness=1e-4):
-
-            print PhiT.shape
-
-
-            PhiT, PhiTD, PhiTDD, _ = self.generate_basis_function(tau=tau)
-
-            print PhiT.shape
+        return np.dot(Phi.T, sample_W)
 

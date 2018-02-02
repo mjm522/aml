@@ -402,6 +402,14 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return np.array(self._kinematics.inertia(argument))
 
+    def set_gripper_speed(self, speed):
+        print "set_gripper_speed: not implemented"
+        pass
+
+    def set_arm_speed(self,speed):
+
+        self.set_joint_position_speed(speed)
+
     def ik(self, pos, ori=None):
 
         success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)

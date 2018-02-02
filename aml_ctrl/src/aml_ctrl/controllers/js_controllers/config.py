@@ -59,9 +59,9 @@ JS_TORQUE_CNTLR = {
     'deactivate_wait_time': 5,
 }
 
-JS_POSTN_CNTLR = {
+JS_POSTN_CNTLR_BAXTER = {
     'rate': 500,
-    'kp_q': 10., #gains for position
+    'kp_q': 100., #gains for position
     'kd_dq': np.sqrt(10.),
     'alpha': 0.0,
     'null_kp': 5.,

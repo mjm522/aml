@@ -5,7 +5,7 @@ import copy
 
 import rospy
 
-from config import JS_POSTN_CNTLR_SAWYER as JS_POSTN_CNTLR
+from config import JS_POSTN_CNTLR_BAXTER as JS_POSTN_CNTLR
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
