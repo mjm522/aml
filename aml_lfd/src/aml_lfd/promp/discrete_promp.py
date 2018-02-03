@@ -286,11 +286,7 @@ class DiscretePROMP(object):
         for viapoint in self._viapoints:
             # basis functions at observed time points
 
-            t =  viapoint['t']
-            phase_t = phase.get_phase_from_time(t)
-
-            PhiT, _, _ = self.generate_basis_function(phase_z=phase_t, phase_zd=phase_speed, phase_zdd=0.)
-            # PhiT, _, _ = self.generate_basis_function(phase_z=t, phase_zd=phase_speed, phase_zdd=0.)
+            PhiT, _, _ = self.generate_basis_function(phase_z=phase.get_phase_from_time(viapoint['t']), phase_zd=phase_speed, phase_zdd=0.)
 
             # Conditioning
             aux = viapoint['traj_point_sigma'] + np.dot(np.dot(PhiT.T, new_sigma_W), PhiT)
@@ -300,5 +296,5 @@ class DiscretePROMP(object):
         #get a weight sample from the weight distribution
         sample_W = np.random.multivariate_normal(new_mean_W, randomness*new_sigma_W, 1).T
 
-        return np.dot(Phi.T, sample_W)
+        return np.dot(Phi.T, sample_W), np.dot(PhiD.T, sample_W), np.dot(PhiDD.T, sample_W)
 

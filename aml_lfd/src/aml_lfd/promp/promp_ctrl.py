@@ -5,11 +5,9 @@ class PROMPCtrl(object):
     """
     This class computes the feedback and feedforward gains of the a PROMP in
     closed loop. For more reference, see: https://link.springer.com/article/10.1007/s10514-017-9648-7
-    The system we try to control is a linearised system of the form
-    x_(t+1) = (I + At)x_t + Bt u_t
     """
 
-    def __init__(self, promp_obj, A, B, D_mu=None, D_cov=None, dt=0.01):
+    def __init__(self, promp_obj, dt=0.005):
 
         """
         Constructor of the class:
@@ -20,34 +18,31 @@ class PROMPCtrl(object):
         D_cov= 
         promb_obj = Instatiation of the discrete promp class
         """
+
+        #promp object
+        self._promp = promp_obj
+
         #system matrix
-        self._A = A
+        self._A = None
 
         #control matrix
-        self._B = B
-
-        #drift matrix mean
-        if D_mu is None:
-            self._D_mu = np.zeros(self._A.shape[0])
-        else:
-            self._D_mu = D_mu
-
-        #derif matrix sigma
-        if D_cov is None:
-            self._D_cov = np.diag(np.zeros(self._B.shape[1]))
-        else:
-            self._D_cov = D_cov
+        self._B = None
 
         #time step
         self._dt = dt
 
-        #the I matrix to compute next state
-        self._I = np.eye(A.shape[0])
+        self._Phi   = self._promp._Phi
+        self._PhiD  = self._promp._PhiD
+        self._PhiDD = self._promp._PhiDD
 
-        self._promp = promp_obj
+        self._sigma_W = self._promp._sigma_W
+        self._mean_W  = self._promp._mean_W
 
+        #time steps
+        self._time_steps = self._Phi.shape[1]
 
-    def update_system_matrices(self, A, B, D_mu=None, D_cov=None):
+       
+    def update_system_matrices(self, A, B):
         """
         Update the system matrices 
         this is for the purpose of adding time varying 
@@ -56,21 +51,15 @@ class PROMPCtrl(object):
         self._A = A
         self._B = B
 
-        if D_mu is not None:
-            self._D_mu = D_mu
 
-        if D_cov is not None:
-            self._D_cov = D_cov
-
-    def compute_next_state(self, x, u):
+    def get_basis(self, t):
         """
-        Discretised dynamics function
+        This function creates a basis and Dbasis
+        basis  = [Phi; PhiD]
+        Dbasis = [PhiD; PhiDD]
         """
+        return np.vstack([self._Phi[:, t], self._PhiD[:, t]]), np.vstack([self._PhiD[:, t], self._PhiDD[:, t]])
 
-        x_nxt = np.dot( (self._I + self._A*self._dt), x ) + np.dot(self._B*self._dt, u) + self._D*self._dt
-
-
-        return x_nxt
 
 
     def compute_gains(self, t, add_noise=True):
@@ -78,32 +67,112 @@ class PROMPCtrl(object):
         the control command is assumed to be of type
         u = Kx + k + eps
         """
-        #system noise matrix
-        cov_s = np.dot( np.dot(self._B, self._D_cov), self._B.T)
+        #get the basis funtion at a time step
+        basis, Dbasis = self.get_basis(t)
 
+        if t < self._time_steps-1:
+            basis_t_dt, _ = self.get_basis(t+1)
+        else:
+            basis_t_dt = np.zeros_like(basis)
+
+
+        #part 1 equation 46
         B_pseudo = np.linalg.pinv(self._B)
 
-        #get the basis function for the current time stamp
-        d_basis, basis = self._promp.get_basis(t)
-        traj_cov = self._promp.get_traj_cov()[t,t]
+        #equation 12 for t
+        Sigma_t =  np.dot(np.dot(basis, self._sigma_W), basis.T)
 
-        tmp1 = np.dot(np.dot(d_basis, self._promp._sigma_W), basis.T)
-        tmp2 = np.dot(self._A, traj_cov)
+        #equation 12 for t+dt
+        Sigma_t_dt = np.dot(np.dot(basis_t_dt, self._sigma_W), basis_t_dt.T)
 
-        print tmp1
+        #Cross correlation between t, t+dt, Equation 49
+        Ct = np.dot(np.dot(basis, self._sigma_W), basis_t_dt.T)
 
-        K = np.dot( np.dot(B_pseudo, (tmp1 - tmp2 - 0.5*self._D_cov)), np.linalg.inv(traj_cov) )
+        #System noise Equation 51
+        Sigma_s = (1./self._dt)* ( Sigma_t_dt - np.dot( np.dot( Ct.T, np.linalg.inv(Sigma_t) ), Ct) )
 
-        tmp3 = self._A + np.dot(self._B, K)
+        #control noise Equation 52
+        Sigma_u = np.dot(np.dot(B_pseudo, Sigma_s), B_pseudo.T)
 
-        tmp4 = np.dot(d_basis, self._promp._mean_W)
-        tmp5 = np.dot(basis, self._promp._mean_W)
+        #part 2 equation 46
+        tmp1 = np.dot(np.dot(Dbasis, self._sigma_W), basis.T)
 
-        c = np.random.multivariate_normal(self._D_mu, self._D_cov, 1).T 
+        #part 3 equation 46
+        tmp2 = np.dot(self._A, Sigma_t) + 0.5*Sigma_s
 
-        k = np.dot(B_pseudo, (tmp4 - np.dot(tmp3, tmp5) )) - c
+        #compute feedback gain; complete equation 46
+        K = np.dot( np.dot(B_pseudo, (tmp1-tmp2) ), np.linalg.inv(Sigma_t))
 
-        return K, k
+        #part 1 equation 48
+        tmp3 = np.dot(Dbasis, self._mean_W)
+
+        #part 2 equation 48
+        tmp4 = np.dot( (self._A + np.dot(self._B, K)), np.dot(basis, self._mean_W) )
+
+        #compute feedforward gain; complete equation 48
+        k = np.dot(B_pseudo, (tmp3-tmp4))
+
+        return K, k, Sigma_u
 
 
+    def compute_gain_traj(self):
+        """
+        This function is to compute the entire gain trajectory
+        of a given state distribution
+        """
+        time_steps = self._Phi.shape[1]
+        state_dim, action_dim = self._B.shape
 
+        K_traj = np.zeros([time_steps, state_dim, state_dim])
+        k_traj = np.zeros([time_steps, action_dim])
+        Sigma_u_traj = np.zeros([time_steps, action_dim, action_dim])
+
+        for t in range(time_steps):
+
+            K_traj[t, :, :], k_traj[t, :], Sigma_u_traj[t, :, :] = self.compute_gains(t)
+
+        return K_traj, k_traj, Sigma_u_traj
+
+
+    def compute_control_cmd(self, t, state, sample=False):
+        """
+        This function is compute the specific control
+        command at a time step t 
+        Args: 
+        t : time step
+        state : state for which control command needs to be computed
+        """
+
+        K, k, Sigma_u = self.compute_gains(t)
+
+        mean_u = np.dot(K, state) + k
+
+        if sample:
+            #get a weight sample from the weight distribution
+            return np.random.multivariate_normal(mean_u, Sigma_u, 1).T,  Sigma_u
+
+        else:
+
+            return mean_u, Sigma_u
+
+
+    def compute_ctrl_traj(self, state_list):
+        """
+        This function computes an entire
+        control sequence for a given state list
+        Args:
+        state_list for which control has to be computed
+        this assumes that len(state_list) = timesteps in the basis function
+        """
+
+        time_steps = self._Phi.shape[1]
+        _, action_dim = self._B.shape
+
+        ctrl_cmds_mean  =  np.zeros([time_steps, action_dim])
+        ctrl_cmds_sigma =  np.zeros([time_steps, action_dim, action_dim])
+
+        for t in range(time_steps):
+
+            ctrl_cmds_mean[t, :], ctrl_cmds_sigma[t, :, :] = self.compute_control_cmd(t, state_list[t,:])
+
+        return ctrl_cmds_mean, ctrl_cmds_sigma
