@@ -35,8 +35,21 @@ def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=
     # plot the mean on top
     plt.plot(mean, color_mean, label=label)
 
+    ########################to remove duplicate label handles########################
+    handles, labels = plt.gca().get_legend_handles_labels()
+    i =1
+    while i<len(labels):
+        if labels[i] in labels[:i]:
+            del(labels[i])
+            del(handles[i])
+        else:
+            i +=1
 
-def demo_generate_traj(additional_viapoint=True):
+    plt.legend(handles, labels)
+    ###############################################################################
+
+
+def demo_generate_traj(additional_viapoint=False):
     """
     Make the additional_viapoint False to 
     see the control commands accurately reproduced
@@ -60,6 +73,12 @@ def demo_generate_traj(additional_viapoint=True):
 
 
     for traj, traj_vel in zip(demos_list, Ddemos_list):
+        """
+        This labeling in the loop causes
+        multiple labels to be added to the axis
+        Is there a way to avoid it than the funciton
+        given in plot_mean_and_sigma above?
+        """
 
         plt.figure("ProMP-Pos")
         plt.plot(traj, 'k', alpha=0.2, label='demo_pos')
@@ -94,33 +113,6 @@ def demo_generate_traj(additional_viapoint=True):
     plot_mean_and_sigma(mean=traj_data_2['mu_Dtraj'].squeeze(), sigma=traj_data_2['sigma_Dtraj'], color_mean='g', color_shading='g', label='speed=1.')
     plot_mean_and_sigma(mean=traj_data_3['mu_Dtraj'].squeeze(), sigma=traj_data_3['sigma_Dtraj'], color_mean='b', color_shading='b', label='speed=1.33')
 
-    plt.figure("ProMP-Pos")
-    ########################to remove duplicate label handles########################
-    handles, labels = plt.gca().get_legend_handles_labels()
-    i =1
-    while i<len(labels):
-        if labels[i] in labels[:i]:
-            del(labels[i])
-            del(handles[i])
-        else:
-            i +=1
-
-    plt.legend(handles, labels)
-    ###############################################################################
-
-    plt.figure("ProMP-Vel")
-    ########################to remove duplicate label handles########################
-    handles, labels = plt.gca().get_legend_handles_labels()
-    i =1
-    while i<len(labels):
-        if labels[i] in labels[:i]:
-            del(labels[i])
-            del(handles[i])
-        else:
-            i +=1
-
-    plt.legend(handles, labels)
-    ###############################################################################
 
 def compute_ctrl_cmds(traj_data, color='k', label='', original_actions=None):
 
