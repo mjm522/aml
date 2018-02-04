@@ -7,20 +7,17 @@ class PROMPCtrl(object):
     closed loop. For more reference, see: https://link.springer.com/article/10.1007/s10514-017-9648-7
     """
 
-    def __init__(self, promp_obj, dt=0.005):
+    def __init__(self, traj_data, dt=0.005):
 
         """
         Constructor of the class:
         Args:
-        A = linearised system dynamics matrix
-        B = linearised system control matrix
-        D_mu = 
-        D_cov= 
-        promb_obj = Instatiation of the discrete promp class
+        Phi = Basis function
+        PhiD = Derivative of basis function
+        PhiDD = Second derivative of basis function
+        mean_W = computed mean weights
+        sigma_W = computed variance of weights
         """
-
-        #promp object
-        self._promp = promp_obj
 
         #system matrix
         self._A = None
@@ -31,12 +28,12 @@ class PROMPCtrl(object):
         #time step
         self._dt = dt
 
-        self._Phi   = self._promp._Phi
-        self._PhiD  = self._promp._PhiD
-        self._PhiDD = self._promp._PhiDD
+        self._Phi   = traj_data['Phi']
+        self._PhiD  = traj_data['PhiD']
+        self._PhiDD = traj_data['PhiDD']
 
-        self._sigma_W = self._promp._sigma_W
-        self._mean_W  = self._promp._mean_W
+        self._mean_W   = traj_data['mean_W']
+        self._sigma_W  = traj_data['sigma_W']
 
         #time steps
         self._time_steps = self._Phi.shape[1]
@@ -47,6 +44,9 @@ class PROMPCtrl(object):
         Update the system matrices 
         this is for the purpose of adding time varying 
         system matrices
+        Args:
+        A = System matrix shape: [state_dim x state_dim]
+        B = Control matrix shape: [state_dim x action_dim]
         """
         self._A = A
         self._B = B
@@ -62,7 +62,8 @@ class PROMPCtrl(object):
 
 
 
-    def compute_gains(self, t, add_noise=True):
+    def compute_gains(self, t, inv_thresh=1e-4):
+
         """
         the control command is assumed to be of type
         u = Kx + k + eps
@@ -77,7 +78,7 @@ class PROMPCtrl(object):
 
 
         #part 1 equation 46
-        B_pseudo = np.linalg.pinv(self._B)
+        B_pseudo = np.linalg.pinv(self._B, rcond=inv_thresh)
 
         #equation 12 for t
         Sigma_t =  np.dot(np.dot(basis, self._sigma_W), basis.T)
@@ -89,7 +90,7 @@ class PROMPCtrl(object):
         Ct = np.dot(np.dot(basis, self._sigma_W), basis_t_dt.T)
 
         #System noise Equation 51
-        Sigma_s = (1./self._dt)* ( Sigma_t_dt - np.dot( np.dot( Ct.T, np.linalg.inv(Sigma_t) ), Ct) )
+        Sigma_s = (1./self._dt)* ( Sigma_t_dt - np.dot( np.dot( Ct.T, np.linalg.pinv(Sigma_t, rcond=inv_thresh) ), Ct) )
 
         #control noise Equation 52
         Sigma_u = np.dot(np.dot(B_pseudo, Sigma_s), B_pseudo.T)
@@ -101,7 +102,7 @@ class PROMPCtrl(object):
         tmp2 = np.dot(self._A, Sigma_t) + 0.5*Sigma_s
 
         #compute feedback gain; complete equation 46
-        K = np.dot( np.dot(B_pseudo, (tmp1-tmp2) ), np.linalg.inv(Sigma_t))
+        K = np.dot( np.dot(B_pseudo, (tmp1-tmp2) ), np.linalg.pinv(Sigma_t, rcond=inv_thresh))
 
         #part 1 equation 48
         tmp3 = np.dot(Dbasis, self._mean_W)
@@ -161,17 +162,16 @@ class PROMPCtrl(object):
         This function computes an entire
         control sequence for a given state list
         Args:
-        state_list for which control has to be computed
+        state_list for which control has to be computed: shape [state_dim * time_steps]
         this assumes that len(state_list) = timesteps in the basis function
         """
 
-        time_steps = self._Phi.shape[1]
         _, action_dim = self._B.shape
 
-        ctrl_cmds_mean  =  np.zeros([time_steps, action_dim])
-        ctrl_cmds_sigma =  np.zeros([time_steps, action_dim, action_dim])
+        ctrl_cmds_mean  =  np.zeros([self._time_steps, action_dim])
+        ctrl_cmds_sigma =  np.zeros([self._time_steps, action_dim, action_dim])
 
-        for t in range(time_steps):
+        for t in range(self._time_steps-1):
 
             ctrl_cmds_mean[t, :], ctrl_cmds_sigma[t, :, :] = self.compute_control_cmd(t, state_list[t,:])
 

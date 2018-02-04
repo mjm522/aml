@@ -294,7 +294,35 @@ class DiscretePROMP(object):
             new_sigma_W = new_sigma_W - np.dot(np.dot(new_sigma_W, PhiT) * 1 / aux, np.dot(PhiT.T, new_sigma_W))
 
         #get a weight sample from the weight distribution
-        sample_W = np.random.multivariate_normal(new_mean_W, randomness*new_sigma_W, 1).T
+        
+        sample_W =  np.random.multivariate_normal(new_mean_W, randomness*new_sigma_W, 1).T
 
-        return np.dot(Phi.T, sample_W), np.dot(PhiD.T, sample_W), np.dot(PhiDD.T, sample_W)
+        traj_data = {
+        #computed mean of the trajectory
+        'mean_W':new_mean_W,
+        #computed sigma of the trajectory
+        'sigma_W':new_sigma_W,
+        #compute the mean of the trajectory
+        'mu_traj':np.dot(Phi.T, sample_W),
+        #compute the variance of the trajectory
+        'sigma_traj':np.dot( np.dot(Phi.T, new_sigma_W), Phi),
+        #compute the mean of the velocity trajectory
+        'mu_Dtraj':np.dot(PhiD.T, sample_W),
+        #compute the variance of the velocity trajectory
+        'sigma_Dtraj':np.dot( np.dot(PhiD.T, new_sigma_W), PhiD),
+        #compute the mean of the acceleration trajectory
+        'mu_DDtraj':np.dot(PhiDD.T, sample_W),    
+        #compute the variance of the acceleration trajectory
+        'sigma_DDtraj':np.dot( np.dot(PhiDD.T, new_sigma_W), PhiDD),
+        #basis function
+        'Phi':Phi,
+        #derivative of basis function
+        'PhiD':PhiD,
+        #second derivative of basis function
+        'PhiDD':PhiDD,
+        #phase that is use  d to generate the data
+        'phase':phase,
+        }
+
+        return traj_data
 

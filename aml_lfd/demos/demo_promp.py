@@ -20,11 +20,20 @@ Ddemos_list   = [data['states'][k][:,1] for k in range(100)]
 d_promp = DiscretePROMP(data=demos_list)
 d_promp.train()
 
-def plot_mean_and_sigma(mean, lower_bound, upper_bound, color_mean=None, color_shading=None):
+def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=None, label=''):
+
+    """
+    Expects mean = [Nx1] and Sigma [NxN]
+    The computed sigma is NXN, so diag of that is taken to get the variance
+    """
+
+    lower_bound = mean - interval*np.diag(sigma)
+    upper_bound = mean + interval*np.diag(sigma)
+
     # plot the shaded range of the confidence intervals
     plt.fill_between(range(mean.shape[0]), lower_bound, upper_bound, color=color_shading, alpha=.5)
     # plot the mean on top
-    plt.plot(mean, color_mean)
+    plt.plot(mean, color_mean, label=label)
 
 
 def demo_generate_traj():
@@ -38,8 +47,8 @@ def demo_generate_traj():
     d_promp.set_goal(demos_list[0][-1])
 
     #add a via point
-    # d_promp.add_viapoint(0.3, 2.25)
-    # d_promp.add_viapoint(0.6, 2.25)
+    d_promp.add_viapoint(0.3, 2.25)
+    d_promp.add_viapoint(0.6, 2.25)
     # plt.scatter(0.7, 5, marker='*', s=100)
 
     for traj, traj_vel in zip(demos_list, Ddemos_list):
@@ -50,22 +59,23 @@ def demo_generate_traj():
         plt.figure("ProMP-Vel")
         plt.plot(traj_vel, 'k', alpha=0.2, label='demo_vel')
 
-    for _ in  range(1):
-
-        pos_1, vel_1, acc_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
-        pos_2, vel_2, acc_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
-        pos_3, vel_3, acc_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
-
-        plt.figure("ProMP-Pos")
-        plt.plot(pos_1, 'r', label='speed=0.8')
-        plt.plot(pos_2, 'g', label='speed=1.')
-        plt.plot(pos_3, 'b', label='speed=1.33')
+ 
+    traj_data_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
+    traj_data_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
+    traj_data_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
 
 
-        plt.figure("ProMP-Vel")
-        plt.plot(vel_1, 'r', label='speed=0.8')
-        plt.plot(vel_2, 'g', label='speed=1.')
-        plt.plot(vel_3, 'b', label='speed=1.33')
+    plt.figure("ProMP-Pos")
+
+    plot_mean_and_sigma(mean=traj_data_1['mu_traj'].squeeze(), sigma=traj_data_1['sigma_traj'], color_mean='r', color_shading='r', label='speed=0.8')
+    plot_mean_and_sigma(mean=traj_data_2['mu_traj'].squeeze(), sigma=traj_data_2['sigma_traj'], color_mean='g', color_shading='g', label='speed=1.')
+    plot_mean_and_sigma(mean=traj_data_3['mu_traj'].squeeze(), sigma=traj_data_3['sigma_traj'], color_mean='b', color_shading='b', label='speed=1.33')
+
+    plt.figure("ProMP-Vel")
+
+    plot_mean_and_sigma(mean=traj_data_1['mu_Dtraj'].squeeze(), sigma=traj_data_1['sigma_Dtraj'], color_mean='r', color_shading='r', label='speed=0.8')
+    plot_mean_and_sigma(mean=traj_data_2['mu_Dtraj'].squeeze(), sigma=traj_data_2['sigma_Dtraj'], color_mean='g', color_shading='g', label='speed=1.')
+    plot_mean_and_sigma(mean=traj_data_3['mu_Dtraj'].squeeze(), sigma=traj_data_3['sigma_Dtraj'], color_mean='b', color_shading='b', label='speed=1.33')
 
     plt.figure("ProMP-Pos")
     ########################to remove duplicate label handles########################
@@ -95,54 +105,50 @@ def demo_generate_traj():
     plt.legend(handles, labels)
     ###############################################################################
 
+def compute_ctrl_cmds(traj_data, color='k', label='', original_actions=None):
 
-def create_demo_traj():
+    A = np.array([ [0.,1.], [0., 0.] ])
+    B = np.array([ [0.], [1.] ])
+
+    promp_ctl = PROMPCtrl(traj_data=traj_data)
+    promp_ctl.update_system_matrices(A=A, B=B)
+
+    plt.figure("Ctrl cmds")
+
+    state_list = np.hstack([traj_data['mu_traj'],  traj_data['mu_Dtraj']]) #data['states'][0] #
+
+    ctrl_cmds_mean, ctrl_cmds_sigma = promp_ctl.compute_ctrl_traj(state_list=state_list)
+
+    plot_mean_and_sigma(mean=ctrl_cmds_mean[:, 0], sigma=np.diag(ctrl_cmds_sigma[:, 0, 0]), color_mean=color, color_shading=color, label=label)
+
+    if original_actions is not None:
+
+        plt.plot(original_actions, 'k', label='original control')
+
+    plt.legend()
+
+
+def create_ctrl_traj():
     """
     This funciton shows how to compute 
     closed form control distribution from the trajectory distribution
     """
-
-    state  = data['states'][0]
     action = data['actions'][0]
 
-    action_dim = 1
+    traj_data_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
+    traj_data_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
+    traj_data_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
 
-    promp_ctl = PROMPCtrl(promp_obj=d_promp)
-    promp_ctl.update_system_matrices(A=np.array([ [0.,1.], [0., 0.] ]), B=np.array([ [0.], [1.] ]))
-
-    ctrl_cmds_mean, ctrl_cmds_sigma = promp_ctl.compute_ctrl_traj(state_list=state)
-
-    plt.figure("Ctrl cmds")
-
-    for k in range(action_dim):
-        
-        mean        = ctrl_cmds_mean[:, k]
-        lower_bound = mean - 3.*ctrl_cmds_sigma[:, k, k]
-        upper_bound = mean + 3*ctrl_cmds_sigma[:, k, k]
-
-        plot_mean_and_sigma(mean=mean, lower_bound=lower_bound, upper_bound=upper_bound, color_mean='g', color_shading='g')
-
-    plt.plot(action, 'r', label='original control')
-
-    ########################to remove duplicate label handles########################
-    handles, labels = plt.gca().get_legend_handles_labels()
-    i =1
-    while i<len(labels):
-        if labels[i] in labels[:i]:
-            del(labels[i])
-            del(handles[i])
-        else:
-            i +=1
-
-    plt.legend(handles, labels)
-    ###############################################################################
-
-
+    compute_ctrl_cmds(traj_data_1, color='r', label='speed=0.8', original_actions=None)
+    #only we know how the mean of speed 1 trajectory was produced
+    compute_ctrl_cmds(traj_data_2, color='g', label='speed=1.', original_actions=action)
+    
+    compute_ctrl_cmds(traj_data_3, color='b', label='speed=1.33', original_actions=None)
 
 def main():
 
     demo_generate_traj()
-    create_demo_traj()
+    create_ctrl_traj()
     plt.show()
 
 
