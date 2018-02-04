@@ -34,7 +34,19 @@ class Phase():
         self._DDz = DDz
 
     def get_phase_from_time(self, time_steps):
+        """
+        This funciton is to convert a timestep
+        to a phase
+        """
         return time_steps/self._phase_end
+
+    def get_time_step(self, t):
+        """
+        This function is to compute the 
+        time step of a phase
+        """
+        phase = self.get_phase_from_time(t)
+        return int(phase*self._time_steps)
 
     def __call__(self):
         return self

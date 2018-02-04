@@ -36,20 +36,28 @@ def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=
     plt.plot(mean, color_mean, label=label)
 
 
-def demo_generate_traj():
-
-    #add a via point
-    # d_promp.add_viapoint(0.7, 5)
-    # plt.scatter(0.7, 5, marker='*', s=100)
+def demo_generate_traj(additional_viapoint=True):
+    """
+    Make the additional_viapoint False to 
+    see the control commands accurately reproduced
+    by the promp. The conditioning takes it harder whe
+    additional via points are added
+    """
 
     #set the start and goal, the spatial scaling
     d_promp.set_start(demos_list[0][0])
     d_promp.set_goal(demos_list[0][-1])
 
-    #add a via point
-    d_promp.add_viapoint(0.3, 2.25)
-    d_promp.add_viapoint(0.6, 2.25)
-    # plt.scatter(0.7, 5, marker='*', s=100)
+
+    if additional_viapoint:
+        #add a via point
+        d_promp.add_viapoint(0.3, 2.25)
+        d_promp.add_viapoint(0.6, 2.25)
+
+    traj_data_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
+    traj_data_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
+    traj_data_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
+
 
     for traj, traj_vel in zip(demos_list, Ddemos_list):
 
@@ -59,17 +67,26 @@ def demo_generate_traj():
         plt.figure("ProMP-Vel")
         plt.plot(traj_vel, 'k', alpha=0.2, label='demo_vel')
 
- 
-    traj_data_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
-    traj_data_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
-    traj_data_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
-
 
     plt.figure("ProMP-Pos")
 
     plot_mean_and_sigma(mean=traj_data_1['mu_traj'].squeeze(), sigma=traj_data_1['sigma_traj'], color_mean='r', color_shading='r', label='speed=0.8')
     plot_mean_and_sigma(mean=traj_data_2['mu_traj'].squeeze(), sigma=traj_data_2['sigma_traj'], color_mean='g', color_shading='g', label='speed=1.')
     plot_mean_and_sigma(mean=traj_data_3['mu_traj'].squeeze(), sigma=traj_data_3['sigma_traj'], color_mean='b', color_shading='b', label='speed=1.33')
+
+    if additional_viapoint:
+        """
+        Though phase of each of these traj_data is
+        different, the via point will be present in the 
+        same phase on all, so it is okay to take the default phase
+        to find the plot location
+        """
+        for viapoint in d_promp._viapoints:
+            #plot only additional viapoints
+            if (viapoint['t'] > 0) and (viapoint['t'] < 1):
+                time_step = d_promp._phase.get_time_step(viapoint['t'])
+                plt.scatter(time_step, viapoint['traj_point'], marker='*', s=500)
+
 
     plt.figure("ProMP-Vel")
 
