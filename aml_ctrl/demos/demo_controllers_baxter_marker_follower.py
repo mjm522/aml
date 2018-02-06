@@ -4,49 +4,88 @@
 # where <controller_id> is (default:1):
 # 1 (Position Control), 2 (Velocity Control), or 3 (Torque Control)
 
-import rospy
-import sys
+"""
+This demo is for showing various contollers in operations space.
+The demo opens up a marker in the rviz environment, which can be
+dragged to places (and rotated) to give a setpoint. The type of controller and the arm to 
+be contolled can be choosen by righ clicking in the rviz environment.
+By default position controller is chosen.
+Another variable called multiple_goals (defualt value=0) is used to help the robot move along a trajectory
+rather than a fixed goal. If this parameter is set (i.e. multiple_goals=1), seires of position and
+orientation rising from the mouse movement is recorded and played when the move button is lifted. 
+"""
 
-from interactive_markers.interactive_marker_server import *
-from interactive_markers.menu_handler import *
-from visualization_msgs.msg import *
+import sys
+import rospy
+import argparse
+import quaternion
+import numpy as np
+
 from geometry_msgs.msg import Point
+from visualization_msgs.msg import *
+from interactive_markers.menu_handler import *
+from interactive_markers.interactive_marker_server import *
 
 from aml_robot.baxter_robot import BaxterArm
-from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
+from aml_visual_tools.rviz_markers import RvizMarkers
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 from aml_ctrl.controllers.os_controllers.os_velocity_controller import OSVelocityController
 from aml_ctrl.controllers.os_controllers.os_impedance_controller import OSImpedanceController
 
-from aml_visual_tools.rviz_markers import RvizMarkers
-
-import numpy as np
-import quaternion
-
-menu_handler = MenuHandler()
+menu_handler      = MenuHandler()
 destinationMarker = RvizMarkers()
 
+
+global multiple_goals
+
+set_points_pos = []
+set_points_ori = []
+
 def process_feedback(feedback):
+    """
+    Feed back callback function
+    """
+
+    global set_points_pos, set_points_ori, multiple_goals
+    
     p = feedback.pose.position
     q = feedback.pose.orientation
-    # print q.x, q.y, q.z, q.w
+
     print feedback.marker_name + "_marker is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z)
 
     goal_pos = np.array([p.x,p.y,p.z])
     goal_ori = np.quaternion(q.w, q.x,q.y,q.z)
+
+    if multiple_goals:
+        set_points_pos.append(goal_pos)
+        set_points_ori.append(goal_ori)
+    else:
+        set_points_pos = [goal_pos]
+        set_points_ori = [goal_ori]
+
     if feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
 
         ctrlr.set_active(True)
 
-        ctrlr.set_goal(goal_pos=goal_pos, 
-                       goal_ori=goal_ori, 
-                       orientation_ctrl = True)
+        print len(set_points_pos)
 
-        lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
+        for set_pos, set_ori in zip(set_points_pos, set_points_ori):
+
+            ctrlr.set_goal(goal_pos=set_pos, 
+                           goal_ori=set_ori, 
+                           orientation_ctrl = True)
+
+            lin_error, ang_error, success, time_elapsed = ctrlr.wait_until_goal_reached(timeout=1.0)
+
+        set_points = []
 
     rate.sleep()
 
 def switch_arm(armfeedback):
+    """
+    Function to select the arm
+    """
     global ctrlr, limb
     if armfeedback.menu_entry_id == 2:
         limb = r_limb
@@ -59,6 +98,9 @@ def switch_arm(armfeedback):
     ctrlr.set_active(True)
 
 def set_controller(controller_id, arm):
+    """
+    Function to choose a controller
+    """
     global controller_defined, ctrlr
     if controller_defined:
         ctrlr.set_active(False)
@@ -76,6 +118,9 @@ def set_controller(controller_id, arm):
     return controller
 
 def switch_controller(switch_control_feedback):
+    """
+    callback to choose the contoller
+    """
     global limb, ctrlr, control_id
     if switch_control_feedback.menu_entry_id == 5:
         print "Switching to Position Control"
@@ -105,31 +150,35 @@ def init_menu():
 
 if __name__=="__main__":
     
+    #taking the params using rospy since 
+    #ros passes some additional parameters to the file when run from a launch file
+    #hence sys.args will crash
 
-    argv = rospy.myargv()[:]
+    global multiple_goals
 
-    if not len(argv) == 2:
-        if len(argv) == 1:
-            control_id = 1
-            print "Using Position Control"
-        else:
-            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
-            sys.exit()
+    parser = argparse.ArgumentParser(description='Collect demonstrations')
+
+    parser.add_argument('-c', '--control_id', type=int, default=1, help='type of controller-(1. Pos 2. Vel 3. Torque 4. Impedance)')
+
+    parser.add_argument('-m', '--multiple_goals', type=int, default=0, help='should follow multiple goals')
+    
+    args = parser.parse_args(rospy.myargv()[1:])
+
+    control_id = args.control_id
+    multiple_goals = args.multiple_goals
+
+    if control_id == 1:
+        print "Using Position Controller"
+    elif control_id ==2:
+        print "Using Velocity Controller"
+    elif control_id == 3:
+        print "Using Torque Controller"
+    elif control_id == 4:
+        print "Using Impedance Controller"
     else:
-        if float(argv[1]) < 5 and float(argv[1]) > 0:
-            control_id = float(argv[1])
-            if control_id == 1:
-                print "Using Position Controller"
-            elif control_id ==2:
-                print "Using Velocity Controller"
-            elif control_id == 3:
-                print "Using Torque Controller"
-            elif control_id == 4:
-                print "Using Impedance Controller"
-        else:
-            print "\nInvalid Control ID!"
-            print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
-            sys.exit()
+        print "\nInvalid Control ID!"
+        print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
+        sys.exit()
 
     controller_defined = False
 
