@@ -105,16 +105,19 @@ def init_menu():
 
 if __name__=="__main__":
     
-    if not len(sys.argv) == 2:
-        if len(sys.argv) == 1:
+
+    argv = rospy.myargv()[:]
+
+    if not len(argv) == 2:
+        if len(argv) == 1:
             control_id = 1
             print "Using Position Control"
         else:
             print "\nUSAGE: rosrun aml_ctrl demo_controller_baxter_sim_follow_marker <controller_id>\n\nwhere <controller_id> is (default:1):\n1. Position Control\n2. Velocity Control\n3. Torque Control\n3. Impedance Control\n"
             sys.exit()
     else:
-        if float(sys.argv[1]) < 5 and float(sys.argv[1]) > 0:
-            control_id = float(sys.argv[1])
+        if float(argv[1]) < 5 and float(argv[1]) > 0:
+            control_id = float(argv[1])
             if control_id == 1:
                 print "Using Position Controller"
             elif control_id ==2:
