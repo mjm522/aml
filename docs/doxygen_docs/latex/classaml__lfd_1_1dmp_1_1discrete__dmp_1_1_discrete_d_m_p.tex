@@ -1,0 +1,164 @@
+\hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p}{\section{aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P Class Reference}
+\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p}\index{aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P@{aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P}}
+}
+
+
+Inheritance diagram for aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a0afae018e62e15edb234540305900106}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1e4c3e90a2e09b9d0632f0609d0e046d}{load\-\_\-demo\-\_\-trajectory}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a742b9e083ff20498f00dac0a3a823031}{get\-\_\-time\-\_\-stamps}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1b999ffff82a65a6ed652d95a642772d}{process\-\_\-trajectory}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a35fc0754f0382c6850197f9d6aaa8201}{create\-\_\-kernel\-\_\-fcn}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_af7cfa075be80acd8250fdcbfa4a7f05a}{train}
+\item 
+def \hyperlink{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a240f470f6d319d32b429c5b8e494004e}{generate\-\_\-trajectory}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}The DMP class that implements discrete version of the theory
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a0afae018e62e15edb234540305900106}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{config}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a0afae018e62e15edb234540305900106}
+\begin{DoxyVerb}Class constructor
+Args: 
+the config dictionary contains following entities
+dt : time step 
+rbf_num : number of basis functions
+end_time : the last time of the trajectory
+type : what type of forcing function, whether it should allow external disturbance, or the one that allows stalling
+type 1: standard dmp
+type 2: 
+type 3: allows phase stop
+dof : number of degrees of freedom for the robot
+K: proporational gain of DMP
+D: derivative gain of DMP
+tau: temporal scaling parameter of the DMP
+ax: the time constant of the canonical system
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a35fc0754f0382c6850197f9d6aaa8201}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!create\-\_\-kernel\-\_\-fcn@{create\-\_\-kernel\-\_\-fcn}}
+\index{create\-\_\-kernel\-\_\-fcn@{create\-\_\-kernel\-\_\-fcn}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{create\-\_\-kernel\-\_\-fcn}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-create\-\_\-kernel\-\_\-fcn (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{centers, }
+\item[{}]{bfs\-\_\-width}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a35fc0754f0382c6850197f9d6aaa8201}
+\begin{DoxyVerb}this function creates a basis function. The basis fucntions are gaussians.
+The guassian is centered at a fixed centered (defined in the constructor)
+Args:
+centers : centers of the basis functions
+bfs_width : width of a basis function
+Returns:
+the kernel
+\end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a240f470f6d319d32b429c5b8e494004e}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!generate\-\_\-trajectory@{generate\-\_\-trajectory}}
+\index{generate\-\_\-trajectory@{generate\-\_\-trajectory}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{generate\-\_\-trajectory}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-generate\-\_\-trajectory (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{config = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a240f470f6d319d32b429c5b8e494004e}
+\begin{DoxyVerb}this function is to generate a new DMP trajectory from already trained system
+Args: 
+config : contains all parameters like the input
+dt: time step
+K: porportional gain of the dmp
+D: derivative gain of the dmp
+y: the start location of the dmp
+dy the start velocity of the dmp
+goals: goals to which the dmp has to move - helps in spatial scaling
+tau: temporatl scale constant
+ext_force: optional parameter, denotes the external peturbation to a dmp, example, collision
+\end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a742b9e083ff20498f00dac0a3a823031}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!get\-\_\-time\-\_\-stamps@{get\-\_\-time\-\_\-stamps}}
+\index{get\-\_\-time\-\_\-stamps@{get\-\_\-time\-\_\-stamps}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{get\-\_\-time\-\_\-stamps}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-get\-\_\-time\-\_\-stamps (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a742b9e083ff20498f00dac0a3a823031}
+\begin{DoxyVerb}function to get the time stamps
+Args: None
+Returns : None
+\end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1e4c3e90a2e09b9d0632f0609d0e046d}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!load\-\_\-demo\-\_\-trajectory@{load\-\_\-demo\-\_\-trajectory}}
+\index{load\-\_\-demo\-\_\-trajectory@{load\-\_\-demo\-\_\-trajectory}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{load\-\_\-demo\-\_\-trajectory}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-load\-\_\-demo\-\_\-trajectory (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{trajectory}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1e4c3e90a2e09b9d0632f0609d0e046d}
+\begin{DoxyVerb}this function for storing demo trajectory
+Args: 
+trajectory : arrray of [number of dof, data points]
+Returns:
+none, store the trajectories
+\end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1b999ffff82a65a6ed652d95a642772d}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!process\-\_\-trajectory@{process\-\_\-trajectory}}
+\index{process\-\_\-trajectory@{process\-\_\-trajectory}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{process\-\_\-trajectory}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-process\-\_\-trajectory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_a1b999ffff82a65a6ed652d95a642772d}
+\begin{DoxyVerb}this function processes trajectories. a incoming trajectories are 
+re-scaled to fit [0, 1] using a 1D linear interpolation
+Args: None
+Returns: None 
+\end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_af7cfa075be80acd8250fdcbfa4a7f05a}{\index{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}!train@{train}}
+\index{train@{train}!aml_lfd::dmp::discrete_dmp::DiscreteDMP@{aml\-\_\-lfd\-::dmp\-::discrete\-\_\-dmp\-::\-Discrete\-D\-M\-P}}
+\subsubsection[{train}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-dmp.\-discrete\-\_\-dmp.\-Discrete\-D\-M\-P.\-train (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p_af7cfa075be80acd8250fdcbfa4a7f05a}
+\begin{DoxyVerb}function that trains the DMP object
+finds the weights of the DMP
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-lfd/src/aml\-\_\-lfd/dmp/discrete\-\_\-dmp.\-py\end{DoxyCompactItemize}

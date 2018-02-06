@@ -1,0 +1,67 @@
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin}{\section{sawyer\-\_\-gazebo\-\_\-plugin\-:\-:Sawyer\-Gazebo\-Ros\-Control\-Plugin Class Reference}
+\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin}\index{sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin@{sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin}}
+}
+
+
+Inheritance diagram for sawyer\-\_\-gazebo\-\_\-plugin\-:\-:Sawyer\-Gazebo\-Ros\-Control\-Plugin\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sawyer\-\_\-gazebo\-\_\-plugin\-:\-:Sawyer\-Gazebo\-Ros\-Control\-Plugin\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a79dd7527929c20b9c27d75e4fd30bccb}{void {\bfseries Load} (gazebo\-::physics\-::\-Model\-Ptr parent, sdf\-::\-Element\-Ptr sdf)}\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a79dd7527929c20b9c27d75e4fd30bccb}
+
+\item 
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_af2c89f1d9521a2e88cd7cd7524dc6d4d}{void {\bfseries enable\-Command\-Callback} (const intera\-\_\-core\-\_\-msgs\-::\-Assembly\-State msg)}\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_af2c89f1d9521a2e88cd7cd7524dc6d4d}
+
+\item 
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a795aa6394ef757d33d8b550110fbe4f1}{void {\bfseries head\-Command\-Callback} (const intera\-\_\-core\-\_\-msgs\-::\-Head\-Pan\-Command msg)}\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a795aa6394ef757d33d8b550110fbe4f1}
+
+\item 
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a96fe745f6eb99d7c8e33a421215bd0a1}{void {\bfseries right\-Mode\-Command\-Callback} (const intera\-\_\-core\-\_\-msgs\-::\-Joint\-Command\-Const\-Ptr \&msg)}\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_a96fe745f6eb99d7c8e33a421215bd0a1}
+
+\item 
+void \hyperlink{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_aa9ffbc75bbe5769b77c7cf837920afc7}{mode\-Command\-Callback} (const intera\-\_\-core\-\_\-msgs\-::\-Joint\-Command\-Const\-Ptr \&msg, const std\-::string \&side)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_aa9ffbc75bbe5769b77c7cf837920afc7}{\index{sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin@{sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin}!mode\-Command\-Callback@{mode\-Command\-Callback}}
+\index{mode\-Command\-Callback@{mode\-Command\-Callback}!sawyer_gazebo_plugin::SawyerGazeboRosControlPlugin@{sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin}}
+\subsubsection[{mode\-Command\-Callback}]{\setlength{\rightskip}{0pt plus 5cm}void sawyer\-\_\-gazebo\-\_\-plugin\-::\-Sawyer\-Gazebo\-Ros\-Control\-Plugin\-::mode\-Command\-Callback (
+\begin{DoxyParamCaption}
+\item[{const intera\-\_\-core\-\_\-msgs\-::\-Joint\-Command\-Const\-Ptr \&}]{msg, }
+\item[{const std\-::string \&}]{side}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin_aa9ffbc75bbe5769b77c7cf837920afc7}
+Switch multiple controllers simultaneously.
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\-\_\-controllers} & A vector of controller names to be started \\
+\hline
+{\em stop\-\_\-controllers} & A vector of controller names to be stopped \\
+\hline
+{\em strictness} & How important it is that the requested controllers are started and stopped. The levels are defined in the controller\-\_\-manager\-\_\-msgs/\-Switch\-Controllers service as either {\ttfamily B\-E\-S\-T\-\_\-\-E\-F\-F\-O\-R\-T} or {\ttfamily S\-T\-R\-I\-C\-T}. {\ttfamily B\-E\-S\-T\-\_\-\-E\-F\-F\-O\-R\-T} means that switch\-Controller can still succeed if a non-\/existant controller is requested to be stopped or started.\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-sawyer\-\_\-sim/sawyer\-\_\-gazebo/src/sawyer\-\_\-gazebo\-\_\-ros\-\_\-control\-\_\-plugin.\-cpp\end{DoxyCompactItemize}

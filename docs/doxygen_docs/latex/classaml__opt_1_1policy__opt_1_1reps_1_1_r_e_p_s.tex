@@ -1,0 +1,82 @@
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s}{\section{aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S Class Reference}
+\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s}\index{aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S@{aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S}}
+}
+
+
+Inheritance diagram for aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a08147c6602721fc1d480741b746c1b61}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_ab675a32e5e6c0549285d28fa92bb4b7b}{init\-\_\-opt}
+\item 
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_ae9a1d2f2c98429fa9de625731d605aab}{def {\bfseries optimize\-\_\-policy}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_ae9a1d2f2c98429fa9de625731d605aab}
+
+\item 
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a5515f020a41c284cb097f3582aaf5290}{def {\bfseries get\-\_\-itr\-\_\-snapshot}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a5515f020a41c284cb097f3582aaf5290}
+
+\item 
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_aa41dcd0fdd7bfd0cc0dde09fbdc3e450}{def {\bfseries train}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_aa41dcd0fdd7bfd0cc0dde09fbdc3e450}
+
+\item 
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a14d29a892e1f573596cbb0947dc9c0cf}{def {\bfseries update\-\_\-plot}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a14d29a892e1f573596cbb0947dc9c0cf}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a08147c6602721fc1d480741b746c1b61}{\index{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S@{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_opt::policy_opt::reps::REPS@{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{env, }
+\item[{}]{policy, }
+\item[{}]{tf\-\_\-sess, }
+\item[{}]{config}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_a08147c6602721fc1d480741b746c1b61}
+\begin{DoxyVerb}:param epsilon: Max KL divergence between new policy and old policy.
+:param L2_reg_dual: Dual regularization
+:param L2_reg_loss: Loss regularization
+:param max_opt_itr: Maximum number of batch optimization iterations.
+:param optimizer: Module path to the optimizer. It must support the same interface as
+scipy.optimize.fmin_l_bfgs_b.
+:return:
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_ab675a32e5e6c0549285d28fa92bb4b7b}{\index{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S@{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S}!init\-\_\-opt@{init\-\_\-opt}}
+\index{init\-\_\-opt@{init\-\_\-opt}!aml_opt::policy_opt::reps::REPS@{aml\-\_\-opt\-::policy\-\_\-opt\-::reps\-::\-R\-E\-P\-S}}
+\subsubsection[{init\-\_\-opt}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-policy\-\_\-opt.\-reps.\-R\-E\-P\-S.\-init\-\_\-opt (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s_ab675a32e5e6c0549285d28fa92bb4b7b}
+\begin{DoxyVerb}this function builds the computational graph required for the reps algorithm
+by building a computational graph, it becomes easy to train the neural network
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-opt/src/aml\-\_\-opt/policy\-\_\-opt/reps.\-py\end{DoxyCompactItemize}

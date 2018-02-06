@@ -1,13 +1,13 @@
 var searchData=
 [
-  ['recordsample',['RecordSample',['../classaml__data__collec__utils_1_1record__sample_1_1_record_sample.html',1,'aml_data_collec_utils::record_sample']]],
-  ['reset_5fstate_5fcs',['reset_state_cs',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a26c7a072996b7b5e2cdb13f19e3c3053',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
-  ['reset_5fstate_5fdmp',['reset_state_dmp',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a07482e8fe6955be1c72e67258953e298',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
-  ['robot_5fstate_5fset_5fstart_5fend_5findex',['robot_state_set_start_end_index',['../classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a36c6f2efeec6ef3e551ae098780c59bd',1,'aml_robot::mujoco::mujoco_robot::MujocoRobot']]],
-  ['robotinterface',['RobotInterface',['../classaml__robot_1_1robot__interface_1_1_robot_interface.html',1,'aml_robot::robot_interface']]],
-  ['rollout_5fcs',['rollout_cs',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a21a2c8cac5774e8dbd87a211fda6ef05',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
-  ['rollout_5fdmp',['rollout_dmp',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#ad46fa7e783a6c38e19bb6f36fed76a8b',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
-  ['rs485getinfo',['RS485GetInfo',['../qbmove__communications_8h.html#a65b0719c48b487b5e7432f794e3fec1b',1,'qbmove_communications.h']]],
-  ['rs485listports',['RS485listPorts',['../qbmove__communications_8h.html#a088f2abb4e7610589910e31f5c72b236',1,'qbmove_communications.h']]],
-  ['rs485read',['RS485read',['../qbmove__communications_8h.html#a8c7444a05d655538cb7d13ee47290c8d',1,'qbmove_communications.h']]]
+  ['openrs485',['openRS485',['../qbmove__communications_8h.html#a4d05126da422a8993b011282362c7882',1,'qbmove_communications.h']]],
+  ['optimiser',['Optimiser',['../classaml__opt_1_1optimiser_1_1_optimiser.html',1,'aml_opt::optimiser']]],
+  ['osbiarmcontroller',['OSBiArmController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__bi__arm__controller_1_1_o_s_bi_arm_controller.html',1,'aml_ctrl::controllers::os_controllers::os_bi_arm_controller']]],
+  ['oscontroller',['OSController',['../classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller.html',1,'aml_ctrl::controllers::os_controller']]],
+  ['osimpedancecontroller',['OSImpedanceController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__impedance__controller_1_1_o_s_impedance_controller.html',1,'aml_ctrl::controllers::os_controllers::os_impedance_controller']]],
+  ['osjttorquecontroller',['OSJTTorqueController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html',1,'aml_ctrl::controllers::os_controllers::os_jt_torque_controller']]],
+  ['ospositioncontroller',['OSPositionController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller.html',1,'aml_ctrl::controllers::os_controllers::os_postn_controller']]],
+  ['ostorquecontroller',['OSTorqueController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__torque__controller_1_1_o_s_torque_controller.html',1,'aml_ctrl::controllers::os_controllers::os_torque_controller']]],
+  ['ostrajgenerator',['OSTrajGenerator',['../classaml__ctrl_1_1traj__generator_1_1os__traj__generator_1_1_o_s_traj_generator.html',1,'aml_ctrl::traj_generator::os_traj_generator']]],
+  ['osvelocitycontroller',['OSVelocityController',['../classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__velocity__controller_1_1_o_s_velocity_controller.html',1,'aml_ctrl::controllers::os_controllers::os_velocity_controller']]]
 ];

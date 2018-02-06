@@ -1,125 +1,127 @@
-\hypertarget{qbmove__communications_8h}{}\section{aml\+\_\+drivers/aml\+\_\+pisa\+\_\+hand/qb\+A\+P\+I/src/qbmove\+\_\+communications.h File Reference}
-\label{qbmove__communications_8h}\index{aml\+\_\+drivers/aml\+\_\+pisa\+\_\+hand/qb\+A\+P\+I/src/qbmove\+\_\+communications.\+h@{aml\+\_\+drivers/aml\+\_\+pisa\+\_\+hand/qb\+A\+P\+I/src/qbmove\+\_\+communications.\+h}}
+\hypertarget{qbmove__communications_8h}{\section{aml\-\_\-drivers/aml\-\_\-pisa\-\_\-hand/qb\-A\-P\-I/src/qbmove\-\_\-communications.h File Reference}
+\label{qbmove__communications_8h}\index{aml\-\_\-drivers/aml\-\_\-pisa\-\_\-hand/qb\-A\-P\-I/src/qbmove\-\_\-communications.\-h@{aml\-\_\-drivers/aml\-\_\-pisa\-\_\-hand/qb\-A\-P\-I/src/qbmove\-\_\-communications.\-h}}
+}
 
 
-Library of functions for S\+E\+R\+I\+AL P\+O\+RT communication with a QB Move. Function Prototypes.  
+Library of functions for S\-E\-R\-I\-A\-L P\-O\-R\-T communication with a Q\-B Move. Function Prototypes.  
 
 
-{\ttfamily \#include \char`\"{}commands.\+h\char`\"{}}\newline
-{\ttfamily \#include $<$time.\+h$>$}\newline
-Include dependency graph for qbmove\+\_\+communications.\+h\+:\nopagebreak
+{\ttfamily \#include \char`\"{}commands.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+Include dependency graph for qbmove\-\_\-communications.\-h\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=219pt]{qbmove__communications_8h__incl}
+\includegraphics[width=217pt]{qbmove__communications_8h__incl}
 \end{center}
 \end{figure}
 \subsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
-struct \hyperlink{structcomm__settings}{comm\+\_\+settings}
+struct \hyperlink{structcomm__settings}{comm\-\_\-settings}
 \end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
-\#define \hyperlink{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03}{H\+A\+N\+D\+LE}~int
+\#define \hyperlink{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03}{H\-A\-N\-D\-L\-E}~int
 \item 
-\hypertarget{qbmove__communications_8h_a5fdc7facea201bfce4ad308105f88d0c}{}\label{qbmove__communications_8h_a5fdc7facea201bfce4ad308105f88d0c} 
-\#define {\bfseries I\+N\+V\+A\+L\+I\+D\+\_\+\+H\+A\+N\+D\+L\+E\+\_\+\+V\+A\+L\+UE}~-\/1
+\hypertarget{qbmove__communications_8h_a5fdc7facea201bfce4ad308105f88d0c}{\#define {\bfseries I\-N\-V\-A\-L\-I\-D\-\_\-\-H\-A\-N\-D\-L\-E\-\_\-\-V\-A\-L\-U\-E}~-\/1}\label{qbmove__communications_8h_a5fdc7facea201bfce4ad308105f88d0c}
+
 \end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{qbmove__communications_8h_a4a4b9cd04b7bc0361256581b13fadbdc}{}\label{qbmove__communications_8h_a4a4b9cd04b7bc0361256581b13fadbdc} 
-typedef struct \hyperlink{structcomm__settings}{comm\+\_\+settings} {\bfseries comm\+\_\+settings}
+\hypertarget{qbmove__communications_8h_a4a4b9cd04b7bc0361256581b13fadbdc}{typedef struct \hyperlink{structcomm__settings}{comm\-\_\-settings} {\bfseries comm\-\_\-settings}}\label{qbmove__communications_8h_a4a4b9cd04b7bc0361256581b13fadbdc}
+
 \end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{qbmove__communications_8h_a70990e1cf4d18b3baeb3c7295dbd6426}{}\label{qbmove__communications_8h_a70990e1cf4d18b3baeb3c7295dbd6426} 
-int {\bfseries comm\+Bootloader} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
+\hypertarget{qbmove__communications_8h_a70990e1cf4d18b3baeb3c7295dbd6426}{int {\bfseries comm\-Bootloader} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)}\label{qbmove__communications_8h_a70990e1cf4d18b3baeb3c7295dbd6426}
+
 \item 
-\hypertarget{qbmove__communications_8h_a92ef5f590c59ab49a224b8e612eb08ac}{}\label{qbmove__communications_8h_a92ef5f590c59ab49a224b8e612eb08ac} 
-int {\bfseries comm\+Calibrate} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
+\hypertarget{qbmove__communications_8h_a92ef5f590c59ab49a224b8e612eb08ac}{int {\bfseries comm\-Calibrate} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)}\label{qbmove__communications_8h_a92ef5f590c59ab49a224b8e612eb08ac}
+
 \item 
-\hypertarget{qbmove__communications_8h_ac3fc8ebaa05ea9d3ff895088c30103d5}{}\label{qbmove__communications_8h_ac3fc8ebaa05ea9d3ff895088c30103d5} 
-int {\bfseries comm\+Hand\+Calibrate} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int speed, short int repetitions)
+\hypertarget{qbmove__communications_8h_ac3fc8ebaa05ea9d3ff895088c30103d5}{int {\bfseries comm\-Hand\-Calibrate} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int speed, short int repetitions)}\label{qbmove__communications_8h_ac3fc8ebaa05ea9d3ff895088c30103d5}
+
 \end{DoxyCompactItemize}
-\begin{Indent}{\bf Virtual C\+OM (R\+S485) functions}\par
+\begin{Indent}{\bf Virtual C\-O\-M (R\-S485) functions}\par
 \begin{DoxyCompactItemize}
 \item 
-int \hyperlink{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236}{R\+S485list\+Ports} (char list\+\_\+of\+\_\+ports\mbox{[}10\mbox{]}\mbox{[}255\mbox{]})
+int \hyperlink{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236}{R\-S485list\-Ports} (char list\-\_\-of\-\_\-ports\mbox{[}10\mbox{]}\mbox{[}255\mbox{]})
 \item 
-void \hyperlink{qbmove__communications_8h_a4d05126da422a8993b011282362c7882}{open\+R\+S485} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, const char $\ast$port\+\_\+s)
+void \hyperlink{qbmove__communications_8h_a4d05126da422a8993b011282362c7882}{open\-R\-S485} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, const char $\ast$port\-\_\-s)
 \item 
-void \hyperlink{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a}{close\+R\+S485} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t)
-\end{DoxyCompactItemize}
-\end{Indent}
-\begin{Indent}{\bf QB Move Commands}\par
-\begin{DoxyCompactItemize}
-\item 
-int \hyperlink{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d}{R\+S485read} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, char $\ast$package)
-\item 
-\hypertarget{qbmove__communications_8h_af5bf8448818684348d30d03d59fc2c1b}{}\label{qbmove__communications_8h_af5bf8448818684348d30d03d59fc2c1b} 
-int {\bfseries R\+S485\+List\+Devices} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, char list\+\_\+of\+\_\+ids\mbox{[}255\mbox{]})
-\item 
-void \hyperlink{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b}{R\+S485\+Get\+Info} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, char $\ast$buffer)
-\item 
-int \hyperlink{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863}{comm\+Ping} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
-\item 
-void \hyperlink{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd}{comm\+Activate} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, char activate)
-\item 
-void \hyperlink{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9}{comm\+Set\+Inputs} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int inputs\mbox{[}$\,$\mbox{]})
-\item 
-\hypertarget{qbmove__communications_8h_aa3aee192f28b08cf6d80fc719e73ad46}{}\label{qbmove__communications_8h_aa3aee192f28b08cf6d80fc719e73ad46} 
-void {\bfseries comm\+Set\+Pos\+Stiff} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int inputs\mbox{[}$\,$\mbox{]})
-\item 
-int \hyperlink{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0}{comm\+Get\+Inputs} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int inputs\mbox{[}2\mbox{]})
-\item 
-int \hyperlink{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7}{comm\+Get\+Measurements} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int measurements\mbox{[}3\mbox{]})
-\item 
-int \hyperlink{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf}{comm\+Get\+Currents} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int currents\mbox{[}2\mbox{]})
-\item 
-\hypertarget{qbmove__communications_8h_a3f700c3fc90215428707c7c98b3d538f}{}\label{qbmove__communications_8h_a3f700c3fc90215428707c7c98b3d538f} 
-int {\bfseries comm\+Get\+Curr\+And\+Meas} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int $\ast$values)
-\item 
-\hypertarget{qbmove__communications_8h_a731e861c53a68c7e2e57d36383bf3360}{}\label{qbmove__communications_8h_a731e861c53a68c7e2e57d36383bf3360} 
-int {\bfseries comm\+Get\+Emg} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, short int emg\mbox{[}2\mbox{]})
-\item 
-int \hyperlink{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1}{comm\+Get\+Activate} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, char $\ast$activate)
-\item 
-int \hyperlink{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0}{comm\+Get\+Info} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, unsigned char info\+\_\+type, char $\ast$info)
+void \hyperlink{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a}{close\-R\-S485} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t)
 \end{DoxyCompactItemize}
 \end{Indent}
-\begin{Indent}{\bf QB Move Parameters}\par
+\begin{Indent}{\bf Q\-B Move Commands}\par
 \begin{DoxyCompactItemize}
 \item 
-int \hyperlink{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90}{comm\+Set\+Param} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\+\_\+parameter} type, void $\ast$values, unsigned short num\+\_\+of\+\_\+values)
+int \hyperlink{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d}{R\-S485read} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, char $\ast$package)
 \item 
-int \hyperlink{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771}{comm\+Get\+Param} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id, enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\+\_\+parameter} type, void $\ast$values, unsigned short num\+\_\+of\+\_\+values)
+\hypertarget{qbmove__communications_8h_af5bf8448818684348d30d03d59fc2c1b}{int {\bfseries R\-S485\-List\-Devices} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, char list\-\_\-of\-\_\-ids\mbox{[}255\mbox{]})}\label{qbmove__communications_8h_af5bf8448818684348d30d03d59fc2c1b}
+
 \item 
-int \hyperlink{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20}{comm\+Store\+Params} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
+void \hyperlink{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b}{R\-S485\-Get\-Info} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, char $\ast$buffer)
 \item 
-\hypertarget{qbmove__communications_8h_af49ed4d474529ec3a53e37f5f85c1e7b}{}\label{qbmove__communications_8h_af49ed4d474529ec3a53e37f5f85c1e7b} 
-int {\bfseries comm\+Store\+Default\+Params} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
+int \hyperlink{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863}{comm\-Ping} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)
 \item 
-int \hyperlink{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c}{comm\+Restore\+Params} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
+void \hyperlink{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd}{comm\-Activate} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, char activate)
 \item 
-\hypertarget{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19}{}\label{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19} 
-int \hyperlink{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19}{comm\+Init\+Mem} (\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$comm\+\_\+settings\+\_\+t, int id)
-\begin{DoxyCompactList}\small\item\em T\+O\+DO. \end{DoxyCompactList}\item 
-\hypertarget{qbmove__communications_8h_a97912dd3b3c6529884b0e61a2ca6a31b}{}\label{qbmove__communications_8h_a97912dd3b3c6529884b0e61a2ca6a31b} 
-long {\bfseries timevaldiff} (struct timeval $\ast$starttime, struct timeval $\ast$finishtime)
+void \hyperlink{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9}{comm\-Set\-Inputs} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int inputs\mbox{[}$\,$\mbox{]})
+\item 
+\hypertarget{qbmove__communications_8h_aa3aee192f28b08cf6d80fc719e73ad46}{void {\bfseries comm\-Set\-Pos\-Stiff} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int inputs\mbox{[}$\,$\mbox{]})}\label{qbmove__communications_8h_aa3aee192f28b08cf6d80fc719e73ad46}
+
+\item 
+int \hyperlink{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0}{comm\-Get\-Inputs} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int inputs\mbox{[}2\mbox{]})
+\item 
+int \hyperlink{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7}{comm\-Get\-Measurements} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int measurements\mbox{[}3\mbox{]})
+\item 
+int \hyperlink{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf}{comm\-Get\-Currents} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int currents\mbox{[}2\mbox{]})
+\item 
+\hypertarget{qbmove__communications_8h_a3f700c3fc90215428707c7c98b3d538f}{int {\bfseries comm\-Get\-Curr\-And\-Meas} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int $\ast$values)}\label{qbmove__communications_8h_a3f700c3fc90215428707c7c98b3d538f}
+
+\item 
+\hypertarget{qbmove__communications_8h_a731e861c53a68c7e2e57d36383bf3360}{int {\bfseries comm\-Get\-Emg} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, short int emg\mbox{[}2\mbox{]})}\label{qbmove__communications_8h_a731e861c53a68c7e2e57d36383bf3360}
+
+\item 
+int \hyperlink{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1}{comm\-Get\-Activate} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, char $\ast$activate)
+\item 
+int \hyperlink{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0}{comm\-Get\-Info} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, unsigned char info\-\_\-type, char $\ast$info)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Q\-B Move Parameters}\par
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90}{comm\-Set\-Param} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\-\_\-parameter} type, void $\ast$values, unsigned short num\-\_\-of\-\_\-values)
+\item 
+int \hyperlink{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771}{comm\-Get\-Param} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id, enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\-\_\-parameter} type, void $\ast$values, unsigned short num\-\_\-of\-\_\-values)
+\item 
+int \hyperlink{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20}{comm\-Store\-Params} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)
+\item 
+\hypertarget{qbmove__communications_8h_af49ed4d474529ec3a53e37f5f85c1e7b}{int {\bfseries comm\-Store\-Default\-Params} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)}\label{qbmove__communications_8h_af49ed4d474529ec3a53e37f5f85c1e7b}
+
+\item 
+int \hyperlink{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c}{comm\-Restore\-Params} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)
+\item 
+\hypertarget{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19}{int \hyperlink{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19}{comm\-Init\-Mem} (\hyperlink{structcomm__settings}{comm\-\_\-settings} $\ast$comm\-\_\-settings\-\_\-t, int id)}\label{qbmove__communications_8h_aa3771c9c4be2805d66c5b1a59066cb19}
+
+\begin{DoxyCompactList}\small\item\em T\-O\-D\-O. \end{DoxyCompactList}\item 
+\hypertarget{qbmove__communications_8h_a97912dd3b3c6529884b0e61a2ca6a31b}{long {\bfseries timevaldiff} (struct timeval $\ast$starttime, struct timeval $\ast$finishtime)}\label{qbmove__communications_8h_a97912dd3b3c6529884b0e61a2ca6a31b}
+
 \end{DoxyCompactItemize}
 \end{Indent}
 \begin{Indent}{\bf General Functions}\par
-{\em This functions returns an 8 bit L\+CR checksum over the lenght of a buffer.
+{\em This functions returns an 8 bit L\-C\-R checksum over the lenght of a buffer.
 
 
 \begin{DoxyParams}{Parameters}
-{\em data\+\_\+buffer} & Buffer. \\
+{\em data\-\_\-buffer} & Buffer. \\
 \hline
-{\em data\+\_\+length} & Buffer length.\\
+{\em data\-\_\-length} & Buffer length.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -136,38 +138,34 @@ printf(\textcolor{stringliteral}{"Checksum: %d"}, (\textcolor{keywordtype}{int})
 \end{DoxyParagraph}
 }\begin{DoxyCompactItemize}
 \item 
-\hypertarget{qbmove__communications_8h_a35819265b74001583803a2295b3236dc}{}\label{qbmove__communications_8h_a35819265b74001583803a2295b3236dc} 
-char {\bfseries checksum} (char $\ast$data\+\_\+buffer, int data\+\_\+length)
+\hypertarget{qbmove__communications_8h_a35819265b74001583803a2295b3236dc}{char {\bfseries checksum} (char $\ast$data\-\_\-buffer, int data\-\_\-length)}\label{qbmove__communications_8h_a35819265b74001583803a2295b3236dc}
+
 \end{DoxyCompactItemize}
 \end{Indent}
 
 
 \subsection{Detailed Description}
-Library of functions for S\+E\+R\+I\+AL P\+O\+RT communication with a QB Move. Function Prototypes. 
-
-This library contains all necessary functions for communicating with a QB Move when using a U\+SB to R\+S485 connector that provides a Virtual C\+OM interface. 
+Library of functions for S\-E\-R\-I\-A\-L P\-O\-R\-T communication with a Q\-B Move. Function Prototypes. This library contains all necessary functions for communicating with a Q\-B Move when using a U\-S\-B to R\-S485 connector that provides a Virtual C\-O\-M interface. 
 
 \subsection{Macro Definition Documentation}
-\hypertarget{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03}{}\label{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!H\+A\+N\+D\+LE@{H\+A\+N\+D\+LE}}
-\index{H\+A\+N\+D\+LE@{H\+A\+N\+D\+LE}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{H\+A\+N\+D\+LE}{HANDLE}}
-{\footnotesize\ttfamily \#define H\+A\+N\+D\+LE~int}
-
-On unix systems, H\+A\+N\+D\+LE is defined as an {\itshape int} and I\+N\+V\+A\+L\+I\+D\+\_\+\+H\+A\+N\+D\+L\+E\+\_\+\+V\+A\+L\+UE is defined as -\/1. 
+\hypertarget{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!H\-A\-N\-D\-L\-E@{H\-A\-N\-D\-L\-E}}
+\index{H\-A\-N\-D\-L\-E@{H\-A\-N\-D\-L\-E}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{H\-A\-N\-D\-L\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define H\-A\-N\-D\-L\-E~int}}\label{qbmove__communications_8h_ab521aa5010fb1afb801a899a55569e03}
+On unix systems, H\-A\-N\-D\-L\-E is defined as an {\itshape int} and I\-N\-V\-A\-L\-I\-D\-\_\-\-H\-A\-N\-D\-L\-E\-\_\-\-V\-A\-L\-U\-E is defined as -\/1. 
 
 \subsection{Function Documentation}
-\hypertarget{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a}{}\label{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!close\+R\+S485@{close\+R\+S485}}
-\index{close\+R\+S485@{close\+R\+S485}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{close\+R\+S485()}{closeRS485()}}
-{\footnotesize\ttfamily void close\+R\+S485 (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t }\end{DoxyParamCaption})}
-
-This function is used to close a serial port being used with the QB Move.
+\hypertarget{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!close\-R\-S485@{close\-R\-S485}}
+\index{close\-R\-S485@{close\-R\-S485}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{close\-R\-S485}]{\setlength{\rightskip}{0pt plus 5cm}void close\-R\-S485 (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a5f87643fab51e02e4eab71bf4ab1a33a}
+This function is used to close a serial port being used with the Q\-B Move.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -180,21 +178,24 @@ This function is used to close a serial port being used with the QB Move.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd}{}\label{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Activate@{comm\+Activate}}
-\index{comm\+Activate@{comm\+Activate}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Activate()}{commActivate()}}
-{\footnotesize\ttfamily void comm\+Activate (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{char}]{activate }\end{DoxyParamCaption})}
-
-This function activates or deactivates a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Activate@{comm\-Activate}}
+\index{comm\-Activate@{comm\-Activate}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Activate}]{\setlength{\rightskip}{0pt plus 5cm}void comm\-Activate (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{char}]{activate}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_aff081c6687d87e38cddfe714ad2de0fd}
+This function activates or deactivates a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
-{\em activate} & T\+R\+UE to turn motors on. F\+A\+L\+SE to turn motors off. \\
+{\em activate} & T\-R\-U\-E to turn motors on. F\-A\-L\-S\-E to turn motors off. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -209,19 +210,22 @@ This function activates or deactivates a QB Move connected to the serial port.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1}{}\label{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Activate@{comm\+Get\+Activate}}
-\index{comm\+Get\+Activate@{comm\+Get\+Activate}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Activate()}{commGetActivate()}}
-{\footnotesize\ttfamily int comm\+Get\+Activate (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{char $\ast$}]{activate }\end{DoxyParamCaption})}
-
-This function gets the activation status of a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Activate@{comm\-Get\-Activate}}
+\index{comm\-Get\-Activate@{comm\-Get\-Activate}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Activate}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Activate (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{char $\ast$}]{activate}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_abaec903aef1ce3cebb5f42f63995c2e1}
+This function gets the activation status of a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em activation} & Activation status.\\
 \hline
@@ -247,19 +251,22 @@ Returns 0 if communication was ok, -\/1 otherwise.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf}{}\label{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Currents@{comm\+Get\+Currents}}
-\index{comm\+Get\+Currents@{comm\+Get\+Currents}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Currents()}{commGetCurrents()}}
-{\footnotesize\ttfamily int comm\+Get\+Currents (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{short int}]{currents\mbox{[}2\mbox{]} }\end{DoxyParamCaption})}
-
-This function gets currents from a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Currents@{comm\-Get\-Currents}}
+\index{comm\-Get\-Currents@{comm\-Get\-Currents}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Currents}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Currents (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{short int}]{currents\mbox{[}2\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a4b3c724150046fc4a766db52fa086fdf}
+This function gets currents from a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em currents} & Currents.\\
 \hline
@@ -285,23 +292,27 @@ Returns 0 if communication was ok, -\/1 otherwise.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0}{}\label{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Info@{comm\+Get\+Info}}
-\index{comm\+Get\+Info@{comm\+Get\+Info}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Info()}{commGetInfo()}}
-{\footnotesize\ttfamily int comm\+Get\+Info (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{unsigned char}]{info\+\_\+type,  }\item[{char $\ast$}]{info }\end{DoxyParamCaption})}
-
-This function is used to ping the QB Move and get information about the device.
+\hypertarget{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Info@{comm\-Get\-Info}}
+\index{comm\-Get\-Info@{comm\-Get\-Info}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Info}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Info (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{unsigned char}]{info\-\_\-type, }
+\item[{char $\ast$}]{info}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_af9a2caeab56a107278aad9e24b406ab0}
+This function is used to ping the Q\-B Move and get information about the device.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
-{\em buffer} & Buffer that stores a string with information about the device. B\+U\+F\+F\+ER S\+I\+ZE M\+U\+ST BE AT L\+E\+A\+ST 500. \\
+{\em buffer} & Buffer that stores a string with information about the device. B\-U\-F\-F\-E\-R S\-I\-Z\-E M\-U\-S\-T B\-E A\-T L\-E\-A\-S\-T 500. \\
 \hline
-{\em info\+\_\+type} & Information to be retrieved.\\
+{\em info\-\_\-type} & Information to be retrieved.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -318,19 +329,22 @@ puts(auxstring);
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0}{}\label{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Inputs@{comm\+Get\+Inputs}}
-\index{comm\+Get\+Inputs@{comm\+Get\+Inputs}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Inputs()}{commGetInputs()}}
-{\footnotesize\ttfamily int comm\+Get\+Inputs (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{short int}]{inputs\mbox{[}2\mbox{]} }\end{DoxyParamCaption})}
-
-This function gets input references from a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Inputs@{comm\-Get\-Inputs}}
+\index{comm\-Get\-Inputs@{comm\-Get\-Inputs}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Inputs}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Inputs (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{short int}]{inputs\mbox{[}2\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_ae0a38427212fc15a1021d2459a86f2c0}
+This function gets input references from a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em inputs} & Input references.\\
 \hline
@@ -356,19 +370,22 @@ Returns 0 if communication was ok, -\/1 otherwise.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7}{}\label{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Measurements@{comm\+Get\+Measurements}}
-\index{comm\+Get\+Measurements@{comm\+Get\+Measurements}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Measurements()}{commGetMeasurements()}}
-{\footnotesize\ttfamily int comm\+Get\+Measurements (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{short int}]{measurements\mbox{[}3\mbox{]} }\end{DoxyParamCaption})}
-
-This function gets measurements from a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Measurements@{comm\-Get\-Measurements}}
+\index{comm\-Get\-Measurements@{comm\-Get\-Measurements}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Measurements}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Measurements (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{short int}]{measurements\mbox{[}3\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a06a73f0c93c7ae12a95541c1feee10b7}
+This function gets measurements from a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em measurements} & Measurements.\\
 \hline
@@ -394,25 +411,30 @@ Returns 0 if communication was ok, -\/1 otherwise.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771}{}\label{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Get\+Param@{comm\+Get\+Param}}
-\index{comm\+Get\+Param@{comm\+Get\+Param}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Get\+Param()}{commGetParam()}}
-{\footnotesize\ttfamily int comm\+Get\+Param (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\+\_\+parameter}}]{type,  }\item[{void $\ast$}]{values,  }\item[{unsigned short}]{num\+\_\+of\+\_\+values }\end{DoxyParamCaption})}
-
-This function gets a parameter that is stored in the QB Move memory.
+\hypertarget{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Get\-Param@{comm\-Get\-Param}}
+\index{comm\-Get\-Param@{comm\-Get\-Param}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Get\-Param}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Get\-Param (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{enum {\bf qbmove\-\_\-parameter}}]{type, }
+\item[{void $\ast$}]{values, }
+\item[{unsigned short}]{num\-\_\-of\-\_\-values}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a8678c915fec187a8e63a8894e6a91771}
+This function gets a parameter that is stored in the Q\-B Move memory.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
-{\em param\+\_\+type} & The parameter to be get. \\
+{\em param\-\_\-type} & The parameter to be get. \\
 \hline
 {\em values} & An array with the parameter values. \\
 \hline
-{\em num\+\_\+of\+\_\+values} & The size of the values array.\\
+{\em num\-\_\-of\-\_\-values} & The size of the values array.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -433,21 +455,23 @@ This function gets a parameter that is stored in the QB Move memory.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863}{}\label{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Ping@{comm\+Ping}}
-\index{comm\+Ping@{comm\+Ping}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Ping()}{commPing()}}
-{\footnotesize\ttfamily int comm\+Ping (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id }\end{DoxyParamCaption})}
-
-This function is used to ping the QB Move.
+\hypertarget{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Ping@{comm\-Ping}}
+\index{comm\-Ping@{comm\-Ping}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Ping}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Ping (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a7f95a0e23b674b1fe32b8e35f0e36863}
+This function is used to ping the Q\-B Move.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
-{\em buffer} & Buffer that stores a string with information about the device. B\+U\+F\+F\+ER S\+I\+ZE M\+U\+ST BE AT L\+E\+A\+ST 500.\\
+{\em buffer} & Buffer that stores a string with information about the device. B\-U\-F\-F\-E\-R S\-I\-Z\-E M\-U\-S\-T B\-E A\-T L\-E\-A\-S\-T 500.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -469,19 +493,21 @@ Returns 0 if ping was ok, -\/1 otherwise.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c}{}\label{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Restore\+Params@{comm\+Restore\+Params}}
-\index{comm\+Restore\+Params@{comm\+Restore\+Params}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Restore\+Params()}{commRestoreParams()}}
-{\footnotesize\ttfamily int comm\+Restore\+Params (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id }\end{DoxyParamCaption})}
-
+\hypertarget{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Restore\-Params@{comm\-Restore\-Params}}
+\index{comm\-Restore\-Params@{comm\-Restore\-Params}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Restore\-Params}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Restore\-Params (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_af60062569bcd25b6f2fc19ba378d583c}
 This function restores the factory default parameters.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number.\\
+{\em id} & The device's id number.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -498,19 +524,22 @@ This function restores the factory default parameters.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9}{}\label{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Set\+Inputs@{comm\+Set\+Inputs}}
-\index{comm\+Set\+Inputs@{comm\+Set\+Inputs}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Set\+Inputs()}{commSetInputs()}}
-{\footnotesize\ttfamily void comm\+Set\+Inputs (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{short int}]{inputs\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
-
-This function send reference inputs to a QB Move connected to the serial port.
+\hypertarget{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Set\-Inputs@{comm\-Set\-Inputs}}
+\index{comm\-Set\-Inputs@{comm\-Set\-Inputs}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Set\-Inputs}]{\setlength{\rightskip}{0pt plus 5cm}void comm\-Set\-Inputs (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{short int}]{inputs\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a894f6f9ec9822112ff3c7eef10d123c9}
+This function send reference inputs to a Q\-B Move connected to the serial port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em inputs} & Input references.\\
 \hline
@@ -531,25 +560,30 @@ inputs[1]   = -1000;
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90}{}\label{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Set\+Param@{comm\+Set\+Param}}
-\index{comm\+Set\+Param@{comm\+Set\+Param}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Set\+Param()}{commSetParam()}}
-{\footnotesize\ttfamily int comm\+Set\+Param (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{enum \hyperlink{commands_8h_a0f1ee428e49fc602d6fde71d7ff80f36}{qbmove\+\_\+parameter}}]{type,  }\item[{void $\ast$}]{values,  }\item[{unsigned short}]{num\+\_\+of\+\_\+values }\end{DoxyParamCaption})}
-
-This function sets a parameter that remains stored in the QB Move memory.
+\hypertarget{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Set\-Param@{comm\-Set\-Param}}
+\index{comm\-Set\-Param@{comm\-Set\-Param}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Set\-Param}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Set\-Param (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{enum {\bf qbmove\-\_\-parameter}}]{type, }
+\item[{void $\ast$}]{values, }
+\item[{unsigned short}]{num\-\_\-of\-\_\-values}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_aebe4cb071376ef683b788a3842243e90}
+This function sets a parameter that remains stored in the Q\-B Move memory.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
-{\em param\+\_\+type} & The parameter to be set. \\
+{\em param\-\_\-type} & The parameter to be set. \\
 \hline
 {\em values} & An array with the parameter values. \\
 \hline
-{\em num\+\_\+of\+\_\+values} & The size of the values array.\\
+{\em num\-\_\-of\-\_\-values} & The size of the values array.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -566,19 +600,21 @@ This function sets a parameter that remains stored in the QB Move memory.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20}{}\label{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!comm\+Store\+Params@{comm\+Store\+Params}}
-\index{comm\+Store\+Params@{comm\+Store\+Params}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{comm\+Store\+Params()}{commStoreParams()}}
-{\footnotesize\ttfamily int comm\+Store\+Params (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id }\end{DoxyParamCaption})}
-
-This function stores all parameters that were set in the QB Move memory.
+\hypertarget{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!comm\-Store\-Params@{comm\-Store\-Params}}
+\index{comm\-Store\-Params@{comm\-Store\-Params}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{comm\-Store\-Params}]{\setlength{\rightskip}{0pt plus 5cm}int comm\-Store\-Params (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_ad3359fdac0ba857804dfc4a9bc761b20}
+This function stores all parameters that were set in the Q\-B Move memory.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number.\\
+{\em id} & The device's id number.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -595,17 +631,19 @@ This function stores all parameters that were set in the QB Move memory.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a4d05126da422a8993b011282362c7882}{}\label{qbmove__communications_8h_a4d05126da422a8993b011282362c7882} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!open\+R\+S485@{open\+R\+S485}}
-\index{open\+R\+S485@{open\+R\+S485}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{open\+R\+S485()}{openRS485()}}
-{\footnotesize\ttfamily void open\+R\+S485 (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{const char $\ast$}]{port\+\_\+s }\end{DoxyParamCaption})}
-
-This function is used to open a serial port for using with the QB Move.
+\hypertarget{qbmove__communications_8h_a4d05126da422a8993b011282362c7882}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!open\-R\-S485@{open\-R\-S485}}
+\index{open\-R\-S485@{open\-R\-S485}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{open\-R\-S485}]{\setlength{\rightskip}{0pt plus 5cm}void open\-R\-S485 (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{const char $\ast$}]{port\-\_\-s}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a4d05126da422a8993b011282362c7882}
+This function is used to open a serial port for using with the Q\-B Move.
 
 
 \begin{DoxyParams}{Parameters}
-{\em port\+\_\+s} & The string to the serial port path.\\
+{\em port\-\_\-s} & The string to the serial port path.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -624,19 +662,21 @@ Returns the file descriptor associated to the serial port.
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b}{}\label{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!R\+S485\+Get\+Info@{R\+S485\+Get\+Info}}
-\index{R\+S485\+Get\+Info@{R\+S485\+Get\+Info}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{R\+S485\+Get\+Info()}{RS485GetInfo()}}
-{\footnotesize\ttfamily void R\+S485\+Get\+Info (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{char $\ast$}]{buffer }\end{DoxyParamCaption})}
-
-This function is used to ping the serial port for a QB Move and get information about the device. O\+N\+LY U\+SE W\+H\+EN O\+NE D\+E\+V\+I\+CE IS C\+O\+N\+N\+E\+C\+T\+ED O\+N\+LY.
+\hypertarget{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!R\-S485\-Get\-Info@{R\-S485\-Get\-Info}}
+\index{R\-S485\-Get\-Info@{R\-S485\-Get\-Info}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{R\-S485\-Get\-Info}]{\setlength{\rightskip}{0pt plus 5cm}void R\-S485\-Get\-Info (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{char $\ast$}]{buffer}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a65b0719c48b487b5e7432f794e3fec1b}
+This function is used to ping the serial port for a Q\-B Move and get information about the device. O\-N\-L\-Y U\-S\-E W\-H\-E\-N O\-N\-E D\-E\-V\-I\-C\-E I\-S C\-O\-N\-N\-E\-C\-T\-E\-D O\-N\-L\-Y.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em buffer} & Buffer that stores a string with information about the device. B\+U\+F\+F\+ER S\+I\+ZE M\+U\+ST BE AT L\+E\+A\+ST 500.\\
+{\em buffer} & Buffer that stores a string with information about the device. B\-U\-F\-F\-E\-R S\-I\-Z\-E M\-U\-S\-T B\-E A\-T L\-E\-A\-S\-T 500.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyParagraph}{Example}
@@ -652,21 +692,22 @@ puts(auxstring);
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236}{}\label{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!R\+S485list\+Ports@{R\+S485list\+Ports}}
-\index{R\+S485list\+Ports@{R\+S485list\+Ports}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{R\+S485list\+Ports()}{RS485listPorts()}}
-{\footnotesize\ttfamily int R\+S485list\+Ports (\begin{DoxyParamCaption}\item[{char}]{list\+\_\+of\+\_\+ports\mbox{[}10\mbox{]}\mbox{[}255\mbox{]} }\end{DoxyParamCaption})}
-
-This function is used to return a list of available serial ports. A maximum of 10 ports are found. T\+H\+IS F\+U\+N\+C\+T\+I\+O\+NS IS N\+OT I\+M\+P\+L\+E\+M\+E\+N\+T\+ED F\+OR L\+I\+N\+UX Y\+ET.
+\hypertarget{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!R\-S485list\-Ports@{R\-S485list\-Ports}}
+\index{R\-S485list\-Ports@{R\-S485list\-Ports}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{R\-S485list\-Ports}]{\setlength{\rightskip}{0pt plus 5cm}int R\-S485list\-Ports (
+\begin{DoxyParamCaption}
+\item[{char}]{list\-\_\-of\-\_\-ports\mbox{[}10\mbox{]}\mbox{[}255\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b236}
+This function is used to return a list of available serial ports. A maximum of 10 ports are found. T\-H\-I\-S F\-U\-N\-C\-T\-I\-O\-N\-S I\-S N\-O\-T I\-M\-P\-L\-E\-M\-E\-N\-T\-E\-D F\-O\-R L\-I\-N\-U\-X Y\-E\-T.
 
 \begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000001}{Todo}]Make L\+I\+N\+UX version of this function.\end{DoxyRefDesc}
+\item[\hyperlink{todo__todo000001}{Todo}]Make L\-I\-N\-U\-X version of this function.\end{DoxyRefDesc}
 
 
 
 \begin{DoxyParams}{Parameters}
-{\em list\+\_\+of\+\_\+ports} & An array of strings with the serial ports paths.\\
+{\em list\-\_\-of\-\_\-ports} & An array of strings with the serial ports paths.\\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -687,19 +728,22 @@ num\_ports = \hyperlink{qbmove__communications_8h_a088f2abb4e7610589910e31f5c72b
 \end{DoxyCode}
  
 \end{DoxyParagraph}
-\hypertarget{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d}{}\label{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d} 
-\index{qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}!R\+S485read@{R\+S485read}}
-\index{R\+S485read@{R\+S485read}!qbmove\+\_\+communications.\+h@{qbmove\+\_\+communications.\+h}}
-\subsubsection{\texorpdfstring{R\+S485read()}{RS485read()}}
-{\footnotesize\ttfamily int R\+S485read (\begin{DoxyParamCaption}\item[{\hyperlink{structcomm__settings}{comm\+\_\+settings} $\ast$}]{comm\+\_\+settings\+\_\+t,  }\item[{int}]{id,  }\item[{char $\ast$}]{package }\end{DoxyParamCaption})}
-
+\hypertarget{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d}{\index{qbmove\-\_\-communications.\-h@{qbmove\-\_\-communications.\-h}!R\-S485read@{R\-S485read}}
+\index{R\-S485read@{R\-S485read}!qbmove_communications.h@{qbmove\-\_\-communications.\-h}}
+\subsubsection[{R\-S485read}]{\setlength{\rightskip}{0pt plus 5cm}int R\-S485read (
+\begin{DoxyParamCaption}
+\item[{{\bf comm\-\_\-settings} $\ast$}]{comm\-\_\-settings\-\_\-t, }
+\item[{int}]{id, }
+\item[{char $\ast$}]{package}
+\end{DoxyParamCaption}
+)}}\label{qbmove__communications_8h_a8c7444a05d655538cb7d13ee47290c8d}
 This function is used to read a package from the device.
 
 
 \begin{DoxyParams}{Parameters}
-{\em comm\+\_\+settings\+\_\+t} & A {\itshape \hyperlink{structcomm__settings}{comm\+\_\+settings}} structure containing info about the communication settings.\\
+{\em comm\-\_\-settings\-\_\-t} & A {\itshape \hyperlink{structcomm__settings}{comm\-\_\-settings}} structure containing info about the communication settings.\\
 \hline
-{\em id} & The device\textquotesingle{}s id number. \\
+{\em id} & The device's id number. \\
 \hline
 {\em package} & Package will be stored here.\\
 \hline

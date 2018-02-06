@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['jscontroller',['JSController',['../classaml__ctrl_1_1controllers_1_1js__controller_1_1_j_s_controller.html',1,'aml_ctrl::controllers::js_controller']]],
-  ['jspositioncontroller',['JSPositionController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html',1,'aml_ctrl::controllers::js_controllers::js_postn_controller']]],
-  ['jstorquecontroller',['JSTorqueController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html',1,'aml_ctrl::controllers::js_controllers::js_torque_controller']]],
-  ['jstrajgenerator',['JSTrajGenerator',['../classaml__ctrl_1_1traj__generator_1_1js__traj__generator_1_1_j_s_traj_generator.html',1,'aml_ctrl::traj_generator::js_traj_generator']]]
+  ['handle',['HANDLE',['../qbmove__communications_8h.html#ab521aa5010fb1afb801a899a55569e03',1,'qbmove_communications.h']]],
+  ['handle_5fevent',['handle_event',['../classaml__planners_1_1push__planner_1_1push__worlds_1_1box2d__push__world_1_1_box2_d_push_world.html#aae9b0d62c61d9c32e2373814ff64e869',1,'aml_planners.push_planner.push_worlds.box2d_push_world.Box2DPushWorld.handle_event()'],['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1box2d_1_1pih__world_1_1_p_i_h_world.html#a1df4104a144a66eea9a3dd1d868ad73f',1,'aml_playground.peg_in_hole.pih_worlds.box2d.pih_world.PIHWorld.handle_event()']]],
+  ['hist',['hist',['../classaml__planners_1_1push__planner_1_1push__worlds_1_1plotter_1_1_plotter.html#a080a8bedde0055a10e7f3f9e86a9bab5',1,'aml_planners.push_planner.push_worlds.plotter.Plotter.hist()'],['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1box2d_1_1plotter_1_1_plotter.html#a51f83aad7c45499155f5590fc02313c1',1,'aml_playground.peg_in_hole.pih_worlds.box2d.plotter.Plotter.hist()']]]
 ];

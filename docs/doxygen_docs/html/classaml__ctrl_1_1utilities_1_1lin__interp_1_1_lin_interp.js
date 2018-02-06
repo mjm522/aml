@@ -1,11 +1,11 @@
 var classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp =
 [
-    [ "__init__", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a510909b7cd1fd0fec18444d9ddf93914", null ],
-    [ "configure", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#af86d0e3b306434f7443c9f182b68bb7b", null ],
-    [ "get_interpolated_trajectory", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#ad25640ebae29b62c083c959adc7eb362", null ],
-    [ "lin_step_pos", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#aff59e4d958081c8cf7a38c02f03e17f2", null ],
-    [ "lin_step_qt", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a00fedfe619ef49db994f26bc3d9362a4", null ],
-    [ "plot_lin_interp_traj", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a481f09879b468a539c44b5ba1122b4f1", null ],
+    [ "__init__", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a1e35790a94c93ae7d3d8024028c550ff", null ],
+    [ "configure", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a14a7de9dcf847e85448a5e5b1d061e94", null ],
+    [ "get_interpolated_trajectory", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a50602f7c9cfa8746de0fda436e6b6283", null ],
+    [ "lin_step_pos", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a4938f92638c8384e71cbdc9ca57fd0e0", null ],
+    [ "lin_step_qt", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a4ed2ce1b4e7cc2b115247fb09a7847ad", null ],
+    [ "plot_lin_interp_traj", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#ab08c5f7742c601b1523f7d82216e2f3e", null ],
     [ "dt", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a91ce8d62c538477b2e4e30cc604b9d60", null ],
     [ "goal_pos", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#a2827d5e7e445519eb94643982b8fbe15", null ],
     [ "goal_qt", "classaml__ctrl_1_1utilities_1_1lin__interp_1_1_lin_interp.html#ac042c31929df9c729e392ee7bc72a84a", null ],

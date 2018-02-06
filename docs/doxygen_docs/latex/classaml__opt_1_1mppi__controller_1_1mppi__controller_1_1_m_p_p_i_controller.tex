@@ -1,0 +1,224 @@
+\hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller}{\section{aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller Class Reference}
+\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller}\index{aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller@{aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller}}
+}
+
+
+Inheritance diagram for aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ae231c281d2731163b919cfae98526031}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a22e2e4e882b6786cf5a206906d360a5a}{init}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a687ec79baf303a410b469148db9fd44f}{calc\-\_\-delu}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_acb1e37b0e70f40de3d7924bc3423e670}{get\-\_\-unc}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a2b55b9ba153afbaa57a8b3785b367011}{forward\-\_\-rollout}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ab291469dfce2398f98b5812f25665f65}{forward\-\_\-samples}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a608122d185b4401ca17eb088c72c1a21}{resample\-\_\-samples}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_aecd5cdce0c5364fbcf6ed890b3b1933e}{compute\-\_\-traj\-\_\-probability}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a213f5b0756b132c4e4253baa199cb061}{compute\-\_\-u\-\_\-change}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a689adb7d7d0e10cf9b40b52733c81c5b}{fun\-\_\-to\-\_\-parrallelize}
+\item 
+def \hyperlink{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a04416a629f547bb3a888b479169afda9}{per\-\_\-step\-\_\-iteration}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}Model predictive path integral controller
+The class is able to choose between various types of dynamics models,
+perform forward roll-outs and obtain optimal actions.
+The actions are performed in a model predictive fashion.
+For more details on the approach refer: http://ieeexplore.ieee.org/iel7/8215882/8239529/08246918.pdf
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ae231c281d2731163b919cfae98526031}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fdyn, }
+\item[{}]{cost, }
+\item[{}]{config}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ae231c281d2731163b919cfae98526031}
+\begin{DoxyVerb}Constructor of the class
+Args:
+fdyn = dynamics function handle (this function will be used in the forward simulation)
+cost = cost function handle (this function computes the cost or weight or trajectory, 
+       the types input args of this function can be seen aml_planner/cost)
+config file:
+   dynamics_type = whether is the passed dynamics model is a learned dynamics model
+   dt = time step of forward simulation (type: float)
+   K  = number of look ahead steps of the model predictive approach(type: int)
+   N  = number of samples (type: int)
+   rho = exploation term, this reduces over time on each model predictive iteration (type: float)
+   cmd_dim = dimensions of the control input (type: int)
+   state_dim = dimensions of state control (type: int)
+   use_mc_unc_estimation = whether to use uncertainty (type : bool)
+   resample_proportion = to perform importantance based resampling of the trajectories (optional, type: float)
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a687ec79baf303a410b469148db9fd44f}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!calc\-\_\-delu@{calc\-\_\-delu}}
+\index{calc\-\_\-delu@{calc\-\_\-delu}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{calc\-\_\-delu}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-calc\-\_\-delu (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{t}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a687ec79baf303a410b469148db9fd44f}
+\begin{DoxyVerb}compute the delta u increament exploration that needs to be performed
+Args:
+t = time index
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_aecd5cdce0c5364fbcf6ed890b3b1933e}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!compute\-\_\-traj\-\_\-probability@{compute\-\_\-traj\-\_\-probability}}
+\index{compute\-\_\-traj\-\_\-probability@{compute\-\_\-traj\-\_\-probability}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{compute\-\_\-traj\-\_\-probability}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-compute\-\_\-traj\-\_\-probability (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{ss}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_aecd5cdce0c5364fbcf6ed890b3b1933e}
+\begin{DoxyVerb}Compute the goodness of trajectory and normalise it
+Basically it means we are finding which trajectories are more probable.
+Args: ss = trajectory costs for all samples
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a213f5b0756b132c4e4253baa199cb061}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!compute\-\_\-u\-\_\-change@{compute\-\_\-u\-\_\-change}}
+\index{compute\-\_\-u\-\_\-change@{compute\-\_\-u\-\_\-change}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{compute\-\_\-u\-\_\-change}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-compute\-\_\-u\-\_\-change (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj\-\_\-prob, }
+\item[{}]{delus\-\_\-samples}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a213f5b0756b132c4e4253baa199cb061}
+\begin{DoxyVerb}Compute the incremental u_change of iterative update
+Args: traj_prob = weights of individual trajectories
+    delus_samples = the exploation that was added to the control commands
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a2b55b9ba153afbaa57a8b3785b367011}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!forward\-\_\-rollout@{forward\-\_\-rollout}}
+\index{forward\-\_\-rollout@{forward\-\_\-rollout}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{forward\-\_\-rollout}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-forward\-\_\-rollout (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{u\-\_\-list, }
+\item[{}]{k}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a2b55b9ba153afbaa57a8b3785b367011}
+\begin{DoxyVerb}perform a single rollout for a set of control commands
+Args:
+u_list = list of control commands to perform rollout
+k = number of resampling to be done if required
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ab291469dfce2398f98b5812f25665f65}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!forward\-\_\-samples@{forward\-\_\-samples}}
+\index{forward\-\_\-samples@{forward\-\_\-samples}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{forward\-\_\-samples}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-forward\-\_\-samples (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{us}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_ab291469dfce2398f98b5812f25665f65}
+\begin{DoxyVerb}compute and collect the forward samples
+Args: 
+us : set of control commands
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a689adb7d7d0e10cf9b40b52733c81c5b}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!fun\-\_\-to\-\_\-parrallelize@{fun\-\_\-to\-\_\-parrallelize}}
+\index{fun\-\_\-to\-\_\-parrallelize@{fun\-\_\-to\-\_\-parrallelize}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{fun\-\_\-to\-\_\-parrallelize}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-fun\-\_\-to\-\_\-parrallelize (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{u\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a689adb7d7d0e10cf9b40b52733c81c5b}
+\begin{DoxyVerb}this is function that could be parrallelized to perform parralled rollouts of several
+rollouts for a given set of u_list by perturbing this same list in different amounts
+Currently this funciton is not parrallelized and is performs on a series
+Args: u_list = list of control commands
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_acb1e37b0e70f40de3d7924bc3423e670}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!get\-\_\-unc@{get\-\_\-unc}}
+\index{get\-\_\-unc@{get\-\_\-unc}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{get\-\_\-unc}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-get\-\_\-unc (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x\-\_\-prev, }
+\item[{}]{u, }
+\item[{}]{dt, }
+\item[{}]{n, }
+\item[{}]{noise = {\ttfamily 0.001}}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_acb1e37b0e70f40de3d7924bc3423e670}
+\begin{DoxyVerb}compute the uncertainty of a rollout using monte-carlo sampling
+Args: 
+x_prev = last state
+u = control command
+dt = time step
+n = number of samples
+noise = peturbation
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a22e2e4e882b6786cf5a206906d360a5a}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!init@{init}}
+\index{init@{init}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-init (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x0}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a22e2e4e882b6786cf5a206906d360a5a}
+\begin{DoxyVerb}this function restates after each control action is taken
+in the model predictive fashion
+Args:
+x0 = starting state of each iteration
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a04416a629f547bb3a888b479169afda9}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!per\-\_\-step\-\_\-iteration@{per\-\_\-step\-\_\-iteration}}
+\index{per\-\_\-step\-\_\-iteration@{per\-\_\-step\-\_\-iteration}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{per\-\_\-step\-\_\-iteration}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-per\-\_\-step\-\_\-iteration (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{u\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a04416a629f547bb3a888b479169afda9}
+\begin{DoxyVerb}this is the main loop that performs iterations to find a locally
+optimal control input to be passed on to the robot
+Args: u_list = list of control commands
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a608122d185b4401ca17eb088c72c1a21}{\index{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}!resample\-\_\-samples@{resample\-\_\-samples}}
+\index{resample\-\_\-samples@{resample\-\_\-samples}!aml_opt::mppi_controller::mppi_controller::MPPIController@{aml\-\_\-opt\-::mppi\-\_\-controller\-::mppi\-\_\-controller\-::\-M\-P\-P\-I\-Controller}}
+\subsubsection[{resample\-\_\-samples}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-mppi\-\_\-controller.\-mppi\-\_\-controller.\-M\-P\-P\-I\-Controller.\-resample\-\_\-samples (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller_a608122d185b4401ca17eb088c72c1a21}
+\begin{DoxyVerb}The function that performs sampling importance resampling
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-opt/src/aml\-\_\-opt/mppi\-\_\-controller/mppi\-\_\-controller.\-py\end{DoxyCompactItemize}

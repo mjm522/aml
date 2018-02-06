@@ -1,0 +1,18 @@
+Gazebo simulation with emulated interfaces for the Sawyer robot
+\begin{DoxyItemize}
+\item based on \href{https://github.com/RethinkRobotics/baxter_simulator}{\tt baxter\-\_\-simulator}
+\item using {\ttfamily intera\-\_\-common/intera\-\_\-core\-\_\-msgs} not {\ttfamily baxter\-\_\-common/baxter\-\_\-core\-\_\-msgs}
+\end{DoxyItemize}
+
+\subsection*{\#\#\# Repository overview }
+
+$\vert$ +-- sawyer\-\_\-simulator/ Metapackage $\vert$ +-- sawyer\-\_\-sim\-\_\-description/ Urdf for Gazebo $\vert$ +-- urdf/ $\vert$ +-- launch/ $\vert$ +-- sawyer\-\_\-gazebo/ Gazebo interface for the sawyer that loads the models into simulation $\vert$ +-- src/ $\vert$ +-- launch/ $\vert$ +-- worlds/ $\vert$ +-- sawyer\-\_\-sim\-\_\-controllers/ Controller plugins for sawyer $\vert$ +-- src/ $\vert$ +-- include/ $\vert$ +-- config/ $\vert$ +-- sawyer\-\_\-sim\-\_\-hardware/ This emulates the hardware interfaces of sawyer $\vert$ +-- src/ $\vert$ +-- include/ $\vert$ +-- config/ $\vert$ +-- launch/ $\vert$ +-- sawyer\-\_\-sim\-\_\-kinematics/ Implementation of I\-K, F\-K and gravity compensation for sawyer $\vert$ +-- src/ $\vert$ +-- include/ $\vert$ +-- launch/
+
+\subsection*{\#\#\# T\-O\-D\-O }
+
+
+\begin{DoxyItemize}
+\item Gravity compensation (bug? urdf?)
+\item Tuning pid gain in sawyer\-\_\-sim\-\_\-hardware/config/sawyer\-\_\-sim\-\_\-controllers.\-yaml
+\item Sensor reading 
+\end{DoxyItemize}

@@ -1,0 +1,50 @@
+\hypertarget{classarm__kinematics_1_1_kinematics}{\section{arm\-\_\-kinematics\-:\-:Kinematics Class Reference}
+\label{classarm__kinematics_1_1_kinematics}\index{arm\-\_\-kinematics\-::\-Kinematics@{arm\-\_\-kinematics\-::\-Kinematics}}
+}
+
+
+Collaboration diagram for arm\-\_\-kinematics\-:\-:Kinematics\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classarm__kinematics_1_1_kinematics__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_acccc63bf9ad564b432798a92b7f4f1bd}{typedef boost\-::shared\-\_\-ptr\\*
+$<$ \hyperlink{classarm__kinematics_1_1_kinematics}{Kinematics} $>$ {\bfseries Ptr}}\label{classarm__kinematics_1_1_kinematics_acccc63bf9ad564b432798a92b7f4f1bd}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_aa53318ea68e673df71273f8567fed90b}{bool {\bfseries init\-\_\-grav} ()}\label{classarm__kinematics_1_1_kinematics_aa53318ea68e673df71273f8567fed90b}
+
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_ad9ff5b8c53aa33f4aa32564d4fc46042}{bool {\bfseries init} (std\-::string tip\-\_\-name, int \&no\-\_\-jts)}\label{classarm__kinematics_1_1_kinematics_ad9ff5b8c53aa33f4aa32564d4fc46042}
+
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_ae081313918aec2f76d00196b2cdd33a7}{bool {\bfseries get\-Position\-I\-K} (const geometry\-\_\-msgs\-::\-Pose\-Stamped \&pose\-\_\-stamp, const sensor\-\_\-msgs\-::\-Joint\-State \&seed, sensor\-\_\-msgs\-::\-Joint\-State $\ast$result)}\label{classarm__kinematics_1_1_kinematics_ae081313918aec2f76d00196b2cdd33a7}
+
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_a8cc13d3c9ce515393f6060ef11f98345}{bool {\bfseries get\-Position\-F\-K} (std\-::string frame\-\_\-id, const sensor\-\_\-msgs\-::\-Joint\-State \&joint\-\_\-configuration, geometry\-\_\-msgs\-::\-Pose\-Stamped \&res)}\label{classarm__kinematics_1_1_kinematics_a8cc13d3c9ce515393f6060ef11f98345}
+
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_a26bfc9b1d8355deb1483769ff21d495e}{bool {\bfseries get\-Gravity\-Torques} (const sensor\-\_\-msgs\-::\-Joint\-State joint\-\_\-configuration, intera\-\_\-core\-\_\-msgs\-::\-S\-E\-A\-Joint\-State \&right\-\_\-gravity, bool is\-Enabled)}\label{classarm__kinematics_1_1_kinematics_a26bfc9b1d8355deb1483769ff21d495e}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classarm__kinematics_1_1_kinematics_a5bec450b4a863ba3981dfa846a57e54c}{static Ptr {\bfseries create} (std\-::string tip\-\_\-name, int \&no\-\_\-jts)}\label{classarm__kinematics_1_1_kinematics_a5bec450b4a863ba3981dfa846a57e54c}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-sawyer\-\_\-sim/sawyer\-\_\-sim\-\_\-kinematics/include/sawyer\-\_\-sim\-\_\-kinematics/arm\-\_\-kinematics.\-h\item 
+aml\-\_\-sawyer\-\_\-sim/sawyer\-\_\-sim\-\_\-kinematics/src/arm\-\_\-kinematics.\-cpp\end{DoxyCompactItemize}

@@ -1,6 +1,6 @@
 var classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller =
 [
-    [ "__init__", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#a6a9057f3af216e5baffb06f788cb3a7a", null ],
-    [ "compute_cmd", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#ae53a96d9c5ad714a5f2bd8e7584093e7", null ],
-    [ "send_cmd", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#afe7e4b35075932fbaac675595bc94e55", null ]
+    [ "__init__", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#a3fbf26dde3a732af18afe8be4e83d54e", null ],
+    [ "compute_cmd", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#a3cb752b8f0779f87375a967809b87f1c", null ],
+    [ "send_cmd", "classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__jt__torque__controller_1_1_o_s_j_t_torque_controller.html#aee337f398f6518c05d2cb14da3f78b5e", null ]
 ];

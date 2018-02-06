@@ -1,12 +1,14 @@
 var classaml__data__collec__utils_1_1box__object_1_1_box_object =
 [
-    [ "__init__", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#ac77da9a41411265b2cfbb4d031f5b30d", null ],
-    [ "get_curr_image", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#af55d698d891e6e6c83dea2c1ecf41d8a", null ],
-    [ "get_effect", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#af92e7acabc26299f77a5e95241806aff", null ],
-    [ "get_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a54e242c8ce4f643cab1448da5beac4f8", null ],
-    [ "get_pre_push", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a48d3533233409e3943d143ff25d91e97", null ],
-    [ "get_push_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a73ea10df4cc42b1ac2052172c4ad957d", null ],
-    [ "get_pushes", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a51011584bfe914e45803fdc05109613c", null ],
-    [ "get_reset_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a47ae6d569ccd211a6353de2a687034d2", null ],
-    [ "update_frames", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#af6a670b7ccc37bc3b7a910010167b6fc", null ]
+    [ "__init__", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a0b113ad91ae9191e5f9b22be92b3ac6a", null ],
+    [ "get_box_state", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a7483c6c349ad6fdee4ef76c01bb0cea6", null ],
+    [ "get_curr_image", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a7d9d988a7607d7ff4b7048542a0c37b3", null ],
+    [ "get_effect", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a9f0b232db9ba73d8cbfdbcfad56ea1b6", null ],
+    [ "get_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a9735855fbf5e69e61a921bb6c40d307d", null ],
+    [ "get_pre_push", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#ac0083e59dc6b79f6f57feaaf3352b30c", null ],
+    [ "get_push", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a88af2c9d0a9501750921c75ccc613b55", null ],
+    [ "get_push_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a9953fcbc78eb41c18a3876e21097e65f", null ],
+    [ "get_pushes", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#aa3824a2b91c66708d28b51d3bdc4e409", null ],
+    [ "get_reset_pose", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#a3422f8905c4bb9e15d6af519645f8ccc", null ],
+    [ "update_frames", "classaml__data__collec__utils_1_1box__object_1_1_box_object.html#ab476197b5c0b40ca1276959cf2f53c97", null ]
 ];

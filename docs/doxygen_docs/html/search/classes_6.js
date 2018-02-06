@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['jscontroller',['JSController',['../classaml__ctrl_1_1controllers_1_1js__controller_1_1_j_s_controller.html',1,'aml_ctrl::controllers::js_controller']]],
-  ['jspositioncontroller',['JSPositionController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html',1,'aml_ctrl::controllers::js_controllers::js_postn_controller']]],
-  ['jstorquecontroller',['JSTorqueController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html',1,'aml_ctrl::controllers::js_controllers::js_torque_controller']]],
-  ['jstrajgenerator',['JSTrajGenerator',['../classaml__ctrl_1_1traj__generator_1_1js__traj__generator_1_1_j_s_traj_generator.html',1,'aml_ctrl::traj_generator::js_traj_generator']]]
+  ['gaussianprocess',['GaussianProcess',['../classsrc_1_1aml__dl_1_1gp_1_1simple__gp_1_1_gaussian_process.html',1,'src::aml_dl::gp::simple_gp']]],
+  ['generalpushingmachine',['GeneralPushingMachine',['../classaml__demos_1_1general__pushing__machine_1_1_general_pushing_machine.html',1,'aml_demos::general_pushing_machine']]],
+  ['gpmodel',['GPModel',['../classaml__planners_1_1push__planner_1_1forward__models_1_1gp__model_1_1_g_p_model.html',1,'aml_planners::push_planner::forward_models::gp_model']]]
 ];
