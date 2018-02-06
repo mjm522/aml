@@ -3,8 +3,32 @@ import random
 import numpy as np
 
 class MPPIController(object):
+    """
+    Model predictive path integral controller
+    The class is able to choose between various types of dynamics models,
+    perform forward roll-outs and obtain optimal actions.
+    The actions are performed in a model predictive fashion.
+    For more details on the approach refer: http://ieeexplore.ieee.org/iel7/8215882/8239529/08246918.pdf
+    """
 
     def __init__(self, fdyn, cost, config):
+        """
+        Constructor of the class
+        Args:
+        fdyn = dynamics function handle (this function will be used in the forward simulation)
+        cost = cost function handle (this function computes the cost or weight or trajectory, 
+               the types input args of this function can be seen aml_planner/cost)
+        config file:
+                   dynamics_type = whether is the passed dynamics model is a learned dynamics model
+                   dt = time step of forward simulation (type: float)
+                   K  = number of look ahead steps of the model predictive approach(type: int)
+                   N  = number of samples (type: int)
+                   rho = exploation term, this reduces over time on each model predictive iteration (type: float)
+                   cmd_dim = dimensions of the control input (type: int)
+                   state_dim = dimensions of state control (type: int)
+                   use_mc_unc_estimation = whether to use uncertainty (type : bool)
+                   resample_proportion = to perform importantance based resampling of the trajectories (optional, type: float)
+        """
 
         np.random.seed(config['random_seed'])
 
@@ -50,13 +74,24 @@ class MPPIController(object):
         self._max_itr_conv = 20
 
 
-    def init(self,x0):
+    def init(self, x0):
+        """
+        this function restates after each control action is taken
+        in the model predictive fashion
+        Args:
+        x0 = starting state of each iteration
+        """
 
         self._x0 = x0
 
 
     # Random variation of control command (a random change in the control command)
     def calc_delu(self, t):
+        """
+        compute the delta u increament exploration that needs to be performed
+        Args:
+        t = time index
+        """
         
         return self._rho[t]*np.random.randn(self._cmd_dim) #/np.sqrt(self._dt))
 
@@ -64,6 +99,15 @@ class MPPIController(object):
 
     # Computes average uncertainty by predicting small random perturbations on x_prev, u
     def get_unc(self, x_prev, u, dt, n, noise = 0.001):
+        """
+        compute the uncertainty of a rollout using monte-carlo sampling
+        Args: 
+        x_prev = last state
+        u = control command
+        dt = time step
+        n = number of samples
+        noise = peturbation
+        """
 
         if not self._is_learnt_dyn:
             return 0.0
@@ -78,9 +122,14 @@ class MPPIController(object):
 
         return np.mean(sigmas)
 
-
-
     def forward_rollout(self, u_list, k):
+        """
+        perform a single rollout for a set of control commands
+        Args:
+        u_list = list of control commands to perform rollout
+        k = number of resampling to be done if required
+        """
+
         xs_samples = np.zeros((self._N, self._state_dim)) # Forward trajectory samples
         ss = np.zeros(self._N) # Costs
 
@@ -92,6 +141,7 @@ class MPPIController(object):
             resample_flag = False
         
         xs_samples[0,:] = self._x0.copy()
+
         def comp_unc(x, us, dt, sigma, iter):
 
             if self._use_mc_unc:
@@ -121,6 +171,11 @@ class MPPIController(object):
 
 
     def forward_samples(self, us):
+        """
+        compute and collect the forward samples
+        Args: 
+        us : set of control commands
+        """
 
         if (self._itr != 0): # and (self._resamp_p > 0)
             self._resamples = self.resample_samples()
@@ -139,6 +194,9 @@ class MPPIController(object):
 
 
     def resample_samples(self):
+        """
+        The function that performs sampling importance resampling
+        """
 
         resamples = []
         #proportion of old samples: p
@@ -159,6 +217,11 @@ class MPPIController(object):
         return np.asarray(resamples)
 
     def compute_traj_probability(self, ss):
+        """
+        Compute the goodness of trajectory and normalise it
+        Basically it means we are finding which trajectories are more probable.
+        Args: ss = trajectory costs for all samples
+        """
         exp_ss = np.exp(-self._h*ss)
         denominators = np.sum(exp_ss, axis=0)
         exp_ss =  exp_ss[:,:,None]/denominators[None,:,None]
@@ -166,6 +229,11 @@ class MPPIController(object):
 
 
     def compute_u_change(self, traj_prob, delus_samples):
+        """
+        Compute the incremental u_change of iterative update
+        Args: traj_prob = weights of individual trajectories
+            delus_samples = the exploation that was added to the control commands
+        """
         
         delus_samples = np.multiply(traj_prob, delus_samples)
         delus_samples[np.isnan(delus_samples)] = 0.
@@ -193,6 +261,12 @@ class MPPIController(object):
 
 
     def fun_to_parrallelize(self, u_list):
+        """
+        this is function that could be parrallelized to perform parralled rollouts of several
+        rollouts for a given set of u_list by perturbing this same list in different amounts
+        Currently this funciton is not parrallelized and is performs on a series
+        Args: u_list = list of control commands
+        """
         tic = time.time()
 
         xs_samples, ss, delus_samples = self.forward_samples(u_list)
@@ -218,6 +292,11 @@ class MPPIController(object):
 
 
     def per_step_iteration(self, u_list):
+        """
+        this is the main loop that performs iterations to find a locally
+        optimal control input to be passed on to the robot
+        Args: u_list = list of control commands
+        """
         local_cost = 1000.
         itr = 0
         self._rho = self._rho_bkup.copy()
