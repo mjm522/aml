@@ -26,7 +26,7 @@ import quaternion
 menu_handler = MenuHandler()
 destinationMarker = RvizMarkers()
 
-def processFeedback(feedback):
+def process_feedback(feedback):
     p = feedback.pose.position
     q = feedback.pose.orientation
     # print q.x, q.y, q.z, q.w
@@ -46,7 +46,7 @@ def processFeedback(feedback):
 
     rate.sleep()
 
-def switchArm(armfeedback):
+def switch_arm(armfeedback):
     global ctrlr, limb
     if armfeedback.menu_entry_id == 2:
         limb = r_limb
@@ -55,10 +55,10 @@ def switchArm(armfeedback):
         limb = l_limb
         print "Left arm selected"
 
-    ctrlr = setController(control_id, limb)
+    ctrlr = set_controller(control_id, limb)
     ctrlr.set_active(True)
 
-def setController(controller_id, arm):
+def set_controller(controller_id, arm):
     global controller_defined, ctrlr
     if controller_defined:
         ctrlr.set_active(False)
@@ -75,7 +75,7 @@ def setController(controller_id, arm):
     controller_defined = True
     return controller
 
-def switchController(switch_control_feedback):
+def switch_controller(switch_control_feedback):
     global limb, ctrlr, control_id
     if switch_control_feedback.menu_entry_id == 5:
         print "Switching to Position Control"
@@ -89,21 +89,22 @@ def switchController(switch_control_feedback):
     if switch_control_feedback.menu_entry_id == 8:
         print "Switching to Impedance Control"
         control_id = 4
-    ctrlr = setController(control_id,limb)
+    ctrlr = set_controller(control_id,limb)
     ctrlr.set_active(True)
 
 def init_menu():
     arm_menu = menu_handler.insert("Arm")
-    menu_handler.insert( "Right arm", parent = arm_menu, callback=switchArm )
-    menu_handler.insert( "Left arm", parent = arm_menu, callback=switchArm )
+    menu_handler.insert( "Right arm", parent = arm_menu, callback=switch_arm )
+    menu_handler.insert( "Left arm", parent = arm_menu, callback=switch_arm )
 
     control_menu = menu_handler.insert("Controller")
-    menu_handler.insert("Position Controller", parent = control_menu, callback =  switchController)
-    menu_handler.insert("Velocity Controller", parent = control_menu, callback =  switchController)
-    menu_handler.insert("Torque Controller", parent = control_menu, callback =  switchController)
-    menu_handler.insert("Impedance Controller", parent = control_menu, callback = switchController)
+    menu_handler.insert("Position Controller", parent = control_menu, callback =  switch_controller)
+    menu_handler.insert("Velocity Controller", parent = control_menu, callback =  switch_controller)
+    menu_handler.insert("Torque Controller", parent = control_menu, callback =  switch_controller)
+    menu_handler.insert("Impedance Controller", parent = control_menu, callback = switch_controller)
 
 if __name__=="__main__":
+    
     if not len(sys.argv) == 2:
         if len(sys.argv) == 1:
             control_id = 1
@@ -138,7 +139,7 @@ if __name__=="__main__":
     l_limb.untuck_arm()
 
     limb = r_limb
-    ctrlr = setController(control_id, limb)
+    ctrlr = set_controller(control_id, limb)
 
     start_pos, start_ori = limb.get_ee_pose()
     goal_ori = start_ori#quaternion.as_float_array(start_ori)
@@ -151,7 +152,7 @@ if __name__=="__main__":
     # create an interactive marker for our server
     position = Point( start_pos[0], start_pos[1], start_pos[2])
     marker = destinationMarker.makeMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, quaternion.as_float_array(start_ori), True)
-    server.insert(marker, processFeedback)
+    server.insert(marker, process_feedback)
     menu_handler.apply( server, marker.name )
 
     # 'commit' changes and send to all clients

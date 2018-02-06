@@ -1,7 +1,9 @@
 
 
 class Cost(object):
-
+	"""
+	Abstract class of the various types of cost
+	"""
 
     def __init__(self, config):
         """ Not implemented """
@@ -10,8 +12,6 @@ class Cost(object):
 
 
     def get(self, x, u, du, sigma, t):
-
-        """ Not implemented """
 
         pass
 

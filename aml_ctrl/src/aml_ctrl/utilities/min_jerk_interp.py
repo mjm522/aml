@@ -1,8 +1,7 @@
-import numpy as np
-import quaternion
 import copy
-
-from aml_lfd.utilities.utilities import compute_w
+import quaternion
+import numpy as np
+from aml_math.quaternion_utils import compute_w
 
 class MinJerkInterp():
     def __init__(self, dt=0.05, tau=5.):

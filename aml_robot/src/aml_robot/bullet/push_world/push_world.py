@@ -36,7 +36,7 @@ class PushWorld():
 
         pb.resetBasePositionAndOrientation(self._world_id, np.array([0., 0., -0.5]), np.array([0.,0.,0.,1]))
 
-        self._robot    = BulletRobot(robot_id=robot_id, ee_link_idx=-1, config=config_push_world)
+        self._robot  = BulletRobot(robot_id=robot_id, ee_link_idx=-1, config=config_push_world)
 
         self._box.configure_default_pos(np.array([0., 0., 0.]), np.array([0.,0.,0.,1]))
 
