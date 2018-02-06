@@ -78,14 +78,14 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install protobuf
+    pip install protobuf pandas
 
-#RUN bin/bash -c "cd /tmp && \
-#                 git clone https://github.com/pybox2d/pybox2d && \
-#                 cd pybox2d && \
-#                 python setup.py build && \
-#                 python setup.py install"
-#RUN rm -rf /tmp/pybox2d*
+RUN bin/bash -c "cd /tmp && \
+                 git clone https://github.com/pybox2d/pybox2d && \
+                 cd pybox2d && \
+                 python setup.py build && \
+                 python setup.py install"
+RUN rm -rf /tmp/pybox2d*
 
 
 #six PySide

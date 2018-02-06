@@ -21,7 +21,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install protobuf
+    pip install protobuf pandas
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \
