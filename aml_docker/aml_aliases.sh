@@ -7,7 +7,7 @@ command_exists () {
     type "$1" &> /dev/null ;
 }
 
-if command_exists nvidia-docker; then
+if command_exists nvidia-docker && [ -z "$AML_DOCKER_NOFORCE_INTEL" ]; then
       extra_params=''
       alias xdocker="nvidia-docker"
       echo "nvidia-docker exists"
