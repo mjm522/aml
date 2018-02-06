@@ -1,0 +1,171 @@
+\hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt}{\section{aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt Class Reference}
+\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt}\index{aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt@{aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt}}
+}
+
+
+Inheritance diagram for aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a0a71f80fcff8bdf8328ae0a532125e1d}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a4005747e098a9549c82f7c4905a071a7}{put\-\_\-state\-\_\-constraints}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a9048ee7c5eefabd1b60cb9ae8a4110ed}{get\-\_\-traj\-\_\-samples}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a29e2be5e4e1269619e32fc8526d9fe09}{compute\-\_\-traj\-\_\-change}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_adbdd2dacb2bf0a3abe79752034074d0c}{savitsky\-\_\-gollay\-\_\-filter}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_ab61b672735f26076de753af61ad0fd6c}{modify\-\_\-traj}
+\item 
+def \hyperlink{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a98370ec436863fadd75ccc95ed4eaa83}{run}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}Class that utilizes PI2 algorithm to optimize a trajectory
+The algorithm, starts from a initial trajectory and incrementally modifies 
+it to find a lower cost trajectory
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a0a71f80fcff8bdf8328ae0a532125e1d}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{config, }
+\item[{}]{cost\-\_\-fn, }
+\item[{}]{visualize\-\_\-fn = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a0a71f80fcff8bdf8328ae0a532125e1d}
+\begin{DoxyVerb}Constructor of the PITraj class.
+Args: 
+config: 
+N: time steps of a trajectory
+K: no of rollouts that should be performed to collect trajectories
+h: the scalar tuning parameter of the PI2 algorithm
+gain: the coefficient that determines the amount of mixing
+max_iter: maximum number of iterations by the PI2 algorithm
+num_traj: total number of trajectories in the optimizer
+smooth_traj: whether to smooth a trajectory or not
+state_constraints: given as a dict {'min':[], 'max':[]}
+init_traj: optional input argument, gives an initial idea of the trajectory
+start: start of the trajectory, the optimizer optimises point except start and end
+goal: end point of the trajectory
+
+cost_fn: handle to the cost function, this function accepts and entire trajecotry sample (array[no_dimension, time_steps])
+and returns a scalar cost for the trajectory
+
+visualize_fn: handle to the plotting tool, this function accepts and an entire trajectory sample to display it
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a29e2be5e4e1269619e32fc8526d9fe09}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!compute\-\_\-traj\-\_\-change@{compute\-\_\-traj\-\_\-change}}
+\index{compute\-\_\-traj\-\_\-change@{compute\-\_\-traj\-\_\-change}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{compute\-\_\-traj\-\_\-change}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-compute\-\_\-traj\-\_\-change (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{cost\-\_\-samples, }
+\item[{}]{del\-\_\-traj\-\_\-samples}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a29e2be5e4e1269619e32fc8526d9fe09}
+\begin{DoxyVerb}this function compute the required trajectory change based on cost of each trajectory
+low cost trajectories will be preferred to high cost trajectories
+Args: 
+cost_samples: cost values assosciated with each trajectory rollout
+del_traj_samples: the exploratory trajectory change that was supplied 
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a9048ee7c5eefabd1b60cb9ae8a4110ed}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!get\-\_\-traj\-\_\-samples@{get\-\_\-traj\-\_\-samples}}
+\index{get\-\_\-traj\-\_\-samples@{get\-\_\-traj\-\_\-samples}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{get\-\_\-traj\-\_\-samples}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-get\-\_\-traj\-\_\-samples (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj, }
+\item[{}]{gain = {\ttfamily 1e-\/0}}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a9048ee7c5eefabd1b60cb9ae8a4110ed}
+\begin{DoxyVerb}this function computes the trajectory samples for a given trajectory
+Args: 
+traj: a trajectory sample
+gain: exploratory gain. High value of this can make the algorithm numerically unstable.
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_ab61b672735f26076de753af61ad0fd6c}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!modify\-\_\-traj@{modify\-\_\-traj}}
+\index{modify\-\_\-traj@{modify\-\_\-traj}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{modify\-\_\-traj}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-modify\-\_\-traj (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj, }
+\item[{}]{traj\-\_\-change\-\_\-gain = {\ttfamily 1e-\/1}}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_ab61b672735f26076de753af61ad0fd6c}
+\begin{DoxyVerb}this function computes the stochastic incremental change to the existing path
+depending on the forward rollouts
+Args:
+traj: input trajectory
+traj_change_gain: the parameter that scales the change to a trajectory, this should not be a very large value
+since it can make the convergence numerically unstable
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a4005747e098a9549c82f7c4905a071a7}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!put\-\_\-state\-\_\-constraints@{put\-\_\-state\-\_\-constraints}}
+\index{put\-\_\-state\-\_\-constraints@{put\-\_\-state\-\_\-constraints}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{put\-\_\-state\-\_\-constraints}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-put\-\_\-state\-\_\-constraints (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a4005747e098a9549c82f7c4905a071a7}
+\begin{DoxyVerb}this function enforces the state constraints on the trajectory
+the exploration can lead to creation of trajectories that are outside the 
+constraints, this function de-limits them
+Args:
+traj: input trajectory
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a98370ec436863fadd75ccc95ed4eaa83}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!run@{run}}
+\index{run@{run}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-run (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_a98370ec436863fadd75ccc95ed4eaa83}
+\begin{DoxyVerb}the main function that runs the algorithm
+Args: None
+\end{DoxyVerb}
+ \hypertarget{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_adbdd2dacb2bf0a3abe79752034074d0c}{\index{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}!savitsky\-\_\-gollay\-\_\-filter@{savitsky\-\_\-gollay\-\_\-filter}}
+\index{savitsky\-\_\-gollay\-\_\-filter@{savitsky\-\_\-gollay\-\_\-filter}!aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt@{aml\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::pi\-\_\-traj\-\_\-opt\-::\-P\-I\-Traj\-Opt}}
+\subsubsection[{savitsky\-\_\-gollay\-\_\-filter}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-pi\-\_\-traj\-\_\-opt.\-P\-I\-Traj\-Opt.\-savitsky\-\_\-gollay\-\_\-filter (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj}
+\end{DoxyParamCaption}
+)}}\label{classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt_adbdd2dacb2bf0a3abe79752034074d0c}
+\begin{DoxyVerb}this is a smoothing filter that helps to make 
+the exploratory trajectories smooth.
+This is an optional part and is implemented depending on the self._smooth_traj variable
+Args:
+traj: input trajectory
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-opt/src/aml\-\_\-opt/pi\-\_\-traj\-\_\-opt/pi\-\_\-traj\-\_\-opt.\-py\end{DoxyCompactItemize}

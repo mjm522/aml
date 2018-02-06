@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['recordsample',['RecordSample',['../classaml__data__collec__utils_1_1record__sample_1_1_record_sample.html',1,'aml_data_collec_utils::record_sample']]],
-  ['robotinterface',['RobotInterface',['../classaml__robot_1_1robot__interface_1_1_robot_interface.html',1,'aml_robot::robot_interface']]]
+  ['nnpushfwdmodel',['NNPushFwdModel',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html',1,'src::aml_dl::mdn::model::nn_push_fwd_model']]]
 ];

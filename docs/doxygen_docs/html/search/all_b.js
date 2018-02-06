@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['nnpushfwdmodel',['NNPushFwdModel',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html',1,'src::aml_dl::mdn::model::nn_push_fwd_model']]]
+  ['k',['K',['../classsrc_1_1aml__dl_1_1gp_1_1simple__gp_1_1_gaussian_process.html#ad9fa07865dca3b3beb3ffa280fd6ae71',1,'src::aml_dl::gp::simple_gp::GaussianProcess']]],
+  ['kinematics',['Kinematics',['../classarm__kinematics_1_1_kinematics.html',1,'arm_kinematics']]],
+  ['kinematics',['kinematics',['../namespacekinematics.html',1,'']]]
 ];

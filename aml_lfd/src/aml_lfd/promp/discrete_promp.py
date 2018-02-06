@@ -53,7 +53,8 @@ class Phase():
 
 class DiscretePROMP(object):
     """
-    Discrete PROMP
+    Discrete PROMP for more details on the implementation
+    of the this, refer : https://link.springer.com/article/10.1007/s10514-017-9648-7
     """
 
     def __init__(self, data, num_bfs=35, bfs_sigma=0.0286, num_centers_outside_range=2.):
@@ -107,6 +108,14 @@ class DiscretePROMP(object):
 
 
     def generate_basis_function(self, phase_z, phase_zd, phase_zdd):
+        """
+        This function generates the basis funciton, first derivative and second derivative
+        from a phase
+        Args:
+        phase_z   = phase of the trajectory (type: np.array([time steps, 1]))
+        phaze_zd  = velocity of the phase (type: np.array([time steps, 1]))
+        phaze_zds = acceleration of the phase (type: np.array([time steps, 1]))
+        """
 
         # basis functions
         phase_minus_centre = np.array(map(lambda x: x - self._bfs_centres, np.tile(phase_z, (self._n_bfs, 1)).T)).T
@@ -163,10 +172,14 @@ class DiscretePROMP(object):
         """
         This function is for adding the temporal scalability for 
         the basis function
+        Args:
+        dt = time step
+        phase_speed =  speed at which the phase has to evolve 0<speed<1, the trajectory rolls faster
+        phase speed > 1 the trajectory rolls slower, too high values produces numerical instability
         """
         num_time_steps = int(self._traj_len / phase_speed)
 
-        phase = Phase(dt=self._dt, phase_speed=phase_speed, time_steps=num_time_steps)
+        phase = Phase(dt=dt, phase_speed=phase_speed, time_steps=num_time_steps)
 
         return phase
 
@@ -273,6 +286,8 @@ class DiscretePROMP(object):
     def get_bounds(self, t_index):
         """
         compute bounds of a value at a specific time index
+        Args: 
+        t_index = time index of a trajectory
         """
         mean = self.get_mean(t_index)
         std  = self.get_std()
@@ -281,6 +296,9 @@ class DiscretePROMP(object):
 
     def generate_trajectory(self, phase_speed=1., randomness=1e-4):
         """
+        Args: 
+        phase_speed = speed at which the trajectory rolls
+        randomness  = randomness to sample the weight of the basis function
         Outputs a trajectory
         :param randomness: float between 0. (output will be the mean of gaussians) and 1. (fully randomized inside the variance)
         :return: a 1-D vector of the generated points

@@ -1,0 +1,82 @@
+\hypertarget{classkinematics_1_1position__kinematics}{\section{kinematics\-:\-:position\-\_\-kinematics Class Reference}
+\label{classkinematics_1_1position__kinematics}\index{kinematics\-::position\-\_\-kinematics@{kinematics\-::position\-\_\-kinematics}}
+}
+
+
+Collaboration diagram for kinematics\-:\-:position\-\_\-kinematics\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{classkinematics_1_1position__kinematics__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classkinematics_1_1position__kinematics_a53ee0691aa91508e59b930b21dd0edad}{typedef boost\-::shared\-\_\-ptr\\*
+$<$ \hyperlink{classkinematics_1_1position__kinematics}{position\-\_\-kinematics} $>$ \hyperlink{classkinematics_1_1position__kinematics_a53ee0691aa91508e59b930b21dd0edad}{poskin\-\_\-ptr}}\label{classkinematics_1_1position__kinematics_a53ee0691aa91508e59b930b21dd0edad}
+
+\begin{DoxyCompactList}\small\item\em return types of \hyperlink{classkinematics_1_1position__kinematics_a589bbfbe9e504e5b9f74755b692cab8b}{create()} and create\-On\-Stack() \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classkinematics_1_1position__kinematics_a2659fecf1d5181ff470474218267fc0c}{run} ()
+\item 
+void \hyperlink{classkinematics_1_1position__kinematics_a7b3684100673777bdcc93fa323bf2d8e}{exit} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{classkinematics_1_1position__kinematics_a53ee0691aa91508e59b930b21dd0edad}{poskin\-\_\-ptr} \hyperlink{classkinematics_1_1position__kinematics_a589bbfbe9e504e5b9f74755b692cab8b}{create} (std\-::string side)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classkinematics_1_1position__kinematics_a659a8cef00bba971f202464e054f6bc5}{init} (std\-::string side)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classkinematics_1_1position__kinematics_a589bbfbe9e504e5b9f74755b692cab8b}{\index{kinematics\-::position\-\_\-kinematics@{kinematics\-::position\-\_\-kinematics}!create@{create}}
+\index{create@{create}!kinematics::position_kinematics@{kinematics\-::position\-\_\-kinematics}}
+\subsubsection[{create}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf poskin\-\_\-ptr} kinematics\-::position\-\_\-kinematics\-::create (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{side}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classkinematics_1_1position__kinematics_a589bbfbe9e504e5b9f74755b692cab8b}
+Factory method that creates a new instance of position\-\_\-kinematics(), calls init and returns initialized non-\/\-N\-U\-L\-L pointer if init succeeds. Returns an empty pointer when init fails. Design pattern expects that we always check to see if a pointer is not N\-U\-L\-L before assuming we can use it.
+
+\begin{DoxyReturn}{Returns}
+boost\-::shared\-\_\-ptr 
+\end{DoxyReturn}
+\hypertarget{classkinematics_1_1position__kinematics_a7b3684100673777bdcc93fa323bf2d8e}{\index{kinematics\-::position\-\_\-kinematics@{kinematics\-::position\-\_\-kinematics}!exit@{exit}}
+\index{exit@{exit}!kinematics::position_kinematics@{kinematics\-::position\-\_\-kinematics}}
+\subsubsection[{exit}]{\setlength{\rightskip}{0pt plus 5cm}void kinematics\-::position\-\_\-kinematics\-::exit (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classkinematics_1_1position__kinematics_a7b3684100673777bdcc93fa323bf2d8e}
+Method that allows signals (from their main function) to trigger any cleanup and manually exit the node's run loop. This is usually triggered by capturing a S\-I\-G\-T\-E\-R\-M, etc. \hypertarget{classkinematics_1_1position__kinematics_a659a8cef00bba971f202464e054f6bc5}{\index{kinematics\-::position\-\_\-kinematics@{kinematics\-::position\-\_\-kinematics}!init@{init}}
+\index{init@{init}!kinematics::position_kinematics@{kinematics\-::position\-\_\-kinematics}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}bool kinematics\-::position\-\_\-kinematics\-::init (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{side}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classkinematics_1_1position__kinematics_a659a8cef00bba971f202464e054f6bc5}
+Method to initialize the publishing and subscribing topics, services and to acquire the resources required \begin{DoxyReturn}{Returns}
+true if succeeds. 
+\end{DoxyReturn}
+\hypertarget{classkinematics_1_1position__kinematics_a2659fecf1d5181ff470474218267fc0c}{\index{kinematics\-::position\-\_\-kinematics@{kinematics\-::position\-\_\-kinematics}!run@{run}}
+\index{run@{run}!kinematics::position_kinematics@{kinematics\-::position\-\_\-kinematics}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void kinematics\-::position\-\_\-kinematics\-::run (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classkinematics_1_1position__kinematics_a2659fecf1d5181ff470474218267fc0c}
+Method that serves as the main execution loop of the Node. This is called in the main() function to 'run' and only returns after exit or ros\-::shutdown is called. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-sawyer\-\_\-sim/sawyer\-\_\-sim\-\_\-kinematics/include/sawyer\-\_\-sim\-\_\-kinematics/position\-\_\-kinematics.\-h\item 
+aml\-\_\-sawyer\-\_\-sim/sawyer\-\_\-sim\-\_\-kinematics/src/position\-\_\-kinematics.\-cpp\end{DoxyCompactItemize}

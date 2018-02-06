@@ -1,0 +1,102 @@
+\hypertarget{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter}{\section{src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter Class Reference}
+\label{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter}\index{src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter@{src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter}}
+}
+
+
+Inheritance diagram for src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ae576639042e298c74a8087bb9e6783e9}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ac0e20b548ebe5b280b5294f79c189ba3}{setup\-\_\-listener}
+\item 
+def \hyperlink{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_a9c42d47e7912c065006aef42f687471d}{listener\-\_\-callback}
+\item 
+def \hyperlink{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_abd6a89a579282e21da25ae864e5aac45}{run}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This is the master class that acts as a listener socket to
+the plot stream class. This class continously listens to the 
+client and accepts a connection.
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ae576639042e298c74a8087bb9e6783e9}{\index{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!src::aml_visual_tools::master_client_plotter::MasterPlotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{port\-\_\-num = {\ttfamily 6000}, }
+\item[{}]{plot\-\_\-title = {\ttfamily \char`\"{}master\-\_\-plot\char`\"{}}, }
+\item[{}]{plot\-\_\-size = {\ttfamily None}, }
+\item[{}]{max\-\_\-plot\-\_\-length = {\ttfamily 200}}
+\end{DoxyParamCaption}
+)}}\label{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ae576639042e298c74a8087bb9e6783e9}
+\begin{DoxyVerb}Constructor of the class
+Args: 
+port_num: the port on the local machine
+plot_title: name of the plot window
+plot_size: size of the plot window; defualt is (10,5)
+max_plot_length: length of the plot window
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_a9c42d47e7912c065006aef42f687471d}{\index{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}!listener\-\_\-callback@{listener\-\_\-callback}}
+\index{listener\-\_\-callback@{listener\-\_\-callback}!src::aml_visual_tools::master_client_plotter::MasterPlotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}}
+\subsubsection[{listener\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}def src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter.\-listener\-\_\-callback (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_a9c42d47e7912c065006aef42f687471d}
+\begin{DoxyVerb}The function that constantly monitors the client
+This expects a numpy array in string format as the data input
+For a demo, please chek aml_visual_tools/demos/demo_plot_data_stream.py
+\end{DoxyVerb}
+ \hypertarget{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_abd6a89a579282e21da25ae864e5aac45}{\index{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}!run@{run}}
+\index{run@{run}!src::aml_visual_tools::master_client_plotter::MasterPlotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter.\-run (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_abd6a89a579282e21da25ae864e5aac45}
+\begin{DoxyVerb}This function runs continously listening
+to any messages sent from the client
+\end{DoxyVerb}
+ \hypertarget{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ac0e20b548ebe5b280b5294f79c189ba3}{\index{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}!setup\-\_\-listener@{setup\-\_\-listener}}
+\index{setup\-\_\-listener@{setup\-\_\-listener}!src::aml_visual_tools::master_client_plotter::MasterPlotter@{src\-::aml\-\_\-visual\-\_\-tools\-::master\-\_\-client\-\_\-plotter\-::\-Master\-Plotter}}
+\subsubsection[{setup\-\_\-listener}]{\setlength{\rightskip}{0pt plus 5cm}def src.\-aml\-\_\-visual\-\_\-tools.\-master\-\_\-client\-\_\-plotter.\-Master\-Plotter.\-setup\-\_\-listener (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{port\-\_\-num}
+\end{DoxyParamCaption}
+)}}\label{classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter_ac0e20b548ebe5b280b5294f79c189ba3}
+\begin{DoxyVerb}The function that sets up listener.
+The port number is the port on the local machine
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-visual\-\_\-tools/src/aml\-\_\-visual\-\_\-tools/master\-\_\-client\-\_\-plotter.\-py\end{DoxyCompactItemize}

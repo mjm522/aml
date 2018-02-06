@@ -1,12 +1,12 @@
 var classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model =
 [
-    [ "__init__", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#abba6ee2442f278244138b2895c5794ca", null ],
-    [ "configure_data", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a07528b2685be54ed8945d38a975f7da1", null ],
-    [ "get_data", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a6e33c519a1935e62ee9a2313934c28f3", null ],
-    [ "get_model_path", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a86df4f9ff970b225dba286cf4479a2e0", null ],
-    [ "init_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#adf7d8d72b613e45b2435083f252788b4", null ],
-    [ "load_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a5ef5396697c19ed09e34bf711c8af604", null ],
-    [ "run_op", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a91dfe860df5e0a8414f473e4ea5c75ab", null ],
-    [ "save_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#aee153d417bd2134f2af6db35d245777d", null ],
-    [ "train", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a2a28c60e16552d4c98bf3a3d888e2837", null ]
+    [ "__init__", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#ad6652bf559d5bd2c1b19b04bf33df75b", null ],
+    [ "configure_data", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a858340bd817662925dbb6e9a8b18a849", null ],
+    [ "get_data", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a8cca0e360546da170f5aa656c8d9cd4d", null ],
+    [ "get_model_path", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a44e6e7d86d8fd315ea9f28f33596974c", null ],
+    [ "init_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a783d2019673c0be1d1e7b83b1267c573", null ],
+    [ "load_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#ae44f259bf2a404429c94feef99ef438c", null ],
+    [ "run_op", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#ab003cc5a0d648c7382ad78623298c394", null ],
+    [ "save_model", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a73d0861f6862f8febd63dfeb09962f44", null ],
+    [ "train", "classsrc_1_1aml__dl_1_1mdn_1_1model_1_1nn__push__fwd__model_1_1_n_n_push_fwd_model.html#a963312f51065b84cdaa12fb6fb71a1f8", null ]
 ];

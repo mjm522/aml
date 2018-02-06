@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['check_5foffset',['check_offset',['../classaml__lfd_1_1dmp_1_1discrete__dmp__shell_1_1_discrete_d_m_p_shell.html#a10cec75150acb1c2e426fc17ce22bde6',1,'aml_lfd::dmp::discrete_dmp_shell::DiscreteDMPShell']]],
+  ['calc_5fdelu',['calc_delu',['../classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html#a687ec79baf303a410b469148db9fd44f',1,'aml_opt::mppi_controller::mppi_controller::MPPIController']]],
+  ['clear_5fviapoints',['clear_viapoints',['../classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a3f8d736f60febfdf772a90340a94582c',1,'aml_lfd::promp::discrete_promp::DiscretePROMP']]],
   ['closers485',['closeRS485',['../qbmove__communications_8h.html#a5f87643fab51e02e4eab71bf4ab1a33a',1,'qbmove_communications.h']]],
+  ['collect_5fdemo',['collect_demo',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_p_i_h_world.html#ae1ac8f9db87c00650b6e8764f8760bfa',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world::PIHWorld']]],
   ['commactivate',['commActivate',['../qbmove__communications_8h.html#aff081c6687d87e38cddfe714ad2de0fd',1,'qbmove_communications.h']]],
   ['commgetactivate',['commGetActivate',['../qbmove__communications_8h.html#abaec903aef1ce3cebb5f42f63995c2e1',1,'qbmove_communications.h']]],
   ['commgetcurrents',['commGetCurrents',['../qbmove__communications_8h.html#a4b3c724150046fc4a766db52fa086fdf',1,'qbmove_communications.h']]],
@@ -14,5 +16,22 @@ var searchData=
   ['commrestoreparams',['commRestoreParams',['../qbmove__communications_8h.html#af60062569bcd25b6f2fc19ba378d583c',1,'qbmove_communications.h']]],
   ['commsetinputs',['commSetInputs',['../qbmove__communications_8h.html#a894f6f9ec9822112ff3c7eef10d123c9',1,'qbmove_communications.h']]],
   ['commsetparam',['commSetParam',['../qbmove__communications_8h.html#aebe4cb071376ef683b788a3842243e90',1,'qbmove_communications.h']]],
-  ['commstoreparams',['commStoreParams',['../qbmove__communications_8h.html#ad3359fdac0ba857804dfc4a9bc761b20',1,'qbmove_communications.h']]]
+  ['commstoreparams',['commStoreParams',['../qbmove__communications_8h.html#ad3359fdac0ba857804dfc4a9bc761b20',1,'qbmove_communications.h']]],
+  ['compute_5fcontrol_5fcmd',['compute_control_cmd',['../classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl.html#ae8ae663183befe2c2091471c2fb508cd',1,'aml_lfd::promp::promp_ctrl::PROMPCtrl']]],
+  ['compute_5fctrl_5ftraj',['compute_ctrl_traj',['../classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl.html#a2ad503db99e10376b97446bb83388cb4',1,'aml_lfd::promp::promp_ctrl::PROMPCtrl']]],
+  ['compute_5fgain_5ftraj',['compute_gain_traj',['../classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl.html#a45927c8b863935f08d4979a99b252741',1,'aml_lfd::promp::promp_ctrl::PROMPCtrl']]],
+  ['compute_5fgains',['compute_gains',['../classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl.html#aa4f2e09432c78502d0c539d5f00bd479',1,'aml_lfd::promp::promp_ctrl::PROMPCtrl']]],
+  ['compute_5fjs_5fctrlr_5fcmd',['compute_js_ctrlr_cmd',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_p_i_h_world.html#a39c3f19a9be1cf34e371dfecfad0ea6b',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world::PIHWorld']]],
+  ['compute_5fos_5fctrlr_5fcmd',['compute_os_ctrlr_cmd',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_p_i_h_world.html#ab9b4879944d382c3fcd272aed7323fd1',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world::PIHWorld']]],
+  ['compute_5fos_5fimp_5fctrlr_5fcmd',['compute_os_imp_ctrlr_cmd',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_p_i_h_world.html#a6b32eb349ea4c5d6d98eb19bcce7e106',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world::PIHWorld']]],
+  ['compute_5fphase',['compute_phase',['../classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a4c1ab83285199db2e6188fbd85d11a0e',1,'aml_lfd::promp::discrete_promp::DiscretePROMP']]],
+  ['compute_5ftraj_5fchange',['compute_traj_change',['../classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html#a29e2be5e4e1269619e32fc8526d9fe09',1,'aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt']]],
+  ['compute_5ftraj_5fprobability',['compute_traj_probability',['../classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html#aecd5cdce0c5364fbcf6ed890b3b1933e',1,'aml_opt::mppi_controller::mppi_controller::MPPIController']]],
+  ['compute_5fu_5fchange',['compute_u_change',['../classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html#a213f5b0756b132c4e4253baa199cb061',1,'aml_opt::mppi_controller::mppi_controller::MPPIController']]],
+  ['compute_5fvelocities',['compute_velocities',['../classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a00cdc1d700fafc8db39d2f484840f5d1',1,'aml_lfd::promp::discrete_promp::DiscretePROMP']]],
+  ['concrete_5fdropout',['concrete_dropout',['../classaml__planners_1_1push__planner_1_1forward__models_1_1concrete__dropout_1_1_concrete_dropout.html#a96c37a538f89f1eafef12f2cb023fdae',1,'aml_planners::push_planner::forward_models::concrete_dropout::ConcreteDropout']]],
+  ['contour',['contour',['../classaml__planners_1_1push__planner_1_1push__worlds_1_1plotter_1_1_plotter.html#acec61714129e276f05e6dd2947eb3d07',1,'aml_planners.push_planner.push_worlds.plotter.Plotter.contour()'],['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1box2d_1_1plotter_1_1_plotter.html#a94842e88ca034e83d81992eb0b90433c',1,'aml_playground.peg_in_hole.pih_worlds.box2d.plotter.Plotter.contour()']]],
+  ['cost',['cost',['../classaml__planners_1_1push__planner_1_1costs_1_1cost__box2d_1_1_cost_imp.html#ae0609d38535dfb4456debd1081211bb1',1,'aml_planners::push_planner::costs::cost_box2d::CostImp']]],
+  ['create',['create',['../classkinematics_1_1position__kinematics.html#a589bbfbe9e504e5b9f74755b692cab8b',1,'kinematics::position_kinematics']]],
+  ['create_5fkernel_5ffcn',['create_kernel_fcn',['../classaml__lfd_1_1dmp_1_1discrete__dmp_1_1_discrete_d_m_p.html#a35fc0754f0382c6850197f9d6aaa8201',1,'aml_lfd::dmp::discrete_dmp::DiscreteDMP']]]
 ];
