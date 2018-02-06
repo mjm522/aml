@@ -395,10 +395,3 @@ class BulletRobot(object):
             raise ValueError
 
         return pb.calculateMassMatrix(self._id, joints)
-
-
-
-
-
-
-
