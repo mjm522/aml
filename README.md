@@ -122,8 +122,9 @@
 	```
 	cd ~/catkin_workspaces/baxter_ws/src
 	wstool init .
-	wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty)
-	baxter_simulator.rosinstall
+	wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall
+	wstool update
+	wstool merge sawyer_robot/sawyer_robot.rosinstall
 	wstool update
 	```
 
@@ -141,12 +142,12 @@
 7. Few other dependencies
            
 	```
-	pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide
+	pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide pandas
+	pip install pybullet
+	pip install git+git://github.com/pybox2d/pybox2d
 	```
-
-8. Installing pybox2d - follow instructions in this [page](https://github.com/pybox2d/pybox2d/blob/master/INSTALL.md).
-
-9. Installing opencv for python
+	
+8. Installing opencv for python
 
 	**Note:** this compilation could take a while! And install this only after removing opencv-python (this is unofficial version) if installed previously.
 	
