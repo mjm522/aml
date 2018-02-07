@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# A simply python controller for Baxter compatible with GPS (TODO)
+# A simple python controller for Baxter compatible with GPS (TODO)
 
 
 import rospy
