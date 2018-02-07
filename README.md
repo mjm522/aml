@@ -1,13 +1,25 @@
 # Advanced Manipulation Learning (AML) 
 
 
-## Dependencies
+## Live Docs for AML
+
+* Live documentation for AML can be found [here](https://docs.google.com/document/d/1_xM5TvY-ARBdU3P3D4MrxzcuUbaHkiwEP5UDHMdy4yM/edit?usp=sharing)
+* Also see the docs folder in the AML root directory for the doxygen documentation.
+
+## Setting up AML - The Very Simple Way
+
+* A set of scripts for installing AML natively in your host machine, or for getting it setup in a docker container can be found [here](https://github.com/eaa3/aml_install)
+
+
+## Setting AML manually
+
+### Dependencies
 
 * [ROS (Indigo)](http://wiki.ros.org/indigo/Installation/Ubuntu)
 * [BaxterSDK](http://sdk.rethinkrobotics.com/wiki/Hello_Baxter)
 * [Baxter Simulator](http://sdk.rethinkrobotics.com/wiki/Simulator_Installation)
 
-### Python Libraries
+#### Python Libraries
 
 * [numpy](http://www.numpy.org/)
 * [numpy-quaternion](https://pypi.python.org/pypi/numpy-quaternion)
@@ -22,7 +34,7 @@
 * [ipython](https://pypi.python.org/pypi/ipython/6.0.0)
 * [cv2](https://github.com/opencv/opencv)
 
-#### This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.
+##### This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.
 
 1. Installing ROS - Indigo: Follow instructions on this [page](http://wiki.ros.org/indigo/Installation/Ubuntu).
 **Important Note:** install  “desktop-full” version
@@ -172,7 +184,7 @@
 	```
 
         
-#### Possible Errors:
+##### Possible Errors:
 
 1. Could not find any downloads that satisfy the requirement tensorflow
    
