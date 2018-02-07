@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+
 import numpy as np
 import pybullet as pb
 import rospy
 import time
-from aml_playground.peg_in_hole.pih_worlds.bullet.config import config_pih_world
+from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 # from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 from aml_robot.bullet.bullet_sawyer import BulletSawyerArm
+from aml_io.io_tools import get_aml_package_path, get_abs_path
 
 
 def main():
@@ -23,15 +26,17 @@ def main():
     
     pb.setTimeStep(timeStep)
     
-    world = pb.loadURDF(config_pih_world['world_path'],[0,0,-.98])
+    world = pb.loadURDF(pih_world_config['world_path'],[0,0,-.98])
 
-    # peg = pb.loadURDF(config_pih_world['peg_path'])
+    # peg = pb.loadURDF(pih_world_config['peg_path'])
 
     pb.setGravity(0., 0.,-10.)
 
-    # hole = pb.loadURDF(config_pih_world['hole_path'], useFixedBase=True)
+    # hole = pb.loadURDF(pih_world_config['hole_path'], useFixedBase=True)
 
-    manipulator = pb.loadURDF("/home/saif/ros_ws/baxter_ws/src/sawyer_robot/sawyer_description/urdf/sawyer2.urdf", useFixedBase=True)
+    catkin_ws_src_path = get_abs_path(get_aml_package_path()+'/../')
+    print "catkin_ws_src_path:", catkin_ws_src_path
+    manipulator = pb.loadURDF(catkin_ws_src_path + "/sawyer_robot/sawyer_description/urdf/sawyer.urdf", useFixedBase=True)
     pb.resetBasePositionAndOrientation(manipulator,[0,0,0],[0,0,0,1])
     # motors = [n for n in range(pb.getNumJoints(manipulator))]
 
@@ -47,7 +52,7 @@ def main():
 
     # pb.setJointMotorControlArray(manipulator, motors,controlMode=pb.VELOCITY_CONTROL, targetVelocities=np.asarray(velocity_array), forces=[500 for n in range(len(velocity_array))])
 
-    # pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, gains = np.asarray(k), config=config_pih_world)
+    # pm = PIHWorld(world_id=world, peg_id=peg, hole_id=hole, robot_id=manipulator, gains = np.asarray(k), config=pih_world_config)
 
     # pm.run()
 
@@ -94,7 +99,7 @@ if __name__ == "__main__":
 #     p.connect(p.GUI)
 # # p.loadURDF("plane.urdf",[0,0,-.98])
 
-# # world = p.loadURDF(config_pih_world['world_path'])
+# # world = p.loadURDF(pih_world_config['world_path'])
 
 # p.configureDebugVisualizer(p.COV_ENABLE_RENDERING,0)
 # sawyerId = p.loadURDF("/home/saif/ros_ws/baxter_ws/src/sawyer_robot/sawyer_description/urdf/sawyer2.urdf",[0,0,0])
