@@ -17,7 +17,7 @@ class BoxObject(BulletRobot):
         super(BoxObject, self).__init__(robot_id=box_id, config=config_push_world)
 
     def get_effect(self):
-        p, q   = self.get_pos_ori()
+        p, q   = self.get_ee_pose()
         status = {}
         status['pos'] = p
         #all the files in package follows np.quaternion convention, that is
@@ -89,7 +89,7 @@ class PushWorld():
             y_box = random.uniform(-breadth_div2, breadth_div2) # w.r.t box frame
             pre_push_wrt_box = np.array([weight*pre_push_offsets[0], y_box, 0.])
 
-        box_pos, box_ori = self._box.get_pos_ori()
+        box_pos, box_ori = self._box.get_base_pos_ori()
 
         rot = np.asarray(pb.getMatrixFromQuaternion(box_ori)).reshape(3,3)
 
@@ -104,9 +104,9 @@ class PushWorld():
 
     def push_box(self):
 
-        box_pos, box_ori = self._box.get_pos_ori()
+        box_pos, box_ori = self._box.get_base_pos_ori()
 
-        rbt_pos, rbt_ori = self._robot.get_pos_ori()
+        rbt_pos, rbt_ori = self._robot.get_ee_pose()
 
         rot = np.asarray(pb.getMatrixFromQuaternion(box_ori)).reshape(3,3)
 
@@ -140,9 +140,9 @@ class PushWorld():
             return crossed_xlim or crossed_ylim or crossed_zlim
 
 
-        box_pos, box_ori = self._box.get_pos_ori()
+        box_pos, box_ori = self._box.get_base_pos_ori()
 
-        rbt_pos, rbt_ori = self._robot.get_pos_ori()
+        rbt_pos, rbt_ori = self._robot.get_ee_pose()
 
         work_space_limits = self._config['work_space_limits']
 
@@ -218,7 +218,7 @@ class PushWorld():
 
                 success = True
 
-                # self._box.set_default_pos_ori()
+                self._box.set_default_pos_ori()
 
                 self._robot.set_default_pos_ori()
 

@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 import pybullet as pb
 from config import config
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 
 class BulletRobot(object):
 
@@ -26,9 +26,9 @@ class BulletRobot(object):
         if enable_force_torque_sensors:
             self.enable_force_torque_sensors()
 
-        # _update_period = rospy.Duration(1.0/update_rate)
+        _update_period = rospy.Duration(1.0/update_rate)
 
-        # rospy.Timer(_update_period, self._update_state)
+        rospy.Timer(_update_period, self._update_state)
 
         
     def configure_default_pos(self, pos, ori):

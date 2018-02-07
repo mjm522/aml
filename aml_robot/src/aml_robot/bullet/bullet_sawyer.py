@@ -10,7 +10,7 @@ from std_msgs.msg import (
     UInt16,
 )
 
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_robot.sawyer_kinematics import sawyer_kinematics

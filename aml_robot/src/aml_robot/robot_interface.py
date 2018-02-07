@@ -23,7 +23,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from aml_perception import camera_sensor 
 
 #for computation of angular velocity
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 

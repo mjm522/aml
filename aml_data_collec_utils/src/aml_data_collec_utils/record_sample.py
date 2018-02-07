@@ -238,7 +238,7 @@ class RecordSample():
 
     def record_once(self, task_action, task_status=False):
 
-        robot_state = self._robot._state
+        robot_state = self._robot.get_state()
         task_state  = self._task.get_effect()
 
         #np.quaternion causes problem, hence convert to array
