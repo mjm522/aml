@@ -27,7 +27,7 @@ from aml_robot.sawyer_ik import IKSawyer
 from aml_perception import camera_sensor 
 
 #for computation of angular velocity
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
 
