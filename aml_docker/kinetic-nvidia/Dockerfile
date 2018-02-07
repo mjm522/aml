@@ -24,7 +24,8 @@ RUN apt-get update && \
 
 
 RUN pip install --upgrade pip && \
-    pip install protobuf pandas
+    pip install protobuf && \
+    pip install pandas
 
 RUN apt-get update && apt-get install mesa-utils
 

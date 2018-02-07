@@ -17,7 +17,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install protobuf pandas
+    pip install protobuf && \
+    pip install pandas
 
 RUN \
   apt-get update && \

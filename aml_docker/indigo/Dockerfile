@@ -19,7 +19,8 @@ RUN apt-get update && \
 
 
 RUN pip install --upgrade pip && \
-    pip install protobuf
+    pip install protobuf && \
+    pip install pandas
 
 RUN \
   apt-get update && \
