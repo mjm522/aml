@@ -29,6 +29,7 @@
 * [pybox2d](https://github.com/pybox2d/pybox2d)
 * [Pillow](https://pypi.python.org/pypi/Pillow/4.1.1)
 * [Scipy](https://pypi.python.org/pypi/scipy/0.19.0)
+* [Pandas](https://pandas.pydata.org/)
 * [six](https://pypi.python.org/pypi/six/1.10.0)
 * [decorator](https://pypi.python.org/pypi/decorator/4.0.11)
 * [matplotlib](https://pypi.python.org/pypi/matplotlib/2.0.1)
