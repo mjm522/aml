@@ -234,7 +234,6 @@ class SliderWindow(qtg.QWidget):
     def handle_state_popup(self):
         if self.state_popup is None:
             self.state_popup = StatePopup(self)
-            self.state_popup.destroyed.connect(self.handle_state_popup_closed)
 
     def handle_slider_released(self):
         ''' when the slider is released, move the robot to that configuration '''
