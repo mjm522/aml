@@ -32,16 +32,11 @@ JS_TORQUE_CNTLR = {
 
 JS_VELCTY_CNTLR = {
     'rate': 500,
-    'kp_p': 0.0001, #gains for position
+    'kp_p': 0.001, #gains for position
     'kd_p': np.sqrt(0.),
-    'kp_o': 0., #gains for orientation
-    'kd_o': np.sqrt(0.), #gains for orientation
     'alpha': 0.0,
     'null_kp': 5.,
     'null_kd': 3.01,
-    'use_orientation_ctrl': True,
-    'linear_error_thr': 0.12,
-    'angular_error_thr': 0.3,
     'js_pos_error_thr' :0.1,
     'deactivate_wait_time': 5,
     'integrate_jnt_velocity': True,
@@ -68,6 +63,18 @@ JS_POSTN_CNTLR_BAXTER = {
     'null_kd': 3.01,
     'js_pos_error_thr' :0.1,
     'deactivate_wait_time': 5,
+}
+
+JS_VELCTY_CNTLR_BAXTER = {
+    'rate': 500,
+    'kp_p': 0.01, #gains for position
+    'kd_p': np.sqrt(0.01),
+    'alpha': 0.0,
+    'null_kp': 5.,
+    'null_kd': 3.01,
+    'js_pos_error_thr' :0.1,
+    'deactivate_wait_time': 5,
+    'integrate_jnt_velocity': True,
 }
 
 
