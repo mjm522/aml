@@ -30,7 +30,7 @@ JS_TORQUE_CNTLR = {
 }
 
 
-JS_VELCTY_CNTLR = {
+JS_VELOCITY_CNTLR = {
     'rate': 500,
     'kp_p': 0.001, #gains for position
     'kd_p': np.sqrt(0.),
@@ -65,7 +65,7 @@ JS_POSTN_CNTLR_BAXTER = {
     'deactivate_wait_time': 5,
 }
 
-JS_VELCTY_CNTLR_BAXTER = {
+JS_VELOCITY_CNTLR_BAXTER = {
     'rate': 500,
     'kp_p': 0.01, #gains for position
     'kd_p': np.sqrt(0.01),

@@ -5,13 +5,13 @@ import copy
 
 import rospy
 
-from config import JS_POSTN_CNTLR_BAXTER as JS_VELCTY_CNTLR_BAXTER
+from config import JS_POSTN_CNTLR_BAXTER as JS_VELOCITY_CNTLR_BAXTER
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
 
 class JSVelocityController(JSController):
-    def __init__(self, robot_interface, config = JS_VELCTY_CNTLR_BAXTER):
+    def __init__(self, robot_interface, config = JS_VELOCITY_CNTLR_BAXTER):
 
         JSController.__init__(self, robot_interface, config)
 
