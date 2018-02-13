@@ -317,7 +317,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         #please note that this might produce a bug since self._goal_ori_old gets 
         #updated only if get_ee_vel is called. 
         #TODO : to update in get_ee_pose or find a better way to compute velocity
-        
+        # Simulated robot always returns 0 for linear and angular velocities
         if real_robot:
             
             ee_velocity = self.endpoint_velocity()['linear']
