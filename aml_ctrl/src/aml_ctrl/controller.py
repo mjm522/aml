@@ -17,8 +17,8 @@ class Controller(object):
         self._robot    = robot_interface
         self._cmd      = np.zeros(self._robot._nu)
 
-        update_period = rospy.Duration(1.0/config['rate'])
-        rospy.Timer(update_period, self.update)
+        update_period = rospy.Duration(1.0/self._config['rate'])
+        self._control_callback = rospy.Timer(update_period, self.update)
 
         self._last_time = rospy.Time.now()
 
@@ -66,6 +66,15 @@ class Controller(object):
 
     def set_active(self,is_active):
         self._is_active = is_active
+
+        if self._control_callback: 
+            self._control_callback.shutdown()
+            self._control_callback = None
+
+        if self._is_active:
+            update_period = rospy.Duration(1.0/self._config['rate'])
+            self._control_callback = rospy.Timer(update_period, self.update)
+
 
 
 

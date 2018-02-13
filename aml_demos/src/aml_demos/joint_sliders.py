@@ -5,6 +5,9 @@ A small app for controlling Baxter's joint positions using sliders
 usage: ./joint_sliders.py (left|right)
 
 author: Matthew Broadway (https://github.com/mbway)
+
+author2: Ermano Arruda (https://github.com/eaa3)
+feature: Adding controller options
 '''
 
 import os
@@ -21,6 +24,33 @@ import python_qt_binding.QtGui as qtg
 # ROS imports
 import rospy
 from aml_robot.baxter_robot import BaxterArm
+
+from aml_ctrl.controllers.js_controllers.js_torque_controller import JSTorqueController
+from aml_ctrl.controllers.js_controllers.js_postn_controller2 import JSPositionController2
+from aml_ctrl.controllers.js_controllers.js_velocity_controller import JSVelocityController
+
+class DummyController(object):
+
+    def __init__(self,arm):
+        self.arm = arm
+        self._config = {}
+        self._config['js_pos_error_thr'] = 0.05
+        self._config['timeout'] = 5.0
+
+    def set_goal(self, goal_js_pos, goal_js_vel=None, goal_js_acc=None):
+        ''' Using control interface as defined in AML '''
+
+        joint_command = dict(zip(self.arm.joint_names(),goal_js_pos))
+        self.arm.move_to_joint_positions(joint_command, timeout=self._config['timeout'], threshold=self._config['js_pos_error_thr'])
+
+    def wait_until_goal_reached(self, timeout = 5.0):
+        ''' just dummy '''
+
+        pass
+
+    def set_active(self,is_active):
+        ''' just dummy '''
+        pass
 
 
 class FloatSlider(qtg.QSlider):
@@ -129,6 +159,20 @@ class SliderWindow(qtg.QWidget):
         vbox.addLayout(header_box2)
         vbox.addLayout(sliders_box)
 
+        control_options = [('dummy_controller',DummyController), ('js_position_control',JSPositionController2),('js_velocity_control',JSVelocityController),('js_torque_control',JSTorqueController)]
+        self.controller_dict = {}
+
+        combo_box = qtg.QComboBox()
+        for item in control_options:
+            combo_box.addItem(item[0])
+            self.controller_dict[item[0]] = item[1]
+
+        combo_box.activated[str].connect(self.handle_control_choice)
+
+        self._controller = control_options[0][1](self.arm) # getting default controller
+
+        header_box.addWidget(combo_box)
+
         tuck = qtg.QPushButton('tuck')
         tuck.clicked.connect(self.handle_tuck)
         header_box.addWidget(tuck)
@@ -147,6 +191,8 @@ class SliderWindow(qtg.QWidget):
         self.moving_status.setStyleSheet('color: red')
         self.moving = False
         header_box.addWidget(self.moving_status)
+
+        
 
         # note: doesn't apply to tuck/untuck
         header_box2.addWidget(qtg.QLabel('timeout:'))
@@ -224,12 +270,45 @@ class SliderWindow(qtg.QWidget):
             self.sync_sliders()
 
     def handle_tuck(self):
-        BackgroundWorker(self, self.arm.tuck_arm)
+
+        def callback():
+            self._controller.set_active(False)
+            self.arm.tuck_arm()
+            self._controller.set_active(True)
+            
+
+        BackgroundWorker(self, callback)
+        
     def handle_untuck(self):
-        BackgroundWorker(self, self.arm.untuck_arm)
+
+        def callback():
+            self._controller.set_active(False)
+            self.arm.untuck_arm()
+            self._controller.set_active(True)
+
+        BackgroundWorker(self, callback)
+
     def handle_joint_command(self, joint_command, timeout, threshold):
-        BackgroundWorker(self, lambda:
-            self.arm.move_to_joint_positions(joint_command, timeout=timeout, threshold=threshold))
+
+        self._controller._config['js_pos_error_thr'] = threshold
+        self._controller._config['timeout'] = timeout
+        
+        cmd = [joint_command[jnt_name] for jnt_name in self.joint_names]
+
+        def callback():
+            self._controller.set_goal(goal_js_pos=cmd)
+            self._controller.wait_until_goal_reached(timeout=timeout)
+
+
+        BackgroundWorker(self, callback)
+
+    def handle_control_choice(self, text):
+
+        self._controller.set_active(False)
+        self._controller = None
+        self._controller = self.controller_dict[str(text)](self.arm)
+        self._controller.set_active(True) # activate controller
+        print "Control choice: ", text
 
     def handle_state_popup(self):
         if self.state_popup is None:

@@ -5,13 +5,13 @@ import copy
 
 import rospy
 
-from config import JS_POSTN_CNTLR_BAXTER as JS_VELOCITY_CNTLR_BAXTER
+from config import JS_VELOCITY_CNTLR_BAXTER as JS_VELOCITY_CNTLR
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
 
 class JSVelocityController(JSController):
-    def __init__(self, robot_interface, config = JS_VELOCITY_CNTLR_BAXTER):
+    def __init__(self, robot_interface, config = JS_VELOCITY_CNTLR):
 
         JSController.__init__(self, robot_interface, config)
 
@@ -28,6 +28,8 @@ class JSVelocityController(JSController):
         self._alpha    = self._config['alpha']
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
+
+        self._dq = np.zeros_like(self._goal_js_pos)
 
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
@@ -56,11 +58,18 @@ class JSVelocityController(JSController):
 
         q              = robot_state['position']
 
-        dq             = robot_state['velocity']
+        dq             = self._dq*0.99 + robot_state['velocity']*0.01
+        self._dq = dq
 
         js_delta       = goal_js_pos-q
 
-        u              = self._kp_q*js_delta
+        if np.linalg.norm(dq) < 1e-3:
+            dq = np.zeros_like(q)
+
+        if np.linalg.norm(js_delta) < 1e-3:
+            js_delta = np.zeros_like(q)
+
+        u              = self._kp_q*js_delta + self._kd_dq*(goal_js_vel - dq)
 
         if np.any(np.isnan(u)):
             u               = self._cmd

@@ -29,6 +29,8 @@ class JSTorqueController(JSController):
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 
+        self._dq = np.zeros_like(self._goal_js_pos)
+
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
 
@@ -38,15 +40,33 @@ class JSTorqueController(JSController):
 
         goal_js_pos       = self._goal_js_pos
 
-        goal_js_vel       = self._goal_js_vel
 
-        goal_js_acc       = self._goal_js_acc
+        if self._goal_js_vel is None:
+
+            goal_js_vel = np.zeros_like(goal_js_pos)
+
+        else:
+
+            goal_js_vel   = self._goal_js_vel
+
+        if self._goal_js_acc is None:
+
+            goal_js_acc = np.zeros_like(goal_js_pos)
+
+        else:
+
+            goal_js_acc       = self._goal_js_acc
+
 
         robot_state    = self._state
 
         q              = robot_state['position']
 
-        dq             = robot_state['velocity']
+        dq             = self._dq*0.99 + robot_state['velocity']*0.01
+        self._dq = dq
+
+        if np.linalg.norm(dq) < 1e-3:
+            dq = np.zeros_like(q)
 
         h              = robot_state['gravity_comp']
 
@@ -81,6 +101,7 @@ class JSTorqueController(JSController):
         else:
             self._cmd       = u
 
+
         # Never forget to update the error
         self._error = {'js_pos': js_delta}
 
@@ -94,8 +115,8 @@ class JSTorqueController(JSController):
 
         JSController.set_active(self,is_active)
 
-        if is_active is False:
-            hold_time = rospy.Duration(self._deactivate_wait_time)
-            last_time = rospy.Time.now()
-            while (rospy.Time.now() - last_time) <= hold_time:
-                self._robot.exec_position_cmd2(np.zeros(self._robot._nu))
+        # if is_active is False:
+        #     hold_time = rospy.Duration(self._deactivate_wait_time)
+        #     last_time = rospy.Time.now()
+        #     while (rospy.Time.now() - last_time) <= hold_time:
+        #         self._robot.exec_position_cmd_delta(np.zeros(self._robot._nu))

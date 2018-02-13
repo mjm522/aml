@@ -36,7 +36,7 @@ class BaxterArm(baxter_interface.limb.Limb):
     def __init__(self, limb, on_state_callback=None):
 
         #Load aml_logo
-        load_aml_logo()
+        # load_aml_logo()
 
         self._ready = False
 
