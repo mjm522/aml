@@ -18,7 +18,7 @@ class JSController(Controller):
         self._js_thr = config['js_pos_error_thr']
 
         self._goal_js_pos = self._robot._state['position']
-        self._goal_js_vel = self._robot._state['velocity']
+        self._goal_js_vel = np.zeros_like(self._goal_js_pos)
         self._goal_js_acc = np.zeros_like(self._goal_js_pos)
 
         self._type = 'js'
@@ -66,6 +66,17 @@ class JSController(Controller):
         # print("lin_error: %0.4f ang_error: %0.4f elapsed_time: "%(lin_error,ang_error),time_elapsed, " success: ", success)
 
         return js_error, success, time_elapsed
+
+
+    def set_active(self, is_active):
+
+        self._goal_js_pos = self._robot._state['position']
+        self._goal_js_vel = np.zeros_like(self._goal_js_pos)
+        self._goal_js_acc = np.zeros_like(self._goal_js_pos)
+
+        Controller.set_active(self,is_active)
+
+
 
 
 

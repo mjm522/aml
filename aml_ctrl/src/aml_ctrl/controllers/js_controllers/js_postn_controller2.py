@@ -5,13 +5,13 @@ import copy
 
 import rospy
 
-from config import JS_TORQUE_CNTLR
+from config import JS_POSTN_CNTLR_BAXTER as JS_POSTN_CNTLR
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
 
-class JSTorqueController(JSController):
-    def __init__(self, robot_interface, config = JS_TORQUE_CNTLR):
+class JSPositionController2(JSController):
+    def __init__(self, robot_interface, config = JS_POSTN_CNTLR):
 
         JSController.__init__(self, robot_interface, config)
 
@@ -29,17 +29,16 @@ class JSTorqueController(JSController):
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 
+
         self._dq = np.zeros_like(self._goal_js_pos)
 
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
 
+
     def compute_cmd(self, time_elapsed):
 
-        # calculate the Jacobian for the end effector
-
         goal_js_pos       = self._goal_js_pos
-
 
         if self._goal_js_vel is None:
 
@@ -57,7 +56,6 @@ class JSTorqueController(JSController):
 
             goal_js_acc       = self._goal_js_acc
 
-
         robot_state    = self._state
 
         q              = robot_state['position']
@@ -65,42 +63,20 @@ class JSTorqueController(JSController):
         dq             = self._dq*0.99 + robot_state['velocity']*0.01
         self._dq = dq
 
+        js_delta       = goal_js_pos-q
+
         if np.linalg.norm(dq) < 1e-3:
             dq = np.zeros_like(q)
 
-        h              = robot_state['gravity_comp']
+        if np.linalg.norm(js_delta) < 1e-3:
+            js_delta = np.zeros_like(q)
 
-        # calculate the jacobian of the end effector
-        jac_ee         = robot_state['jacobian']
-
-        # calculate the inertia matrix in joint space
-        Mq             = robot_state['inertia']
-
-        js_delta       = goal_js_pos-q
-
-        u              = np.dot(Mq, self._kp_q*js_delta + self._kd_dq*(goal_js_vel-dq))
- 
-        # calculate our secondary control signa
-        # calculated desired joint angle acceleration
-
-        prop_val            = (self._robot.q_mean - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
-
-        q_des               = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
-
-        u_null              = np.dot(Mq, q_des)
-
-        # calculate the null space filter
-        null_filter         = np.eye(len(q)) - np.dot(jac_ee.T, np.linalg.pinv(jac_ee.T))
-
-        u_null_filtered     = np.dot(null_filter, u_null)
-
-        u                   += self._alpha*u_null_filtered
+        u              = self._kp_q*js_delta + self._kd_dq*(goal_js_vel - dq)
 
         if np.any(np.isnan(u)):
             u               = self._cmd
         else:
             self._cmd       = u
-
 
         # Never forget to update the error
         self._error = {'js_pos': js_delta}
@@ -108,15 +84,9 @@ class JSTorqueController(JSController):
         return self._cmd
 
     def send_cmd(self,time_elapsed):
-        self._robot.exec_torque_cmd(self._cmd)
+        self._robot.exec_position_cmd_delta(self._cmd) # changed to position cmd
 
 
     def set_active(self,is_active):
 
         JSController.set_active(self,is_active)
-
-        # if is_active is False:
-        #     hold_time = rospy.Duration(self._deactivate_wait_time)
-        #     last_time = rospy.Time.now()
-        #     while (rospy.Time.now() - last_time) <= hold_time:
-        #         self._robot.exec_position_cmd_delta(np.zeros(self._robot._nu))

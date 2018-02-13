@@ -58,5 +58,6 @@ workon robotics
 
 pip install git+git://github.com/pybox2d/pybox2d
 
-pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide
+pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide pandas
+pip install pybullet==1.8.3
 pip install --upgrade tensorflow

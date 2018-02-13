@@ -17,6 +17,10 @@ def get_aml_package_path(aml_package_name=None):
     return aml_package_path
 
 
+def get_abs_path(path):
+    return abspath(path)
+
+
 def save_data(data, filename, append_to_file = False, over_write_existing=False):
 
     if not over_write_existing:

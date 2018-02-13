@@ -7,7 +7,7 @@ import numpy as np
 import quaternion
 import copy
 
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 from aml_robot.utilities.utilities import convert_rospy_time2sec
 
 class MujocoRobot():
@@ -108,6 +108,8 @@ class MujocoRobot():
 
         self._state = state
 
+    def get_state(self):
+        return self._state
 
     def get_ee_pose(self):
         

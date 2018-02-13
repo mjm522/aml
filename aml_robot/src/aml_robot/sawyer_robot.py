@@ -27,7 +27,7 @@ from aml_robot.sawyer_ik import IKSawyer
 from aml_perception import camera_sensor 
 
 #for computation of angular velocity
-from aml_lfd.utilities.utilities import compute_omg
+from aml_math.quaternion_utils import compute_omg
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
 
@@ -385,7 +385,7 @@ class SawyerArm(intera_interface.Limb):
         self.set_joint_positions(joint_command)
 
     def exec_position_cmd_delta(self,cmd):
-        curr_q = self.joint_angles()[:7]
+        curr_q = self.joint_angles()
         joint_names = self.joint_names()
 
         joint_command = dict([(joint, curr_q[joint] + cmd[i]) for i, joint in enumerate(joint_names)])

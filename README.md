@@ -1,13 +1,26 @@
 # Advanced Manipulation Learning (AML) 
 
 
-## Dependencies
+## Live Docs for AML
+
+* Live documentation for AML can be found [here](https://docs.google.com/document/d/1_xM5TvY-ARBdU3P3D4MrxzcuUbaHkiwEP5UDHMdy4yM/edit?usp=sharing)
+* Also see the docs folder in the AML root directory for the doxygen documentation.
+
+## Setting up AML - The Very Simple Way
+
+* A set of scripts for installing AML natively in your host machine, or for getting it setup in a docker container can be found [here](https://github.com/eaa3/aml_install)
+
+
+## Setting AML manually
+
+### Dependencies
 
 * [ROS (Indigo)](http://wiki.ros.org/indigo/Installation/Ubuntu)
 * [BaxterSDK](http://sdk.rethinkrobotics.com/wiki/Hello_Baxter)
 * [Baxter Simulator](http://sdk.rethinkrobotics.com/wiki/Simulator_Installation)
+* [Saywer Robot](http://sdk.rethinkrobotics.com/intera/Main_Page)
 
-### Python Libraries
+#### Python Libraries
 
 * [numpy](http://www.numpy.org/)
 * [numpy-quaternion](https://pypi.python.org/pypi/numpy-quaternion)
@@ -16,13 +29,14 @@
 * [pybox2d](https://github.com/pybox2d/pybox2d)
 * [Pillow](https://pypi.python.org/pypi/Pillow/4.1.1)
 * [Scipy](https://pypi.python.org/pypi/scipy/0.19.0)
+* [Pandas](https://pandas.pydata.org/)
 * [six](https://pypi.python.org/pypi/six/1.10.0)
 * [decorator](https://pypi.python.org/pypi/decorator/4.0.11)
 * [matplotlib](https://pypi.python.org/pypi/matplotlib/2.0.1)
 * [ipython](https://pypi.python.org/pypi/ipython/6.0.0)
 * [cv2](https://github.com/opencv/opencv)
 
-#### This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.
+##### This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.
 
 1. Installing ROS - Indigo: Follow instructions on this [page](http://wiki.ros.org/indigo/Installation/Ubuntu).
 **Important Note:** install  “desktop-full” version
@@ -109,8 +123,9 @@
 	```
 	cd ~/catkin_workspaces/baxter_ws/src
 	wstool init .
-	wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty)
-	baxter_simulator.rosinstall
+	wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall
+	wstool update
+	wstool merge sawyer_robot/sawyer_robot.rosinstall
 	wstool update
 	```
 
@@ -128,12 +143,12 @@
 7. Few other dependencies
            
 	```
-	pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide
+	pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide pandas
+	pip install pybullet
+	pip install git+git://github.com/pybox2d/pybox2d
 	```
-
-8. Installing pybox2d - follow instructions in this [page](https://github.com/pybox2d/pybox2d/blob/master/INSTALL.md).
-
-9. Installing opencv for python
+	
+8. Installing opencv for python
 
 	**Note:** this compilation could take a while! And install this only after removing opencv-python (this is unofficial version) if installed previously.
 	
@@ -172,7 +187,7 @@
 	```
 
         
-#### Possible Errors:
+##### Possible Errors:
 
 1. Could not find any downloads that satisfy the requirement tensorflow
    

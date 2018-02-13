@@ -23,21 +23,26 @@ limb.untuck_arm()
 
 start_pos, start_ori = limb.get_ee_pose()
 
-goal_pos = start_pos + np.array([0.2,-0.08,-0.11])
+goal_pos = start_pos + np.array([0.2,0.10,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
 print "GOALORI: ", goal_ori
+
+success, joints = limb.ik(goal_pos,goal_ori)
 
 rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():
 
-	success, joints = limb.ik(goal_pos,goal_ori)
+	
+	print success, joints, len(joints)
 
-	print success, joints
+	# print "CURRENT STATE:", limb.get_state()
 
-	print "CURRENT STATE:", limb.get_state()
+	# Just a dummy proportional command
+	curr_angles = limb.angles()[:7]
+	print "DIM: ", len(curr_angles)
 
-
-	limb.exec_position_cmd_delta(np.ones(7)*0.05)
+	cmd = (joints - limb.angles()[:7])*0.5
+	limb.exec_position_cmd_delta(cmd)
 
 	rate.sleep()
 
