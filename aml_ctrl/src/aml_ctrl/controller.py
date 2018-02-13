@@ -67,7 +67,7 @@ class Controller(object):
     def set_active(self,is_active):
         self._is_active = is_active
 
-        if self._control_callback: 
+        if self._control_callback is not None: 
             self._control_callback.shutdown()
             self._control_callback = None
 
