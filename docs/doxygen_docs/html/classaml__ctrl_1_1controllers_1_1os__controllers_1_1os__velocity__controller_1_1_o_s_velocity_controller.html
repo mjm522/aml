@@ -128,8 +128,7 @@ Collaboration diagram for aml_ctrl.controllers.os_controllers.os_velocity_contro
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2fb1750695088e028a61aa6b06006b7e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2fb1750695088e028a61aa6b06006b7e"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b></td></tr>
+<tr class="memitem:a2fb1750695088e028a61aa6b06006b7e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__velocity__controller_1_1_o_s_velocity_controller.html#a2fb1750695088e028a61aa6b06006b7e">__init__</a></td></tr>
 <tr class="separator:a2fb1750695088e028a61aa6b06006b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67c40896c4ff97e01876067c7f0227fc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67c40896c4ff97e01876067c7f0227fc"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>get_time</b></td></tr>
@@ -137,11 +136,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>get_time</b></td></tr>
 <tr class="memitem:a258538858a45d152856b74c978b77b24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a258538858a45d152856b74c978b77b24"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>compute_cmd</b></td></tr>
 <tr class="separator:a258538858a45d152856b74c978b77b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a972ac1575f218b3c77d144190d4daf13"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a972ac1575f218b3c77d144190d4daf13"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>send_cmd</b></td></tr>
+<tr class="memitem:a972ac1575f218b3c77d144190d4daf13"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__velocity__controller_1_1_o_s_velocity_controller.html#a972ac1575f218b3c77d144190d4daf13">send_cmd</a></td></tr>
 <tr class="separator:a972ac1575f218b3c77d144190d4daf13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac09e229dbbb04fcb80f4d8b8e12cb2e8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac09e229dbbb04fcb80f4d8b8e12cb2e8"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>set_active</b></td></tr>
+<tr class="memitem:ac09e229dbbb04fcb80f4d8b8e12cb2e8"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__velocity__controller_1_1_o_s_velocity_controller.html#ac09e229dbbb04fcb80f4d8b8e12cb2e8">set_active</a></td></tr>
 <tr class="separator:ac09e229dbbb04fcb80f4d8b8e12cb2e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller.html">aml_ctrl.controllers.os_controller.OSController</a></td></tr>
 <tr class="memitem:a45df7c8506ac273fa1fa4151d150bce6 inherit pub_methods_classaml__ctrl_1_1controllers_1_1os__controller_1_1_o_s_controller"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45df7c8506ac273fa1fa4151d150bce6"></a>
@@ -179,6 +176,117 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>sleep</b></td></tr>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>set_active</b></td></tr>
 <tr class="separator:ab3cf24f3dae223949e893bc61595c89e inherit pub_methods_classaml__ctrl_1_1controller_1_1_controller"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><pre class="fragment">This class is an implementation fo the Operational Space velocity control 
+controller specified in http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
+Paper title : Operational Space Control: A Theoretical and Empirical Comparison (section 3.1)
+This code control scheme it is assumed to have an already gravity compensated arm
+i.e. the gravity compensation happens in the joint space, while the operation space is used for task control
+</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a2fb1750695088e028a61aa6b06006b7e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def aml_ctrl.controllers.os_controllers.os_velocity_controller.OSVelocityController.__init__ </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>robot_interface</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>config</em> = <code>OS_VELCTY_CNTLR</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">Constructor of the class,
+Args:
+robot_interface : interface to the arm (type: aml_robot)
+config: params: 
+        kp_p : proportional gain for position
+        kd_p : derivative gain for position
+        kp_o : proportional gain for orientation
+        kd_o : derivative gain for orientation
+        null_kp: proportional gain for null space controller
+        null_kd: derivative gain for null space controller
+        alpha: null space control mixing factor
+        integrate_jnt_velocity: whether to integrate velocity
+        deactivate_wait_time: tim eout
+        rate: rate of speed sending commands
+</pre> 
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a972ac1575f218b3c77d144190d4daf13"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def aml_ctrl.controllers.os_controllers.os_velocity_controller.OSVelocityController.send_cmd </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>time_elapsed</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">This function sends command to the robot
+</pre> 
+</div>
+</div>
+<a class="anchor" id="ac09e229dbbb04fcb80f4d8b8e12cb2e8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def aml_ctrl.controllers.os_controllers.os_velocity_controller.OSVelocityController.set_active </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>is_active</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">To set the control active. 
+Args: is_active (type: bool)
+If the controller is not active or reaches time out
+the controller automatically switches to position mode to avoid drift of the arm
+</pre> 
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>aml_ctrl/src/aml_ctrl/controllers/os_controllers/os_velocity_controller.py</li>
 </ul>

@@ -8,8 +8,6 @@ var searchData=
   ['minjerkinterp',['MinJerkInterp',['../classaml__ctrl_1_1utilities_1_1min__jerk__interp_1_1_min_jerk_interp.html',1,'aml_ctrl::utilities::min_jerk_interp']]],
   ['mixturedensitynetwork',['MixtureDensityNetwork',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_density_network.html',1,'src::aml_dl::mdn::model::tf_mdn_model']]],
   ['mixtureofgaussians',['MixtureOfGaussians',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_of_gaussians.html',1,'src::aml_dl::mdn::model::tf_mdn_model']]],
-  ['mlppolicy',['MLPPolicy',['../classaml__opt_1_1policy__opt_1_1mlp__policy_1_1_m_l_p_policy.html',1,'aml_opt::policy_opt::mlp_policy']]],
-  ['mlppolicydist',['MLPPolicyDist',['../classaml__opt_1_1policy__opt_1_1mlp__policy__dist_1_1_m_l_p_policy_dist.html',1,'aml_opt::policy_opt::mlp_policy_dist']]],
   ['modecommandcallback',['modeCommandCallback',['../classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html#aff0207bdb9a7d00b791ce5edc6ee27b9',1,'baxter_gazebo_plugin::BaxterGazeboRosControlPlugin::modeCommandCallback()'],['../classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin.html#aa9ffbc75bbe5769b77c7cf837920afc7',1,'sawyer_gazebo_plugin::SawyerGazeboRosControlPlugin::modeCommandCallback()']]],
   ['modify_5ftraj',['modify_traj',['../classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html#ab61b672735f26076de753af61ad0fd6c',1,'aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt']]],
   ['mppicontroller',['MPPIController',['../classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html',1,'aml_opt::mppi_controller::mppi_controller']]],

@@ -11,7 +11,29 @@ from aml_ctrl.controllers.os_controller import OSController
 from aml_ctrl.utilities.utilities import quatdiff
 
 class OSTorqueController(OSController):
+    """
+    This class is an implementation fo the Operational Space torque control
+    controller specified in http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
+    Paper title : Operational Space Control: A Theoretical and Empirical Comparison (section 3.2)
+    This code control scheme it is assumed to have an already gravity compensated arm
+    i.e. the gravity compensation happens in the joint space, while the operation space is used for task control
+    """
     def __init__(self, robot_interface, config = OS_TORQUE_CNTLR):
+        """
+        Constructor of the class,
+        Args:
+        robot_interface : interface to the arm (type: aml_robot)
+        config: params: 
+                        kp_p : proportional gain for position
+                        kd_p : derivative gain for position
+                        kp_o : proportional gain for orientation
+                        kd_o : derivative gain for orientation
+                        null_kp: proportional gain for null space controller
+                        null_kd: derivative gain for null space controller
+                        alpha: null space control mixing factor
+                        deactivate_wait_time: tim eout
+                        rate: rate of speed sending commands
+        """
 
         OSController.__init__(self, robot_interface, config)
 
@@ -68,7 +90,7 @@ class OSTorqueController(OSController):
         curr_vel       = robot_state['ee_vel']
         curr_omg       = robot_state['ee_omg']
 
-        # convert the mass compensation into end effector space
+        # convert the mass compensation into end effector space, equation 50
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
         svd_u, svd_s, svd_v = np.linalg.svd(Mx_inv)
 
@@ -101,12 +123,11 @@ class OSTorqueController(OSController):
         else:
             omg_des = np.zeros(3)
 
-        #print "h: ", h
+        #compute 
         a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
  
-        # calculate desired force in (x,y,z) space
+        # calculate desired force in (x,y,z) operational space
         Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
-
 
         # transform into joint space, add vel and gravity compensation
         u                   = np.dot(jac_ee.T, Fx)
@@ -114,6 +135,7 @@ class OSTorqueController(OSController):
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
+        #derivative of equation 9
         prop_val            = (self._robot.q_mean - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
 
         q_des               = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
@@ -123,6 +145,7 @@ class OSTorqueController(OSController):
         # calculate the null space filter
         Jdyn_inv            = np.dot(Mx, np.dot(jac_ee, np.linalg.inv(Mq)))
 
+        #equation 55 part 2
         null_filter         = np.eye(len(q)) - np.dot(jac_ee.T, Jdyn_inv)
 
         u_null_filtered     = np.dot(null_filter, u_null)
@@ -140,10 +163,19 @@ class OSTorqueController(OSController):
         return self._cmd
 
     def send_cmd(self,time_elapsed):
+        """
+        This function sends command to the robot
+        """
         self._robot.exec_torque_cmd(self._cmd)
 
 
     def set_active(self,is_active):
+        """
+        To set the control active. 
+        Args: is_active (type: bool)
+        If the controller is not active or reaches time out
+        the controller automatically switches to position mode to avoid drift of the arm
+        """
 
         OSController.set_active(self,is_active)
 

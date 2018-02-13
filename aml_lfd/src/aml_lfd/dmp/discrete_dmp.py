@@ -85,9 +85,16 @@ class DiscreteDMP(object):
         
         for ID in range(self._dof):
 
+
             traj = self._demo_traj[:len(self._time_stamps), ID]
             nsample  = np.arange(0.,  len(traj)*self._dt, self._dt)
             nnsample = np.arange(0.,  len(traj)*self._dt-4*self._dt,  (len(traj)*self._dt-4*self._dt) / (1./self._dt))
+            
+            print self._demo_traj.shape
+            print traj.shape
+            print len(self._time_stamps)
+            print len(nnsample)
+
             traj_data[:,ID+1] = interp1d(nsample, traj)(nnsample)
         
         return traj_data

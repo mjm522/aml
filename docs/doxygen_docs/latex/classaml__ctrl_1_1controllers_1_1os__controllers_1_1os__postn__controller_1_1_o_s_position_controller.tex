@@ -3,8 +3,7 @@
 }
 
 
-Inheritance diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-\_\-postn\-\_\-controller.\-O\-S\-Position\-Controller\-:
-\nopagebreak
+Inheritance diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-\_\-postn\-\_\-controller.\-O\-S\-Position\-Controller\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -13,8 +12,7 @@ Inheritance diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-
 \end{figure}
 
 
-Collaboration diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-\_\-postn\-\_\-controller.\-O\-S\-Position\-Controller\-:
-\nopagebreak
+Collaboration diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-\_\-postn\-\_\-controller.\-O\-S\-Position\-Controller\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -24,8 +22,7 @@ Collaboration diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a4ef9b21568a648b97bcd2fbf1781055a}{def {\bfseries \-\_\-\-\_\-init\-\_\-\-\_\-}}\label{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a4ef9b21568a648b97bcd2fbf1781055a}
-
+def \hyperlink{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a4ef9b21568a648b97bcd2fbf1781055a}{\-\_\-\-\_\-init\-\_\-\-\_\-}
 \item 
 \hypertarget{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a2dfdbc0052a9e76beebe4f265cb6b47d}{def {\bfseries compute\-\_\-cmd}}\label{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a2dfdbc0052a9e76beebe4f265cb6b47d}
 
@@ -34,6 +31,42 @@ Collaboration diagram for aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os
 
 \end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This class is an implementation fo the Operational Space position control
+The type of control scheme is given in Robotics: Modelling, Planning and Control (page: 345)
+Some equation of this is also adpated from http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
+Paper title : Operational Space Control: A Theoretical and Empirical Comparison
+This code control scheme it is assumed to have an already gravity compensated arm
+i.e. the gravity compensation happens in the joint space, while the operation space is used for task control
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a4ef9b21568a648b97bcd2fbf1781055a}{\index{aml\-\_\-ctrl\-::controllers\-::os\-\_\-controllers\-::os\-\_\-postn\-\_\-controller\-::\-O\-S\-Position\-Controller@{aml\-\_\-ctrl\-::controllers\-::os\-\_\-controllers\-::os\-\_\-postn\-\_\-controller\-::\-O\-S\-Position\-Controller}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_ctrl::controllers::os_controllers::os_postn_controller::OSPositionController@{aml\-\_\-ctrl\-::controllers\-::os\-\_\-controllers\-::os\-\_\-postn\-\_\-controller\-::\-O\-S\-Position\-Controller}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-ctrl.\-controllers.\-os\-\_\-controllers.\-os\-\_\-postn\-\_\-controller.\-O\-S\-Position\-Controller.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{robot\-\_\-interface, }
+\item[{}]{config = {\ttfamily OS\-\_\-POSTN\-\_\-CNTLR}}
+\end{DoxyParamCaption}
+)}}\label{classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__postn__controller_1_1_o_s_position_controller_a4ef9b21568a648b97bcd2fbf1781055a}
+\begin{DoxyVerb}Constructor of the class,
+Args:
+robot_interface : interface to the arm (type: aml_robot)
+config: params: 
+        kp_p : proportional gain for position
+        kd_p : derivative gain for position
+        kp_o : proportional gain for orientation
+        kd_o : derivative gain for orientation
+        null_kp: proportional gain for null space controller
+        null_kd: derivative gain for null space controller
+        alpha: null space control mixing factor
+        rate: rate of speed sending commands
+        dt: time step
+\end{DoxyVerb}
+ 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 

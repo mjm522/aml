@@ -5,7 +5,7 @@
 # Example: ./bash.sh dev:indigo-cuda
 
 DOCKER_IMAGE=$1
-WORK_DIR="${HOME}/Projects/"
+WORK_DIR="${HOME}/catkin_ws/"
 ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
 
 #192.168.0.9:0

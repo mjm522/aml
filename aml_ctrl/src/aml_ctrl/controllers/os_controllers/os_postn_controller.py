@@ -7,13 +7,35 @@ from aml_ctrl.utilities.utilities import quatdiff
 from aml_ctrl.controllers.os_controller import OSController
 
 class OSPositionController(OSController):
+    """
+    This class is an implementation fo the Operational Space position control
+    The type of control scheme is given in Robotics: Modelling, Planning and Control (page: 345)
+    Some equation of this is also adpated from http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
+    Paper title : Operational Space Control: A Theoretical and Empirical Comparison
+    This code control scheme it is assumed to have an already gravity compensated arm
+    i.e. the gravity compensation happens in the joint space, while the operation space is used for task control
+    """
     def __init__(self, robot_interface, config = OS_POSTN_CNTLR):
-
+        """
+        Constructor of the class,
+        Args:
+        robot_interface : interface to the arm (type: aml_robot)
+        config: params: 
+                        kp_p : proportional gain for position
+                        kd_p : derivative gain for position
+                        kp_o : proportional gain for orientation
+                        kd_o : derivative gain for orientation
+                        null_kp: proportional gain for null space controller
+                        null_kd: derivative gain for null space controller
+                        alpha: null space control mixing factor
+                        rate: rate of speed sending commands
+                        dt: time step
+        """
         OSController.__init__(self,robot_interface, config)
 
         #proportional gain for position
         self._kp_p       = self._config['kp_p']
-        #derivative gain for position
+        #derivative gain for velocity
         self._kd_p       = self._config['kd_p']
         #proportional gain for orientation
         self._kp_o       = self._config['kp_o']
@@ -88,10 +110,13 @@ class OSPositionController(OSController):
 
             jac_ee          = jac_ee[0:3,:]
             delta_ori       = None
+            #compute PD control law
             delta           = self._kp_p*delta_pos + self._kd_p*delta_vel
 
+        #compute pseudo inverse of paper: jacobian equation 5
         jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
 
+        #gradient of the secondary goal, paper : equation 9
         prop_val            = (self._robot.q_mean - q) #+ np.pi) % (np.pi*2) - np.pi
 
         q_null              = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)

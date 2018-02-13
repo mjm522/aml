@@ -78,7 +78,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install protobuf pandas
+    pip install protobuf
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \
@@ -96,7 +96,7 @@ RUN pip install --upgrade pip && \
 # TENSOR FLOW *GPU*
 
 # Install pybullet
-RUN pip install pybullet==1.8.3
+#RUN pip install pybullet==1.8.3
 
 # Fix paths so that CUDNN can be found
 # See https://github.com/tensorflow/tensorflow/issues/8264

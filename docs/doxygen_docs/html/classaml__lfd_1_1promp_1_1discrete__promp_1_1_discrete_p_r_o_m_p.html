@@ -115,23 +115,18 @@ $(document).ready(function(){initNavTree('classaml__lfd_1_1promp_1_1discrete__pr
 Inheritance diagram for aml_lfd.promp.discrete_promp.DiscretePROMP:</div>
 <div class="dyncontent">
 <div class="center"><img src="classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p__inherit__graph.png" border="0" usemap="#aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_inherit__map" alt="Inheritance graph"/></div>
-<map name="aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_inherit__map" id="aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_inherit__map">
-</map>
 </div>
 <div class="dynheader">
 Collaboration diagram for aml_lfd.promp.discrete_promp.DiscretePROMP:</div>
 <div class="dyncontent">
 <div class="center"><img src="classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p__coll__graph.png" border="0" usemap="#aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_coll__map" alt="Collaboration graph"/></div>
-<map name="aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_coll__map" id="aml__lfd_8promp_8discrete__promp_8_discrete_p_r_o_m_p_coll__map">
-</map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a08411e5267252063f4ba35a92e445ddc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a08411e5267252063f4ba35a92e445ddc">__init__</a></td></tr>
 <tr class="separator:a08411e5267252063f4ba35a92e445ddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07b41a1e58a98d21e5155e8bd45e4e26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07b41a1e58a98d21e5155e8bd45e4e26"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>generate_basis_function</b></td></tr>
+<tr class="memitem:a07b41a1e58a98d21e5155e8bd45e4e26"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a07b41a1e58a98d21e5155e8bd45e4e26">generate_basis_function</a></td></tr>
 <tr class="separator:a07b41a1e58a98d21e5155e8bd45e4e26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00cdc1d700fafc8db39d2f484840f5d1"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html#a00cdc1d700fafc8db39d2f484840f5d1">compute_velocities</a></td></tr>
 <tr class="separator:a00cdc1d700fafc8db39d2f484840f5d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,7 +156,8 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>generate_basis_functio
 <tr class="separator:a9cf60d83ce2014e1d595951f9c4e349d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><pre class="fragment">Discrete PROMP
+<div class="textblock"><pre class="fragment">Discrete PROMP for more details on the implementation
+of the this, refer : https://link.springer.com/article/10.1007/s10514-017-9648-7
 </pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a08411e5267252063f4ba35a92e445ddc"></a>
 <div class="memitem">
@@ -305,6 +301,10 @@ Observations and corresponding basis activations
 </div><div class="memdoc">
 <pre class="fragment">This function is for adding the temporal scalability for 
 the basis function
+Args:
+dt = time step
+phase_speed =  speed at which the phase has to evolve 0&lt;speed&lt;1, the trajectory rolls faster
+phase speed &gt; 1 the trajectory rolls slower, too high values produces numerical instability
 </pre> 
 </div>
 </div>
@@ -323,6 +323,50 @@ the basis function
 </div><div class="memdoc">
 <pre class="fragment">function to add new demo to the list
 param: traj : a uni dimentional numpy array
+</pre> 
+</div>
+</div>
+<a class="anchor" id="a07b41a1e58a98d21e5155e8bd45e4e26"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def aml_lfd.promp.discrete_promp.DiscretePROMP.generate_basis_function </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>phase_z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>phase_zd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>phase_zdd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">This function generates the basis funciton, first derivative and second derivative
+from a phase
+Args:
+phase_z   = phase of the trajectory (type: np.array([time steps, 1]))
+phaze_zd  = velocity of the phase (type: np.array([time steps, 1]))
+phaze_zds = acceleration of the phase (type: np.array([time steps, 1]))
 </pre> 
 </div>
 </div>
@@ -355,7 +399,10 @@ param: traj : a uni dimentional numpy array
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">Outputs a trajectory
+<pre class="fragment">Args: 
+phase_speed = speed at which the trajectory rolls
+randomness  = randomness to sample the weight of the basis function
+Outputs a trajectory
 :param randomness: float between 0. (output will be the mean of gaussians) and 1. (fully randomized inside the variance)
 :return: a 1-D vector of the generated points
 </pre> 
@@ -412,6 +459,8 @@ param: traj : a uni dimentional numpy array
       </table>
 </div><div class="memdoc">
 <pre class="fragment">compute bounds of a value at a specific time index
+Args: 
+t_index = time index of a trajectory
 </pre> 
 </div>
 </div>

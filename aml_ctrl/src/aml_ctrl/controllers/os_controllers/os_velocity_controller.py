@@ -11,7 +11,30 @@ from aml_ctrl.controllers.os_controller import OSController
 from aml_ctrl.utilities.utilities import quatdiff
 
 class OSVelocityController(OSController):
+    """
+    This class is an implementation fo the Operational Space velocity control 
+    controller specified in http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
+    Paper title : Operational Space Control: A Theoretical and Empirical Comparison (section 3.1)
+    This code control scheme it is assumed to have an already gravity compensated arm
+    i.e. the gravity compensation happens in the joint space, while the operation space is used for task control
+    """
     def __init__(self, robot_interface, config = OS_VELCTY_CNTLR):
+        """
+        Constructor of the class,
+        Args:
+        robot_interface : interface to the arm (type: aml_robot)
+        config: params: 
+                        kp_p : proportional gain for position
+                        kd_p : derivative gain for position
+                        kp_o : proportional gain for orientation
+                        kd_o : derivative gain for orientation
+                        null_kp: proportional gain for null space controller
+                        null_kd: derivative gain for null space controller
+                        alpha: null space control mixing factor
+                        integrate_jnt_velocity: whether to integrate velocity
+                        deactivate_wait_time: tim eout
+                        rate: rate of speed sending commands
+        """
 
         OSController.__init__(self, robot_interface, config)
 
@@ -30,6 +53,8 @@ class OSVelocityController(OSController):
         #null space control gain
         self._alpha    = self._config['alpha']
 
+        #implementation of control scheme in 3.1.1 of the paper
+        #and 3.1.2 of the paper
         self._integrate_jnt_velocity = self._config['integrate_jnt_velocity']
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
@@ -87,10 +112,9 @@ class OSVelocityController(OSController):
         curr_omg       = robot_state['ee_omg']
 
         #pseudo inverse of jacobian
+        #equation 5
         jac_star       = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
-        # print jac_ee.shape
-        # print jac_star.shape
-
+  
         #gradient of redundancy resolution function
         # grad_g         = 
 
@@ -103,20 +127,18 @@ class OSVelocityController(OSController):
 
         self._old_time = curr_time
 
-
         #reference velocity
         dxr            = goal_vel + self._kp_p*(goal_pos-ee_pos)
 
         #reference_joint_velocity
         if self._integrate_jnt_velocity:
-            
+            #section 3.1.2
             dqr        = np.dot(jac_star, dxr) + self._alpha*(np.eye(self._robot._nu) - np.dot(np.dot(jac_star, jac_ee), grad_g))
-
         else:
-
+            #section 3.1.1
             dqr        = np.zeros_like(dq)
 
-
+        #computing acceleartion by using finite differences
         ddqr           = (dqr - self._dqr_old)/dt
 
         self._dqr_old  = dqr
@@ -125,10 +147,7 @@ class OSVelocityController(OSController):
 
         self._qr_old   = qr
 
-        
-
-
-        # convert the mass compensation into end effector space
+        # convert the mass compensation into end effector space, equation 50
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
         svd_u, svd_s, svd_v = np.linalg.svd(Mx_inv)
 
@@ -170,26 +189,31 @@ class OSVelocityController(OSController):
         else:
             Fx                  = np.dot(Mx,x_des + 0.*a_g)
 
-
         # transform into joint space, add vel and gravity compensation
         u                   = np.dot(jac_ee.T, Fx)
 
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
+        #secondary goal, equation 9 derivative
         prop_val            = (self._robot.q_mean - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
 
+        #desired joint position
         q_des               = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
 
+        #compute the null vector
         u_null              = np.dot(Mq, q_des)
 
         # calculate the null space filter
         Jdyn_inv            = np.dot(Mx, np.dot(jac_ee, np.linalg.inv(Mq)))
 
+        #equation 55 part 2
         null_filter         = np.eye(len(q)) - np.dot(jac_ee.T, Jdyn_inv)
 
         u_null_filtered     = np.dot(null_filter, u_null)
 
+        #gain of the null compensated command equation 14/24 
+        #depending on whether velocity intergration was chosen
         u                   += self._alpha*u_null_filtered
 
         if np.any(np.isnan(u)):
@@ -201,11 +225,21 @@ class OSVelocityController(OSController):
         self._error = {'linear' : x_des, 'angular' : omg_des}
         return self._cmd
 
-    def send_cmd(self,time_elapsed):
+    def send_cmd(self, time_elapsed):
+        """
+        This function sends command to the robot
+        """
+
         self._robot.exec_torque_cmd(self._cmd)
 
 
-    def set_active(self,is_active):
+    def set_active(self, is_active):
+        """
+        To set the control active. 
+        Args: is_active (type: bool)
+        If the controller is not active or reaches time out
+        the controller automatically switches to position mode to avoid drift of the arm
+        """
 
         OSController.set_active(self,is_active)
 

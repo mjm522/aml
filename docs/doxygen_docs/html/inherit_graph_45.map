@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$class_pisa_soft_hand.html" title="PisaSoftHand" alt="" coords="6,5,109,32"/>
+<area shape="rect" id="node2" href="$classsawyer__sim__controllers_1_1_sawyer_effort_controller.html" title="sawyer_sim_controllers\l::SawyerEffortController" alt="" coords="141,5,304,46"/>
+<area shape="rect" id="node3" href="$classsawyer__sim__controllers_1_1_sawyer_gripper_controller.html" title="sawyer_sim_controllers\l::SawyerGripperController" alt="" coords="137,70,309,111"/>
+<area shape="rect" id="node4" href="$classsawyer__sim__controllers_1_1_sawyer_head_controller.html" title="sawyer_sim_controllers\l::SawyerHeadController" alt="" coords="142,135,303,177"/>
+<area shape="rect" id="node5" href="$classsawyer__sim__controllers_1_1_sawyer_position_controller.html" title="sawyer_sim_controllers\l::SawyerPositionController" alt="" coords="134,201,311,242"/>
+<area shape="rect" id="node6" href="$classsawyer__sim__controllers_1_1_sawyer_velocity_controller.html" title="sawyer_sim_controllers\l::SawyerVelocityController" alt="" coords="134,266,311,307"/>
 </map>

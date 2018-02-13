@@ -3,8 +3,7 @@
 }
 
 
-Inheritance diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P\-:
-\nopagebreak
+Inheritance diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -13,8 +12,7 @@ Inheritance diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P
 \end{figure}
 
 
-Collaboration diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P\-:
-\nopagebreak
+Collaboration diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -26,8 +24,7 @@ Collaboration diagram for aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\
 \item 
 def \hyperlink{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a08411e5267252063f4ba35a92e445ddc}{\-\_\-\-\_\-init\-\_\-\-\_\-}
 \item 
-\hypertarget{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a07b41a1e58a98d21e5155e8bd45e4e26}{def {\bfseries generate\-\_\-basis\-\_\-function}}\label{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a07b41a1e58a98d21e5155e8bd45e4e26}
-
+def \hyperlink{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a07b41a1e58a98d21e5155e8bd45e4e26}{generate\-\_\-basis\-\_\-function}
 \item 
 def \hyperlink{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a00cdc1d700fafc8db39d2f484840f5d1}{compute\-\_\-velocities}
 \item 
@@ -58,7 +55,8 @@ def \hyperlink{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_
 
 
 \subsection{Detailed Description}
-\begin{DoxyVerb}Discrete PROMP
+\begin{DoxyVerb}Discrete PROMP for more details on the implementation
+of the this, refer : https://link.springer.com/article/10.1007/s10514-017-9648-7
 \end{DoxyVerb}
  
 
@@ -120,6 +118,10 @@ Observations and corresponding basis activations
 )}}\label{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a4c1ab83285199db2e6188fbd85d11a0e}
 \begin{DoxyVerb}This function is for adding the temporal scalability for 
 the basis function
+Args:
+dt = time step
+phase_speed =  speed at which the phase has to evolve 0<speed<1, the trajectory rolls faster
+phase speed > 1 the trajectory rolls slower, too high values produces numerical instability
 \end{DoxyVerb}
  \hypertarget{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a00cdc1d700fafc8db39d2f484840f5d1}{\index{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}!compute\-\_\-velocities@{compute\-\_\-velocities}}
 \index{compute\-\_\-velocities@{compute\-\_\-velocities}!aml_lfd::promp::discrete_promp::DiscretePROMP@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}}
@@ -131,6 +133,23 @@ the basis function
 \begin{DoxyVerb}function to add new demo to the list
 param: traj : a uni dimentional numpy array
 \end{DoxyVerb}
+ \hypertarget{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a07b41a1e58a98d21e5155e8bd45e4e26}{\index{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}!generate\-\_\-basis\-\_\-function@{generate\-\_\-basis\-\_\-function}}
+\index{generate\-\_\-basis\-\_\-function@{generate\-\_\-basis\-\_\-function}!aml_lfd::promp::discrete_promp::DiscretePROMP@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}}
+\subsubsection[{generate\-\_\-basis\-\_\-function}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P.\-generate\-\_\-basis\-\_\-function (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{phase\-\_\-z, }
+\item[{}]{phase\-\_\-zd, }
+\item[{}]{phase\-\_\-zdd}
+\end{DoxyParamCaption}
+)}}\label{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a07b41a1e58a98d21e5155e8bd45e4e26}
+\begin{DoxyVerb}This function generates the basis funciton, first derivative and second derivative
+from a phase
+Args:
+phase_z   = phase of the trajectory (type: np.array([time steps, 1]))
+phaze_zd  = velocity of the phase (type: np.array([time steps, 1]))
+phaze_zds = acceleration of the phase (type: np.array([time steps, 1]))
+\end{DoxyVerb}
  \hypertarget{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a9cf60d83ce2014e1d595951f9c4e349d}{\index{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}!generate\-\_\-trajectory@{generate\-\_\-trajectory}}
 \index{generate\-\_\-trajectory@{generate\-\_\-trajectory}!aml_lfd::promp::discrete_promp::DiscretePROMP@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}}
 \subsubsection[{generate\-\_\-trajectory}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-promp.\-discrete\-\_\-promp.\-Discrete\-P\-R\-O\-M\-P.\-generate\-\_\-trajectory (
@@ -140,7 +159,10 @@ param: traj : a uni dimentional numpy array
 \item[{}]{randomness = {\ttfamily 1e-\/4}}
 \end{DoxyParamCaption}
 )}}\label{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a9cf60d83ce2014e1d595951f9c4e349d}
-\begin{DoxyVerb}Outputs a trajectory
+\begin{DoxyVerb}Args: 
+phase_speed = speed at which the trajectory rolls
+randomness  = randomness to sample the weight of the basis function
+Outputs a trajectory
 :param randomness: float between 0. (output will be the mean of gaussians) and 1. (fully randomized inside the variance)
 :return: a 1-D vector of the generated points
 \end{DoxyVerb}
@@ -163,6 +185,8 @@ param: traj : a uni dimentional numpy array
 \end{DoxyParamCaption}
 )}}\label{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_ad076683586a6ccc1900180d6a481bd55}
 \begin{DoxyVerb}compute bounds of a value at a specific time index
+Args: 
+t_index = time index of a trajectory
 \end{DoxyVerb}
  \hypertarget{classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p_a34bb1e437a4aa0271cab9a8f3733a2a4}{\index{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}!get\-\_\-mean@{get\-\_\-mean}}
 \index{get\-\_\-mean@{get\-\_\-mean}!aml_lfd::promp::discrete_promp::DiscretePROMP@{aml\-\_\-lfd\-::promp\-::discrete\-\_\-promp\-::\-Discrete\-P\-R\-O\-M\-P}}

@@ -16,11 +16,9 @@ var hierarchy =
       [ "sawyer_sim_controllers::SawyerPositionController", "classsawyer__sim__controllers_1_1_sawyer_position_controller.html", null ],
       [ "sawyer_sim_controllers::SawyerVelocityController", "classsawyer__sim__controllers_1_1_sawyer_velocity_controller.html", null ]
     ] ],
-    [ "demo_reps.Cost", "classdemo__reps_1_1_cost.html", null ],
     [ "aml_data_collec_utils.record_sample.DataManager", "classaml__data__collec__utils_1_1record__sample_1_1_data_manager.html", null ],
     [ "aml_lfd.ilqr.ilqr_traj_follow.DDP_TrajFollowClass", "classaml__lfd_1_1ilqr_1_1ilqr__traj__follow_1_1_d_d_p___traj_follow_class.html", null ],
     [ "aml_lfd.lqr.ddp_traj_follow_base.DDPTrajFollow", "classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow.html", null ],
-    [ "demo_reps.FwdModel", "classdemo__reps_1_1_fwd_model.html", null ],
     [ "src.aml_dl.gp.simple_gp.GaussianProcess", "classsrc_1_1aml__dl_1_1gp_1_1simple__gp_1_1_gaussian_process.html", null ],
     [ "GazeboRosControlPlugin", null, [
       [ "baxter_gazebo_plugin::BaxterGazeboRosControlPlugin", "classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html", null ],
@@ -87,12 +85,6 @@ var hierarchy =
       [ "aml_opt.mppi_controller.mppi_controller.MPPIController", "classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html", null ],
       [ "aml_opt.optimiser.Optimiser", "classaml__opt_1_1optimiser_1_1_optimiser.html", null ],
       [ "aml_opt.pi_traj_opt.pi_traj_opt.PITrajOpt", "classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html", null ],
-      [ "aml_opt.policy_opt.mlp_policy.MLPPolicy", "classaml__opt_1_1policy__opt_1_1mlp__policy_1_1_m_l_p_policy.html", null ],
-      [ "aml_opt.policy_opt.mlp_policy_dist.MLPPolicyDist", "classaml__opt_1_1policy__opt_1_1mlp__policy__dist_1_1_m_l_p_policy_dist.html", null ],
-      [ "aml_opt.policy_opt.point_env.PointEnv", "classaml__opt_1_1policy__opt_1_1point__env_1_1_point_env.html", null ],
-      [ "aml_opt.policy_opt.reps.REPS", "classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s.html", null ],
-      [ "aml_opt.policy_opt.sampler.BatchSampler", "classaml__opt_1_1policy__opt_1_1sampler_1_1_batch_sampler.html", null ],
-      [ "aml_opt.policy_opt.utilities.TfFunction", "classaml__opt_1_1policy__opt_1_1utilities_1_1_tf_function.html", null ],
       [ "aml_perception.camera_sensor.CameraSensor", "classaml__perception_1_1camera__sensor_1_1_camera_sensor.html", null ],
       [ "aml_planners.push_planner.costs.cost.Cost", "classaml__planners_1_1push__planner_1_1costs_1_1cost_1_1_cost.html", [
         [ "aml_planners.push_planner.costs.cost_2push_imp.CostImp", "classaml__planners_1_1push__planner_1_1costs_1_1cost__2push__imp_1_1_cost_imp.html", null ],

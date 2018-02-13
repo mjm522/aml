@@ -172,26 +172,6 @@ var annotated =
         [ "pi_traj_opt", null, [
           [ "PITrajOpt", "classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html", "classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt" ]
         ] ]
-      ] ],
-      [ "policy_opt", null, [
-        [ "mlp_policy", null, [
-          [ "MLPPolicy", "classaml__opt_1_1policy__opt_1_1mlp__policy_1_1_m_l_p_policy.html", "classaml__opt_1_1policy__opt_1_1mlp__policy_1_1_m_l_p_policy" ]
-        ] ],
-        [ "mlp_policy_dist", null, [
-          [ "MLPPolicyDist", "classaml__opt_1_1policy__opt_1_1mlp__policy__dist_1_1_m_l_p_policy_dist.html", "classaml__opt_1_1policy__opt_1_1mlp__policy__dist_1_1_m_l_p_policy_dist" ]
-        ] ],
-        [ "point_env", null, [
-          [ "PointEnv", "classaml__opt_1_1policy__opt_1_1point__env_1_1_point_env.html", "classaml__opt_1_1policy__opt_1_1point__env_1_1_point_env" ]
-        ] ],
-        [ "reps", null, [
-          [ "REPS", "classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s.html", "classaml__opt_1_1policy__opt_1_1reps_1_1_r_e_p_s" ]
-        ] ],
-        [ "sampler", null, [
-          [ "BatchSampler", "classaml__opt_1_1policy__opt_1_1sampler_1_1_batch_sampler.html", "classaml__opt_1_1policy__opt_1_1sampler_1_1_batch_sampler" ]
-        ] ],
-        [ "utilities", null, [
-          [ "TfFunction", "classaml__opt_1_1policy__opt_1_1utilities_1_1_tf_function.html", "classaml__opt_1_1policy__opt_1_1utilities_1_1_tf_function" ]
-        ] ]
       ] ]
     ] ],
     [ "aml_perception", null, [
@@ -444,10 +424,6 @@ var annotated =
     ] ],
     [ "demo_predictive_push_world", null, [
       [ "TestModelPushWorld", "classdemo__predictive__push__world_1_1_test_model_push_world.html", "classdemo__predictive__push__world_1_1_test_model_push_world" ]
-    ] ],
-    [ "demo_reps", null, [
-      [ "FwdModel", "classdemo__reps_1_1_fwd_model.html", "classdemo__reps_1_1_fwd_model" ],
-      [ "Cost", "classdemo__reps_1_1_cost.html", "classdemo__reps_1_1_cost" ]
     ] ],
     [ "ik_pick_and_place", null, [
       [ "PickAndPlace", "classik__pick__and__place_1_1_pick_and_place.html", "classik__pick__and__place_1_1_pick_and_place" ]

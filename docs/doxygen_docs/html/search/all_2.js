@@ -1,7 +1,6 @@
 var searchData=
 [
   ['batchcreator',['BatchCreator',['../classsrc_1_1aml__dl_1_1utilities_1_1tf__batch__creator_1_1_batch_creator.html',1,'src::aml_dl::utilities::tf_batch_creator']]],
-  ['batchsampler',['BatchSampler',['../classaml__opt_1_1policy__opt_1_1sampler_1_1_batch_sampler.html',1,'aml_opt::policy_opt::sampler']]],
   ['baxter_5fkinematics',['baxter_kinematics',['../classaml__robot_1_1baxter__kinematics_1_1baxter__kinematics.html',1,'aml_robot::baxter_kinematics']]],
   ['baxterarm',['BaxterArm',['../classaml__robot_1_1baxter__robot_1_1_baxter_arm.html',1,'aml_robot::baxter_robot']]],
   ['baxterbuttonstatus',['BaxterButtonStatus',['../classaml__robot_1_1baxter__robot_1_1_baxter_button_status.html',1,'aml_robot::baxter_robot']]],
@@ -18,11 +17,11 @@ var searchData=
   ['box2dviewer',['Box2DViewer',['../classaml__robot_1_1box2d_1_1box2d__viewer_1_1_box2_d_viewer.html',1,'aml_robot::box2d::box2d_viewer']]],
   ['box2dviewerros',['Box2DViewerROS',['../classaml__robot_1_1box2d_1_1box2d__viewer__ros_1_1_box2_d_viewer_r_o_s.html',1,'aml_robot::box2d::box2d_viewer_ros']]],
   ['boxar',['BoxAR',['../class_box_a_r.html',1,'']]],
-  ['boxobject',['BoxObject',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_box_object.html',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world']]],
-  ['boxobject',['BoxObject',['../classaml__data__collec__utils_1_1box__object_1_1_box_object.html',1,'aml_data_collec_utils::box_object']]],
   ['boxobject',['BoxObject',['../classaml__playground_1_1push__box_1_1push__worlds_1_1bullet_1_1push__world_1_1_box_object.html',1,'aml_playground::push_box::push_worlds::bullet::push_world']]],
-  ['boxobject',['BoxObject',['../classaml__robot_1_1bullet_1_1push__world_1_1push__world_1_1_box_object.html',1,'aml_robot::bullet::push_world::push_world']]],
+  ['boxobject',['BoxObject',['../classaml__data__collec__utils_1_1box__object_1_1_box_object.html',1,'aml_data_collec_utils::box_object']]],
   ['boxobject',['BoxObject',['../classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_box_object.html',1,'aml_robot::mujoco::push_world::collect_push_data_sim']]],
+  ['boxobject',['BoxObject',['../classaml__robot_1_1bullet_1_1push__world_1_1push__world_1_1_box_object.html',1,'aml_robot::bullet::push_world::push_world']]],
+  ['boxobject',['BoxObject',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_box_object.html',1,'aml_playground::peg_in_hole::pih_worlds::bullet::pih_world']]],
   ['bulletrobot',['BulletRobot',['../classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html',1,'aml_robot::bullet::bullet_robot']]],
   ['bulletsawyerarm',['BulletSawyerArm',['../classaml__robot_1_1bullet_1_1bullet__sawyer_1_1_bullet_sawyer_arm.html',1,'aml_robot::bullet::bullet_sawyer']]]
 ];
