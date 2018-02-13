@@ -83,4 +83,14 @@ class OSController(Controller):
         return lin_error, ang_error, success, time_elapsed
 
 
+    def set_active(self, is_active):
+
+        self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
+
+        self._goal_vel  = np.zeros(3)
+        self._goal_omg  = np.zeros(3)
+
+        Controller.set_active(self,is_active)
+
+
 

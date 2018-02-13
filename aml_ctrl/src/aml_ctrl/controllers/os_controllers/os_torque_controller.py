@@ -30,12 +30,27 @@ class OSTorqueController(OSController):
         #null space control gain
         self._alpha    = self._config['alpha']
 
+        self._integrate_jnt_velocity = self._config['integrate_jnt_velocity']
+
         self._deactivate_wait_time = self._config['deactivate_wait_time']
+
+        # temporary !!
+        self._old_time = self.get_time()
+
+        
+        self._qr_old   = self._robot._state['position']
+
+        self._dqr_old  = np.zeros(self._robot._nu)
 
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
 
-    def compute_cmd(self,time_elapsed):
+    def get_time(self):
+
+        time_now       = rospy.Time.now()
+        return time_now.secs + time_now.nsecs*1e-9
+
+    def compute_cmd(self, time_elapsed):
 
         # calculate the Jacobian for the end effector
 
@@ -56,17 +71,68 @@ class OSTorqueController(OSController):
         h              = robot_state['gravity_comp']
 
         # calculate the jacobian of the end effector
-        jac_ee         = robot_state['jacobian']
+        if self._orientation_ctrl:
+            jac_ee  = robot_state['jacobian']
+        else:
+            jac_ee  = robot_state['jacobian'][:3,:]
 
         # calculate the inertia matrix in joint space
         Mq             = robot_state['inertia']
 
         # calculate position of the end-effector
-        ee_xyz         = robot_state['ee_point']
+        ee_pos         = robot_state['ee_point']
         ee_ori         = robot_state['ee_ori']
 
         curr_vel       = robot_state['ee_vel']
         curr_omg       = robot_state['ee_omg']
+
+
+
+        delta_pos      = goal_pos - ee_pos
+
+        delta_vel      = goal_vel - curr_vel
+
+        #pseudo inverse of jacobian
+        jac_star       = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
+        # print jac_ee.shape
+        # print jac_star.shape
+
+        #gradient of redundancy resolution function
+        # grad_g         = 
+
+        curr_time      = self.get_time()
+
+        dt             = curr_time - self._old_time
+        # print dt
+        if dt == 0.0:
+            dt = 0.0001
+
+        self._old_time = curr_time
+
+
+        #reference velocity
+        dxr            = goal_vel + self._kp_p*(goal_pos-ee_pos)
+
+        #reference_joint_velocity
+        if self._integrate_jnt_velocity:
+            
+            dqr        = np.dot(jac_star, dxr) + self._alpha*(np.eye(self._robot._nu) - np.dot(np.dot(jac_star, jac_ee), grad_g))
+
+        else:
+
+            dqr        = np.zeros_like(dq)
+
+
+        ddqr           = (dqr - self._dqr_old)/dt
+
+        self._dqr_old  = dqr
+
+        qr             = self._qr_old + dqr*dt
+
+        self._qr_old   = qr
+
+        
+
 
         # convert the mass compensation into end effector space
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
@@ -82,22 +148,26 @@ class OSTorqueController(OSController):
         # convert the mass compensation into end effector space
         Mx   = np.dot(svd_v.T, np.dot(np.diag(svd_s), svd_u.T))
 
-        # x_des   = goal_pos - ee_xyz
-        x_des   = self._kp_p*(goal_pos - ee_xyz) + self._kd_p*(goal_vel - curr_vel)
+        # x_des   = goal_pos - ee_pos
+        x_des   = self._kp_p*delta_pos + self._kd_p*delta_vel
  
         if self._orientation_ctrl:
             if goal_ori is None:
                 print "For orientation control, pass goal orientation!"
                 raise ValueError
-            else:
-                if type(goal_ori) is np.quaternion:
-                    omg_des  = quatdiff(goal_ori, ee_ori)
-                elif len(goal_ori) == 3:
-                    # omg_des = goal_ori
-                    omg_des = self._kp_o*goal_ori + self._kd_o*(goal_omg - curr_omg)
-                else:
-                    print "Wrong dimension"
-                    raise ValueError
+            
+
+            delta_ori       = quatdiff(goal_ori, curr_ori)
+            delta_omg       = goal_omg - curr_omg
+
+            if np.linalg.norm(delta_ori) < self._angular_threshold:
+                delta_ori = np.zeros(delta_ori.shape)
+                delta_omg = np.zeros(delta_omg.shape)
+
+
+
+            omg_des = self._kp_o*delta_ori + self._kd_o*delta_omg
+            
         else:
             omg_des = np.zeros(3)
 
@@ -105,7 +175,10 @@ class OSTorqueController(OSController):
         a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
  
         # calculate desired force in (x,y,z) space
-        Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
+        if self._orientation_ctrl:
+            Fx                  = np.dot(Mx, np.hstack([x_des, omg_des]) + 0.*a_g)
+        else:
+            Fx                  = np.dot(Mx,x_des + 0.*a_g)
 
 
         # transform into joint space, add vel and gravity compensation
@@ -136,7 +209,6 @@ class OSTorqueController(OSController):
 
         # Never forget to update the error
         self._error = {'linear' : x_des, 'angular' : omg_des}
-
         return self._cmd
 
     def send_cmd(self,time_elapsed):
