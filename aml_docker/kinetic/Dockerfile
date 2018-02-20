@@ -1,5 +1,11 @@
 FROM osrf/ros:kinetic-desktop-full
 
+
+# installs avahi for local network discovery (required for using the real robot)
+RUN apt-get update && apt-get install -y \
+    avahi-daemon avahi-utils
+
+
 RUN apt-get update && \ 
     apt-get -y install ros-kinetic-rviz && \
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \

@@ -54,7 +54,11 @@ RUN apt-get update && apt-get install -y \
     ros-indigo-desktop-full=1.1.5-0* \
     && rm -rf /var/lib/apt/lists/*
 
+# installs avahi for local network discovery (required for using the real robot)
+RUN apt-get update && apt-get install -y \
+    avahi-daemon avahi-utils
 
+#ADD avahi-configs/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
 
 
@@ -78,10 +82,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-
     pip install protobuf && \
     pip install pandas
-
 
 RUN bin/bash -c "cd /tmp && \
                  git clone https://github.com/pybox2d/pybox2d && \
