@@ -7,6 +7,7 @@
 DOCKER_IMAGE=$1
 WORK_DIR="${HOME}/catkin_ws/"
 ROOT_DIR="$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd)"
+echo "ROOT_DIR: ${ROOT_DIR}"
 
 #192.168.0.9:0
 #192.168.0.9:0
@@ -25,11 +26,18 @@ source ${ROOT_DIR}/aml_aliases.sh
 
 #sudo nvidia-modprobe -u -c=0
 # Running container and giving access to X11 in a safer way
+# --network=rosnet \
+# --hostname="aml_container" \ (give the container a name)
+#        --network="host" \
+# --publish-all="true" \ (to publish all ports from the container to the outside)
+# --device="/dev/snd" \
 xdocker run -it \
+       --network="host" \
        --user=$(id -u) \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --workdir="/home/$USER" \
+       --volume="${ROOT_DIR}/avahi-configs:/etc/avahi" \
        --volume="/home/$USER:/home/$USER" \
        --volume="/etc/group:/etc/group:ro" \
        --volume="/etc/passwd:/etc/passwd:ro" \
@@ -38,7 +46,7 @@ xdocker run -it \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="${WORK_DIR}:/home/Projects" ${extra_params} \
        $DOCKER_IMAGE \
-       bash
+       bash 
 
 # Unsafe container execution with X11 access 
 # xhost +

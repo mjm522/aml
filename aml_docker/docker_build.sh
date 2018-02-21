@@ -10,4 +10,5 @@ then
       exit 1
 fi
 
+#cp -r avahi-configs ${DOCKER_FILE_PATH}
 docker build ${DOCKER_FILE_PATH} -t dev:${DOCKER_FILE_PATH##*/}

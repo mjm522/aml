@@ -61,6 +61,12 @@ RUN apt-get update && apt-get install -y \
 # setup entrypoint, need entrypoint.sh in the same folder with Dockerfile
 COPY ./ros_entrypoint.sh /
 
+
+# installs avahi for local network discovery (required for using the real robot)
+RUN apt-get update && apt-get install -y \
+    avahi-daemon avahi-utils
+
+
 # Dependencies for baxter and sawyer simulator
 RUN apt-get update && \ 
     apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
