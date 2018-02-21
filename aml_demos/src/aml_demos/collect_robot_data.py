@@ -79,7 +79,7 @@ class CollectRobotData(object):
                 dummy_task = {}
 
                 #start recording the data
-                self._record_sample.start_record(task_action=dummy_task)
+                self._sample_recorder.start_record(task_action=dummy_task)
                 
             elif not self._robot.get_lfd_status and self._start_record:
 
@@ -88,7 +88,7 @@ class CollectRobotData(object):
                 self._start_record = False
 
                 #stop recording the data
-                self._record_sample.stop_record(task_status=True)
+                self._sample_recorder.stop_record(task_status=True)
                 
                 self._finish_demo  = True
                 
@@ -109,10 +109,10 @@ class CollectRobotData(object):
 
     def save_data_now(self):
 
-        self._record_sample.save_data_now()
+        self._sample_recorder.save_data_now()
 
 
-    def __call__(self):
+    def run(self):
 
         self.collect_data()
 
@@ -125,7 +125,9 @@ def main():
     limb = 'left'
     arm = BaxterArm(limb)
 
-    CollectRobotData(robot_interface=arm, config=collect_robot_data_config)
+    crd = CollectRobotData(robot_interface=arm, config=collect_robot_data_config)
+
+    crd.run()
 
 
 if __name__ == '__main__':
