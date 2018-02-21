@@ -155,6 +155,9 @@ class DataManager(object):
         saved_data = False
 
         #if more number of samples came in, then make a new sample, else append to existing sample
+        if self._data is None:
+            self.create_new_data()
+            
         if len(self._data) >= self._num_samples_per_file:
 
             print "Saving the data file ..."
