@@ -10,6 +10,7 @@
 #include <marker_odometry/aruco_utils.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+#include <sstream>
 
 using namespace aruco;
 
@@ -171,6 +172,7 @@ public:
         //for each marker, draw info and its boundaries in the image
         for(size_t i=0; i<hand_markers.size(); ++i)
         {
+
           // only publishing the selected marker
           if(hand_markers[i].id == hand_marker_id)
           {
@@ -309,8 +311,11 @@ public:
 
           
           //for box marker
-          if((openni_rgb_markers[i].id == box_marker_id) && calibrated) 
+          if(calibrated) //(openni_rgb_markers[i].id == box_marker_id) && 
           {
+
+            std::stringstream ss;
+            ss << box << openni_rgb_markers[i].id;
             //keep in mind that this is called only if the marker on the box
             // is visible
             //only perform the following operations if we know the pose of openni camera w.r.t base
@@ -319,7 +324,7 @@ public:
             transformBoxToBase = (static_cast<tf::Transform>(transformOpenniToBase)*transformBoxToOpenni);
 
             tf::StampedTransform stampedTransformBoxToBase(transformBoxToBase, curr_stamp,
-                                                  "base", "box");
+                                                  "base", ss.c_str());
             br.sendTransform(stampedTransformBoxToBase);
 
             //draw a 3d cube in each marker if there is 3d info
