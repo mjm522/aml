@@ -324,7 +324,7 @@ public:
             transformBoxToBase = (static_cast<tf::Transform>(transformOpenniToBase)*transformBoxToOpenni);
 
             tf::StampedTransform stampedTransformBoxToBase(transformBoxToBase, curr_stamp,
-                                                  "base", ss.c_str());
+                                                  "base", ss.str().c_str());
             br.sendTransform(stampedTransformBoxToBase);
 
             //draw a 3d cube in each marker if there is 3d info
