@@ -315,7 +315,7 @@ public:
           {
 
             std::stringstream ss;
-            ss << box << openni_rgb_markers[i].id;
+            ss << "box" << openni_rgb_markers[i].id;
             //keep in mind that this is called only if the marker on the box
             // is visible
             //only perform the following operations if we know the pose of openni camera w.r.t base
