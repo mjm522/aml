@@ -85,17 +85,20 @@ class DiscreteDMP(object):
         
         for ID in range(self._dof):
 
-
-            traj = self._demo_traj[:len(self._time_stamps), ID]
+            traj = self._demo_traj[:, ID]
             nsample  = np.arange(0.,  len(traj)*self._dt, self._dt)
-            nnsample = np.arange(0.,  len(traj)*self._dt-4*self._dt,  (len(traj)*self._dt-4*self._dt) / (1./self._dt))
+            nnsample = np.arange(0.,  (len(traj)-4)*self._dt,  (len(traj)-4)*self._dt**2  )[:len(self._time_stamps)]
             
-            # print self._demo_traj.shape
-            # print traj.shape
-            # print len(self._time_stamps)
-            # print len(nnsample)
+            # print "id \t", ID
+            # print (   len(traj)*self._dt-4*self._dt) / (1./self._dt)
+            # print (   (len(traj)-4)*self._dt**2)
+            # print " demo traj shape \t", self._demo_traj.shape
+            # print "traj shape \t", traj.shape
+            # print "time steps \t",len(self._time_stamps)
+            # print "n sample shape \t", nsample.shape
+            # print "nn sample shape \t", nnsample.shape
 
-            traj_data[:,ID+1] = interp1d(nsample, traj)(nnsample)
+            traj_data[:,ID+1] = interp1d(nsample, traj, kind='cubic')(nnsample)
         
         return traj_data
 
@@ -240,6 +243,10 @@ class DiscreteDMP(object):
         #by rolling out out point at a time
         while u > 1e-3:
 
+            if config['goal_thresh'] is not None:
+                if np.linalg.norm(y-goals) < config['goal_thresh']:
+                    break
+
             id = id + 1
             kf = self._kernel_fcn(np.array([[u]]))
 
@@ -248,6 +255,8 @@ class DiscreteDMP(object):
             if  self._type == 1:
                 scaling = np.multiply((goals - config['y0']), 1./config['original_scaling'])
                 ddy = K * (goals - y) - D * dy + np.multiply(scaling, forces.T) * u
+                if np.linalg.norm(ddy) < 1e-10:
+                    import pdb;pdb.set_trace()
             elif  self._type == 2 or self._type == 3:
                 scaling = goals - config['y0']
                 ddy = K * (goals - y) - D * dy - K * scaling * u + K * forces.T * u
@@ -277,10 +286,10 @@ class DiscreteDMP(object):
             
             #canonical system rollout based on the typpe of the system
             if  self._type == 1 or self._type == 2:
-                u = u + 1/tau * ax * u * dt
+                u = u + 1./tau * ax * u * dt
             elif  self._type == 3:
                 phasestop = 1 + config['ac'] * np.sqrt(np.sum((yreal - y)**2))
-                u = u + 1/tau * ax * u * dt / phasestop
+                u = u + 1./tau * ax * u * dt / phasestop
 
             t = t + dt
             timestamps = np.hstack([timestamps, t])
