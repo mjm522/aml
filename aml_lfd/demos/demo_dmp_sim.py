@@ -3,9 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_lfd.dmp.config import discrete_dmp_config
+from aml_lfd.utilities.smooth_demo_traj import SmoothDemoTraj
+
 
 
 def train_dmp(trajectory):
+
+    discrete_dmp_config['dof'] = trajectory.shape[1]
 
     dmp = DiscreteDMP(config=discrete_dmp_config)
     dmp.load_demo_trajectory(trajectory)
@@ -15,18 +19,20 @@ def train_dmp(trajectory):
 
 def test_dmp(dmp):
 
+    discrete_dmp_config['dof'] = dmp._dof
+
     test_config = discrete_dmp_config
     test_config['dt'] = 0.001
 
     # play with the parameters
-    start_offset = np.array([0.,0.])
-    goal_offset = np.array([.0, 0.])
+    start_offset = np.zeros(dmp._dof)
+    goal_offset = np.zeros(dmp._dof)
     speed = 0.5
     external_force = np.array([0.,0.,0.,0.])
     alpha_phaseStop = 20.
 
     test_config['y0'] = dmp._traj_data[0, 1:] + start_offset
-    test_config['dy'] = np.array([0., 0.])
+    test_config['dy'] = np.zeros(dmp._dof) 
     test_config['goals'] = dmp._traj_data[-1, 1:] + goal_offset
     test_config['tau'] = 1./speed
     test_config['ac'] = alpha_phaseStop
@@ -39,22 +45,33 @@ def test_dmp(dmp):
 
     test_traj = dmp.generate_trajectory(config=test_config)
 
+    #in 2D only maximum only two dimensions can be plotted
+
+    if dmp._dof > 2:
+        print "Warning: Only 2 dimensions can be plotted"
+
     plt.figure(1)
     plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')
     plt.plot(test_traj[:,1], test_traj[:,2], 'r--')
 
     plt.figure(2)
-    plt.plot(test_traj[:,0], test_traj[:,1], 'g-')
-    plt.plot(test_traj[:,0], test_traj[:,2], 'm-')
+    for k in range(dmp._dof):
+
+        plt.plot(test_traj[:,0], test_traj[:,k+1])
+
     plt.show()
 
 def main():
 
     data_storage_path = os.environ['AML_DATA'] + '/aml_lfd/dmp/'
     file_name = data_storage_path+'recorded_trajectory.txt'
+
     trajectory = np.loadtxt(file_name)
 
-    dmp = train_dmp(trajectory)
+    #this is for smoothing the trajectory
+    smooth_traj = SmoothDemoTraj(trajectory, window_len=35, poly_order=3)
+
+    dmp = train_dmp(smooth_traj._smoothed_traj)
     test_dmp(dmp)
 
 
