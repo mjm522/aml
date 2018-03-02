@@ -62,7 +62,7 @@ class Box2dDMP():
         else:
             test_config['extForce'] = np.array([0,0,0,0])
 
-        test_traj = self._dmp.generate_trajectory(config=test_config)
+        test_traj = self._dmp.generate_trajectory(config=test_config)['pos']
 
         if plot_traj:
 

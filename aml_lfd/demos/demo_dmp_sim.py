@@ -43,7 +43,7 @@ def test_dmp(dmp):
     else:
         test_config['extForce'] = np.array([0,0,0,0])
 
-    test_traj = dmp.generate_trajectory(config=test_config)
+    test_traj = dmp.generate_trajectory(config=test_config)['pos']
 
     #in 2D only maximum only two dimensions can be plotted
 

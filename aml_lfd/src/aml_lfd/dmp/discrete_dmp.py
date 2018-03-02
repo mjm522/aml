@@ -231,6 +231,9 @@ class DiscreteDMP(object):
         yreal = y
         dyreal = dy
         Y = yreal
+        dY = dyreal
+        ddY = np.zeros_like(dyreal)
+
         timestamps = np.array([0])
         t = 0
         #generate the trajectory
@@ -255,6 +258,9 @@ class DiscreteDMP(object):
 
             if  self._type == 1 or self._type == 2:
                 Y = np.vstack([Y,y])
+                dY = np.vstack([dY, dy])
+                ddY = np.vstack([ddY, ddy])
+            
             #for the phase stop allowing type of DMP
             elif  self._type == 3:
                 Ky = 300.
@@ -266,6 +272,8 @@ class DiscreteDMP(object):
                 dyreal = dyreal + ddyreal * dt
                 yreal = yreal + dyreal * dt
                 Y = np.vstack([Y,yreal])
+                dY = np.vstack([dY, dyreal])
+                ddY = np.vstack([ddY, ddy])
             
             #canonical system rollout based on the typpe of the system
             if  self._type == 1 or self._type == 2:
@@ -278,6 +286,17 @@ class DiscreteDMP(object):
             timestamps = np.hstack([timestamps, t])
 
         #append the trajectory
-        traj = np.hstack([np.asarray(timestamps)[:,None], Y])
+        traj   = np.hstack([np.asarray(timestamps)[:,None], Y])
+        dtraj  = np.hstack([np.asarray(timestamps)[:,None], dY])
+        ddtraj = np.hstack([np.asarray(timestamps)[:,None], ddY])
 
-        return traj
+        traj_data = {
+        #computed traj of the trajectory
+        'pos':traj,
+        #computed vel of the trajectory
+        'vel':dtraj,
+        #computed acc of the trajectory
+        'acc':ddtraj,
+        }
+
+        return traj_data

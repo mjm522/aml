@@ -71,16 +71,10 @@ def test_dmp(dmp, speed=1., plot_trained=False):
     if plot_trained:
         plot_traj([dmp._traj_data[:,1:], test_traj[:,1:]])
 
-
-    vel_traj =  np.diff(test_traj[:,1:], axis=0)
-    vel_traj =  np.vstack([np.zeros_like(vel_traj[0]), vel_traj])*test_config['dt']
-    acc_traj =  np.diff(vel_traj, axis=0)
-    acc_traj =  np.vstack([np.zeros_like(acc_traj[0]), acc_traj])*test_config['dt']
-
     test_traj = {
-    'pos_traj': test_traj[:,1:],
-    'vel_traj':vel_traj,
-    'acc_traj':acc_traj
+    'pos_traj': test_traj['pos'][:,1:],
+    'vel_traj':test_traj['vel'][:,1:],
+    'acc_traj':test_traj['acc'][:,1:]
     }
     
     return test_traj
