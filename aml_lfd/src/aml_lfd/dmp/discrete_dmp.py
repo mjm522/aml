@@ -155,9 +155,12 @@ class DiscreteDMP(object):
         # canonical system roll out
         x = np.zeros([1, self._traj_data.shape[0]])
         x[0,0] = 1.
+        t = 0
         # 1: Euler solution to exponential decreased canonical system
         for i in range(1, x.shape[1]):
+            #x[:,i] = np.exp(float(ax)*t/tau)
             x[:,i] = x[:,i-1] + 1./tau * ax * x[:,i-1] * dt
+            t += dt
   
         # calculate weights directly
         phi = self._kernel_fcn(x)
@@ -181,7 +184,10 @@ class DiscreteDMP(object):
                 if y.ndim == 1:
                     y = y[:,None]
             elif  self._type == 2 or self._type == 3:
-                y = (tau * Ydd[:,i-1] + D * Yd[:,i-1])/K - (goals[i-1] - Y[:,i-1]) + (goals[i-1] - Y[1,i-1]) * x.T
+
+                y = (tau * Ydd[:,i-1] + D * Yd[:,i-1])/K - (goals[i-1] - Y[:,i-1]) +  np.multiply( (goals[i-1] - Y[1,i-1]),  x[0,:])
+                if y.ndim == 1:
+                    y = y[:,None]
 
             y = np.multiply(y, 1./(x.T))
 
@@ -241,6 +247,7 @@ class DiscreteDMP(object):
         t = 0
         #generate the trajectory
         #by rolling out out point at a time
+
         while u > 1e-3:
 
             if config['goal_thresh'] is not None:
@@ -255,8 +262,6 @@ class DiscreteDMP(object):
             if  self._type == 1:
                 scaling = np.multiply((goals - config['y0']), 1./config['original_scaling'])
                 ddy = K * (goals - y) - D * dy + np.multiply(scaling, forces.T) * u
-                if np.linalg.norm(ddy) < 1e-10:
-                    import pdb;pdb.set_trace()
             elif  self._type == 2 or self._type == 3:
                 scaling = goals - config['y0']
                 ddy = K * (goals - y) - D * dy - K * scaling * u + K * forces.T * u
@@ -284,8 +289,9 @@ class DiscreteDMP(object):
                 dY = np.vstack([dY, dyreal])
                 ddY = np.vstack([ddY, ddy])
             
-            #canonical system rollout based on the typpe of the system
+            #canonical system rollout based on the type of the system
             if  self._type == 1 or self._type == 2:
+                #u = np.exp(float(ax)*t/tau)
                 u = u + 1./tau * ax * u * dt
             elif  self._type == 3:
                 phasestop = 1 + config['ac'] * np.sqrt(np.sum((yreal - y)**2))
