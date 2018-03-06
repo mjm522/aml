@@ -1,8 +1,13 @@
+#!/usr/bin/env python
 
 import numpy as np
 import quaternion
 import rospy
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController 
+
+
+Controller = OSTorqueController
 
 import numpy as np
 import quaternion
@@ -23,20 +28,20 @@ def main_coop_gravity_comp_demo():
 
     arm_master = BaxterArm(master_limb)
     arm_slave  = BaxterArm(slave_limb)
-    #baxter_ctrlr.set_neutral()
+
     arm_master.untuck_arm()
     arm_slave.untuck_arm()
 
     master_start_pos, master_start_ori  =  arm_master.get_ee_pose()
     slave_start_pos,  slave_start_ori   =  arm_slave.get_ee_pose()
 
-    ctrlr_slave = OSCTorqueController(arm_slave)
+    ctrlr_slave = Controller(arm_slave)
 
     cmd = np.zeros(7)
     rate = 200 #Hz
     rate = rospy.timer.Rate(rate)
 
-    rel_pos = slave_start_pos - master_start_pos#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
+    rel_pos = (slave_start_pos - master_start_pos)*0.90#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
     rel_ori = slave_start_ori.conjugate()*master_start_ori
 
     ctrlr_slave.set_active(True)
@@ -61,13 +66,13 @@ def main_coop_gravity_comp_demo():
         goal_pos = (master_pos + rel_pos_rl) # goal position of right arm w.r.t. base
     
         #following is the initiall difference when using left_arm_start and rigt_arm_start
-        goal_ori = master_ori*rel_ori
+        goal_ori = master_ori#*rel_ori
 
 
-        ctrlr_slave.set_goal(goal_pos,goal_ori)
+        ctrlr_slave.set_goal(goal_pos=goal_pos, goal_ori=goal_ori, orientation_ctrl=True)
         
 
-        lin_error, ang_error, success, time_elapsed = ctrlr_slave.wait_until_goal_reached(timeout=0.5)
+        lin_error, ang_error, success, time_elapsed = ctrlr_slave.wait_until_goal_reached(timeout=0.05)
         
         print("lin_error: %0.4f ang_error: %0.4f elapsed_time: (secs,nsecs) = (%d,%d)"%(lin_error,ang_error,time_elapsed.secs,time_elapsed.nsecs), " success: ", success)
 

@@ -137,5 +137,4 @@ class OSPositionController(OSController):
 
 
     def send_cmd(self,time_elapsed):
-        # self._robot.exec_position_cmd(self._cmd)
         self._robot.exec_position_cmd_delta(self._cmd)
