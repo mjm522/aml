@@ -10,6 +10,9 @@
 #include <marker_odometry/aruco_utils.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+#include <sstream>
+
+#include "aml_calib/MarkerPoseStamped.h"
 
 using namespace aruco;
 
@@ -27,6 +30,7 @@ private:
   image_transport::Publisher image_pub;
   image_transport::Publisher debug_pub;
   ros::Publisher pose_pub;
+  ros::Publisher marker_pose_pub;
   ros::Publisher transform_pub; 
   ros::Publisher openni_rgb_cam_info_pub; 
   ros::Publisher position_pub;
@@ -79,8 +83,11 @@ public:
     
     image_pub = it.advertise("result", 0);
     debug_pub = it.advertise("debug", 0);
-    pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 100);
     transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
+    marker_pose_pub = nh.advertise<aml_calib::MarkerPoseStamped>("marker_pose", 100);
+
+    // publishes the calibration marker pose
+    pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 100);
     position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
 
     openni_rgb_cam_info_pub = nh.advertise<sensor_msgs::CameraInfo>("camera_info", 100);
@@ -171,7 +178,8 @@ public:
         //for each marker, draw info and its boundaries in the image
         for(size_t i=0; i<hand_markers.size(); ++i)
         {
-          // only publishing the selected marker
+
+          // only publishing the selected marker unless the id is -1, in which case publish them all
           if(hand_markers[i].id == hand_marker_id)
           {
 
@@ -195,7 +203,7 @@ public:
             poseMsg.header.frame_id = reference_frame;
             poseMsg.header.stamp = curr_stamp;
             pose_pub.publish(poseMsg);
-
+            
             geometry_msgs::TransformStamped transformMsg;
             tf::transformStampedTFToMsg(stampedTransform, transformMsg);
             transform_pub.publish(transformMsg);
@@ -204,7 +212,7 @@ public:
             positionMsg.header = transformMsg.header;
             positionMsg.vector = transformMsg.transform.translation;
             position_pub.publish(positionMsg);
-           
+
             computedMarkerToBase = true;
           }
 
@@ -309,8 +317,11 @@ public:
 
           
           //for box marker
-          if((openni_rgb_markers[i].id == box_marker_id) && calibrated) 
+          if(calibrated) //(openni_rgb_markers[i].id == box_marker_id) && 
           {
+
+            std::stringstream ss;
+            ss << "box" << openni_rgb_markers[i].id;
             //keep in mind that this is called only if the marker on the box
             // is visible
             //only perform the following operations if we know the pose of openni camera w.r.t base
@@ -319,8 +330,16 @@ public:
             transformBoxToBase = (static_cast<tf::Transform>(transformOpenniToBase)*transformBoxToOpenni);
 
             tf::StampedTransform stampedTransformBoxToBase(transformBoxToBase, curr_stamp,
-                                                  "base", "box");
+                                                  "base", ss.str().c_str());
             br.sendTransform(stampedTransformBoxToBase);
+
+
+            aml_calib::MarkerPoseStamped markerPoseMsg;
+            tf::poseTFToMsg(stampedTransformBoxToBase, markerPoseMsg.pose.pose);
+            markerPoseMsg.pose.header.frame_id = "base";
+            markerPoseMsg.pose.header.stamp = curr_stamp;
+            markerPoseMsg.marker_id = openni_rgb_markers[i].id;
+            marker_pose_pub.publish(markerPoseMsg);
 
             //draw a 3d cube in each marker if there is 3d info
             if(openni_rgb_camParam.isValid() && box_marker_size != -1)

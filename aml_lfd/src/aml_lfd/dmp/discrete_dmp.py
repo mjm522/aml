@@ -85,17 +85,20 @@ class DiscreteDMP(object):
         
         for ID in range(self._dof):
 
-
-            traj = self._demo_traj[:len(self._time_stamps), ID]
+            traj = self._demo_traj[:, ID]
             nsample  = np.arange(0.,  len(traj)*self._dt, self._dt)
-            nnsample = np.arange(0.,  len(traj)*self._dt-4*self._dt,  (len(traj)*self._dt-4*self._dt) / (1./self._dt))
+            nnsample = np.arange(0.,  (len(traj)-4)*self._dt,  (len(traj)-4)*self._dt**2  )[:len(self._time_stamps)]
             
-            print self._demo_traj.shape
-            print traj.shape
-            print len(self._time_stamps)
-            print len(nnsample)
+            # print "id \t", ID
+            # print (   len(traj)*self._dt-4*self._dt) / (1./self._dt)
+            # print (   (len(traj)-4)*self._dt**2)
+            # print " demo traj shape \t", self._demo_traj.shape
+            # print "traj shape \t", traj.shape
+            # print "time steps \t",len(self._time_stamps)
+            # print "n sample shape \t", nsample.shape
+            # print "nn sample shape \t", nnsample.shape
 
-            traj_data[:,ID+1] = interp1d(nsample, traj)(nnsample)
+            traj_data[:,ID+1] = interp1d(nsample, traj, kind='cubic')(nnsample)
         
         return traj_data
 
@@ -152,9 +155,12 @@ class DiscreteDMP(object):
         # canonical system roll out
         x = np.zeros([1, self._traj_data.shape[0]])
         x[0,0] = 1.
+        t = 0
         # 1: Euler solution to exponential decreased canonical system
         for i in range(1, x.shape[1]):
+            #x[:,i] = np.exp(float(ax)*t/tau)
             x[:,i] = x[:,i-1] + 1./tau * ax * x[:,i-1] * dt
+            t += dt
   
         # calculate weights directly
         phi = self._kernel_fcn(x)
@@ -178,7 +184,10 @@ class DiscreteDMP(object):
                 if y.ndim == 1:
                     y = y[:,None]
             elif  self._type == 2 or self._type == 3:
-                y = (tau * Ydd[:,i-1] + D * Yd[:,i-1])/K - (goals[i-1] - Y[:,i-1]) + (goals[i-1] - Y[1,i-1]) * x.T
+
+                y = (tau * Ydd[:,i-1] + D * Yd[:,i-1])/K - (goals[i-1] - Y[:,i-1]) +  np.multiply( (goals[i-1] - Y[1,i-1]),  x[0,:])
+                if y.ndim == 1:
+                    y = y[:,None]
 
             y = np.multiply(y, 1./(x.T))
 
@@ -231,11 +240,19 @@ class DiscreteDMP(object):
         yreal = y
         dyreal = dy
         Y = yreal
+        dY = dyreal
+        ddY = np.zeros_like(dyreal)
+
         timestamps = np.array([0])
         t = 0
         #generate the trajectory
         #by rolling out out point at a time
+
         while u > 1e-3:
+
+            if config['goal_thresh'] is not None:
+                if np.linalg.norm(y-goals) < config['goal_thresh']:
+                    break
 
             id = id + 1
             kf = self._kernel_fcn(np.array([[u]]))
@@ -255,6 +272,9 @@ class DiscreteDMP(object):
 
             if  self._type == 1 or self._type == 2:
                 Y = np.vstack([Y,y])
+                dY = np.vstack([dY, dy])
+                ddY = np.vstack([ddY, ddy])
+            
             #for the phase stop allowing type of DMP
             elif  self._type == 3:
                 Ky = 300.
@@ -266,18 +286,32 @@ class DiscreteDMP(object):
                 dyreal = dyreal + ddyreal * dt
                 yreal = yreal + dyreal * dt
                 Y = np.vstack([Y,yreal])
+                dY = np.vstack([dY, dyreal])
+                ddY = np.vstack([ddY, ddy])
             
-            #canonical system rollout based on the typpe of the system
+            #canonical system rollout based on the type of the system
             if  self._type == 1 or self._type == 2:
-                u = u + 1/tau * ax * u * dt
+                #u = np.exp(float(ax)*t/tau)
+                u = u + 1./tau * ax * u * dt
             elif  self._type == 3:
                 phasestop = 1 + config['ac'] * np.sqrt(np.sum((yreal - y)**2))
-                u = u + 1/tau * ax * u * dt / phasestop
+                u = u + 1./tau * ax * u * dt / phasestop
 
             t = t + dt
             timestamps = np.hstack([timestamps, t])
 
         #append the trajectory
-        traj = np.hstack([np.asarray(timestamps)[:,None], Y])
+        traj   = np.hstack([np.asarray(timestamps)[:,None], Y])
+        dtraj  = np.hstack([np.asarray(timestamps)[:,None], dY])
+        ddtraj = np.hstack([np.asarray(timestamps)[:,None], ddY])
 
-        return traj
+        traj_data = {
+        #computed traj of the trajectory
+        'pos':traj,
+        #computed vel of the trajectory
+        'vel':dtraj,
+        #computed acc of the trajectory
+        'acc':ddtraj,
+        }
+
+        return traj_data

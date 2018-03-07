@@ -304,7 +304,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         ee_point        = np.array([ee_point.x, ee_point.y, ee_point.z])
         
         ee_ori          = self.endpoint_pose()['orientation']
-        ee_ori          = np.quaternion(ee_ori.w, ee_ori.x, ee_ori.y, ee_ori.z)
+        ee_ori          = np.quaternion(ee_ori.w, ee_ori.x, ee_ori.y, ee_ori.z) # Hamilton notation
         
         return ee_point, ee_ori
 
@@ -410,9 +410,20 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self.set_joint_position_speed(speed)
 
-    def ik(self, pos, ori=None):
 
-        success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+
+
+    def ik(self, pos, ori=None, use_service=False):
+        success = False
+        soln = None
+
+        if use_service:
+            success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+        else:
+            soln = self._kinematics.inverse_kinematics(position=pos,orientation=ori)
+
+            if soln is not None:
+                success = True
 
         return success, soln
 

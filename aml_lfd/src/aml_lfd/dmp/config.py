@@ -12,4 +12,5 @@ discrete_dmp_config = {
         'original_scaling':1.,
         'type':1,
         'dof':2,
+        'goal_thresh':None,
 }

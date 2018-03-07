@@ -29,6 +29,8 @@ class JSVelocityController(JSController):
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 
+        self._alpha = self._config['velocity_filter_alpha']
+
         self._dq = np.zeros_like(self._goal_js_pos)
 
         if 'rate' in self._config:
@@ -58,7 +60,8 @@ class JSVelocityController(JSController):
 
         q              = robot_state['position']
 
-        dq             = self._dq*0.99 + robot_state['velocity']*0.01
+        dq             = self._dq*(1.0 - self._alpha) + robot_state['velocity']*self._alpha
+
         self._dq = dq
 
         js_delta       = goal_js_pos-q

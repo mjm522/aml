@@ -30,7 +30,7 @@ OS_VELCTY_CNTLR = {
 
 
 
-OS_POSTN_CNTLR = {
+OS_POSTN_CNTLR_SIM_BAXTER = {
     'rate': 100,
     'kp_p': 5., #gains for position
     'kd_p': np.sqrt(0.0001),
@@ -46,18 +46,53 @@ OS_POSTN_CNTLR = {
     'dt' : 0.01
 }
 
-OS_TORQUE_CNTLR = {
+OS_POSTN_CNTLR_REAL_BAXTER = {
     'rate': 100,
-    'kp_p': 10.,
-    'kd_p': np.sqrt(2.0),
-    'kp_o': 1.0, #gains for orientation
+    'kp_p': 10., #gains for position
+    'kd_p': np.sqrt(10.0),
+    'kp_o': 8.0, #gains for orientation
+    'kd_o': np.sqrt(8.0), #gains for orientation
+    'alpha': 3.14,
+    'null_kp': 4.0*0,
+    'null_kd': 2.5*0,
+    'use_orientation_ctrl': True,
+    'linear_error_thr': 0.02, # error of 2 cm
+    'angular_error_thr': 0.02, # allowing angular errors of 0.3 radians
+    'js_pos_error_thr' :0.1,
+    'dt' : 0.01
+}
+
+OS_TORQUE_CNTLR_SIM_BAXTER = {
+    'rate': 500,
+    'kp_p': 5.0,
+    'kd_p': np.sqrt(0.5),
+    'kp_o': 5.0, #gains for orientation
     'kd_o': np.sqrt(0.0001), #gains for orientation
-    'alpha': 3.25,
+    'alpha': 3.14,
     'null_kp': 1.5,
     'null_kd': 2.5,
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.05,
-    'angular_error_thr': 0.05
+    'angular_error_thr': 0.05,
+    'integrate_jnt_velocity': False,
+    'deactivate_wait_time': 10
+}
+
+
+OS_TORQUE_CNTLR_REAL_BAXTER = {
+    'rate': 500,
+    'kp_p': 15.0,
+    'kd_p': np.sqrt(15.0),
+    'kp_o': 10.0, #gains for orientation
+    'kd_o': np.sqrt(10.0), #gains for orientation
+    'alpha': 3.14,
+    'null_kp': 1.5,
+    'null_kd': 2.5,
+    'use_orientation_ctrl': True,
+    'linear_error_thr': 0.025*0,
+    'angular_error_thr': 0.025*0,
+    'integrate_jnt_velocity': False,
+    'deactivate_wait_time': 10
 }
 
 
@@ -79,3 +114,8 @@ OS_IMPEDANCE_CNTLR = {
     'pos_threshold': 0.01,
     'deactivate_wait_time': 5,
 }
+
+
+
+OS_POSTN_CNTLR = OS_POSTN_CNTLR_REAL_BAXTER
+OS_TORQUE_CNTLR = OS_TORQUE_CNTLR_REAL_BAXTER

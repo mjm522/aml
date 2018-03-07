@@ -70,6 +70,8 @@ class Controller(object):
         if self._control_callback is not None: 
             self._control_callback.shutdown()
             self._control_callback = None
+            # this is essential to keep the current joint position when switching back to position mode
+            self._robot.exec_position_cmd_delta(np.zeros(self._robot._nu)) 
 
         if self._is_active:
             update_period = rospy.Duration(1.0/self._config['rate'])

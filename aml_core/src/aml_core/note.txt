@@ -1,0 +1,8 @@
+This will hold interfaces to outside libraries:
+
+
+e.g.:
+
+
+python-quaternion
+ROS timers, threads and mathematical operations

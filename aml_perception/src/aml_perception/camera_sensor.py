@@ -18,7 +18,8 @@ import numpy as np
 
 class CameraSensor(object):
 
-  def __init__(self,image_topic="/camera/rgb/image_rect_color", depth_topic="/camera/depth_registered/sw_registered/image_rect"):
+  def __init__(self, image_topic="/camera/rgb/image_rect_color", 
+                     depth_topic="/camera/depth_registered/sw_registered/image_rect"):
     self.rgb_image_pub = rospy.Publisher("rgb_image_out", Image, queue_size=1)
     # self.depth_image_pub = rospy.Publisher("depth_image_out",Image)
 
@@ -33,15 +34,17 @@ class CameraSensor(object):
     self._curr_depth_image = None#np.zeros((480,640),dtype=np.uint16)
 
   def start(self):
-    self._rgb_image_sub = rospy.Subscriber(self._image_topic,Image,   self._on_rgb_image)
-    self._depth_image_sub = rospy.Subscriber(self._depth_topic,Image, self._on_depth_image)
+    if self._image_topic is not None:
+      self._rgb_image_sub = rospy.Subscriber(self._image_topic,Image, self._on_rgb_image)
+    if self._depth_topic is not None:
+      self._depth_image_sub = rospy.Subscriber(self._depth_topic,Image, self._on_depth_image)
 
   def shutdown(self):
     self._rgb_image_sub.shutdown()
     self._depth_image_sub.shutdown()
 
   def _on_rgb_image(self, data):
-    pass
+
     try:
         cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError as e:
@@ -69,9 +72,10 @@ class CameraSensor(object):
     try:
         cv_image = self._bridge.imgmsg_to_cv2(data, desired_encoding='passthrough')
     except CvBridgeError as e:
-      print("camera_sensor: unable to publish depth_image")
-    except Exception as e:
-      print("camera_sensor: other error. Unable to publish rgb_image")
+      print("camera_sensor: unable to convert depth_image to opencv type",e)
+      # print 'camera_sensor: unable to convert depth_image to opencv type'
+    # except Exception as e:
+    #   print "camera_sensor: other error."
     
     self._curr_depth_image = np.array(cv_image,dtype=np.float32)
     self._curr_depth_image[np.isnan(self._curr_depth_image)] = 0

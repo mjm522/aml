@@ -23,6 +23,7 @@ JS_VELOCITY_CNTLR = {
     'js_pos_error_thr' :0.1,
     'deactivate_wait_time': 5,
     'integrate_jnt_velocity': True,
+    'velocity_filter_alpha': 0.05 # low pass filter on the robot velocity readings
 }
 
 
@@ -56,7 +57,8 @@ JS_VELOCITY_CNTLR_BAXTER = {
     'null_kp': 5.,
     'null_kd': 3.01,
     'js_pos_error_thr' :0.1,
-    'deactivate_wait_time': 5
+    'deactivate_wait_time': 5,
+    'velocity_filter_alpha': 0.01  # low pass filter on the robot velocity readings
 }
 
 

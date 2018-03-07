@@ -14,7 +14,7 @@ class TrajPlayer():
 
         self._rate = rospy.Rate(rate)
 
-        self._time_steps = len(trajectory[trajectory.keys()[0]])
+        self._time_steps = len(trajectory['pos_traj'])
 
         self._timeout = timeout
 
@@ -38,9 +38,19 @@ class TrajPlayer():
 
             elif self._ctrlr.type is 'js':
 
+                if self._traj['vel_traj'] is None:
+                    goal_js_vel = None
+                else:
+                    goal_js_vel = self._traj['vel_traj'][t]
+
+                if self._traj['acc_traj'] is None:
+                    goal_js_acc = None
+                else:
+                    goal_js_acc = self._traj['acc_traj'][t]
+
                 self._ctrlr.set_goal(  goal_js_pos=self._traj['pos_traj'][t], 
-                                       goal_js_vel=self._traj['vel_traj'][t], 
-                                       goal_js_acc=self._traj['acc_traj'][t])
+                                       goal_js_vel=goal_js_vel, 
+                                       goal_js_acc=goal_js_acc)
             
             
                 js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=self._timeout)
@@ -57,7 +67,7 @@ class TrajPlayer():
         
         elif self._ctrlr.type is 'js':
             
-            js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=5.0)
+            js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
         self._ctrlr.set_active(False)
 
