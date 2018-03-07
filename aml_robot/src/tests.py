@@ -51,7 +51,7 @@ print "GOALORI: ", goal_ori
 rate = rospy.Rate(5) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
-	print(limb.ik(start_pos))
+	print(limb.ik(start_pos,goal_ori))
 	rate.sleep()
 
 	
