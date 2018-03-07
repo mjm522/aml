@@ -1,17 +1,19 @@
 import numpy as np
-from PyKDL import *
+import PyKDL as kdl
+from aml_utils.aml_kdl.aml_pykdl import AMLPyKDL 
 from aml_playground.peg_in_hole.pih_worlds.box2d.config import man_config
 
 
-class PyKDLBox2d(object):
+class PyKDLBox2d(AMLPyKDL):
 
     def __init__(self, config):
         self._config = config
         self._chain  = Chain()
         self._base_position = self._config['joints'][0]['anchor']
-        self._num_joints = len(self._config['joints'])
-        self._fwd_k  = None
+
         self.setup_chain()
+
+        AMLPyKDL.__init__(self, self._chain, self._num_joints, self._base_position)
 
     def setup_chain(self):
 
@@ -20,63 +22,59 @@ class PyKDLBox2d(object):
             joint_pos = self._config['joints'][k]['anchor']
             #add a segment to the pykdl
             #frame is a relative frame from the previous joint
-            self._chain.addSegment(Segment(Joint(Joint.RotZ),Frame(Vector(joint_pos[0]-prev_joint_pos[0],joint_pos[1]-prev_joint_pos[1],0.))))
+            self._chain.addSegment(kdl.Segment(kdl.Joint(Joint.RotZ), kdl.Frame(kdl.Vector(joint_pos[0]-prev_joint_pos[0],joint_pos[1]-prev_joint_pos[1],0.))))
 
         last_link_dim = self._config['links'][-1]['dim']
 
         ee_pos = (0, 2*last_link_dim[1])
-        self._chain.addSegment(Segment(Joint(Joint.RotZ),Frame(Vector(ee_pos[0],ee_pos[1],0.))))
+        self._chain.addSegment(kdl.Segment(kdl.Joint(Joint.RotZ), kdl.Frame(kdl.Vector(ee_pos[0],ee_pos[1],0.))))
         
-        self._fwd_k = ChainFkSolverPos_recursive(self._chain)
-        self._vel_ik= ChainIkSolverVel_pinv(self._chain)
-        self._pos_ik= ChainIkSolverPos_NR(self._chain, self._fwd_k, self._vel_ik)
-        self._jac   = ChainJntToJacSolver(self._chain)
 
-    def kdl_to_mat(self, data):
-        mat =  np.array(np.zeros((data.rows(), data.columns())))
-        for i in range(data.rows()):
-            for j in range(data.columns()):
-                mat[i,j] = data[i,j]
-        return mat
+    # def kdl_to_mat(self, data):
+    #     mat =  np.array(np.zeros((data.rows(), data.columns())))
+    #     for i in range(data.rows()):
+    #         for j in range(data.columns()):
+    #             mat[i,j] = data[i,j]
+    #     return mat
 
-    def update_chain(self, q):
-        self._last_joint_pos = JntArray(self._num_joints)
-        for k in range(self._num_joints):
-            self._last_joint_pos[k] = q[k]
+    # def update_chain(self, q):
+    #     self._last_joint_pos = JntArray(self._num_joints)
+    #     for k in range(self._num_joints):
+    #         self._last_joint_pos[k] = q[k]
 
-    def compute_fwd_kinematics(self, q=None):
+    # def compute_fwd_kinematics(self, q=None):
 
-        if q is not None:
-            assert len(q) == self._num_joints
+    #     if q is not None:
+    #         assert len(q) == self._num_joints
             
-            joint_angles=JntArray(self._num_joints)
+    #         joint_angles=JntArray(self._num_joints)
             
-            for k in range(self._num_joints):
-                joint_angles[k] = q[k]
-        else:
-            joint_angles =  self._last_joint_pos
+    #         for k in range(self._num_joints):
+    #             joint_angles[k] = q[k]
+    #     else:
+    #         joint_angles =  self._last_joint_pos
          
-        final_frame = Frame()
-        self._fwd_k.JntToCart(joint_angles, final_frame)
-        final_ee = (final_frame.p[0] + self._base_position[0], final_frame.p[1] + self._base_position[1])
+    #     final_frame = Frame()
+    #     self._fwd_k.JntToCart(joint_angles, final_frame)
+    #     final_ee = (final_frame.p[0] + self._base_position[0], final_frame.p[1] + self._base_position[1])
 
-        rotation = Rotation(final_frame.M).GetEulerZYX()
+    #     rotation = Rotation(final_frame.M).GetEulerZYX()
 
-        return np.asarray([final_ee[0], final_ee[1], rotation[0]])
+    #     return np.asarray([final_ee[0], final_ee[1], rotation[0]])
 
-    def compute_inv_kinematics(self, ee_pos):
+    # def compute_inv_kinematics(self, ee_pos):
 
-        desired_frame = Frame(Vector(ee_pos[0],ee_pos[1],0))
-        q_out = JntArray(self._num_joints)
-        self._pos_ik.CartToJnt(self._last_joint_pos, desired_frame, q_out)
+    #     desired_frame = Frame(Vector(ee_pos[0],ee_pos[1],0))
+    #     q_out = JntArray(self._num_joints)
+    #     self._pos_ik.CartToJnt(self._last_joint_pos, desired_frame, q_out)
 
-        return np.asarray(q_out)
+    #     return np.asarray(q_out)
 
-    def compute_jacobian(self):
-        jacobian = Jacobian(self._num_joints)
-        self._jac.JntToJac(self._last_joint_pos, jacobian)
-        jac = self.kdl_to_mat(jacobian)
-        return np.vstack([jac[0,:], jac[1,:], jac[5,:]])
+    # def compute_jacobian(self):
+    #     jacobian = Jacobian(self._num_joints)
+    #     self._jac.JntToJac(self._last_joint_pos, jacobian)
+    #     jac = self.kdl_to_mat(jacobian)
+    #     return np.vstack([jac[0,:], jac[1,:], jac[5,:]])
 
 
 def main():
