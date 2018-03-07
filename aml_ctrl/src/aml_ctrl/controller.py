@@ -15,16 +15,18 @@ class Controller(object):
         self._rate = rospy.timer.Rate(config['rate'])
 
         self._robot    = robot_interface
-        self._cmd      = np.zeros(self._robot._nu)
 
-        update_period = rospy.Duration(1.0/self._config['rate'])
-        self._control_callback = rospy.Timer(update_period, self.update)
+        self._cmd      = np.zeros(self._robot._nu)
 
         self._last_time = rospy.Time.now()
 
         self._error = None
 
         self._is_active = False
+
+        update_period = rospy.Duration(1.0/self._config['rate'])
+        
+        self._control_callback = rospy.Timer(update_period, self.update)
 
     @abc.abstractmethod
     def compute_cmd(self,time_elapsed):
