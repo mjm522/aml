@@ -10,6 +10,15 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+# PCL ########################## PCL (apparently) links the required BOOST libraries and Eigen3 also
+find_package(PCL REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+################################
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -17,17 +26,21 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_python_setup()
 
 
-
+SET(PROJECT_INCLUDE ./include)
+SET(PROJECT_CODE_SOURCE ${PROJECT_SOURCE_DIR}/src/aml_perception)
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_INCLUDE}
 )
 
+SET(LINK_LIBS ${PCL_LIBRARIES})
 
 #############
 ## Install ##
 #############
-
+add_executable(run_file ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
+target_link_libraries(run_file ${LINK_LIBS})
 
 #install(
 #  DIRECTORY scripts/
