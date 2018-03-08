@@ -1,5 +1,4 @@
 import rospy
-import numpy as np
 from aml_services.srv import SendPisaHandCmd, ReadPisaHandCurr
 
 
