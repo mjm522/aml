@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -26,21 +27,29 @@ add_definitions(${PCL_DEFINITIONS})
 catkin_python_setup()
 
 
-SET(PROJECT_INCLUDE ./include)
+SET(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/include)
 SET(PROJECT_CODE_SOURCE ${PROJECT_SOURCE_DIR}/src/aml_perception)
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_INCLUDE}
+  ${PROJECT_SOURCE_DIR}
 )
 
 SET(LINK_LIBS ${PCL_LIBRARIES})
+
+SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
+
+add_library(proj_libs STATIC ${PROJ_LIBS})
 
 #############
 ## Install ##
 #############
 add_executable(run_file ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
-target_link_libraries(run_file ${LINK_LIBS})
+target_link_libraries(run_file ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+
+add_executable(subs ${PROJECT_CODE_SOURCE}/subs.cpp)
+target_link_libraries(subs ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 
 #install(
 #  DIRECTORY scripts/
