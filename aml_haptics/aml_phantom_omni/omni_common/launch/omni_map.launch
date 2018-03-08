@@ -1,0 +1,14 @@
+<launch>
+  <!-- Create a map and some transformation from phantom to map -->
+  <node pkg="tf" type="static_transform_publisher" name="map_tf" args="-0.1 -0.1 0 0 0 0 1 /world /map 100" />
+  <node pkg="tf" type="static_transform_publisher" name="world_tf" args="0.0 -0.18 -0.085 0 0 0 1 /world /base 100" />
+
+  <!-- Run the map server -->
+  <arg name="map_file" default="$(find omni_common)/maps/tubes.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node name="phaton_control" pkg="omni_common" type="control.py"/>
+</launch>
+
+  
+  
