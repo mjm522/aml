@@ -1,6 +1,6 @@
 import numpy as np
 import PyKDL as kdl
-from aml_pykdl import AMLPyKDL 
+from aml_utils.aml_pykdl.aml_pykdl import AMLPyKDL
 from aml_playground.peg_in_hole.pih_worlds.box2d.config import man_config
 
 

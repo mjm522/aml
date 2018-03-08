@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>aml_pykdl</name>
+  <name>aml_utils</name>
   <version>0.0.0</version>
-  <description>The aml_pykdl package</description>
+  <description>The aml_utils package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
