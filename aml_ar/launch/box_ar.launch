@@ -1,0 +1,48 @@
+<launch>
+
+    <!-- give a defulat value to arg -->
+    <arg name="ext_cam" default="True" />
+
+    <!-- TODO:: how to give to different marker sizes ??-->
+    <arg name="box_markerSize"            default="0.124"/>    <!-- in m (old: 0.141), (decentralised marker was 0.122)-->
+    <arg name="marker_frame"              default="camera_link"/> <!-- camera_rgb_optical_frame -->
+    <arg name="ref_frame"                 default="marker"/>  <!-- leave empty and the pose will be published wrt param parent_name -->
+    <!-- camera_rgb_optical_frame -->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.24 0 0 0 0 0 left_gripper_base marker 30" />-->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0.323 -0.141 -1.261 1.579 -0.804 -1.573 left_gripper_base base 10" /> -->
+
+    <!--  2.47314417  0.23107538  0.06962334 -->
+    <!-- goal left: 0.8276729,-0.15015955,0.0613232 -->
+    <!-- goal right:0.70064068, 0.76912946.  0.02922201 -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.70064068, 0.76912946 -0.093 0.589, 0.404, 0.713, 0.565 base box_goal 30" /> -->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="1.022 0.231 -0.093 0.589, 0.404, 0.413, 0.565 base box_goal 30" />-->
+    
+    <!-- Bag file 10 -->
+    <!-- 0.8276729, -0.15015955, 0.0613232 -->
+    <!--<node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.8276729 -0.15015955 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />-->
+    <node pkg="tf" type="static_transform_publisher" name="mock_transform_broadcaster_box_goal" args="0.7083 0.5866 -0.094 0.495 0.494 0.527 0.483 base box_goal 30" />
+    
+
+
+
+
+    <!-- BOX AR node overlays simple planar visual components over the camera image
+         openni_rgb_rect_image: rectified rgb image
+         openni_rgb_camera_info: camera info (intrinsics)
+         box_marker_size: size in meters of the marker/box -->
+    <node pkg="aml_ar" type="box_ar_node" name="box_ar" output="screen">
+        <remap from="/openni_rgb_camera_info" to="/camera/rgb/camera_info" />
+        <remap from="/openni_rgb_rect_image" to="/camera/rgb/image_rect_color"/>
+
+        <param name="image_is_rectified" value="True"/>
+        <param name="box_marker_size"              value="$(arg box_markerSize)"/>
+        <param name="reference_frame"              value="$(arg ref_frame)"/>   <!-- frame in which the marker pose will be refered -->
+        <param name="camera_frame"                 value="camera_rgb_optical_frame"/>
+        <param name="marker_frame"                 value="$(arg marker_frame)" />
+    </node>
+
+</launch>
+
