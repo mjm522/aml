@@ -147,7 +147,7 @@ namespace aml_pcl
                                 double &plane_dist); 
         void fitPointsToPlane(PointCloudPtr input_cloud_ptr,Eigen::Vector3f &plane_normal, double &plane_dist);
 
-        Eigen::Vector3f compute_centroid(PointCloudPtr input_cloud_ptr);
+        Eigen::Vector3f computeCentroid(PointCloudPtr input_cloud_ptr);
 
 
     };

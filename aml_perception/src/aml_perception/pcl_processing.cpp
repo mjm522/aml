@@ -216,7 +216,7 @@ namespace aml_pcl
 
     };
 
-    Eigen::Vector3f PCLProcessor::compute_centroid(PointCloudPtr input_cloud_ptr) 
+    Eigen::Vector3f PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
     {
         Eigen::Vector3f centroid;
         Eigen::Vector3f cloud_pt;
