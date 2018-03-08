@@ -59,6 +59,12 @@ public:
   ros::Publisher pose_publisher;
   ros::Publisher button_publisher;
   ros::Publisher joint_publisher;
+  
+  //for robot_state_publisher node this will simply
+  //take urdf description, compute the frame transform
+  //and publish it
+  ros::Publisher joint_pub;
+  
   ros::Subscriber haptic_sub;
   std::string omni_name, ref_frame, units;
 
@@ -68,6 +74,9 @@ public:
     ros::param::param(std::string("~omni_name"), omni_name, std::string("phantom"));
     ros::param::param(std::string("~reference_frame"), ref_frame, std::string("/map"));
     ros::param::param(std::string("~units"), units, std::string("mm"));
+
+    //for robot_state_publisher node
+    joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
     
     //Publish button state on NAME/button
     std::ostringstream stream1;
@@ -117,6 +126,7 @@ public:
     state->lock = false;
     state->close_gripper = false;
     state->lock_pos = zeros;
+    
     if (!units.compare("mm"))
       state->units_ratio = 1.0;
     else if (!units.compare("cm"))
@@ -132,6 +142,7 @@ public:
       units = "mm";
     }
     ROS_INFO("PHaNTOM position given in [%s], ratio [%.1f]", units.c_str(), state->units_ratio);
+  
   }
 
   /*******************************************************************************
@@ -192,6 +203,9 @@ public:
     joint_state.name[5] = "roll";
     joint_state.position[5] = state->thetas[6] + M_PI;
     joint_publisher.publish(joint_state);
+
+    //for robot_state_publisher node
+    joint_pub.publish(joint_state);
     
     // Build the pose msg
     geometry_msgs::PoseStamped pose_msg;
@@ -219,6 +233,7 @@ public:
       state->buttons_prev[1] = state->buttons[1];
       button_publisher.publish(button_event);
     }
+
   }
 };
 

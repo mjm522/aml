@@ -1,13 +1,26 @@
 <launch>
-  <arg name="reference_frame" default="/map"/>
+  
+  <!-- this is for getting the tf transform of the robot -->
+
+  <param name="robot_description" command="cat $(find omni_description)/urdf/omni.urdf" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+  <arg name="reference_frame" default="/base"/>
   <arg name="units" default="mm"/>
   <arg name="publish_rate" default="1000"/>
   <arg name="omni_name" default="phantom"/>
-  
+
   <node name="omni_state" pkg="omni_common" type="omni_state" output="screen"> 
     <param name="omni_name" value="$(arg omni_name)"/>
     <param name="publish_rate" value="$(arg publish_rate)"/>
     <param name="reference_frame" value="$(arg reference_frame)"/>
     <param name="units" value="$(arg units)"/>
   </node>
+
+  <!-- in order to visualize the system in rviz uncomment the following line -->
+
+  <!--
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find omni_common)/launch/omni.rviz" required="true" /> 
+  -->
+
 </launch>
