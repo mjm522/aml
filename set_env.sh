@@ -14,7 +14,7 @@ else
 fi
 
 
-MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collec_utils aml_playground'
+MODULES='aml_robot aml_dl aml_io aml_lfd aml_ctrl aml_perception aml_data_collec_utils aml_playground aml_opt aml_planners'
 
 for module in $MODULES
 do

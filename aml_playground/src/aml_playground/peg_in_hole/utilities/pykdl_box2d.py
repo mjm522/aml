@@ -1,6 +1,6 @@
 import numpy as np
 import PyKDL as kdl
-from aml_pykdl import AMLPyKDL 
+from aml_utils.aml_pykdl.aml_pykdl import AMLPyKDL
 from aml_playground.peg_in_hole.pih_worlds.box2d.config import man_config
 
 
@@ -12,7 +12,7 @@ class PyKDLBox2d(AMLPyKDL):
 
         self._base_position = self._config['joints'][0]['anchor']
 
-        self._num_joints = len(config['joints'])
+        self.setup_chain()
 
         AMLPyKDL.__init__(self, self.setup_chain(), self._base_position)
 
@@ -27,6 +27,7 @@ class PyKDLBox2d(AMLPyKDL):
             joint_pos = self._config['joints'][k]['anchor']
             #add a segment to the pykdl
             #frame is a relative frame from the previous joint
+
             chain.addSegment(kdl.Segment(kdl.Joint(kdl.Joint.RotZ), kdl.Frame(kdl.Vector(joint_pos[0]-prev_joint_pos[0],joint_pos[1]-prev_joint_pos[1],0.))))
 
         last_link_dim = self._config['links'][-1]['dim']
@@ -48,7 +49,6 @@ class PyKDLBox2d(AMLPyKDL):
         jac = self.compute_jacobian()
 
         return np.vstack([jac[0,:], jac[1,:], jac[5,:]])
-
 
 def main():
     pb = PyKDLBox2d(man_config)

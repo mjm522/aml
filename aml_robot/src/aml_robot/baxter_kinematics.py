@@ -128,8 +128,8 @@ class baxter_kinematics(object):
         pos = PyKDL.Vector(position[0], position[1], position[2])
         if orientation is not None:
             rot = PyKDL.Rotation()
-            rot = rot.Quaternion(orientation[0], orientation[1],
-                                 orientation[2], orientation[3])
+            rot = rot.Quaternion(orientation[1],
+                                 orientation[2], orientation[3], orientation[0])
         # Populate seed with current angles if not provided
         seed_array = PyKDL.JntArray(self._num_jnts)
         if seed != None:
@@ -144,6 +144,7 @@ class baxter_kinematics(object):
             goal_pose = PyKDL.Frame(rot, pos)
         else:
             goal_pose = PyKDL.Frame(pos)
+            
         result_angles = PyKDL.JntArray(self._num_jnts)
 
         if self._ik_p_kdl.CartToJnt(seed_array, goal_pose, result_angles) >= 0:
