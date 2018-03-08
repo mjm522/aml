@@ -20,9 +20,13 @@ class Manipulator(PyKDLBox2d):
         self._ppm = self._config['pixels_per_meter']
 
         self._num_links = len(self._config['links'])
+        
         self._bodies = []
+        
         self._links = []
+        
         self._link_color = []
+        
         self._joints = []
 
         self.add_manipulator(config)
@@ -31,12 +35,15 @@ class Manipulator(PyKDLBox2d):
     def add_manipulator(self, params):
 
         for link in params['links']:
+            
             self._link_color.append(link['color'])
             
             if link['type'] ==  'static':
+                
                 body = self._world.CreateStaticBody(position=link['pos'])
 
             elif link['type'] == 'dynamic':
+                
                 body = self._world.CreateDynamicBody(position=link['pos'], 
                                                      angle=link['ori'],
                                                      linearDamping=link['lin_damp'],
@@ -44,6 +51,7 @@ class Manipulator(PyKDLBox2d):
                                                      awake=link['awake'])
                
             else:
+                
                 raise Exception("Unknown type")
 
 
@@ -52,13 +60,17 @@ class Manipulator(PyKDLBox2d):
                                               friction=link['mu'])
             
             self._bodies.append(body)
+            
             self._links.append(shape)
 
         if len(params['links']) - len(params['joints']) != 1:
+            
             raise Exception("There are not sufficient number of joints!")
 
         k = 0
+        
         for joint in params['joints']:
+            
             joint = self._world.CreateRevoluteJoint(
                                     bodyA          = self._bodies[k], 
                                     bodyB          = self._bodies[k+1], 
@@ -77,23 +89,30 @@ class Manipulator(PyKDLBox2d):
     def set_joint_speed(self, joint_speed):
 
         for k in range(len(self._joints)):
+            
             self._joints[k].motorSpeed = joint_speed[k]
 
     def compute_os_ctrlr_cmd(self, os_set_point, Kp=0.1):
+        
         state = self.get_state()
+        
         error = Kp*np.dot(np.linalg.pinv(state['ee_jac'], rcond=1e-4), (os_set_point - state['ee_pos'])) - np.sqrt(Kp)*state['j_vel']
 
         return error
 
     def set_joint_pos(self, joint_pos):
+        
         for k in range(1, len(self._bodies)):
+            
             body = self._bodies[k]
+            
             body.angle = joint_pos[k-1]
 
 
     def set_max_joit_torque(self, joint_torques):
 
         for k in range(len(self._joints)):
+            
             self._joints[k].maxMotorTorque = joint_torques[k]
 
     # def set_joint_position(self, joint_pos):
@@ -139,7 +158,9 @@ class Manipulator(PyKDLBox2d):
         ee_pos = self.get_state()['ee_pos']
         
         for k in range(len(self._links)):    
+            
             vertices = self.get_vertices(link_idx=k, cam_pos=cam_pos)
+            
             pygame.draw.polygon(surface, self._link_color[k], vertices)
 
         pygame.draw.circle(surface, (0,0,0), (int(ee_pos[0] * self._ppm - cam_pos[0]),int( self._config['image_height'] - ee_pos[1] * self._ppm - cam_pos[1])), 10, 0)
@@ -148,22 +169,30 @@ class Manipulator(PyKDLBox2d):
     def get_state(self):
 
         link_pos = []
+        
         link_vel = []
  
         joint_state = [joint.angle for joint in self._joints]
+        
         joint_velocity = [joint.speed for joint in self._joints]
+        
         joint_torques = [joint.GetMotorTorque(self._dt) for joint in self._joints]
 
         self.update_chain(joint_state)
 
         #assuming first link to be base link
         for k in range(1,len(self._bodies)):
+            
             (px,py) = self._bodies[k].position
+            
             angle   = self._bodies[k].angle
+            
             (vx,vy) = self._bodies[k].linearVelocity
+            
             omg     = self._bodies[k].angularVelocity
 
             link_pos.append([px, py, angle])
+            
             link_vel.append([vx, vy, omg])
 
         state = { 'j_pos': np.asarray(joint_state), 
@@ -171,30 +200,37 @@ class Manipulator(PyKDLBox2d):
                   'j_torq':np.asarray(joint_torques),
                   'link_pos':np.asarray(link_pos),
                   'link_vel': np.asarray(link_vel),
-                  'ee_pos': self.compute_fwd_kinematics(),
-                  'ee_jac': self.compute_jacobian(),
+                  'ee_pos': self.get_ee_pose(),
+                  'ee_jac': self.get_jacobian(),
                 }
 
         return state
 
 
     def sample_action(self):
+        
         state = self.get_state()
+        
         joint_speed = state['j_vel'] + 0.9*np.ones(len(self._joints))
+        
         return joint_speed
 
 
     def get_image_point(self,world_point):
+        
         px = world_point[0]*self._ppm
+        
         py = self._config['image_height'] - world_point[1]*self._ppm 
 
         return np.array([px,py])
 
 
     def get_image_point_norm(self,local_point):
+        
         (px,py) = self.get_image_point2(local_point)
 
         px /= float(self._config['image_width'])
+        
         py /= float(self._config['image_height'])
 
         return np.array([px,py])
@@ -215,11 +251,15 @@ class Manipulator(PyKDLBox2d):
 
             #add noise if we want to
             body_pos_noise = np.random.randn(2)*np.sqrt(noise)
+            
             body_ori_noise = np.random.randn(1)*np.sqrt(noise)
 
             body.position = (link['pos'][0]+body_pos_noise[0], link['pos'][1]+body_pos_noise[1])
+            
             body.angle    = link['ori'] + body_ori_noise[0]
+            
             body.linearVelocity  = (0., 0.)
+            
             body.angularVelocity = 0.
 
 
@@ -229,8 +269,13 @@ class Manipulator(PyKDLBox2d):
         state = [x, y, th, dx, dy, dth]
         '''
         for k in range(1, len(self._bodies)):
+            
             body = self._bodies[k]
+            
             body.position = (state[k+0], state[k+1])
+            
             body.angle = state[k+2]
+            
             body.linearVelocity = (state[k+3],state[k+4])
+            
             body.angularVelocity = state[k+5]
