@@ -1,0 +1,9 @@
+<launch>
+
+    <include file="$(find omni_common)/launch/omni_state.launch">
+    </include>
+
+    <!-- start baxter tele operation -->
+    <node pkg="aml_demos" type="phantom_omni_baxter_teleop.py" name="spm" output="screen"/>
+
+</launch>

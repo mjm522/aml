@@ -1,10 +1,11 @@
 #include <pcl/point_cloud.h>  
 #include <pcl/point_types.h>  
 
-// #include <pcl/filters/extract_indices.h>
-// #include <pcl/segmentation/sac_segmentation.h>
-// #include <pcl/filters/voxel_grid.h>
-// #include <pcl/filters/random_sample.h>
+
+#include <pcl/filters/extract_indices.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/random_sample.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/transforms.h>
@@ -31,12 +32,17 @@ namespace aml_pcloud
 
     typedef pcl::PCLPointCloud2 PointCloud2;
 
+
+    class {
+    public:
+        template<typename T>
+        operator boost::shared_ptr<T>() { return boost::shared_ptr<T>(); }
+    } nullptr;
+
     class PclRosConversions
     {
     public:
 
-
-        typedef std::shared_ptr<PclRosConversions> Ptr;
 
 
         PclRosConversions() {}
@@ -59,8 +65,6 @@ namespace aml_pcloud
 
     public:
 
-        typedef std::shared_ptr<PCLProcessor> Ptr;
-
         PCLProcessor() {}
 
         // ----- service request.function =  "read_pcd_file"
@@ -69,9 +73,10 @@ namespace aml_pcloud
         // ----- service request.function =  "save_to_file"
         void saveToPcdFile(std::string filename, const PointCloudPtr cloud);
 
-        // pcl::PCLPointCloud2::Ptr downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud); // === CAUSES SEGFAULT !!
 
-        // PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
+        pcl::PCLPointCloud2::Ptr downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud); // === CAUSES SEGFAULT !!
+
+        PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
 
         /**
          *  computeNormals function
