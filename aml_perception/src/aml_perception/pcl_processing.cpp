@@ -28,7 +28,7 @@ namespace aml_pcloud
         if (pcl::io::loadPCDFile<CloudPoint> (input_file, *cloud) == -1) //* load the file
         {
             PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
-            return (0);
+            return nullptr;
         }
         else return cloud;
     };
@@ -37,52 +37,52 @@ namespace aml_pcloud
     {
         pcl::io::savePCDFileASCII (filename, *cloud);
     };
+    // may cause seg fault with ROS PCL
+    pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
+    {
 
-    // pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
-    // {
+        pcl::PCLPointCloud2::Ptr cloud_filtered;
+        // Create the filtering object
+        pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+        sor.setInputCloud (cloud);
+        sor.setLeafSize (0.008f, 0.008f, 0.008f);
+        sor.filter (*cloud_filtered);
 
-    //     pcl::PCLPointCloud2::Ptr cloud_filtered;
-    //     // Create the filtering object
-    //     pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-    //     sor.setInputCloud (cloud);
-    //     sor.setLeafSize (0.008f, 0.008f, 0.008f);
-    //     sor.filter (*cloud_filtered);
+        return cloud_filtered;
 
-    //     return cloud_filtered;
-
-    // }
+    }
 
 
-    // PointCloudPtr PCLProcessor::getPointsNotInPlane(PointCloudPtr input_cloud)
-    // {
+    PointCloudPtr PCLProcessor::getPointsNotInPlane(PointCloudPtr input_cloud)
+    {
 
-    //     PointCloudPtr cloudExtracted(new pcl::PointCloud<pcl::PointXYZ>);
+        PointCloudPtr cloudExtracted(new pcl::PointCloud<pcl::PointXYZ>);
 
-    //     // Plane segmentation (do not worry, we will see this later).
-    //     pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-    //     pcl::SACSegmentation<pcl::PointXYZ> segmentation;
-    //     segmentation.setOptimizeCoefficients(true);
-    //     segmentation.setModelType(pcl::SACMODEL_PLANE);
-    //     segmentation.setMethodType(pcl::SAC_RANSAC);
-    //     segmentation.setDistanceThreshold(0.01);
-    //     segmentation.setInputCloud(input_cloud);
+        // Plane segmentation (do not worry, we will see this later).
+        pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+        pcl::SACSegmentation<pcl::PointXYZ> segmentation;
+        segmentation.setOptimizeCoefficients(true);
+        segmentation.setModelType(pcl::SACMODEL_PLANE);
+        segmentation.setMethodType(pcl::SAC_RANSAC);
+        segmentation.setDistanceThreshold(0.01);
+        segmentation.setInputCloud(input_cloud);
 
-    //     // Object for storing the indices.
-    //     pcl::PointIndices::Ptr pointIndices(new pcl::PointIndices);
+        // Object for storing the indices.
+        pcl::PointIndices::Ptr pointIndices(new pcl::PointIndices);
 
-    //     segmentation.segment(*pointIndices, *coefficients);
+        segmentation.segment(*pointIndices, *coefficients);
 
-    //     // Object for extracting points from a list of indices.
-    //     pcl::ExtractIndices<pcl::PointXYZ> extract;
-    //     extract.setInputCloud(input_cloud);
-    //     extract.setIndices(pointIndices);
-    //     // We will extract the points that are NOT indexed (the ones that are not in a plane).
-    //     extract.setNegative(true);
-    //     extract.filter(*cloudExtracted);
+        // Object for extracting points from a list of indices.
+        pcl::ExtractIndices<pcl::PointXYZ> extract;
+        extract.setInputCloud(input_cloud);
+        extract.setIndices(pointIndices);
+        // We will extract the points that are NOT indexed (the ones that are not in a plane).
+        extract.setNegative(true);
+        extract.filter(*cloudExtracted);
 
-    //     return cloudExtracted;
-    // };
-
+        return cloudExtracted;
+    }
+    // END of problematic methods
     pcl::PointCloud<pcl::PointNormal>::Ptr PCLProcessor::computeNormals(PointCloudPtr cloud)
     {
         pcl::PointCloud<pcl::PointNormal>::Ptr cloud_normals (new pcl::PointCloud<pcl::PointNormal>); // Output datasets
@@ -98,7 +98,7 @@ namespace aml_pcloud
 
         return cloud_normals;
 
-    };
+    }
 
     PointCloudPtr PCLProcessor::transformPointCloud(PointCloudPtr input_cloud, Eigen::Matrix4f camera_pose)
     {
@@ -113,18 +113,8 @@ namespace aml_pcloud
     void PCLProcessor::addPointCloud(PointCloudPtr cloud_base, PointCloudPtr cloud_add)
     {
         // get the points from the clouds
-        auto &v_base = cloud_base->points;
-        auto &v_add  = cloud_add->points;
 
-        // reserve enough space for all clouds
-        v_base.reserve(v_base.size() + v_add.size());
-
-        // loop over the points in the cloud to add
-        for(const auto &p : v_add) 
-        {
-            // add the point to the base cloud if the value is not NaN
-            if (!std::isnan(p.z)) v_base.emplace_back(p);
-        }
+        *cloud_base += *cloud_add;
     };
 
     void PCLProcessor::fitPointsToPlane(Eigen::MatrixXf points_mat, Eigen::Vector3f &plane_normal, double &plane_dist) {

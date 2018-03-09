@@ -3,8 +3,8 @@
 #include "aml_services/PCLUtility.h"
 
 
-aml_pcloud::PclRosConversions::Ptr pcl_ros_converter_;
-aml_pcloud::PCLProcessor::Ptr pcl_processor_;
+aml_pcloud::PclRosConversions pcl_ros_converter_;
+aml_pcloud::PCLProcessor pcl_processor_;
 
 // ----- starts the ros service
 void initiliseServer();
@@ -21,7 +21,7 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
     {
         ROS_INFO("Reading pcd file: %s", req.in_string_1.c_str());
 
-        aml_pcloud::PointCloudPtr cloud = pcl_processor_->getCloudFromPcdFile(req.in_string_1);
+        aml_pcloud::PointCloudPtr cloud = pcl_processor_.getCloudFromPcdFile(req.in_string_1);
         if (cloud == 0)
         {
             res.success = false;
@@ -29,7 +29,7 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
             return false;
         }
 
-        res.out_cloud_1 = *(pcl_ros_converter_->ROSMsgFromPclCloud(*cloud));
+        res.out_cloud_1 = *(pcl_ros_converter_.ROSMsgFromPclCloud(*cloud));
 
         // res.out_cloud_1 = *out;
         res.info = req.in_string_1 + " read success";
@@ -41,8 +41,8 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
     {
         ROS_INFO("Saving pcd file: %s", req.in_string_1.c_str());
 
-        aml_pcloud::PointCloudPtr cloud = pcl_ros_converter_->pclCloudFromROSMsg(req.in_cloud_1);
-        pcl_processor_->saveToPcdFile(req.in_string_1, cloud);
+        aml_pcloud::PointCloudPtr cloud = pcl_ros_converter_.pclCloudFromROSMsg(req.in_cloud_1);
+        pcl_processor_.saveToPcdFile(req.in_string_1, cloud);
 
         res.success = true;
         res.info = "PCD saved to " + req.in_string_1;
