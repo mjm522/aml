@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -19,7 +20,7 @@ catkin_python_setup()
 
 add_service_files(
   DIRECTORY srv 
-  FILES PredictState.srv PredictAction.srv SendPisaHandCmd.srv ReadPisaHandCurr.srv BoxState.srv PushAction.srv
+  FILES PredictState.srv PredictAction.srv SendPisaHandCmd.srv ReadPisaHandCurr.srv BoxState.srv PushAction.srv PCLUtility.srv
 )
 
 # include_directories(include)
@@ -30,6 +31,7 @@ include_directories(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  sensor_msgs
 )
 
 catkin_package(CATKIN_DEPENDS message_runtime )
