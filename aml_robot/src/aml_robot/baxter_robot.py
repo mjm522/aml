@@ -40,7 +40,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         self._ready = False
 
-        self._configure(limb,on_state_callback)
+        self._configure(limb, on_state_callback)
         
         self._ready = True
 
@@ -145,10 +145,12 @@ class BaxterArm(baxter_interface.limb.Limb):
         self._camera = camera_sensor.CameraSensor()
 
         self._ee_force = None
+
         self._ee_torque = None
 
 
     def _ee_point_state_callback(self, msg):
+
         self._ee_force  = msg.wrench.force
         self._ee_torque = msg.wrench.torque
 

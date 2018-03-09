@@ -11,6 +11,10 @@ class TeleOp(object):
 
     def __init__(self, master_interface, slave_interface, config = TELEOP):
 
+    	"""
+    	Base class of aml_teleoperation
+    	"""
+
         pass
 
     @abc.abstractmethod
