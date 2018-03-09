@@ -39,47 +39,48 @@ namespace aml_pcloud
     };
 
     // may cause seg fault with ROS PCL
+    // may cause seg fault with ROS PCL
     pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
     {
 
-    //     pcl::PCLPointCloud2::Ptr cloud_filtered;
-    //     // Create the filtering object
-    //     pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-    //     sor.setInputCloud (cloud);
-    //     sor.setLeafSize (0.008f, 0.008f, 0.008f);
-    //     sor.filter (*cloud_filtered);
+        pcl::PCLPointCloud2::Ptr cloud_filtered;
+        // Create the filtering object
+        pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+        sor.setInputCloud (cloud);
+        sor.setLeafSize (0.008f, 0.008f, 0.008f);
+        sor.filter (*cloud_filtered);
 
-    //     return cloud_filtered;
+        return cloud_filtered;
 
-    // }
+    }
 
 
-    // PointCloudPtr PCLProcessor::getPointsNotInPlane(PointCloudPtr input_cloud)
-    // {
+    PointCloudPtr PCLProcessor::getPointsNotInPlane(PointCloudPtr input_cloud)
+    {
 
-    //     PointCloudPtr cloudExtracted(new pcl::PointCloud<pcl::PointXYZ>);
+        PointCloudPtr cloudExtracted(new pcl::PointCloud<pcl::PointXYZ>);
 
-    //     // Plane segmentation (do not worry, we will see this later).
-    //     pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-    //     pcl::SACSegmentation<pcl::PointXYZ> segmentation;
-    //     segmentation.setOptimizeCoefficients(true);
-    //     segmentation.setModelType(pcl::SACMODEL_PLANE);
-    //     segmentation.setMethodType(pcl::SAC_RANSAC);
-    //     segmentation.setDistanceThreshold(0.01);
-    //     segmentation.setInputCloud(input_cloud);
+        // Plane segmentation (do not worry, we will see this later).
+        pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+        pcl::SACSegmentation<pcl::PointXYZ> segmentation;
+        segmentation.setOptimizeCoefficients(true);
+        segmentation.setModelType(pcl::SACMODEL_PLANE);
+        segmentation.setMethodType(pcl::SAC_RANSAC);
+        segmentation.setDistanceThreshold(0.01);
+        segmentation.setInputCloud(input_cloud);
 
-    //     // Object for storing the indices.
-    //     pcl::PointIndices::Ptr pointIndices(new pcl::PointIndices);
+        // Object for storing the indices.
+        pcl::PointIndices::Ptr pointIndices(new pcl::PointIndices);
 
-    //     segmentation.segment(*pointIndices, *coefficients);
+        segmentation.segment(*pointIndices, *coefficients);
 
-    //     // Object for extracting points from a list of indices.
-    //     pcl::ExtractIndices<pcl::PointXYZ> extract;
-    //     extract.setInputCloud(input_cloud);
-    //     extract.setIndices(pointIndices);
-    //     // We will extract the points that are NOT indexed (the ones that are not in a plane).
-    //     extract.setNegative(true);
-    //     extract.filter(*cloudExtracted);
+        // Object for extracting points from a list of indices.
+        pcl::ExtractIndices<pcl::PointXYZ> extract;
+        extract.setInputCloud(input_cloud);
+        extract.setIndices(pointIndices);
+        // We will extract the points that are NOT indexed (the ones that are not in a plane).
+        extract.setNegative(true);
+        extract.filter(*cloudExtracted);
 
         return cloudExtracted;
     }
