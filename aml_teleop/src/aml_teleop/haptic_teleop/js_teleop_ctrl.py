@@ -1,11 +1,12 @@
 import rospy
 import numpy as np
-from aml_teleop.haptic_teleop.config import DIRECT_JOINT_CTRL
+from aml_teleop.haptic_teleop.config import JS_TELEOP_CTRL
 from aml_teleop.haptic_teleop.haptic_robot_interface import HapticRobotInterface
+from aml_ctrl.controllers.js_controllers.js_torque_controller import JSTorqueController
 from aml_ctrl.controllers.js_controllers.js_postn_controller import JSPositionController
+from aml_ctrl.controllers.js_controllers.js_velocity_controller import JSVelocityController
 
-
-class DirectJointPosCtrl(HapticRobotInterface):
+class JSTeleopCtrl(HapticRobotInterface):
     """
     This class creates a interface between a haptic device and a robot
     
@@ -25,16 +26,28 @@ class DirectJointPosCtrl(HapticRobotInterface):
                 scale_from_home : if the home of haptic device equals home of robot (type : bool)
                 robot_home : if scale_from_home is set, then the home position of robot must be passed in (type : np.array)
                 rate : the rate of the controller in Hz (type int)
+                ctrlr_type : type of the controller (either = pos, vel, or torq)
  
         """
 
-        HapticRobotInterface.__init__(self, haptic_interface, robot_interface, config)
+        if config['ctrlr_type'] == 'pos':
 
-        self._ctrlr = JSPositionController(robot_interface)
+            controller = JSPositionController(robot_interface)
 
-        self._robot = robot_interface
+        elif config['ctrlr_type'] == 'vel':
 
-        self._haptic = haptic_interface
+            controller = JSVelocityController(robot_interface)
+
+        elif config['ctrlr_type'] == 'torq':
+
+            controller = JSTorqueController(robot_interface)
+
+        else:
+
+            raise Exception("Unknown controller type passed!")
+
+
+        HapticRobotInterface.__init__(self, haptic_interface, robot_interface, controller, config)
 
         self._config = config
 
@@ -48,7 +61,7 @@ class DirectJointPosCtrl(HapticRobotInterface):
 
         assert len(self._hap_jnts) == len(self._rbt_jnts)
 
-        self._ctrlr.set_active(True)
+        self._old_cmd = self._robot_home.copy()
 
 
     def compute_cmd(self):
@@ -64,6 +77,10 @@ class DirectJointPosCtrl(HapticRobotInterface):
         in case the robot has more joints than the haptic master
         the corresponding non-used joints will be set the the home joint position
         """
+
+        if not self._haptic._device_enabled:
+
+            return self._old_cmd
 
         hap_limits = self._haptic._jnt_limits
 
@@ -114,6 +131,8 @@ class DirectJointPosCtrl(HapticRobotInterface):
 
                 cmd[j] = rbt_limits[j]['lower'] + scale[i] * (rbt_limits[j]['upper'] - rbt_limits[j]['lower'])
 
+        self._old_cmd = cmd
+
         return cmd
 
 
@@ -130,6 +149,8 @@ class DirectJointPosCtrl(HapticRobotInterface):
         t = 0
 
         while not rospy.is_shutdown() and not finished:
+
+            self.enable_ctrlr()
 
             goal_js_pos = self.compute_cmd()
 

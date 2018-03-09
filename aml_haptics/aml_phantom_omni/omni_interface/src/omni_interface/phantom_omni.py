@@ -1,6 +1,7 @@
 import tf
 import rospy
 import numpy as np
+import pybullet as pb
 from sensor_msgs.msg import JointState 
 from geometry_msgs.msg import PoseStamped
 from omni_msgs.msg import OmniButtonEvent, OmniFeedback, OmniState
@@ -11,7 +12,7 @@ class PhantomOmni(object):
     Interface class to the Phantom Omni device
     """
 
-    def __init__(self, ori_aml_format=False):
+    def __init__(self, ori_aml_format=False, scale=1e-2):
 
         """
         Constructor of the class
@@ -51,6 +52,20 @@ class PhantomOmni(object):
 
         self._omni_ffbk_pub  = rospy.Publisher("/phantom/force_feedback", OmniFeedback, queue_size=10)
 
+        self._scale = scale
+
+        #this flag is to for mapping into a calibration
+        #space
+        self._calibrated = False
+
+        #while doing the demonstrations, the white button
+        #has to be pressed
+        self._device_enabled = False
+
+        self._calib_pos = (0.,0.,0.)
+
+        self._calib_ori = (0., 0., 0., 1.)
+
         self._update_state() 
 
 
@@ -59,6 +74,14 @@ class PhantomOmni(object):
         self._omni_bt_state['grey_bt']  = msg.grey_button  and 1
         
         self._omni_bt_state['white_bt'] = msg.white_button and 1
+
+        if self._omni_bt_state['white_bt']:
+
+            self._device_enabled = True
+
+        else:
+
+            self._device_enabled = False
 
 
     def omni_js_callback(self, msg):
@@ -123,15 +146,65 @@ class PhantomOmni(object):
         return pos, ori
 
 
-    def get_tf_frame(self, frame='/base'):
+    def calibration(self, ee_pos, ee_ori):
+        """
+        This function is for arbitary transformations
+        between arbitarary ee_pos and ee_ori
+        to the ee_pos and ee_ori of phantom omni
 
-        pos = None; ori = None
+        Args: ee_pos = tuple(x,y,z)
+              ee_ori = tuple(x,y,z,w)
+        """
+        if isinstance(ee_pos, np.ndarray):
+            ee_pos = tuple(ee_pos)
 
-        if self._tf_listener.frameExists(frame):
+        if isinstance(ee_ori, np.ndarray):
+            
+            ee_ori = tuple(ee_ori)
 
-            pos, ori = self._tf_listener.getFrames(frame)
+        elif isinstance(ee_ori, np.quaternion):
 
-        return pos, ori
+            ee_ori = (ee_ori.x, ee_ori.y, ee_ori.z, ee_ori.w)
+
+        omni_ee_pos, omni_ee_ori = self.get_ee_pose()
+
+        inv_hap_pos, inv_hap_ori = pb.invertTransform(tuple(self._scale*omni_ee_pos),
+                                                      tuple(omni_ee_ori))
+
+        self._calib_pos, self._calib_ori = pb.multiplyTransforms(inv_hap_pos, inv_hap_ori, ee_pos, ee_ori)
+
+        print "************************* Calibrated transformations **************************"
+        print "Pos \t", self._calib_pos
+        print "Ori \t", self._calib_ori
+        print "*******************************************************************************"
+
+        self._calibrated = True
+
+    def get_ee_pose_calib_space(self):
+
+        """
+        Once calibrated, we could transform the points
+        arbitarily, the current ee_pos and ee_ori of the
+        haptic device will be mapped into the calibrated
+        space
+        """
+
+        if not self._calibrated:
+
+            print "The calibration is not performed"
+
+        omni_ee_pos, omni_ee_ori = self.get_ee_pose()
+
+        pos, ori = pb.multiplyTransforms(tuple(self._scale*omni_ee_pos), 
+                                        tuple(omni_ee_ori), 
+                                        self._calib_pos, 
+                                        self._calib_ori)
+
+        if self._ori_aml_format:
+
+            ori = (ori[3], ori[0], ori[1], ori[2])
+
+        return np.asarray(pos), np.asarray(ori)
 
 
     def get_jnt_state(self):
@@ -184,7 +257,12 @@ class PhantomOmni(object):
 
         self._omni_state['ee_ori'] = ori
 
-        self._update_state()
+        #if the white button is not pressed
+        #the states wont be updated and hence 
+        #the haptic device maintains the last data
+        if self._device_enabled:
+
+            self._update_state()
 
 
     def omni_force_feedback(self, force, gain=0.5):

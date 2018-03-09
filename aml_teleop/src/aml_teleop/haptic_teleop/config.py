@@ -1,7 +1,18 @@
 HAPTIC_ROBOT_CONFIG = {}
 
-DIRECT_JOINT_CTRL = {
+JS_TELEOP_CTRL = {
     
-    'robot_joints':[0,1,2,3,4,5], #these joints will be one to one mapped
-    'haptic_joints':[0,1,2,3,4,5],
+    'robot_joints':None, #these joints will be one to one mapped
+    'haptic_joints':None,
+    'scale_from_home': True,
+    'robot_home':None, # home position of baxter
+    'rate':200, # rate of the controller
+    'ctrlr_type':'pos', #other options are 'vel', 'torq'
+}
+
+
+OS_TELEOP_CTRL = {
+    
+    'rate':200, # rate of the controller
+    'ctrlr_type':'pos', #other options are 'vel', 'torq'
 }

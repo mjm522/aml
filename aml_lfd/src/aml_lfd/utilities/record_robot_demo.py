@@ -117,9 +117,9 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Collect demonstrations')
 
-    parser.add_argument('-l', '--limb_name', type=str, help='limb index-(left/right)')
+    parser.add_argument('-l', '--limb_name', type=str,     default='left', help='limb index-(left/right)')
 
-    parser.add_argument('-i', '--arm_interface', type=str, help='arm_interface (sawyer/baxter)')
+    parser.add_argument('-i', '--arm_interface', type=str, default=False,  help='arm_interface (sawyer/baxter)')
 
     parser.add_argument('-d', '--demo_name', type=str, help='demo name-(give a name for demo collected)')
     
