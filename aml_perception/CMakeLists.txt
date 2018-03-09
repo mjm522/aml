@@ -11,20 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
-<<<<<<< HEAD
-# set(CMAKE_BUILD_TYPE debug )
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
-
-# PCL ########################## PCL (apparently) links the required BOOST libraries and Eigen3 also
-find_package(PCL 1.7 REQUIRED COMPONENTS common io filters segmentation features)
-=======
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") #-std=c++0x 
 
 # PCL ########################## PCL (apparently) links the required BOOST libraries and Eigen3 also
 find_package(PCL 1.7.1 REQUIRED)
->>>>>>> c654b932a3d3aa917ebc1c496dc83694ae89040a
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
