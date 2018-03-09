@@ -27,7 +27,8 @@
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 
-namespace aml_pcl
+
+namespace aml_pcloud
 {
     typedef pcl::PointXYZ CloudPoint; // A point structure denoting Euclidean xyz coordinates
     typedef pcl::PointCloud<CloudPoint> PointCloud;
@@ -86,12 +87,7 @@ namespace aml_pcl
     class PCLProcessor
     {
 
-    public: 
-        PclRosConversions::ConversionPtr pcl_ros_converter_;
-
-        PCLProcessor() : pcl_ros_converter_(new PclRosConversions) {
-
-        }
+    public:
 
         PointCloudPtr getCloudFromPcdFile(std::string& input_file);
     /**
@@ -153,6 +149,3 @@ namespace aml_pcl
     };
 
 }
-
-
-    

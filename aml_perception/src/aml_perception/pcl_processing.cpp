@@ -1,6 +1,6 @@
 #include "pcl_processing.h"
 
-namespace aml_pcl
+namespace aml_pcloud
 {
 
     // ===== PclRosConversions
@@ -23,7 +23,7 @@ namespace aml_pcl
 
     PointCloudPtr PCLProcessor::getCloudFromPcdFile(std::string& input_file)
     {
-        PointCloudPtr cloud (new aml_pcl::PointCloud);
+        PointCloudPtr cloud (new PointCloud);
 
         if (pcl::io::loadPCDFile<CloudPoint> (input_file, *cloud) == -1) //* load the file
         {
