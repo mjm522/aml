@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include "pcl_processing.h"
-#include "aml_services/PCLCustomMsg.h"
+#include "aml_services/PCLUtility.h"
 
 
 class PCLUtilityServer
@@ -13,13 +13,8 @@ private:
 
     void initiliseServer_();
 
-    static bool processRequest(aml_services::PCLCustomMsg::Request  &req,
-         aml_services::PCLCustomMsg::Response &res)
-{
-  return true;
-}
-
-
+    static bool processRequest(aml_services::PCLUtility::Request  &req,
+         aml_services::PCLUtility::Response &res);
 public:
     PCLUtilityServer() : pcl_ros_converter_(new aml_pcloud::PclRosConversions) 
     {
@@ -28,6 +23,18 @@ public:
 
 
 };
+
+bool PCLUtilityServer::processRequest(aml_services::PCLUtility::Request  &req,
+         aml_services::PCLUtility::Response &res)
+{
+    if (req.function == "read_pcd_file")
+    {
+        ROS_INFO("Reading pcd file: %s", req.in_string_1.c_str());
+        res.out_string_1 = req.in_string_1 + " reading success";
+    }
+    return true;
+}
+
 
 void PCLUtilityServer::initiliseServer_()
 {

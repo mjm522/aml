@@ -89,6 +89,7 @@ namespace aml_pcloud
 
     public:
 
+        // ----- service request.function =  "read_pcd_file"
         PointCloudPtr getCloudFromPcdFile(std::string& input_file);
     /**
      * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZ>

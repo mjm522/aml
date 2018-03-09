@@ -1,0 +1,8 @@
+string function
+sensor_msgs/PointCloud in_cloud_1
+sensor_msgs/PointCloud in_cloud_2
+string in_string_1
+---
+sensor_msgs/PointCloud out_cloud_1
+string out_string_1
+string status

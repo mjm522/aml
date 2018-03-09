@@ -30,8 +30,6 @@ catkin_python_setup()
 
 # add_service_files(
 #   FILES
-#   AddTwoInts.srv
-#   PCLCustomMsg.srv
 # )
 
 # generate_messages(
@@ -58,22 +56,16 @@ add_library(proj_libs STATIC ${PROJ_LIBS})
 #############
 ## Install ##
 #############
-# add_executable(run_file ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
-# target_link_libraries(run_file ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+add_executable(test_clnt ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
+target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp)
 
 # add_executable(subs ${PROJECT_CODE_SOURCE}/subs.cpp)
 # target_link_libraries(subs ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 
-add_executable(utils ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
-target_link_libraries(utils ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
-
-# add_executable(srvr ${PROJECT_CODE_SOURCE}/test_service.cpp)
-# target_link_libraries(srvr ${catkin_LIBRARIES})
-# # add_dependencies(add_two_ints_server beginner_tutorials_gencpp)
-
-# add_executable(clnt ${PROJECT_CODE_SOURCE}/test_client.cpp)
-# target_link_libraries(clnt ${catkin_LIBRARIES})
-# add_dependencies(add_two_ints_client beginner_tutorials_gencpp)
+add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
+target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
 
 #install(
 #  DIRECTORY scripts/
