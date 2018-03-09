@@ -4,11 +4,11 @@ namespace aml_pcloud
 {
 
     // ===== PclRosConversions
-    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2::ConstPtr& msg)
+    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg)
     {
         PointCloudPtr cloud(new PointCloud);
         PointCloud2 pcl_pc2;
-        pcl_conversions::toPCL(*msg, pcl_pc2);
+        pcl_conversions::toPCL(msg, pcl_pc2);
         pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
         return cloud;
     };
@@ -28,19 +28,18 @@ namespace aml_pcloud
         if (pcl::io::loadPCDFile<CloudPoint> (input_file, *cloud) == -1) //* load the file
         {
             PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
-            return (0);
+            return nullptr;
         }
         else return cloud;
     };
 
-    void PCLProcessor::saveToPcdFile(const std::string filename, const pcl::PCLPointCloud2::Ptr cloud)
+    void PCLProcessor::saveToPcdFile(const std::string filename, const PointCloudPtr cloud)
     {
-
-        pcl::PCDWriter writer;
-        writer.write (filename.c_str(), *cloud, 
-            Eigen::Vector4f::Zero (), Eigen::Quaternionf::Identity (), false);
+        pcl::io::savePCDFileASCII (filename, *cloud);
     };
 
+    // may cause seg fault with ROS PCL
+    // may cause seg fault with ROS PCL
     pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
     {
 
@@ -84,8 +83,8 @@ namespace aml_pcloud
         extract.filter(*cloudExtracted);
 
         return cloudExtracted;
-    };
-
+    }
+    // END of problematic methods
     pcl::PointCloud<pcl::PointNormal>::Ptr PCLProcessor::computeNormals(PointCloudPtr cloud)
     {
         pcl::PointCloud<pcl::PointNormal>::Ptr cloud_normals (new pcl::PointCloud<pcl::PointNormal>); // Output datasets
@@ -101,7 +100,7 @@ namespace aml_pcloud
 
         return cloud_normals;
 
-    };
+    }
 
     PointCloudPtr PCLProcessor::transformPointCloud(PointCloudPtr input_cloud, Eigen::Matrix4f camera_pose)
     {
@@ -116,18 +115,8 @@ namespace aml_pcloud
     void PCLProcessor::addPointCloud(PointCloudPtr cloud_base, PointCloudPtr cloud_add)
     {
         // get the points from the clouds
-        auto &v_base = cloud_base->points;
-        auto &v_add  = cloud_add->points;
 
-        // reserve enough space for all clouds
-        v_base.reserve(v_base.size() + v_add.size());
-
-        // loop over the points in the cloud to add
-        for(const auto &p : v_add) 
-        {
-            // add the point to the base cloud if the value is not NaN
-            if (!std::isnan(p.z)) v_base.emplace_back(p);
-        }
+        *cloud_base += *cloud_add;
     };
 
     void PCLProcessor::fitPointsToPlane(Eigen::MatrixXf points_mat, Eigen::Vector3f &plane_normal, double &plane_dist) {

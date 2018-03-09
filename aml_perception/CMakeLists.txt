@@ -12,17 +12,17 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") #-std=c++0x 
 
 # PCL ########################## PCL (apparently) links the required BOOST libraries and Eigen3 also
-find_package(PCL REQUIRED)
+find_package(PCL 1.7.1 REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 ################################
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 catkin_python_setup()
@@ -36,6 +36,13 @@ catkin_python_setup()
 #   DEPENDENCIES
 #   std_msgs  # and/or other packages containing depended messages
 # )
+
+
+catkin_package(
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS pcl_conversions pcl_ros roscpp sensor_msgs
+)
+
 
 SET(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/include)
 SET(PROJECT_CODE_SOURCE ${PROJECT_SOURCE_DIR}/src/aml_perception)
@@ -53,19 +60,22 @@ SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
 
 add_library(proj_libs STATIC ${PROJ_LIBS})
 
-#############
-## Install ##
-#############
+
 add_executable(test_clnt ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
 target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
-add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add_executable(subs ${PROJECT_CODE_SOURCE}/subs.cpp)
 # target_link_libraries(subs ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 
 add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
-target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs )
 add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
+
+
+#############
+## Install ##
+#############
 
 #install(
 #  DIRECTORY scripts/
