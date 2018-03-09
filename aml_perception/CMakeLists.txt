@@ -11,18 +11,19 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_BUILD_TYPE debug )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
 
 # PCL ########################## PCL (apparently) links the required BOOST libraries and Eigen3 also
-find_package(PCL REQUIRED)
+find_package(PCL 1.7 REQUIRED COMPONENTS common io filters segmentation features)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 ################################
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 catkin_python_setup()

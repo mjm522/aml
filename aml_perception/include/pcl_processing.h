@@ -45,11 +45,15 @@ namespace aml_pcloud
     public:
 
 
-        typedef boost::shared_ptr<PclRosConversions> ConversionPtr;
+        typedef std::shared_ptr<PclRosConversions> Ptr;
+
+
+        PclRosConversions() {}
+
     /**
      * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZRGB>
      */
-        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud2::ConstPtr& msg);
+        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg);
 
     // /**
     //  * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZRGBNormal>
@@ -89,12 +93,15 @@ namespace aml_pcloud
 
     public:
 
+        typedef std::shared_ptr<PCLProcessor> Ptr;
+        
+        PCLProcessor() {}
+
         // ----- service request.function =  "read_pcd_file"
         PointCloudPtr getCloudFromPcdFile(std::string& input_file);
-    /**
-     * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZ>
-     */
-        void saveToPcdFile(std::string filename, const pcl::PCLPointCloud2::Ptr cloud);
+
+        // ----- service request.function =  "save_to_file"
+        void saveToPcdFile(std::string filename, const PointCloudPtr cloud);
 
         pcl::PCLPointCloud2::Ptr downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud);
 

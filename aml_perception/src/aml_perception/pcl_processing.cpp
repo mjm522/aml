@@ -4,11 +4,11 @@ namespace aml_pcloud
 {
 
     // ===== PclRosConversions
-    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2::ConstPtr& msg)
+    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg)
     {
         PointCloudPtr cloud(new PointCloud);
         PointCloud2 pcl_pc2;
-        pcl_conversions::toPCL(*msg, pcl_pc2);
+        pcl_conversions::toPCL(msg, pcl_pc2);
         pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
         return cloud;
     };
@@ -33,12 +33,9 @@ namespace aml_pcloud
         else return cloud;
     };
 
-    void PCLProcessor::saveToPcdFile(const std::string filename, const pcl::PCLPointCloud2::Ptr cloud)
+    void PCLProcessor::saveToPcdFile(const std::string filename, const PointCloudPtr cloud)
     {
-
-        pcl::PCDWriter writer;
-        writer.write (filename.c_str(), *cloud, 
-            Eigen::Vector4f::Zero (), Eigen::Quaternionf::Identity (), false);
+        pcl::io::savePCDFileASCII (filename, *cloud);
     };
 
     pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
