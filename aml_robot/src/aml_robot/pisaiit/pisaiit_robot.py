@@ -41,39 +41,39 @@ class PisaIITHand(RobotInterface):
 
     def _update_state(self):
 
-        now                 = rospy.Time.now()
+        # now                 = rospy.Time.now()
 
-        joint_angles        = self.angles()
-        joint_velocities    = self.joint_velocities()
-        joint_efforts       = self.joint_efforts()
+        # joint_angles        = self.angles()
+        # joint_velocities    = self.joint_velocities()
+        # joint_efforts       = self.joint_efforts()
 
-        joint_names         = self.joint_names()
+        # joint_names         = self.joint_names()
 
-        def to_list(ls):
-            return [ls[n] for n in joint_names]
+        # def to_list(ls):
+        #     return [ls[n] for n in joint_names]
 
         state = {}
-        state['position']        = joint_angles
-        state['velocity']        = np.array(to_list(joint_velocities))
-        state['effort']          = np.array(to_list(joint_efforts))
-        state['jacobian']        = self.get_jacobian_from_joints(None)
-        state['inertia']         = self.get_inertia(None)
-        state['rgb_image']       = self._camera._curr_rgb_image
-        state['depth_image']     = self._camera._curr_depth_image
-        state['gravity_comp']    = np.array(self._h)
+        # state['position']        = joint_angles
+        # state['velocity']        = np.array(to_list(joint_velocities))
+        # state['effort']          = np.array(to_list(joint_efforts))
+        # state['jacobian']        = self.get_jacobian_from_joints(None)
+        # state['inertia']         = self.get_inertia(None)
+        # state['rgb_image']       = self._camera._curr_rgb_image
+        # state['depth_image']     = self._camera._curr_depth_image
+        # state['gravity_comp']    = np.array(self._h)
 
 
-        state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
+        # state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
 
-        try:
-            state['ee_point'], state['ee_ori']  = self.get_ee_pose()
-        except:
-            pass
+        # try:
+        #     state['ee_point'], state['ee_ori']  = self.get_ee_pose()
+        # except:
+        #     pass
 
-        try:
-            state['ee_vel'],   state['ee_omg']  = self.get_ee_velocity()
-        except:
-            pass
+        # try:
+        #     state['ee_vel'],   state['ee_omg']  = self.get_ee_velocity()
+        # except:
+        #     pass
 
         return state
 
