@@ -4,21 +4,33 @@ namespace aml_pcloud
 {
 
     // ===== PclRosConversions
-    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg)
+    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud msg)
     {
+        // ----- sensor_msgs::PointCloud2 is required for conversions from and to pcl pointclouds
+        sensor_msgs::PointCloud2 msg_pc2;
+        sensor_msgs::convertPointCloudToPointCloud2(msg, msg_pc2);
+
         PointCloudPtr cloud(new PointCloud);
         PointCloud2 pcl_pc2;
-        pcl_conversions::toPCL(msg, pcl_pc2);
-        pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
-        return cloud;
-    };
 
-    sensor_msgs::PointCloud2::Ptr PclRosConversions::ROSMsgFromPclCloud(PointCloud& cloud)
+        pcl_conversions::toPCL(msg_pc2, pcl_pc2);
+        pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
+
+        return cloud;
+    }
+
+    sensor_msgs::PointCloud PclRosConversions::ROSMsgFromPclCloud(PointCloud& cloud)
     {
-        sensor_msgs::PointCloud2::Ptr msg(new sensor_msgs::PointCloud2);
-        pcl::toROSMsg(cloud, *msg);
+        // ----- sensor_msgs::PointCloud2 is required for conversions from and to pcl pointclouds
+        sensor_msgs::PointCloud2 msg_pc2;
+        sensor_msgs::PointCloud msg;
+
+        pcl::toROSMsg(cloud, msg_pc2);
+        // ----- convert back to PointCloud
+        sensor_msgs::convertPointCloud2ToPointCloud(msg_pc2, msg);
+
         return msg;
-    };
+    }
 
 
     PointCloudPtr PCLProcessor::getCloudFromPcdFile(std::string& input_file)
@@ -27,28 +39,45 @@ namespace aml_pcloud
 
         if (pcl::io::loadPCDFile<CloudPoint> (input_file, *cloud) == -1) //* load the file
         {
-            PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
+            // PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
             return nullptr;
         }
         else return cloud;
-    };
+    }
 
     void PCLProcessor::saveToPcdFile(const std::string filename, const PointCloudPtr cloud)
     {
         pcl::io::savePCDFileASCII (filename, *cloud);
-    };
+    }
 
-    // may cause seg fault with ROS PCL
-    // may cause seg fault with ROS PCL
-    pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
+    // may cause seg fault with ROS PCL if using c++11 std
+    PointCloudPtr PCLProcessor::downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes)
     {
 
-        pcl::PCLPointCloud2::Ptr cloud_filtered;
-        // Create the filtering object
+        // ----- leaf size for downsampling cloud
+        if (leaf_sizes.empty())
+        {
+            for (unsigned i=0; i<3; i++) leaf_sizes.push_back(0.008f);
+        }
+        else if (leaf_sizes.size() < 3)
+        {
+            float val = leaf_sizes[0];
+            for (unsigned i=0; i<3; i++) leaf_sizes[i] = val;
+        }
+
+        pcl::PCLPointCloud2::Ptr cloud_filtered_pc2(new pcl::PCLPointCloud2);
+        PointCloudPtr cloud_filtered(new PointCloud);
+
+        pcl::PCLPointCloud2::Ptr cloud_pc2(new pcl::PCLPointCloud2);
+        pcl::toPCLPointCloud2(*cloud, *cloud_pc2);
+
+        // ----- Create the filtering object
         pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-        sor.setInputCloud (cloud);
-        sor.setLeafSize (0.008f, 0.008f, 0.008f);
-        sor.filter (*cloud_filtered);
+        sor.setInputCloud (cloud_pc2);
+        sor.setLeafSize (leaf_sizes[0], leaf_sizes[1], leaf_sizes[2]);
+        sor.filter (*cloud_filtered_pc2);
+
+        pcl::fromPCLPointCloud2(*cloud_filtered_pc2, *cloud_filtered);
 
         return cloud_filtered;
 
@@ -117,7 +146,7 @@ namespace aml_pcloud
         // get the points from the clouds
 
         *cloud_base += *cloud_add;
-    };
+    }
 
     void PCLProcessor::fitPointsToPlane(Eigen::MatrixXf points_mat, Eigen::Vector3f &plane_normal, double &plane_dist) {
 
@@ -185,7 +214,7 @@ namespace aml_pcloud
         // these correspond to the ith entry of i_normal
         plane_dist = plane_normal.dot(centroid);
 
-    };
+    }
 
     void PCLProcessor::fitPointsToPlane(PointCloudPtr input_cloud_ptr, Eigen::Vector3f &plane_normal, double &plane_dist) 
     {
@@ -203,7 +232,7 @@ namespace aml_pcloud
         }
         fitPointsToPlane(points_mat, plane_normal, plane_dist);
 
-    };
+    }
 
     Eigen::Vector3f PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
     {
@@ -219,6 +248,6 @@ namespace aml_pcloud
         }
         centroid /= npts; //divide by the number of points to get the centroid
         return centroid;
-    };
+    }
 
 }

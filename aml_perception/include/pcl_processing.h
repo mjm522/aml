@@ -1,3 +1,7 @@
+
+// All input, output types for point clouds are sensor_msg::PointCloud or pcl::PointCloud
+
+
 #include <pcl/point_cloud.h>  
 #include <pcl/point_types.h>  
 
@@ -50,12 +54,12 @@ namespace aml_pcloud
     /**
      * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZRGB>
      */
-        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg);
+        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud msg);
 
     /**
      *----- Helper function to convert from pcl::PointCloud<pcl::PointXYZ> to sensor_msgs/PointCloud2
      */
-        sensor_msgs::PointCloud2::Ptr ROSMsgFromPclCloud(PointCloud& cloud);
+        sensor_msgs::PointCloud ROSMsgFromPclCloud(PointCloud& cloud);
   
 
     };
@@ -74,7 +78,7 @@ namespace aml_pcloud
         void saveToPcdFile(std::string filename, const PointCloudPtr cloud);
 
 
-        pcl::PCLPointCloud2::Ptr downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud); // === CAUSES SEGFAULT !!
+        PointCloudPtr downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes); // === CAUSES SEGFAULT !!
 
         PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
 

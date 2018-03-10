@@ -1,9 +1,10 @@
 string function
-sensor_msgs/PointCloud2 in_cloud_1
-sensor_msgs/PointCloud2 in_cloud_2
+sensor_msgs/PointCloud in_cloud_1
+sensor_msgs/PointCloud in_cloud_2
 string in_string_1
+float32[] in_float_array_1
 ---
-sensor_msgs/PointCloud2 out_cloud_1
+sensor_msgs/PointCloud out_cloud_1
 string out_string_1
 string info
 bool success

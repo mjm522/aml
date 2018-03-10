@@ -61,7 +61,7 @@ SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
 add_library(proj_libs STATIC ${PROJ_LIBS})
 
 
-add_executable(test_clnt ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
+add_executable(test_clnt ${PROJECT_SOURCE_DIR}/tests/test_pcl.cpp)
 target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
