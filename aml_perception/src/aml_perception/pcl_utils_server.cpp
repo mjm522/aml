@@ -75,11 +75,39 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
 
         res.msg_out.cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud_out);
 
-        std::ostringstream stm ;
+        std::ostringstream stm;
         stm << "downsampled with leafsize " << "("<< req.msg_in.float_array_1[0] << ", " << req.msg_in.float_array_1[1] << ", " << req.msg_in.float_array_1[2] << ")";
         res.info = stm.str();
         res.success = true;
         return true;
+    }
+
+    else if (req.function == "get_curvature" or req.function == "fit_plane" or req.function == "compute_point_normal")
+    {
+        aml_pcloud::PointCloudPtr cloud_in = pcl_ros_converter_.pclCloudFromROSMsg(req.msg_in.cloud_1);
+
+        if (req.msg_in.int_array_1.size() > 0) ROS_INFO("Computing plane parameters and normals using the provided point indices");
+        else ROS_INFO("Computing plane parameters and normals using full cloud");
+
+        pcl_processor_.fitPlaneAndGetCurvature(cloud_in, req.msg_in.int_array_1, res.msg_out.float_array_1, res.msg_out.float_1);
+
+        res.info = "Plane parameters in msg_out.float_array_1; curvature in msg_out.float_1";
+        res.success = true;
+        return true;
+    }
+
+    else if (req.function == "compute_all_normals")
+    {
+        aml_pcloud::PointCloudPtr cloud_in = pcl_ros_converter_.pclCloudFromROSMsg(req.msg_in.cloud_1);
+        ROS_INFO("Computing normals for all points in plane");
+
+
+        aml_pcloud::PointCloudPtr cloud_out = pcl_processor_.computeNormalForAllPoints(cloud_in);
+        res.msg_out.cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud_out);
+
+        res.info = "Normals stored in the format [normal_x, normal_y, normal_z] in msg_out.cloud_1";
+        res.success = true;
+
     }
 
 }
@@ -90,7 +118,7 @@ void initiliseServer()
     ros::NodeHandle nh_;
     ros::ServiceServer service_ = nh_.advertiseService("aml_pcl_service", processRequest_);
 
-    ROS_INFO("AML PointCloud Utility Server Running...\nAvailable Services:\n   <request.function>  <args> \t\t||\t <responses> \n\n1. \"read_pcd_file\"  \"[file name]\"\t||\t [sensor_msgs/PointCloud out_cloud_1] [string info] [bool success]\n2. \"save_to_file\" [sensor_msgs/PointCloud in_cloud_1]  \"[file name]\"\t||\t [string info] [bool success]\n3. \"downsample_cloud\" [sensor_msgs/PointCloud in_cloud_1] {float_array in_float_array_1 (leafsize)}\t||\t [sensor_msgs/PointCloud out_cloud_1] [string info] [bool success]");
+    ROS_INFO("AML PointCloud Utility Server Running...\nAll responses have 'info (string)' and 'success (bool)' parameters...\nAvailable Services:\n   [request.function]  [required args] {optional args} \t\t||\t <responses> \n\n1. \"read_pcd_file\"  [msg_in.string_1 (file name)]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n2. \"save_to_file\" [sensor_msgs/PointCloud msg_in.cloud_1]  [msg_in.string_1 (file name)]\t||\t\n3. \"downsample_cloud\" [sensor_msgs/PointCloud msg_in.cloud_1] {float_array msg_in.float_array_1 (leafsize)}\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n4. \"compute_point_normal/get_curvature/fit_plane\" [sensor_msgs/PointCloud msg_in.cloud_1] {int_array msg_in.int_array_1 (indices)}\t||\t [float_array msg_out.float_array_1 (plane parameters)] [float curvature]\n5. \"compute_all_normals\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]");
 
     ros::spin();
 }

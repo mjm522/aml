@@ -83,18 +83,27 @@ namespace aml_pcloud
         PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
 
         /**
-         *  computeNormals function
+         *  computeNormalForAllPoints function
          *
-         *  Computes the normals for a given point cloud. Taken from the example from blackboard and
-         *  edited to fit in our program
+         *  Computes the normals for all points in a given point cloud. 
          *
-         *  @see http://blackboard.uva.nl/ -> 20152016 CV2 
          *  
          *  @param  cloud
-         *  @return cloud with normals
+         *  @return cloud of normals
          */
-        pcl::PointCloud<pcl::PointNormal>::Ptr computeNormals(PointCloudPtr cloud);
+        PointCloudPtr computeNormalForAllPoints(PointCloudPtr cloud);
 
+        /**
+         * fitPlaneAndGetCurvature function
+         * Compute the Least-Squares plane fit for a given set of points, using their indices, and return the estimated plane parameters together with the surface curvature.
+         * @param cloud
+         * @param indices <optional>    the indices of the cloud points to be used for computation
+         * 
+         * @param plane parameters      the plane parameters as: a, b, c, d (ax + by + cz + d = 0)
+         * @param curvature             the estimated surface curvature as a measure of lambda_0/(lambda_0 + lambda_1 + lambda_2)
+         */
+        void fitPlaneAndGetCurvature(const PointCloudPtr cloud, std::vector< int > indices, std::vector< float > &plane_parameters, float &curvature);
+        
         /**
          *  TransformPointCloud function
          *
