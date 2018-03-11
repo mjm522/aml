@@ -4,7 +4,6 @@
 #include "pcl_processing.h"
 #include "aml_services/PCLUtility.h"
 
-
 aml_pcloud::PclRosConversions pcl_ros_converter_;
 aml_pcloud::PCLProcessor pcl_processor_;
 
@@ -21,10 +20,10 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
 {
     if (req.function == "read_pcd_file")
     {
-        ROS_INFO("Reading pcd file: %s", req.in_string_1.c_str());
+        ROS_INFO("Reading pcd file: %s", req.msg_in.string_1.c_str());
 
 
-        aml_pcloud::PointCloudPtr cloud = pcl_processor_.getCloudFromPcdFile(req.in_string_1);
+        aml_pcloud::PointCloudPtr cloud = pcl_processor_.getCloudFromPcdFile(req.msg_in.string_1);
         if (cloud == NULL)
         {
             res.success = false;
@@ -34,50 +33,50 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
         }
 
 
-        res.out_cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud);
+        res.msg_out.cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud);
 
         // res.out_cloud_1 = *out;
-        res.info = req.in_string_1 + " read success";
+        res.info = req.msg_in.string_1 + " read success";
         res.success = true;
         return true;
     }
 
     else if (req.function == "save_to_file")
     {
-        if (req.in_string_1.empty())
+        if (req.msg_in.string_1.empty())
         {
             res.success = false;
-            res.info = "failed";
-            ROS_ERROR("Destination path not specified in in_string_1");
+            res.info = "Failed: Destination path not specified in in_string_1.";
+            ROS_ERROR("Destination path not specified!");
             return false;
         }
-        ROS_INFO("Saving pcd file: %s", req.in_string_1.c_str());
+        ROS_INFO("Saving pcd file: %s", req.msg_in.string_1.c_str());
 
-        aml_pcloud::PointCloudPtr cloud = pcl_ros_converter_.pclCloudFromROSMsg(req.in_cloud_1);
-        pcl_processor_.saveToPcdFile(req.in_string_1, cloud);
+        aml_pcloud::PointCloudPtr cloud = pcl_ros_converter_.pclCloudFromROSMsg(req.msg_in.cloud_1);
+        pcl_processor_.saveToPcdFile(req.msg_in.string_1, cloud);
 
         res.success = true;
-        res.info = "PCD saved to " + req.in_string_1;
+        res.info = "PCD saved to " + req.msg_in.string_1;
         return true;
     }
 
     else if (req.function == "downsample_cloud")
     {
         
-        aml_pcloud::PointCloudPtr cloud_in = pcl_ros_converter_.pclCloudFromROSMsg(req.in_cloud_1);
+        aml_pcloud::PointCloudPtr cloud_in = pcl_ros_converter_.pclCloudFromROSMsg(req.msg_in.cloud_1);
 
-        aml_pcloud::PointCloudPtr cloud_out = pcl_processor_.downsampleCloud(cloud_in, req.in_float_array_1);
+        aml_pcloud::PointCloudPtr cloud_out = pcl_processor_.downsampleCloud(cloud_in, req.msg_in.float_array_1);
 
         std::ostringstream info ;
-        info  << "("<< req.in_float_array_1[0] << ", " << req.in_float_array_1[1] << ", " << req.in_float_array_1[2] << ")";
+        info  << "("<< req.msg_in.float_array_1[0] << ", " << req.msg_in.float_array_1[1] << ", " << req.msg_in.float_array_1[2] << ")";
         std::string info_str = info.str();
         ROS_INFO("Downsampling cloud with leaf sizes: %s", info_str.c_str());
         // std::cout << info_str << std::endl;
 
-        res.out_cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud_out);
+        res.msg_out.cloud_1 = pcl_ros_converter_.ROSMsgFromPclCloud(*cloud_out);
 
         std::ostringstream stm ;
-        stm << "downsampled with leafsize " << "("<< req.in_float_array_1[0] << ", " << req.in_float_array_1[1] << ", " << req.in_float_array_1[2] << ")";
+        stm << "downsampled with leafsize " << "("<< req.msg_in.float_array_1[0] << ", " << req.msg_in.float_array_1[1] << ", " << req.msg_in.float_array_1[2] << ")";
         res.info = stm.str();
         res.success = true;
         return true;

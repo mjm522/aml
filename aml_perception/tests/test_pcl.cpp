@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   aml_services::PCLUtility srv;
   srv.request.function = "read_pcd_file";
   // srv.request.b = (argv[2]);
-  srv.request.in_string_1 = "/home/saif/Desktop/image_0001.pcd";
+  srv.request.msg_in.string_1 = "/home/saif/Desktop/image_0001.pcd";
 
 
 
@@ -27,8 +27,8 @@ int main(int argc, char **argv)
     aml_services::PCLUtility srv2;
     srv2.request.function = "save_to_file";
     // srv.request.b = (argv[2]);
-    srv2.request.in_string_1 = "/home/saif/Desktop/image_0002.pcd";
-    srv2.request.in_cloud_1 = srv.response.out_cloud_1;
+    srv2.request.msg_in.string_1 = "/home/saif/Desktop/image_0002.pcd";
+    srv2.request.msg_in.cloud_1 = srv.response.msg_out.cloud_1;
 
     if (client.call(srv2))
     {

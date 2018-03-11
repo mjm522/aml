@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  message_generation
 )
 
 
@@ -32,15 +33,21 @@ catkin_python_setup()
 #   FILES
 # )
 
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # and/or other packages containing depended messages
-# )
+add_message_files(
+  FILES
+  PCLCustomMsg.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs  
+  sensor_msgs
+)
 
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS pcl_conversions pcl_ros roscpp sensor_msgs
+  CATKIN_DEPENDS message_runtime std_msgs sensor_msgs pcl_conversions pcl_ros roscpp sensor_msgs
 )
 
 
