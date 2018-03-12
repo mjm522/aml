@@ -6,13 +6,13 @@ JS_TELEOP_CTRL = {
     'haptic_joints':None,
     'scale_from_home': True,
     'robot_home':None, # home position of baxter
-    'rate':200, # rate of the controller
+    'rate': 500, # rate of the controller
     'ctrlr_type':'pos', #other options are 'vel', 'torq'
 }
 
 
 OS_TELEOP_CTRL = {
     
-    'rate':200, # rate of the controller
+    'rate': 500, # rate of the controller
     'ctrlr_type':'pos', #other options are 'vel', 'torq'
 }
