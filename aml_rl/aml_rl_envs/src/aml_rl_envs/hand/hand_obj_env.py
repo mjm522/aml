@@ -53,6 +53,7 @@ class HandObjEnv(AMLRlEnv):
             self._dmp3.train()
             self._dmp3_config = copy.deepcopy(discrete_dmp_config)
 
+        self._config = config
 
         AMLRlEnv.__init__(self, config, set_gravity=False)
 
@@ -87,7 +88,7 @@ class HandObjEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.5], [0.,0.,0.,1])
 
-        self._object = ManObject(urdf_root_path=self._urdf_root_path, time_step=self._time_step, pos=box_pos, ori=box_ori, scale=scale, useFixedBase = obj_base_fixed)
+        self._object = ManObject(config=self._config, pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
         
         base_hand_pos  = [0., 0., 0.7]
         

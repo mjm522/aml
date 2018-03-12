@@ -93,7 +93,7 @@ class HandObstacleEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori)
  
-        self._object = ManObject(urdf_root_path=self._urdf_root_path, time_step=self._time_step, pos=box_pos, ori=box_ori, scale=scale, useFixedBase = obj_base_fixed)
+        self._object = ManObject(config=self._config, pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
         
         base_hand_pos  = [0.4, 0., 2]
 
