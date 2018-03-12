@@ -1,0 +1,20 @@
+<launch>
+
+    <arg name="control_id" default="1"/>
+    <arg name="multiple_goals" default="0"/>
+    <arg name="arm_interface" default="sawyer"/>
+    <arg name="arm_speed" default="5.0"/>
+    <arg name="gripper_speed" default="0.25"/>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aml_ctrl)/demos/rviz_configs/controllers_marker_follower.rviz"/>
+
+    <node pkg="aml_ctrl" type="demo_controllers_marker_follower.py" name="marker_follower"
+          args="-c $(arg control_id) 
+                -m $(arg multiple_goals)
+                -i $(arg arm_interface)
+                -s $(arg arm_speed)
+                -g $(arg gripper_speed)"
+          output="screen">
+    </node>
+
+</launch>
