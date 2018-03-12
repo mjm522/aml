@@ -1,6 +1,6 @@
 import time
-import pickle
 import warnings
+import cPickle as pickle
 from os.path import exists, join, dirname, abspath
 
 def get_aml_package_path(aml_package_name=None):

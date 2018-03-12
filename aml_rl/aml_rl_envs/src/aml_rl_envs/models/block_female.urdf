@@ -1,0 +1,92 @@
+<robot name="block_female">
+  <link name = "block_body">
+    <visual>
+      <geometry>
+        <box size="0.3 1 0.3"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.3 1 0.3"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- <origin xyz="1 1 1" rpy="0 0 0" /> -->
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+  <link name="block_arm_left">
+    <visual>
+      <geometry>
+        <box size="0.3 0.3 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="grey">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.3 0.3 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+  <link name="block_arm_right">
+    <visual>
+      <geometry>
+        <box size="0.3 0.3 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="grey">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.3 0.3 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+  <joint name="body_left_arm" type="fixed">
+    <parent link="block_body"/>
+    <child link="block_arm_left"/>
+    <origin xyz="-0.3 0.35 0"/>
+  </joint>
+  <joint name="body_right_arm" type="fixed">
+    <parent link="block_body"/>
+    <child link="block_arm_right"/>
+    <origin xyz="-0.3 -0.35 0"/>
+  </joint>
+</robot>

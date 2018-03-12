@@ -1,0 +1,23 @@
+<robot name="robot">
+   <link name="hand_cylinder_base">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.5"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0 0 0.6"/>
+      </material>
+      <origin rpy="0 0 0" xyz="0. 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.05" radius="0.5"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0. 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+</robot>

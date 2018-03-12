@@ -1,0 +1,28 @@
+<robot name="block_male">
+  <link name = "block_body">
+    <visual>
+      <geometry>
+        <box size="0.3 1 0.3"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.3 1 0.3"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- <origin xyz="1 1 1" rpy="0 0 0" /> -->
+      <mass value="0.25"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+</robot>

@@ -1,0 +1,56 @@
+digraph G {
+node [shape=box];
+"base" [label="base"];
+"pedestal" [label="pedestal"];
+"right_arm_base_link" [label="right_arm_base_link"];
+"right_l0" [label="right_l0"];
+"head" [label="head"];
+"screen" [label="screen"];
+"head_camera" [label="head_camera"];
+"right_l1" [label="right_l1"];
+"right_l2" [label="right_l2"];
+"right_l3" [label="right_l3"];
+"right_l4" [label="right_l4"];
+"right_arm_itb" [label="right_arm_itb"];
+"right_l5" [label="right_l5"];
+"right_hand_camera" [label="right_hand_camera"];
+"right_l6" [label="right_l6"];
+"right_wrist" [label="right_wrist"];
+"right_torso_itb" [label="right_torso_itb"];
+"torso" [label="torso"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base" -> "pedestal_fixed" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"pedestal_fixed" -> "pedestal"
+"base" -> "right_arm_mount" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"right_arm_mount" -> "right_arm_base_link"
+"right_arm_base_link" -> "right_j0" [label="xyz: 0 0 0.08 \nrpy: 0 -0 0"]
+"right_j0" -> "right_l0"
+"right_l0" -> "head_pan" [label="xyz: 0 0 0.2965 \nrpy: 0 -0 0"]
+"head_pan" -> "head"
+"head" -> "display_joint" [label="xyz: 0.03 0 0.105 \nrpy: 1.5708 -0 1.5708"]
+"display_joint" -> "screen"
+"head" -> "head_camera" [label="xyz: 0.022803 0 0.21657 \nrpy: -2.1293 -0 -1.5708"]
+"head_camera" -> "head_camera"
+"right_l0" -> "right_j1" [label="xyz: 0.081 0.05 0.237 \nrpy: 1.57079 1.57079 3.14159"]
+"right_j1" -> "right_l1"
+"right_l1" -> "right_j2" [label="xyz: 0 -0.14 0.1425 \nrpy: 1.5708 -0 0"]
+"right_j2" -> "right_l2"
+"right_l2" -> "right_j3" [label="xyz: 0 -0.042 0.26 \nrpy: -1.5708 0 0"]
+"right_j3" -> "right_l3"
+"right_l3" -> "right_j4" [label="xyz: 0 -0.125 -0.1265 \nrpy: 1.5708 -0 0"]
+"right_j4" -> "right_l4"
+"right_l4" -> "right_arm_itb" [label="xyz: -0.055 0 0.075 \nrpy: 3.14159 -1.57079 3.14159"]
+"right_arm_itb" -> "right_arm_itb"
+"right_l4" -> "right_j5" [label="xyz: 0 0.031 0.275 \nrpy: -1.5708 0 0"]
+"right_j5" -> "right_l5"
+"right_l5" -> "right_hand_camera" [label="xyz: 0.039552 -0.033 0.0695 \nrpy: 3.14159 1.57079 3.14159"]
+"right_hand_camera" -> "right_hand_camera"
+"right_l5" -> "right_j6" [label="xyz: 0 -0.11 0.1053 \nrpy: -1.5708 -0.17453 -3.14159"]
+"right_j6" -> "right_l6"
+"right_l5" -> "right_wrist" [label="xyz: 0 0 0.10541 \nrpy: 1.5708 -0 0"]
+"right_wrist" -> "right_wrist"
+"right_l0" -> "right_torso_itb" [label="xyz: -0.055 0 0.22 \nrpy: 3.14159 -1.57079 3.14159"]
+"right_torso_itb" -> "right_torso_itb"
+"base" -> "torso_t0" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"torso_t0" -> "torso"
+}

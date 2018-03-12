@@ -1,0 +1,59 @@
+<robot name="cube.urdf">
+  <link name="support_pin">
+    <visual>
+      <geometry>
+        <capsule length="0.5" radius="0.01"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+      <origin rpy="0 0 0" xyz="0 0 0."/>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.5" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0."/>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <link name="cube_body">
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+       <mass value="0.01"/>
+       <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry>
+				<box size="0.2 0.8 0.2"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry>
+    	 	<box size="0.2 0.8 0.2"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="pin_joint" type="continuous">
+    <parent link="support_pin"/>
+    <child link="cube_body"/>
+    <origin xyz="0 0 -0.15" rpy="0 0 0" />
+    <axis xyz = "0 0 1" />
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint> 
+</robot>
+

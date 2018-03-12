@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import numpy.matlib as npm
 from scipy.interpolate import interp1d
@@ -356,3 +357,46 @@ class DiscretePROMP(object):
 
         return traj_data
 
+
+class MultiplePROMPs(object):
+    """
+    Class that defines multiple PROMPS
+    """
+    def __init__(self, multiple_dim_data):
+        """
+        Constructor of the class
+        data: list of different dimensions.
+        each data list contains a trajectory
+        """
+
+        self._num_dims = len(multiple_dim_data)
+        self._promps_dims = []
+
+        for data in multiple_dim_data:
+
+            self._promps_dims.append(copy.deepcopy(DiscretePROMP(data=data)))
+
+
+    def train(self):
+
+        for promp in self._promps_dims:
+            promp.train()
+
+
+    def generate_trajectory(self, phase_speed=1., randomness=1e-3):
+
+        new_traj = []
+        mu_traj = []
+        sigma_traj = []
+        mu_Dtraj = []
+        sigma_Dtraj = []
+
+        for k in range(self._num_dims):
+
+            new_traj.append(self._promps_dims[k].generate_trajectory(phase_speed, randomness))
+            mu_traj.append(copy.deepcopy(new_traj[-1]['mu_traj']))
+            sigma_traj.append(copy.deepcopy(new_traj[-1]['sigma_traj']))
+            mu_Dtraj.append(copy.deepcopy(new_traj[-1]['mu_Dtraj']))
+            sigma_Dtraj.append(copy.deepcopy(new_traj[-1]['sigma_Dtraj']))
+
+        return np.asarray(mu_traj).squeeze().T, np.asarray(mu_Dtraj).squeeze().T
