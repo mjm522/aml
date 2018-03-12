@@ -8,6 +8,7 @@ author: Matthew Broadway (https://github.com/mbway)
 
 author2: Ermano Arruda (https://github.com/eaa3)
 feature: Adding controller options
+feature: Generalising for both Sawyer and Baxter arm interfaces
 '''
 
 import os
@@ -23,7 +24,6 @@ import python_qt_binding.QtGui as qtg
 
 # ROS imports
 import rospy
-from aml_robot.baxter_robot import BaxterArm
 
 from aml_ctrl.controllers.js_controllers.js_torque_controller import JSTorqueController
 from aml_ctrl.controllers.js_controllers.js_postn_controller2 import JSPositionController2
@@ -87,7 +87,15 @@ def test_float_slider():
 #test_float_slider()
 
 # easier to see what the joint does than the given names
+# adding additional descriptions for sawyer
 my_descriptions = {
+    'j0' : '(1-joint)',
+    'j1' : '(2-joint)',
+    'j2' : '(3-joint)',
+    'j3' : '(4-joint)',
+    'j4' : '(5-joint)',
+    'j5' : '(6-joint)',
+    'j6' : '(7-joint)',
     's0' : '(1-twist)',
     's1' : '(2-swing)', 'e0' : '(2-twist)',
     'e1' : '(3-swing)', 'w0' : '(3-twist)',
@@ -146,10 +154,10 @@ class BackgroundWorker(qtc.QThread):
         self.do_action()
 
 class SliderWindow(qtg.QWidget):
-    def __init__(self, arm_name):
+    def __init__(self, arm_name, ArmInterface):
         super(SliderWindow, self).__init__()
         self.arm_name = arm_name
-        self.arm = BaxterArm(arm_name)
+        self.arm = ArmInterface(arm_name)
 
         vbox = qtg.QVBoxLayout()
         header_box = qtg.QHBoxLayout()
@@ -346,11 +354,12 @@ class SliderWindow(qtg.QWidget):
                 self.joint_slider_labels[i].setText('{:.3f}'.format(val))
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] not in ['left', 'right']:
-        print('usage: ./joint_sliders.py (left|right)')
+    if len(sys.argv) < 3 or sys.argv[1] not in ['left', 'right'] or sys.argv[2] not in ['baxter', 'sawyer']:
+        print('usage: ./joint_sliders.py (left|right) (baxter|sawyer)')
         sys.exit(1)
 
     arm_name = sys.argv[1]
+    arm_interface = sys.argv[2]
 
     rospy.init_node('joint_sliders')
     ros_thread = threading.Thread(target=rospy.spin)
@@ -363,7 +372,17 @@ def main():
     # in the container C.UTF-8 by default which causes 'Fontconfig warning: ignoring C.UTF-8: not a valid language tag'
     os.environ['LC_ALL'] = 'C'
     app = qtg.QApplication(sys.argv)
-    win = SliderWindow(arm_name)
+
+    max_speed = 0.20
+    min_speed = 0.01
+    if arm_interface == "baxter":
+        from aml_robot.baxter_robot import BaxterArm as ArmInterface
+    else:
+        from aml_robot.sawyer_robot import SawyerArm as ArmInterface
+
+    print "ARM INTERFACE",arm_interface
+
+    win = SliderWindow(arm_name, ArmInterface)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
