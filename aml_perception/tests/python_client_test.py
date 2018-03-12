@@ -4,10 +4,15 @@ import sys
 import rospy
 from aml_services.srv import PCLUtility
 from aml_perception.msg import PCLCustomMsg
-
+from sensor_msgs.msg import PointCloud
+import std_msgs.msg
 
 
 if __name__ == "__main__":
+
+    rospy.init_node('pcl_client', anonymous=True)
+
+    pub = rospy.Publisher('pcl', PointCloud, queue_size=10)
 
     print "waiting for service"
     rospy.wait_for_service('aml_pcl_service')
@@ -24,24 +29,42 @@ if __name__ == "__main__":
 
         print resp.info
 
+        hdr = std_msgs.msg.Header()
+        hdr.frame_id = "base"
+        hdr.stamp = rospy.Time.now()
+        resp.msg_out.cloud_1.header = hdr
+
+        # while not rospy.is_shutdown():
+        #     try:
+        #         pub.publish(resp.msg_out.cloud_1)
+        #     except KeyboardInterrupt:
+        #         break
+
+        # try:
+        #     msg2 = PCLCustomMsg()
+        #     msg2.cloud_1 = resp.msg_out.cloud_1
+        #     resp2 = client("compute_centroid", msg2)
+
+        #     print resp2.info
+
+        #     print resp2.msg_out.float_array_1
+
         raw_input()
 
         try:
             msg2 = PCLCustomMsg()
             msg2.cloud_1 = resp.msg_out.cloud_1
-            resp2 = client("compute_centroid", msg2)
+            msg2.float_array_1 = [0., 0., 0., 0., 0., 0.86602540378, -0.5, 0., 0., 0.5, 0.86602540378, 0, 0, 0, 0, 1]
+            resp2 = client("apply_transformation", msg2)
 
             print resp2.info
 
-            print resp2.msg_out.float_array_1
-
-        # try:
-        #     msg2 = PCLCustomMsg()
-        #     msg2.cloud_1 = resp.msg_out.cloud_1
-        #     msg2.float_array_1 = [0., 0., 0., 0., 0., 1.2, -3.2, 0., 0., 3.2, 1.2, 0, 0, 0, 0, 1]
-        #     resp2 = client("apply_transformation", msg2)
-
-        #     print resp2.info
+            resp2.msg_out.cloud_1.header = hdr
+            # while not rospy.is_shutdown():
+            #     try:
+            #         pub.publish(resp2.msg_out.cloud_1)
+            #     except KeyboardInterrupt:
+            #         break
 
             # print resp2.msg_out.cloud_1
             # print resp2.msg_out.float_1

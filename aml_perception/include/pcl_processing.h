@@ -17,6 +17,7 @@
 
 #include <pcl/features/integral_image_normal.h>
 #include <pcl/features/normal_3d.h>
+#include <pcl/features/pfh.h>
 
 #include <pcl/io/pcd_io.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -30,9 +31,9 @@ namespace aml_pcloud
     typedef pcl::PointCloud<CloudPoint> PointCloud;
     typedef pcl::PointCloud<CloudPoint>::Ptr PointCloudPtr;
 
-    typedef pcl::PointXYZRGB PointT; // A point structure denoting xyz and rgb
-    typedef pcl::PointCloud<PointT> PointCloudT;
-    typedef pcl::PointCloud<PointT>::Ptr PointCloudTPtr;
+    typedef pcl::Normal Normal;
+    typedef pcl::PointCloud<Normal> NormalCloud;
+    typedef pcl::PointCloud<Normal>::Ptr NormalCloudPtr;
 
     typedef pcl::PCLPointCloud2 PointCloud2;
 
@@ -77,10 +78,11 @@ namespace aml_pcloud
         // ----- service request.function =  "save_to_file"
         void saveToPcdFile(std::string filename, const PointCloudPtr cloud);
 
+        // ----- service request.function =  "downsample_cloud"
+        PointCloudPtr downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes); 
 
-        PointCloudPtr downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes); // === CAUSES SEGFAULT !!
-
-        PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
+        // ----- service request.function =  "get_points_not_in_plane"
+        PointCloudPtr getPointsNotInPlane(const PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
 
         /**
          *  computeNormalForAllPoints function
@@ -91,7 +93,9 @@ namespace aml_pcloud
          *  @param  cloud
          *  @return cloud of normals
          */
-        PointCloudPtr computeNormalForAllPoints(PointCloudPtr cloud);
+        // ----- service request.function =  "compute_all_normals"
+        PointCloudPtr computeNormalForAllPoints(const PointCloudPtr cloud);
+        void computeNormalForAllPoints(const PointCloudPtr cloud, NormalCloudPtr cloud_normals);
 
         /**
          * fitPlaneAndGetCurvature function
@@ -102,6 +106,7 @@ namespace aml_pcloud
          * @param plane parameters      the plane parameters as: a, b, c, d (ax + by + cz + d = 0)
          * @param curvature             the estimated surface curvature as a measure of lambda_0/(lambda_0 + lambda_1 + lambda_2)
          */
+        // ----- service request.function =  "get_curvature/fit_plane/compute_point_normal"
         void fitPlaneAndGetCurvature(const PointCloudPtr cloud, std::vector< int > indices, std::vector< float > &plane_parameters, float &curvature);
         
         /**
@@ -112,7 +117,8 @@ namespace aml_pcloud
          *  @param  trans_mat_array   the 4x4 transformation matrix flattened as std::vector<float>
          *  @return                   the transformed cloud
          */
-        PointCloudPtr transformPointCloud(PointCloudPtr input_cloud, std::vector<float> trans_mat_array);
+        // ----- service request.function =  "apply_transformation"
+        PointCloudPtr transformPointCloud(const PointCloudPtr input_cloud, std::vector<float> trans_mat_array);
 
         /*
          *  Helper function to concatenate point clouds
@@ -120,7 +126,8 @@ namespace aml_pcloud
          *  @param  cloud_base  the cloud to which the other cloud will be appended
          *  @param  cloud_add   the cloud to add to the other cloud
         */
-        PointCloudPtr addPointClouds(PointCloudPtr cloud_base, PointCloudPtr cloud_add);
+        // ----- service request.function =  "add_clouds"
+        PointCloudPtr addPointClouds(const PointCloudPtr cloud_base, const PointCloudPtr cloud_add);
 
         /**
          *  computeCentroid function
@@ -129,7 +136,33 @@ namespace aml_pcloud
          *  @param  input_cloud       the cloud
          *  @return                   the centroid (x,y,z)
          */
-        std::vector<float> computeCentroid(PointCloudPtr input_cloud_ptr);
+        // ----- service request.function =  "compute_centroid"
+        std::vector<float> computeCentroid(const PointCloudPtr input_cloud_ptr);
+
+        
+        /**
+         * estimatePfhFeatures function
+         * Estimates the Point Feature Histograms for all points in the given cloud (http://pointclouds.org/documentation/tutorials/pfh_estimation.php#pfh-estimation)
+         * @param cloud             input cloud containing n points
+
+         * @param pfh_histograms    histogram vector (of float[125] types)
+         */
+        // ----- Not implemented: should return a vector of type std::vector<float[125]>
+        // void estimatePfhFeatures(const PointCloudPtr cloud, std::vector<float> &pfh_histograms);
+
+
+
+
+
+    private:
+
+        /**
+         * Helper Functions to typecast betweeen pcl::PointCloud<pcl::PointXYZ> and pcl::PointCloud<pcl::Normal>.
+         * Note: This function does not find normals of the points, but just changes the type for easy conversion to ros messages
+         */
+        PointCloudPtr normalCloud2PointCloud(const NormalCloudPtr cloud_normals);
+
+        NormalCloudPtr pointCloud2NormalCloud(const PointCloudPtr cloud_points);
 
 
     };
