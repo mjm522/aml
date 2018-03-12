@@ -84,7 +84,7 @@ namespace aml_pcloud
     }
 
 
-    PointCloudPtr PCLProcessor::getPointsNotInPlane(PointCloudPtr input_cloud)
+    PointCloudPtr PCLProcessor::getPointsNotInPlane(const PointCloudPtr input_cloud)
     {
 
         PointCloudPtr cloudExtracted(new pcl::PointCloud<pcl::PointXYZ>);
@@ -123,49 +123,49 @@ namespace aml_pcloud
             pcl::computePointNormal (*cloud, plane_parameters_eig, curvature);
         else pcl::computePointNormal (*cloud, indices, plane_parameters_eig, curvature);
         
-        // converting eigen vector to std vector
+        // ----- converting eigen vector to std vector
         std::vector<float> v(plane_parameters_eig.data(), plane_parameters_eig.data() + plane_parameters_eig.rows() * plane_parameters_eig.cols());
         plane_parameters = v;
 
     }
 
-    PointCloudPtr PCLProcessor::computeNormalForAllPoints(PointCloudPtr cloud)
+    PointCloudPtr PCLProcessor::computeNormalForAllPoints(const PointCloudPtr cloud)
     {
+        // ---- Output datasets
+        NormalCloudPtr cloud_normals (new NormalCloud);
 
-        // Create the normal estimation class, and pass the input dataset to it
-        pcl::NormalEstimation<CloudPoint, pcl::Normal> ne;
-        ne.setInputCloud (cloud);
-
-        // Create an empty kdtree representation, and pass it to the normal estimation object.
-        // Its content will be filled inside the object, based on the given input dataset (as no other search surface is given).
-        pcl::search::KdTree<CloudPoint>::Ptr tree (new pcl::search::KdTree<CloudPoint> ());
-        ne.setSearchMethod (tree);
-
-        // Output datasets
-        pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
-
-        // Use all neighbors in a sphere of radius 3cm
-        ne.setRadiusSearch (0.03);
-
-        // Compute the features
-        ne.compute (*cloud_normals);
-
-
-        // cloud_normals->points.size () should have the same size as the input cloud->points.size ()*
-
+        computeNormalForAllPoints(cloud, cloud_normals);
         // ----- convert to PointCloud type so as to transmit as rosmsg later
         PointCloudPtr out_cloud(new PointCloud);
 
-        for (unsigned i = 0; i < cloud_normals->size(); i++)
-        {
-            out_cloud->push_back(CloudPoint(cloud_normals->points[i].normal_x, cloud_normals->points[i].normal_y, cloud_normals->points[i].normal_z));
-        }
+        out_cloud = normalCloud2PointCloud(cloud_normals);
 
         return out_cloud;
 
     }
 
-    PointCloudPtr PCLProcessor::transformPointCloud(PointCloudPtr input_cloud, std::vector<float> trans_mat_array)
+    void PCLProcessor::computeNormalForAllPoints(const PointCloudPtr cloud, NormalCloudPtr cloud_normals)
+    {
+        // ----- Create the normal estimation class, and pass the input dataset to it
+        pcl::NormalEstimation<CloudPoint, Normal> ne;
+        ne.setInputCloud (cloud);
+
+        // ----- Create an empty kdtree representation, and pass it to the normal estimation object.
+        // ----- Its content will be filled inside the object, based on the given input dataset (as no other search surface is given).
+        pcl::search::KdTree<CloudPoint>::Ptr tree (new pcl::search::KdTree<CloudPoint> ());
+        ne.setSearchMethod (tree);
+
+        // ----- Use all neighbors in a sphere of radius 3cm
+        ne.setRadiusSearch (0.03);
+
+        // ----- Compute the features
+        ne.compute (*cloud_normals);
+
+
+        // ----- cloud_normals->points.size () should have the same size as the input cloud->points.size ()*
+    }
+
+    PointCloudPtr PCLProcessor::transformPointCloud(const PointCloudPtr input_cloud, std::vector<float> trans_mat_array)
     {
         /**
          *  Initialize a new point cloud to save the data
@@ -189,7 +189,7 @@ namespace aml_pcloud
         return new_cloud;
     }
 
-    PointCloudPtr PCLProcessor::addPointClouds(PointCloudPtr cloud_base, PointCloudPtr cloud_add)
+    PointCloudPtr PCLProcessor::addPointClouds(const PointCloudPtr cloud_base, const PointCloudPtr cloud_add)
     {
         // ----- pcl concatenation
         PointCloudPtr cloud_out(new PointCloud);
@@ -197,7 +197,7 @@ namespace aml_pcloud
         return cloud_out;
     }
 
-    std::vector<float> PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
+    std::vector<float> PCLProcessor::computeCentroid(const PointCloudPtr input_cloud_ptr) 
     {
         Eigen::Vector3f centroid;
         Eigen::Vector3f cloud_pt;
@@ -215,6 +215,61 @@ namespace aml_pcloud
 
         return centroid_std_vec;
 
+    }
+
+    // ===== TODO
+    // void PCLProcessor::estimatePfhFeatures(const PointCloudPtr cloud, std::vector<float> &pfh_histograms)
+    // {       
+
+    //     NormalCloudPtr normals;
+    //     computeNormalForAllPoints(cloud, normals);
+
+    //     // Create the PFH estimation class, and pass the input dataset+normals to it
+    //     pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::PFHSignature125> pfh;
+    //     pfh.setInputCloud (cloud);
+    //     pfh.setInputNormals (normals);
+    //     // alternatively, if cloud is of tpe PointNormal, do pfh.setInputNormals (cloud);
+
+    //     // Create an empty kdtree representation, and pass it to the PFH estimation object.
+    //     // Its content will be filled inside the object, based on the given input dataset (as no other search surface is given).
+    //     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ> ());
+    //     //pcl::KdTreeFLANN<pcl::PointXYZ>::Ptr tree (new pcl::KdTreeFLANN<pcl::PointXYZ> ()); -- older call for PCL 1.5-
+    //     pfh.setSearchMethod (tree);
+
+    //     // Output datasets
+    //     pcl::PointCloud<pcl::PFHSignature125>::Ptr pfhs (new pcl::PointCloud<pcl::PFHSignature125> ());
+
+    //     // Use all neighbors in a sphere of radius 5cm
+    //     // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
+    //     pfh.setRadiusSearch (0.05);
+
+    //     // Compute the features
+    //     pfh.compute (*pfhs);
+
+    // }
+
+    PointCloudPtr PCLProcessor::normalCloud2PointCloud(const NormalCloudPtr cloud_normals)
+    {
+        PointCloudPtr out_cloud(new PointCloud);
+
+        for (unsigned i = 0; i < cloud_normals->size(); i++)
+        {
+            out_cloud->push_back(CloudPoint(cloud_normals->points[i].normal_x, cloud_normals->points[i].normal_y, cloud_normals->points[i].normal_z));
+        }
+
+        return out_cloud;
+    }
+
+    NormalCloudPtr PCLProcessor::pointCloud2NormalCloud(const PointCloudPtr cloud_points)
+    {
+        NormalCloudPtr out_cloud(new NormalCloud);
+
+        for (unsigned i = 0; i < cloud_points->size(); i++)
+        {
+            out_cloud->push_back(Normal(cloud_points->points[i].x, cloud_points->points[i].y, cloud_points->points[i].z));
+        }
+
+        return out_cloud;
     }
 
 }
