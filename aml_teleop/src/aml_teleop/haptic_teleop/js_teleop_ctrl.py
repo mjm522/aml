@@ -147,6 +147,7 @@ class JSTeleopCtrl(HapticRobotInterface):
         finished = False
         
         t = 0
+        # self._ctrlr.set_active(True)
 
         while not rospy.is_shutdown() and not finished:
 
@@ -166,7 +167,7 @@ class JSTeleopCtrl(HapticRobotInterface):
             
             else:
                 # Setting new goal"
-                
+
                 self._ctrlr.set_goal(goal_js_pos=goal_js_pos, 
                                goal_js_vel=goal_js_vel, 
                                goal_js_acc=goal_js_acc)

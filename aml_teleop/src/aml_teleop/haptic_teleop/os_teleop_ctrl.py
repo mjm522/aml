@@ -116,7 +116,7 @@ class OSTeleopCtrl(HapticRobotInterface):
 
             goal_ee_pos, goal_ee_ori = self.compute_cmd()
 
-            print "Sending goal ",t, " goal_os_pos:", np.round(goal_ee_pos.ravel(), 2)
+            # print "Sending goal ",t, " goal_os_pos:", np.round(goal_ee_pos.ravel(), 2)
 
             if np.any(np.isnan(goal_ee_pos)) or np.any(np.isnan(goal_ee_ori)):
                 
