@@ -157,7 +157,7 @@ class OSTorqueController(OSController):
         # calculate our secondary control signa
         # calculated desired joint angle acceleration
 
-        prop_val            = (self._robot.q_mean - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
+        prop_val            = (self._robot.q_mean() - q)#((q_mean - q) + np.pi) % (np.pi*2) - np.pi
 
         q_des               = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
 

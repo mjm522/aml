@@ -63,13 +63,13 @@ class BaxterArm(baxter_interface.limb.Limb):
         if limb == 'left':
             #secondary goal for the manipulator
             self._limb_group = 0
-            self.q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
+            self._q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
             self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
             self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
         
         elif limb == 'right':
             self._limb_group = 1
-            self.q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
+            self._q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
             self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
             self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
                                                             
@@ -219,6 +219,18 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return state
 
+    def set_gripper_speed(self, speed):
+        """
+        not implemented for baxter
+        """
+        pass
+
+    def set_arm_speed(self, speed):
+        """
+        not implemented for baxter
+        """
+        pass
+
     def angles(self):
         joint_angles        = self.joint_angles()
 
@@ -228,6 +240,9 @@ class BaxterArm(baxter_interface.limb.Limb):
             return [ls[n] for n in joint_names]
 
         return np.array(to_list(joint_angles))
+
+    def q_mean(self):
+        return self._q_mean
 
     def get_state(self):
         return self._state

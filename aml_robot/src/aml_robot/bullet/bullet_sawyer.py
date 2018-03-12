@@ -54,13 +54,13 @@ class BulletSawyerArm(BulletRobot):
         if limb == 'left':
             #secondary goal for the manipulator
             self._limb_group = 0
-            self.q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
+            self._q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
             self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
             self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
         
         elif limb == 'right':
             self._limb_group = 1
-            self.q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
+            self._q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
             self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
             self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
                                                             
@@ -172,6 +172,8 @@ class BulletSawyerArm(BulletRobot):
 #         # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
 #         # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
 
+    def q_mean(self):
+        return self._q_mean
 
     def get_gripper_state(self):
         print 'NOT IMPLEMENTED'

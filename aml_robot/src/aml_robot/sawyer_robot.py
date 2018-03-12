@@ -50,10 +50,7 @@ class SawyerArm(intera_interface.Limb):
         
         self._ready = True
 
-        #number of joints
-        self._nq = 7
-        #number of control commads
-        self._nu = 7
+
 
         #these values are from the baxter urdf file
         self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
@@ -64,19 +61,25 @@ class SawyerArm(intera_interface.Limb):
                             {'lower':-1.57079632679,  'upper':2.094},
                             {'lower':-3.059,          'upper':3.059}]
 
+        if self._gripper is not None:
+            self._jnt_limits.append({'lower': self._gripper.MIN_POSITION, 'upper': self._gripper.MAX_POSITION})
+
+        #number of joints
+        self._nq = len(self._jnt_limits)
+        #number of control commads
+        self._nu = len(self._jnt_limits)
+
+
+        self._q_mean = np.array([ 0.5*(limit['lower'] + limit['upper']) for limit in self._jnt_limits])
+
+        self._tuck   = np.array([-3.31223050e-04,-1.18001699e+00,-8.22146399e-05, 2.17995802e+00, -2.70787321e-03,5.69996851e-01, 3.32346747e+00, 2.07798000e-02])
+        self._untuck = self._tuck
+
         if limb == 'left':
             #secondary goal for the manipulator
             self._limb_group = 0
-            self.q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
-            self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
-            self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
-        
         elif limb == 'right':
-            self._limb_group = 1
-            self.q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
-            self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
-            self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
-                                                            
+            self._limb_group = 1                                          
         else:
             print "Unknown limb idex"
             raise ValueError
@@ -188,6 +191,8 @@ class SawyerArm(intera_interface.Limb):
     def untuck_arm(self):
         self.move_to_neutral()
 
+        print self.angles()
+
     def _configure(self, limb, on_state_callback):
         self._state = None
 
@@ -295,8 +300,14 @@ class SawyerArm(intera_interface.Limb):
             return [ls[n] for n in joint_names]
 
         all_angles = to_list(joint_angles)
-        all_angles.append(self._gripper.get_position())
+
+        if self._gripper is not None:
+            all_angles.append(self._gripper.get_position())
         return np.array(all_angles)
+
+
+    def q_mean(self):
+        return self._q_mean
 
     def get_state(self):
         return self._state

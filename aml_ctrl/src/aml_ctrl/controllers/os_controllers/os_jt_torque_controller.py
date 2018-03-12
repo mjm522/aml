@@ -72,7 +72,7 @@ class OSJTTorqueController(OSController):
 
         # jac_star            = np.dot(jac_ee.T, (np.linalg.inv(np.dot(jac_ee, jac_ee.T))))
 
-        # prop_val            = (self._robot.q_mean - q) #+ np.pi) % (np.pi*2) - np.pi
+        # prop_val            = (self._robot.q_mean() - q) #+ np.pi) % (np.pi*2) - np.pi
 
         # q_null              = (self._null_kp * prop_val - self._null_kd * dq).reshape(-1,)
 
