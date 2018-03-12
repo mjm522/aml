@@ -158,6 +158,19 @@ bool processRequest_(aml_services::PCLUtility::Request  &req,
 
     }
 
+    else if (req.function == "compute_centroid")
+    {
+        aml_pcloud::PointCloudPtr cloud_in = pcl_ros_converter_.pclCloudFromROSMsg(req.msg_in.cloud_1);
+        ROS_INFO("Computing centroid of cloud");
+
+        res.msg_out.float_array_1 = pcl_processor_.computeCentroid(cloud_in);
+
+        res.info = "Centroid in msg_out.float_array_1";
+        res.success = true;
+        return true;
+
+    }
+
 
 }
 
@@ -167,7 +180,7 @@ void initiliseServer()
     ros::NodeHandle nh_;
     ros::ServiceServer service_ = nh_.advertiseService("aml_pcl_service", processRequest_);
 
-    ROS_INFO("AML PointCloud Utility Server Running...\nAll responses have 'info (string)' and 'success (bool)' parameters...\nAvailable Services:\n   [request.function]  [required args] {optional args} \t\t||\t <responses> \n\n1. \"read_pcd_file\"  [msg_in.string_1 (file name)]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n2. \"save_to_file\" [sensor_msgs/PointCloud msg_in.cloud_1]  [msg_in.string_1 (file name)]\t||\t\n3. \"downsample_cloud\" [sensor_msgs/PointCloud msg_in.cloud_1] {float_array msg_in.float_array_1 (leafsize)}\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n4. \"compute_point_normal/get_curvature/fit_plane\" [sensor_msgs/PointCloud msg_in.cloud_1] {int_array msg_in.int_array_1 (indices)}\t||\t [float_array msg_out.float_array_1 (plane parameters)] [float curvature]\n5. \"compute_all_normals\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n6. \"apply_transformation\" [sensor_msgs/PointCloud msg_in.cloud_1] [float_array msg_in.float_array_1 (flattened trans matrix)]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n7. \"add_cloud\" [sensor_msgs/PointCloud msg_in.cloud_1] [sensor_msgs/PointCloud msg_in.cloud_2]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n8. \"get_points_not_in_plane\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]");
+    ROS_INFO("AML PointCloud Utility Server Running...\nAll responses have 'info (string)' and 'success (bool)' parameters...\nAvailable Services:\n   [request.function]  [required args] {optional args} \t\t||\t <responses> \n\n1. \"read_pcd_file\"  [msg_in.string_1 (file name)]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n2. \"save_to_file\" [sensor_msgs/PointCloud msg_in.cloud_1]  [msg_in.string_1 (file name)]\t||\t\n3. \"downsample_cloud\" [sensor_msgs/PointCloud msg_in.cloud_1] {float_array msg_in.float_array_1 (leafsize)}\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n4. \"compute_point_normal/get_curvature/fit_plane\" [sensor_msgs/PointCloud msg_in.cloud_1] {int_array msg_in.int_array_1 (indices)}\t||\t [float_array msg_out.float_array_1 (plane parameters)] [float curvature]\n5. \"compute_all_normals\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n6. \"apply_transformation\" [sensor_msgs/PointCloud msg_in.cloud_1] [float_array msg_in.float_array_1 (flattened trans matrix)]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n7. \"add_cloud\" [sensor_msgs/PointCloud msg_in.cloud_1] [sensor_msgs/PointCloud msg_in.cloud_2]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n8. \"get_points_not_in_plane\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [sensor_msgs/PointCloud msg_out.cloud_1]\n9. \"compute_centroid\" [sensor_msgs/PointCloud msg_in.cloud_1]\t||\t [float_array msg_out.float_array_1 (x,y,z)]");
 
     ros::spin();
 }

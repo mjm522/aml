@@ -115,16 +115,21 @@ namespace aml_pcloud
         PointCloudPtr transformPointCloud(PointCloudPtr input_cloud, std::vector<float> trans_mat_array);
 
         /*
-         *  Helper function to concatenate point clouds, with help from TA via Github
-         *  @see https://github.com/Tomaat/CV2/issues/1
+         *  Helper function to concatenate point clouds
          *
          *  @param  cloud_base  the cloud to which the other cloud will be appended
          *  @param  cloud_add   the cloud to add to the other cloud
         */
         PointCloudPtr addPointClouds(PointCloudPtr cloud_base, PointCloudPtr cloud_add);
 
-
-        Eigen::Vector3f computeCentroid(PointCloudPtr input_cloud_ptr);
+        /**
+         *  computeCentroid function
+         *
+         *  This function computes the centroid of a given cloud
+         *  @param  input_cloud       the cloud
+         *  @return                   the centroid (x,y,z)
+         */
+        std::vector<float> computeCentroid(PointCloudPtr input_cloud_ptr);
 
 
     };

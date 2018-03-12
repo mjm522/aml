@@ -197,7 +197,7 @@ namespace aml_pcloud
         return cloud_out;
     }
 
-    Eigen::Vector3f PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
+    std::vector<float> PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
     {
         Eigen::Vector3f centroid;
         Eigen::Vector3f cloud_pt;
@@ -210,7 +210,11 @@ namespace aml_pcloud
             centroid += cloud_pt; //add all the column vectors together
         }
         centroid /= npts; //divide by the number of points to get the centroid
-        return centroid;
+
+        std::vector<float> centroid_std_vec(centroid.data(), centroid.data() + centroid.rows() * centroid.cols());
+
+        return centroid_std_vec;
+
     }
 
 }
