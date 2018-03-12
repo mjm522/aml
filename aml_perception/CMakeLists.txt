@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  message_generation
 )
 
 
@@ -32,15 +33,21 @@ catkin_python_setup()
 #   FILES
 # )
 
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # and/or other packages containing depended messages
-# )
+add_message_files(
+  FILES
+  PCLCustomMsg.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs  
+  sensor_msgs
+)
 
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS pcl_conversions pcl_ros roscpp sensor_msgs
+  CATKIN_DEPENDS message_runtime std_msgs sensor_msgs pcl_conversions pcl_ros roscpp
 )
 
 
@@ -61,7 +68,7 @@ SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
 add_library(proj_libs STATIC ${PROJ_LIBS})
 
 
-add_executable(test_clnt ${PROJECT_CODE_SOURCE}/test_pcl.cpp)
+add_executable(test_clnt ${PROJECT_SOURCE_DIR}/tests/test_pcl.cpp)
 target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

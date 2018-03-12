@@ -4,21 +4,33 @@ namespace aml_pcloud
 {
 
     // ===== PclRosConversions
-    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg)
+    PointCloudPtr PclRosConversions::pclCloudFromROSMsg(const sensor_msgs::PointCloud msg)
     {
+        // ----- sensor_msgs::PointCloud2 is required for conversions from and to pcl pointclouds
+        sensor_msgs::PointCloud2 msg_pc2;
+        sensor_msgs::convertPointCloudToPointCloud2(msg, msg_pc2);
+
         PointCloudPtr cloud(new PointCloud);
         PointCloud2 pcl_pc2;
-        pcl_conversions::toPCL(msg, pcl_pc2);
-        pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
-        return cloud;
-    };
 
-    sensor_msgs::PointCloud2::Ptr PclRosConversions::ROSMsgFromPclCloud(PointCloud& cloud)
+        pcl_conversions::toPCL(msg_pc2, pcl_pc2);
+        pcl::fromPCLPointCloud2(pcl_pc2,*cloud);
+
+        return cloud;
+    }
+
+    sensor_msgs::PointCloud PclRosConversions::ROSMsgFromPclCloud(PointCloud& cloud)
     {
-        sensor_msgs::PointCloud2::Ptr msg(new sensor_msgs::PointCloud2);
-        pcl::toROSMsg(cloud, *msg);
+        // ----- sensor_msgs::PointCloud2 is required for conversions from and to pcl pointclouds
+        sensor_msgs::PointCloud2 msg_pc2;
+        sensor_msgs::PointCloud msg;
+
+        pcl::toROSMsg(cloud, msg_pc2);
+        // ----- convert back to PointCloud
+        sensor_msgs::convertPointCloud2ToPointCloud(msg_pc2, msg);
+
         return msg;
-    };
+    }
 
 
     PointCloudPtr PCLProcessor::getCloudFromPcdFile(std::string& input_file)
@@ -27,28 +39,45 @@ namespace aml_pcloud
 
         if (pcl::io::loadPCDFile<CloudPoint> (input_file, *cloud) == -1) //* load the file
         {
-            PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
+            // PCL_ERROR ("Couldn't read file %s \n",input_file.c_str());
             return nullptr;
         }
         else return cloud;
-    };
+    }
 
     void PCLProcessor::saveToPcdFile(const std::string filename, const PointCloudPtr cloud)
     {
         pcl::io::savePCDFileASCII (filename, *cloud);
-    };
+    }
 
-    // may cause seg fault with ROS PCL
-    // may cause seg fault with ROS PCL
-    pcl::PCLPointCloud2::Ptr PCLProcessor::downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud)
+    // may cause seg fault with ROS PCL if using c++11 std
+    PointCloudPtr PCLProcessor::downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes)
     {
 
-        pcl::PCLPointCloud2::Ptr cloud_filtered;
-        // Create the filtering object
+        // ----- leaf size for downsampling cloud
+        if (leaf_sizes.empty())
+        {
+            for (unsigned i=0; i<3; i++) leaf_sizes.push_back(0.008f);
+        }
+        else if (leaf_sizes.size() < 3)
+        {
+            float val = leaf_sizes[0];
+            for (unsigned i=0; i<3; i++) leaf_sizes[i] = val;
+        }
+
+        pcl::PCLPointCloud2::Ptr cloud_filtered_pc2(new pcl::PCLPointCloud2);
+        PointCloudPtr cloud_filtered(new PointCloud);
+
+        pcl::PCLPointCloud2::Ptr cloud_pc2(new pcl::PCLPointCloud2);
+        pcl::toPCLPointCloud2(*cloud, *cloud_pc2);
+
+        // ----- Create the filtering object
         pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-        sor.setInputCloud (cloud);
-        sor.setLeafSize (0.008f, 0.008f, 0.008f);
-        sor.filter (*cloud_filtered);
+        sor.setInputCloud (cloud_pc2);
+        sor.setLeafSize (leaf_sizes[0], leaf_sizes[1], leaf_sizes[2]);
+        sor.filter (*cloud_filtered_pc2);
+
+        pcl::fromPCLPointCloud2(*cloud_filtered_pc2, *cloud_filtered);
 
         return cloud_filtered;
 
@@ -85,127 +114,90 @@ namespace aml_pcloud
         return cloudExtracted;
     }
     // END of problematic methods
-    pcl::PointCloud<pcl::PointNormal>::Ptr PCLProcessor::computeNormals(PointCloudPtr cloud)
+    void PCLProcessor::fitPlaneAndGetCurvature(const PointCloudPtr cloud, std::vector< int > indices, std::vector< float > &plane_parameters, float &curvature)
     {
-        pcl::PointCloud<pcl::PointNormal>::Ptr cloud_normals (new pcl::PointCloud<pcl::PointNormal>); // Output datasets
-        pcl::IntegralImageNormalEstimation<CloudPoint, pcl::PointNormal> normal_estimator;
 
-        normal_estimator.setNormalEstimationMethod(normal_estimator.AVERAGE_3D_GRADIENT);
-        normal_estimator.setMaxDepthChangeFactor(0.02f);
-        normal_estimator.setNormalSmoothingSize(10.0f);
-        normal_estimator.setInputCloud(cloud);
-        normal_estimator.compute(*cloud_normals);
+        Eigen::Vector4f plane_parameters_eig;
 
-        pcl::copyPointCloud(*cloud, *cloud_normals);
-
-        return cloud_normals;
+        if (indices.size() == 0)
+            pcl::computePointNormal (*cloud, plane_parameters_eig, curvature);
+        else pcl::computePointNormal (*cloud, indices, plane_parameters_eig, curvature);
+        
+        // converting eigen vector to std vector
+        std::vector<float> v(plane_parameters_eig.data(), plane_parameters_eig.data() + plane_parameters_eig.rows() * plane_parameters_eig.cols());
+        plane_parameters = v;
 
     }
 
-    PointCloudPtr PCLProcessor::transformPointCloud(PointCloudPtr input_cloud, Eigen::Matrix4f camera_pose)
+    PointCloudPtr PCLProcessor::computeNormalForAllPoints(PointCloudPtr cloud)
+    {
+
+        // Create the normal estimation class, and pass the input dataset to it
+        pcl::NormalEstimation<CloudPoint, pcl::Normal> ne;
+        ne.setInputCloud (cloud);
+
+        // Create an empty kdtree representation, and pass it to the normal estimation object.
+        // Its content will be filled inside the object, based on the given input dataset (as no other search surface is given).
+        pcl::search::KdTree<CloudPoint>::Ptr tree (new pcl::search::KdTree<CloudPoint> ());
+        ne.setSearchMethod (tree);
+
+        // Output datasets
+        pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
+
+        // Use all neighbors in a sphere of radius 3cm
+        ne.setRadiusSearch (0.03);
+
+        // Compute the features
+        ne.compute (*cloud_normals);
+
+
+        // cloud_normals->points.size () should have the same size as the input cloud->points.size ()*
+
+        // ----- convert to PointCloud type so as to transmit as rosmsg later
+        PointCloudPtr out_cloud(new PointCloud);
+
+        for (unsigned i = 0; i < cloud_normals->size(); i++)
+        {
+            out_cloud->push_back(CloudPoint(cloud_normals->points[i].normal_x, cloud_normals->points[i].normal_y, cloud_normals->points[i].normal_z));
+        }
+
+        return out_cloud;
+
+    }
+
+    PointCloudPtr PCLProcessor::transformPointCloud(PointCloudPtr input_cloud, std::vector<float> trans_mat_array)
     {
         /**
          *  Initialize a new point cloud to save the data
          */
+
+        assert (trans_mat_array.size() == 16);
+
+        Eigen::Matrix4f trans_mat_transpose, trans_mat;
+
+        // ----- this fills the matrix in column major style. Transpose is taken since the trans_mat_array is row major.
+        for (unsigned i; i < trans_mat_array.size(); i++) // maybe there is a better way of typecasting vector into matrix ?
+        {
+            trans_mat_transpose(i) = trans_mat_array[i];
+        }
+
+        trans_mat = trans_mat_transpose.transpose();
+
         PointCloudPtr new_cloud(new PointCloud);
-        pcl::transformPointCloud(*input_cloud, *new_cloud, camera_pose);
+        pcl::transformPointCloud(*input_cloud, *new_cloud, trans_mat);
+
         return new_cloud;
     }
 
-    void PCLProcessor::addPointCloud(PointCloudPtr cloud_base, PointCloudPtr cloud_add)
+    PointCloudPtr PCLProcessor::addPointClouds(PointCloudPtr cloud_base, PointCloudPtr cloud_add)
     {
-        // get the points from the clouds
+        // ----- pcl concatenation
+        PointCloudPtr cloud_out(new PointCloud);
+        *cloud_out = *cloud_base + *cloud_add;
+        return cloud_out;
+    }
 
-        *cloud_base += *cloud_add;
-    };
-
-    void PCLProcessor::fitPointsToPlane(Eigen::MatrixXf points_mat, Eigen::Vector3f &plane_normal, double &plane_dist) {
-
-        int npts = points_mat.cols(); // number of points = number of columns in matrix; check the size
-        
-        // first compute the centroid of the data:
-        Eigen::Vector3f centroid;
-        centroid = Eigen::MatrixXf::Zero(3, 1); // see http://eigen.tuxfamily.org/dox/AsciiQuickReference.txt
-        
-        //centroid = compute_centroid(points_mat);
-         for (int ipt = 0; ipt < npts; ipt++) {
-            centroid += points_mat.col(ipt); //add all the column vectors together
-        }
-        centroid /= npts; //divide by the number of points to get the centroid   
-
-        // subtract this centroid from all points in points_mat:
-        Eigen::MatrixXf points_offset_mat = points_mat;
-        for (int ipt = 0; ipt < npts; ipt++) {
-            points_offset_mat.col(ipt) = points_offset_mat.col(ipt) - centroid;
-        }
-        //compute the covariance matrix w/rt x,y,z:
-        Eigen::Matrix3f CoVar;
-        CoVar = points_offset_mat * (points_offset_mat.transpose()); //3xN matrix times Nx3 matrix is 3x3
-
-        // here is a more complex object: a solver for eigenvalues/eigenvectors;
-        // we will initialize it with our covariance matrix, which will induce computing eval/evec pairs
-        Eigen::EigenSolver<Eigen::Matrix3f> es3f(CoVar);
-
-        Eigen::VectorXf evals; //we'll extract the eigenvalues to here
-
-        // in general, the eigenvalues/eigenvectors can be complex numbers
-        //however, since our matrix is self-adjoint (symmetric, positive semi-definite), we expect
-        // real-valued evals/evecs;  we'll need to strip off the real parts of the solution
-
-        evals = es3f.eigenvalues().real(); // grab just the real parts
-        //cout<<"real parts of evals: "<<evals.transpose()<<endl;
-
-        // our solution should correspond to an e-val of zero, which will be the minimum eval
-        //  (all other evals for the covariance matrix will be >0)
-        // however, the solution does not order the evals, so we'll have to find the one of interest ourselves
-
-        double min_lambda = evals[0]; //initialize the hunt for min eval
-        Eigen::Vector3cf complex_vec; // here is a 3x1 vector of double-precision, complex numbers
-
-        complex_vec = es3f.eigenvectors().col(0); // here's the first e-vec, corresponding to first e-val
-        //cout<<"complex_vec: "<<endl;
-        //cout<<complex_vec<<endl;
-        plane_normal = complex_vec.real(); //strip off the real part
-        //cout<<"real part: "<<est_plane_normal.transpose()<<endl;
-        //est_plane_normal = es3d.eigenvectors().col(0).real(); // evecs in columns
-
-        double lambda_test;
-        int i_normal = 0;
-        //loop through "all" ("both", in this 3-D case) the rest of the solns, seeking min e-val
-        for (int ivec = 1; ivec < 3; ivec++) {
-            lambda_test = evals[ivec];
-            if (lambda_test < min_lambda) {
-                min_lambda = lambda_test;
-                i_normal = ivec; //this index is closer to index of min eval
-                plane_normal = es3f.eigenvectors().col(ivec).real();
-            }
-        }
-        // at this point, we have the minimum eval in "min_lambda", and the plane normal
-        // (corresponding evec) in "est_plane_normal"/
-        // these correspond to the ith entry of i_normal
-        plane_dist = plane_normal.dot(centroid);
-
-    };
-
-    void PCLProcessor::fitPointsToPlane(PointCloudPtr input_cloud_ptr, Eigen::Vector3f &plane_normal, double &plane_dist) 
-    {
-        Eigen::MatrixXf points_mat;
-        Eigen::Vector3f cloud_pt;
-        //populate points_mat from cloud data;
-
-        int npts = input_cloud_ptr->points.size();
-        points_mat.resize(3, npts);
-
-        //somewhat odd notation: getVector3fMap() reading OR WRITING points from/to a pointcloud, with conversions to/from Eigen
-        for (int i = 0; i < npts; ++i) {
-            cloud_pt = input_cloud_ptr->points[i].getVector3fMap();
-            points_mat.col(i) = cloud_pt;
-        }
-        fitPointsToPlane(points_mat, plane_normal, plane_dist);
-
-    };
-
-    Eigen::Vector3f PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
+    std::vector<float> PCLProcessor::computeCentroid(PointCloudPtr input_cloud_ptr) 
     {
         Eigen::Vector3f centroid;
         Eigen::Vector3f cloud_pt;
@@ -218,7 +210,11 @@ namespace aml_pcloud
             centroid += cloud_pt; //add all the column vectors together
         }
         centroid /= npts; //divide by the number of points to get the centroid
-        return centroid;
-    };
+
+        std::vector<float> centroid_std_vec(centroid.data(), centroid.data() + centroid.rows() * centroid.cols());
+
+        return centroid_std_vec;
+
+    }
 
 }

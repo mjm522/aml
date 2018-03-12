@@ -9,8 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  aml_perception
   message_generation
 )
+
+# find_package(aml_perception)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -32,6 +35,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
+  aml_perception
 )
 
 catkin_package(CATKIN_DEPENDS message_runtime )

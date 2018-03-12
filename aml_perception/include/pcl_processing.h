@@ -1,3 +1,7 @@
+
+// All input, output types for point clouds are sensor_msg::PointCloud or pcl::PointCloud
+
+
 #include <pcl/point_cloud.h>  
 #include <pcl/point_types.h>  
 
@@ -50,12 +54,12 @@ namespace aml_pcloud
     /**
      * Helper function to convert from sensor_msgs/PointCloud2 to pcl::PointCloud<pcl::PointXYZRGB>
      */
-        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud2 msg);
+        PointCloudPtr pclCloudFromROSMsg(const sensor_msgs::PointCloud msg);
 
     /**
      *----- Helper function to convert from pcl::PointCloud<pcl::PointXYZ> to sensor_msgs/PointCloud2
      */
-        sensor_msgs::PointCloud2::Ptr ROSMsgFromPclCloud(PointCloud& cloud);
+        sensor_msgs::PointCloud ROSMsgFromPclCloud(PointCloud& cloud);
   
 
     };
@@ -74,55 +78,58 @@ namespace aml_pcloud
         void saveToPcdFile(std::string filename, const PointCloudPtr cloud);
 
 
-        pcl::PCLPointCloud2::Ptr downsamplePcdFile(const pcl::PCLPointCloud2::Ptr cloud); // === CAUSES SEGFAULT !!
+        PointCloudPtr downsampleCloud(const PointCloudPtr cloud, std::vector<float> &leaf_sizes); // === CAUSES SEGFAULT !!
 
         PointCloudPtr getPointsNotInPlane(PointCloudPtr input_cloud); // === CAUSES SEGFAULT !!
 
         /**
-         *  computeNormals function
+         *  computeNormalForAllPoints function
          *
-         *  Computes the normals for a given point cloud. Taken from the example from blackboard and
-         *  edited to fit in our program
+         *  Computes the normals for all points in a given point cloud. 
          *
-         *  @see http://blackboard.uva.nl/ -> 20152016 CV2 
          *  
          *  @param  cloud
-         *  @return cloud with normals
+         *  @return cloud of normals
          */
-        pcl::PointCloud<pcl::PointNormal>::Ptr computeNormals(PointCloudPtr cloud);
+        PointCloudPtr computeNormalForAllPoints(PointCloudPtr cloud);
 
         /**
-         *  TransformPointCloud function
-         *
-         *  This function takes a point cloud and transforms it according to the camera pose
-         *  @param  normal_cloud the cloud with normals
-         *  @param  camera_pose  the camera pose
-         *  @return              the cloud transformed
+         * fitPlaneAndGetCurvature function
+         * Compute the Least-Squares plane fit for a given set of points, using their indices, and return the estimated plane parameters together with the surface curvature.
+         * @param cloud
+         * @param indices <optional>    the indices of the cloud points to be used for computation
+         * 
+         * @param plane parameters      the plane parameters as: a, b, c, d (ax + by + cz + d = 0)
+         * @param curvature             the estimated surface curvature as a measure of lambda_0/(lambda_0 + lambda_1 + lambda_2)
          */
-        PointCloudPtr transformPointCloud(PointCloudPtr input_cloud, Eigen::Matrix4f camera_pose);
+        void fitPlaneAndGetCurvature(const PointCloudPtr cloud, std::vector< int > indices, std::vector< float > &plane_parameters, float &curvature);
+        
+        /**
+         *  transformPointCloud function
+         *
+         *  This function takes a point cloud and transforms it according to the transformation defined in trans_mat
+         *  @param  input_cloud       the cloud
+         *  @param  trans_mat_array   the 4x4 transformation matrix flattened as std::vector<float>
+         *  @return                   the transformed cloud
+         */
+        PointCloudPtr transformPointCloud(PointCloudPtr input_cloud, std::vector<float> trans_mat_array);
 
         /*
-         *  Helper function to concatenate point clouds, with help from TA via Github
-         *  @see https://github.com/Tomaat/CV2/issues/1
+         *  Helper function to concatenate point clouds
          *
          *  @param  cloud_base  the cloud to which the other cloud will be appended
          *  @param  cloud_add   the cloud to add to the other cloud
         */
-        void addPointCloud(PointCloudPtr cloud_base, PointCloudPtr cloud_add);
+        PointCloudPtr addPointClouds(PointCloudPtr cloud_base, PointCloudPtr cloud_add);
 
-        /**provide an array of 3-D points (in columns), and this function will use and eigen-vector approach to find the best-fit plane
-         * It returns the plane's normal vector and the plane's (signed) distance from the origin.
-         * @param points_array input: points_array is a matrix of 3-D points to be plane-fitted; coordinates are in columns
-         * @param plane_normal output: this function will compute components of the plane normal here
-         * @param plane_dist output: scalar (signed) distance of the plane from the origin
+        /**
+         *  computeCentroid function
+         *
+         *  This function computes the centroid of a given cloud
+         *  @param  input_cloud       the cloud
+         *  @return                   the centroid (x,y,z)
          */
-        
-        void fitPointsToPlane(Eigen::MatrixXf points_array, 
-                                Eigen::Vector3f &plane_normal, 
-                                double &plane_dist); 
-        void fitPointsToPlane(PointCloudPtr input_cloud_ptr,Eigen::Vector3f &plane_normal, double &plane_dist);
-
-        Eigen::Vector3f computeCentroid(PointCloudPtr input_cloud_ptr);
+        std::vector<float> computeCentroid(PointCloudPtr input_cloud_ptr);
 
 
     };
