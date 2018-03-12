@@ -6,18 +6,24 @@ import numpy as np
 import pybullet as pb
 from aml_rl_envs.hand.man_object import ManObject
 from omni_interface.phantom_omni import PhantomOmni
+from aml_rl_envs.pisa_hand.pisa_hand import PisaHand
 
 
 class BulletTeleop():
 
     def __init__(self):
 
-        self._object = ManObject(scale=0.5, use_fixed_Base=False, obj_type='cube')
-
         #phantom omni gives in mm, scale accordingly
         self._ph_om = PhantomOmni(scale=1e-2)
 
+        # self._robot = ManObject(scale=0.5, use_fixed_Base=False, obj_type='cube')
+
+        self._robot = PisaHand(scale=3.5, use_fixed_Base=False, hand_type='right')
+
+        
     def run(self):
+
+        time.sleep(1)
 
         while not rospy.is_shutdown():
 
@@ -28,9 +34,9 @@ class BulletTeleop():
                 print "pos \t", np.round(ee_pos, 3)
                 print "ori \t", np.round(ee_ori, 3)
 
-                self._object.set_pose(ee_pos, ee_ori)
+                self._robot.set_base_pose(ee_pos, ee_ori)
 
-            self._object.simple_step()
+            self._robot.simple_step()
 
 
 def main():
