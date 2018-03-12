@@ -162,37 +162,6 @@ class SawyerEnv(AMLRlEnv):
         
         return np.array(self._observation), reward, done, {}
 
-    def _render(self, mode="rgb_array", close=False):
-        
-        if mode != "rgb_array":
-            
-            return np.array([])
-        
-        base_pos,orn = self._pb.getBasePositionAndOrientation(self._sawyer._robot_id)
-        
-        view_matrix = self._pb.computeViewMatrixFromYawPitchRoll(
-                cameraTargetPosition=base_pos,
-                distance=self._cam_dist,
-                yaw=self._cam_yaw,
-                pitch=self._cam_pitch,
-                roll=0,
-                upAxisIndex=2)
-        
-        proj_matrix = self._pb.computeProjectionMatrixFOV(
-                fov=60, aspect=float(RENDER_WIDTH)/RENDER_HEIGHT,
-                nearVal=0.1, farVal=100.0)
-        
-        (_, _, px, _, _) = self._pb.getCameraImage(
-                width=RENDER_WIDTH, height=RENDER_HEIGHT, viewMatrix=view_matrix,
-                projectionMatrix=proj_matrix, renderer=self._pb.ER_BULLET_HARDWARE_OPENGL)
-        
-        rgb_array = np.array(px)
-        
-        rgb_array = rgb_array[:, :, :3]
-        
-        return rgb_array
-
-
     def termination(self):
 
         state = pb.getLinkState(self._sawyer._robot_id, self._sawyer._ee_index)

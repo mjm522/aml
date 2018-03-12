@@ -49,7 +49,7 @@ class ManObject(AMLRlEnv):
 
         self._obj_id   = pb.loadURDF(urdf_file, useFixedBase=use_fixed_Base, globalScaling = scale)
 
-        self.set_pose(pos, ori)
+        self.set_base_pose(pos, ori)
 
         self._num_joints = pb.getNumJoints(self._obj_id)
         
@@ -69,7 +69,7 @@ class ManObject(AMLRlEnv):
         pb.changeDynamics(self._obj_id, 0, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r)
 
 
-    def set_pose(self, pos, ori):
+    def set_base_pose(self, pos, ori):
 
         pb.resetBasePositionAndOrientation(self._obj_id, pos, ori)
 

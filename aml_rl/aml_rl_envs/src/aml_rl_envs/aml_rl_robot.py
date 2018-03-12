@@ -20,9 +20,14 @@ class AMLRlRobot(object):
 
         self._robot_id = None
 
-    def step(self):
+    def simple_step(self):
         
         pb.stepSimulation()
+
+    def set_base_pose(self, pos, ori):
+
+        pb.resetBasePositionAndOrientation(self._robot_id, pos, ori)
+        
 
     def set_ctrl_mode(self):
 
