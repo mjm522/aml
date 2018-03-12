@@ -27,10 +27,10 @@ class HapticRobotInterface(TeleOp):
         safety of the device
         """
 
-        if self._haptic._device_enabled:
+        if self._haptic._device_enabled and not self._ctrlr.is_active():
 
             self._ctrlr.set_active(True)
 
-        else:
+        elif not self._haptic._device_enabled and self._ctrlr.is_active():
 
             self._ctrlr.set_active(False)
