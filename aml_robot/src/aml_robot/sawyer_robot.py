@@ -42,16 +42,6 @@ class SawyerArm(intera_interface.Limb):
         #Load aml_logo
         load_aml_logo("/robot/head_display")
 
-        self._ready = False
-
-        self._limb = limb
-
-        self._configure(limb,on_state_callback)
-        
-        self._ready = True
-
-
-
         #these values are from the baxter urdf file
         self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
                             {'lower':-2.147,          'upper':1.047},
@@ -61,16 +51,24 @@ class SawyerArm(intera_interface.Limb):
                             {'lower':-1.57079632679,  'upper':2.094},
                             {'lower':-3.059,          'upper':3.059}]
 
-        if self._gripper is not None:
-            self._jnt_limits.append({'lower': self._gripper.MIN_POSITION, 'upper': self._gripper.MAX_POSITION})
-
         #number of joints
         self._nq = len(self._jnt_limits)
         #number of control commads
         self._nu = len(self._jnt_limits)
 
+        self._ready = False
+
+        self._limb = limb
+
+        self._configure(limb,on_state_callback)
+        
+        self._ready = True
 
         self._q_mean = np.array([ 0.5*(limit['lower'] + limit['upper']) for limit in self._jnt_limits])
+
+        if self._gripper is not None:
+            self._jnt_limits.append({'lower': self._gripper.MIN_POSITION, 'upper': self._gripper.MAX_POSITION})
+
 
         self._tuck   = np.array([-3.31223050e-04,-1.18001699e+00,-8.22146399e-05, 2.17995802e+00, -2.70787321e-03,5.69996851e-01, 3.32346747e+00, 2.07798000e-02])
         self._untuck = self._tuck
@@ -216,7 +214,7 @@ class SawyerArm(intera_interface.Limb):
         self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', 
                                                SEAJointState, self._gravity_comp_callback)
         #gravity + feed forward torques
-        self._h = [0. for _ in range(7)]
+        self._h = [0. for _ in range(self._nq)]
 
         self.set_sampling_rate()
 
@@ -229,7 +227,6 @@ class SawyerArm(intera_interface.Limb):
 
         self._configure_cuff()
         self._configure_gripper()
-
 
     def _gravity_comp_callback(self, msg):
         self._h = msg.gravity_model_effort
@@ -253,7 +250,7 @@ class SawyerArm(intera_interface.Limb):
         now                 = rospy.Time.now()
 
         joint_angles        = self.angles()
-        joint_velocities    = self.joint_velocities()
+        joint_velocities    = self.velocities()
         joint_efforts       = self.joint_efforts()
 
         joint_names         = self.joint_names()
@@ -263,7 +260,7 @@ class SawyerArm(intera_interface.Limb):
 
         state = {}
         state['position']        = joint_angles
-        state['velocity']        = np.array(to_list(joint_velocities))
+        state['velocity']        = joint_velocities
         state['effort']          = np.array(to_list(joint_efforts))
         state['jacobian']        = self.get_jacobian_from_joints(None)
         state['inertia']         = self.get_arm_inertia(None)
@@ -291,7 +288,7 @@ class SawyerArm(intera_interface.Limb):
 
         return state
 
-    def angles(self):
+    def angles(self, include_gripper = False):
         joint_angles        = self.joint_angles()
 
         joint_names         = self.joint_names()
@@ -301,13 +298,34 @@ class SawyerArm(intera_interface.Limb):
 
         all_angles = to_list(joint_angles)
 
-        if self._gripper is not None:
+        if include_gripper and self._gripper is not None:
             all_angles.append(self._gripper.get_position())
         return np.array(all_angles)
+
+    def velocities(self, include_gripper = False):
+        joint_velocities        = self.joint_velocities()
+
+        joint_names         = self.joint_names()
+
+        def to_list(ls):
+            return [ls[n] for n in joint_names]
+
+        all_velocities = to_list(joint_velocities)
+
+        if include_gripper and self._gripper is not None:
+            all_velocities.append(0.0)
+        return np.array(all_velocities)
 
 
     def q_mean(self):
         return self._q_mean
+
+
+    def n_cmd(self):
+        return self._nu
+
+    def n_joints(self):
+        return self._nq
 
     def get_state(self):
         return self._state
@@ -535,7 +553,9 @@ class SawyerArm(intera_interface.Limb):
             
             argument = dict(zip(self.joint_names(),joint_angles))
         #combine the names and joint angles to a dictionary, that only is accepted by kdl
-        return np.array(self._kinematics.jacobian(argument))
+        jacobian = np.array(self._kinematics.jacobian(argument))
+
+        return jacobian
 
 
     def get_arm_inertia(self, joint_angles=None):
@@ -551,6 +571,7 @@ class SawyerArm(intera_interface.Limb):
         success, soln =  self._ik_sawyer.ik_servive_request(pos=pos, ori=ori)
 
         return success, soln
+
 
 
 def main():
