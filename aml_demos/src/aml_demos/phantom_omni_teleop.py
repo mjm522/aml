@@ -18,7 +18,7 @@ def control_robot(arm, task_space):
     
         config_os_teleop = {
 
-        'rate':10, # rate of the controller
+        'rate': 200, # rate of the controller
         'ctrlr_type':'torq', #other options are 'vel', 'torq'
   
          }
@@ -32,8 +32,8 @@ def control_robot(arm, task_space):
         'robot_joints':[0,1,2,4,5,6], #these joints will be one to one mapped
         'haptic_joints':[0,1,2,3,4,5],
         'scale_from_home': True,
-        'robot_home':arm._untuck, # home position of baxter
-        'rate':10, # rate of the controller
+        'robot_home': arm._untuck[0:arm.n_cmd()], # home position of baxter
+        'rate': 200, # rate of the controller
         'ctrlr_type':'pos', #other options are 'vel', 'torq'
          
          }
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-t', '--task_space', type=bool, default=False,  help='task space')
 
-    parser.add_argument('-i', '--arm_interface', type=str, default='sawyer', help='arm interface, e.g. baxter/sawyer')
+    parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
 
     parser.add_argument('-s', '--arm_speed', type=float, default=1.0, help='Arm speed for position control')
 

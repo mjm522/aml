@@ -168,7 +168,7 @@ class PhantomOmni(object):
 
         omni_ee_pos, omni_ee_ori = self.get_ee_pose()
 
-        inv_hap_pos, inv_hap_ori = pb.invertTransform(tuple(self._scale*omni_ee_pos),
+        inv_hap_pos, inv_hap_ori = pb.invertTransform(tuple(omni_ee_pos),
                                                       tuple(omni_ee_ori))
 
         self._calib_pos, self._calib_ori = pb.multiplyTransforms(inv_hap_pos, inv_hap_ori, ee_pos, ee_ori)
@@ -195,7 +195,7 @@ class PhantomOmni(object):
 
         omni_ee_pos, omni_ee_ori = self.get_ee_pose()
 
-        pos, ori = pb.multiplyTransforms(tuple(self._scale*omni_ee_pos), 
+        pos, ori = pb.multiplyTransforms(tuple(omni_ee_pos), 
                                         tuple(omni_ee_ori), 
                                         self._calib_pos, 
                                         self._calib_ori)
@@ -219,10 +219,17 @@ class PhantomOmni(object):
 
         return js_pos
 
-    
     def get_ee_pose(self):
 
-        return self._omni_state['ee_pos'], self._omni_state['ee_ori']
+        if self._omni_state['ee_pos'] is not None:
+
+            ee_pos = self._scale*self._omni_state['ee_pos']
+
+        else:
+
+            ee_pos = None
+
+        return ee_pos, self._omni_state['ee_ori']
 
 
     def omni_pos_callback(self, msg):
