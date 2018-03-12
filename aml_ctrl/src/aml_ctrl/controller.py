@@ -80,5 +80,9 @@ class Controller(object):
             self._control_callback = rospy.Timer(update_period, self.update)
 
 
+    def is_active(self):
+        return self._is_active
+
+
 
 
