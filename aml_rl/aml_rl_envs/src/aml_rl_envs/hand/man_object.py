@@ -4,23 +4,24 @@ import math
 import numpy as np
 import pybullet as pb
 from os.path import exists, join
-from aml_rl_envs.aml_rl_env import AMLRlEnv
-from aml_rl_envs.config import AML_RL_ENV_CONFIG
+from aml_rl_envs.config import urdf_root_path
+from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 
-class ManObject(AMLRlEnv):
+class ManObject():
 
-    def __init__(self, pos = [1.75, 0., 1.5], ori = [0., 0., 0., 1], 
+    def __init__(self, urdf_root_path=urdf_root_path, time_step=0.01,
+                       pos = [1.75, 0., 1.5], ori = [0., 0., 0., 1], 
                        j_pos=[0.0, 0.0], scale=1., use_fixed_Base=True, 
-                       config=AML_RL_ENV_CONFIG, obj_type='cyl'):
+                       obj_type='cyl', render=False):
 
-        self._config = config
+        if render:
 
-        AMLRlEnv.__init__(self, config, set_gravity=False)
+            setup_bullet_visualizer()
 
-        self._urdf_root_path = config['urdf_root_path']
+        self._urdf_root_path = urdf_root_path
         
-        self._time_step = config['time_step']
+        self._time_step = time_step
 
         self._old_state = None
 
@@ -31,6 +32,11 @@ class ManObject(AMLRlEnv):
         self._radius = scale * 0.3 #radius from urdf file
 
         self.reset(pos, ori, scale, use_fixed_Base)
+
+
+    def simple_step(self):
+
+        pb.stepSimulation()
         
 
     def reset(self, pos, ori, scale, use_fixed_Base):
@@ -52,6 +58,8 @@ class ManObject(AMLRlEnv):
         self.set_base_pose(pos, ori)
 
         self._num_joints = pb.getNumJoints(self._obj_id)
+
+        self._sense_jnt_idx = range(self._num_joints)[-1]
         
         #disable the default position_control mode. 
         for jointIndex in range (self._num_joints):
@@ -86,34 +94,29 @@ class ManObject(AMLRlEnv):
         return pb.getBasePositionAndOrientation(self._obj_id)
 
 
-    def get_curr_state(self, ori_as_euler=True):
+    def get_curr_state(self, ori_type='eul'):
 
-        link_state = pb.getLinkState(self._obj_id, range(self._num_joints)[-1], computeLinkVelocity = 1)
+        link_state = pb.getLinkState(self._obj_id, self._sense_jnt_idx , computeLinkVelocity = 1)
 
         pos = np.asarray(link_state[0])
         
-        if ori_as_euler:
-            
+        if ori_type == 'eul':
             ori = np.asarray(pb.getEulerFromQuaternion(link_state[1]))
         
-        else:
-            
+        elif ori_type == 'quat':
+            ori = np.asarray(link_state[1])
+
+        elif ori_type == 'mat':
             ori = np.asarray(pb.getMatrixFromQuaternion(link_state[1])).reshape(3,3)
         
         vel = np.asarray(link_state[6]) 
-        
         omg = np.asarray(link_state[7])
 
         if self._old_state is None:
-            
             lin_acc = np.zeros_like(vel)
-            
             ang_acc = np.zeros_like(omg)
-        
         else:
-            
             lin_acc = (vel - self._old_state[2])/self._time_step
-            
             ang_acc = (omg - self._old_state[3])/self._time_step
 
         self._old_state = (pos, ori, vel, omg, lin_acc, ang_acc)
@@ -123,12 +126,12 @@ class ManObject(AMLRlEnv):
 
     def enable_force_torque_sensors(self):
 
-        pb.enableJointForceTorqueSensor(self._obj_id, range(self._num_joints)[-1], 1)
+        pb.enableJointForceTorqueSensor(self._obj_id, self._sense_jnt_idx , 1)
 
 
     def get_jnt_state(self):
 
-        jnt_state = pb.getJointState(self._obj_id, 1)
+        jnt_state = pb.getJointState(self._obj_id, self._sense_jnt_idx )
 
         #jnt_state[3] = jnt_applied_torque
         #jnt_state[2] = jnt_reaction_forces
