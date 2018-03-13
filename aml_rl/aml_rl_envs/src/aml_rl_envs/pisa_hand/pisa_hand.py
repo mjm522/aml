@@ -1,11 +1,11 @@
 import numpy as np
 import pybullet as pb
 from os.path import join
-from aml_rl_envs.aml_rl_robot import AMLRlRobot
+from aml_rl_envs.aml_rl_hand import AMLRlHand
 from aml_rl_envs.config import AML_RL_ROBOT_CONFIG
 from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
-class PisaHand(AMLRlRobot):
+class PisaHand(AMLRlHand):
 
     def __init__(self, config=AML_RL_ROBOT_CONFIG, scale=0.5, hand_type='right', use_fixed_Base=False):
 
@@ -19,7 +19,7 @@ class PisaHand(AMLRlRobot):
 
         self._use_fixed_base = use_fixed_Base
 
-        AMLRlRobot.__init__(self, config)
+        AMLRlHand.__init__(self, config, num_fingers=5)
 
         setup_bullet_visualizer()
 
@@ -41,26 +41,12 @@ class PisaHand(AMLRlRobot):
 
         self._robot_id = pb.loadURDF(urdf_file, globalScaling=self._scale, useFixedBase=self._use_fixed_base)
 
+        self._finger_jnt_indices = [[5, 6, 7, 8, 9, 10], #thumb finger joints
+                                    [11, 12, 13, 14, 15, 16, 17], # index finger joints
+                                    [18, 19, 20, 21, 22, 23, 24], # middle finger joints
+                                    [25, 26, 27, 28, 29, 30, 31], # ring finger joints
+                                    [32, 33, 34, 35, 36, 37, 38] ] # little finger joints
+
         self.set_base_pose(pos=(0.,0.,0.), ori=(0.,0.,0.,1.))
 
-        self._movable_jnts = self.get_movable_joints()
-
-        self._jnt_postns=[0. for _ in range(len(self._movable_jnts))]
-        
-        self._motor_names = []
-        
-        self._motor_indices = []
-        
-        for i in self._movable_jnts:
-            
-            jnt_info = pb.getJointInfo(self._robot_id, i)
-            
-            qIndex = jnt_info[3]
-            
-            if qIndex > -1:
-
-                self._motor_names.append(str(jnt_info[1]))
-                
-                self._motor_indices.append(i)
-
-        self.set_ctrl_mode()
+        self.setup_hand()

@@ -97,6 +97,8 @@ class PhantomOmni(object):
 
     def _update_state(self):
 
+        print "HERE"
+
         now                = rospy.Time.now()
 
         state = {}
