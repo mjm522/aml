@@ -54,7 +54,7 @@ class HandObstacleEnv(AMLRlEnv):
             self._dmp3.train()
             self._dmp3_config = copy.deepcopy(discrete_dmp_config)
 
-        AMLRlEnv.__init__(self, config, set_gravity=False)
+        AMLRlEnv.__init__(self, config, set_gravity=True)
 
         self._reset(obj_base_fixed = keep_obj_fixed)
 
@@ -63,7 +63,7 @@ class HandObstacleEnv(AMLRlEnv):
         self.set_space_lims(obs_dim, action_dim, action_high, action_low)
 
 
-    def _reset(self, box_pos=[0.7, 0, 0.9], obj_base_fixed = True): #1.3
+    def _reset(self, box_pos=[-0.7, 0, 0.8], obj_base_fixed = True): #1.3
 
         self.setup_env()
 
@@ -85,27 +85,29 @@ class HandObstacleEnv(AMLRlEnv):
 
         pb.resetBasePositionAndOrientation(self._world_id, [0., 0., -0.5], [0.,0.,0.,1])
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.75], [0.,0.,0.,1])
+        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.66], [0.,0.,0.,1])
 
-        obs_pos=[0, 0, 0.815]
+        obs_pos=[0, 0, 0.72]
         
-        obs_ori=[0.,0.,0.,1] 
+        obs_ori=[0.,0.,1.,0.] 
         
         pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori)
  
-        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
+        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base=obj_base_fixed)
         
-        base_hand_pos  = [0.4, 0., 2]
+        base_hand_pos  = [-0.7, 0., 2.1]
 
         base_hand_ori  = [0,1,0,0]
 
         hand_j_pos = [0, np.pi/2, 0.0, 0.000, 0, 1, -1.2, 0.00]
 
-        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice = 'pincer')
+        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
 
         self._num_fingers = self._hand._num_fingers
 
         self.set_friction_properties()
+
+
 
         # self._observation = self.get_extended_observation()
 
@@ -148,6 +150,7 @@ class HandObstacleEnv(AMLRlEnv):
         ee_poss, ee_oris, ee_vels, ee_omgs = self._hand.get_ee_states(as_tuple=True)
 
         return {'pos_ee': ee_poss,
+                'ori_ee': ee_oris,
                 'vel_ee': ee_vels}
 
 

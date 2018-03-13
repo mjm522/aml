@@ -73,8 +73,6 @@ class Hand(AMLRlHand):
 
         jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = self.get_jnt_states()
 
-        print jnt_poss
-
         self._Jee_old = self.get_jacobians(jnt_poss=jnt_poss)
         
         for k in range(self._num_fingers):

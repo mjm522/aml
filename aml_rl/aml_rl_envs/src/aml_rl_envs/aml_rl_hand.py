@@ -59,19 +59,39 @@ class AMLRlHand(AMLRlRobot):
 
     def get_finger_limits(self):
 
-        lower_limit = [np.zeros(4) for _ in range(self._num_fingers)]
-        
-        upper_limit = [np.zeros(4) for _ in range(self._num_fingers)]
+        lower_lim_list = []; upper_lim_list = []; mean_list = []; range_list = []
 
         for j in range(self._num_fingers):
 
+            num_jnts = len(self._finger_jnt_indices[j])
+
+            lower_lim = np.zeros(num_jnts)
+
+            upper_lim = np.zeros(num_jnts)
+
+            mean_ = np.zeros(num_jnts)
+
+            range_ = np.zeros(num_jnts)
+
             for k, idx in enumerate(self._finger_jnt_indices[j]):
+
+                lower_lim[k] = pb.getJointInfo(self._robot_id, idx)[8]
                 
-                lower_limit[j][k] = pb.getJointInfo(self._robot_id, idx)[8]
+                upper_lim[k] = pb.getJointInfo(self._robot_id, idx)[9]
+
+                mean_[k] = 0.5*( lower_lim[k] + upper_lim[k] )
+
+                range_[k] = ( upper_lim[k] - lower_lim[k])
+
+            lower_lim_list.append(lower_lim)
+
+            upper_lim_list.append(upper_lim)
+
+            mean_list.append(mean_)
+
+            range_list.append(range_)
                 
-                upper_limit[j][k] = pb.getJointInfo(self._robot_id, idx)[9]
-                
-        return {'lower': lower_limit, 'upper':upper_limit}
+        return {'lower': lower_lim_list, 'upper':upper_lim_list, 'mean':mean_list, 'range': range_list}
 
 
     def get_ee_states(self, as_tuple=False):

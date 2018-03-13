@@ -84,7 +84,9 @@ class ManObject():
 
     def get_mass_matrix(self):
 
-        jnt_state = [0., self.get_jnt_state()[0]]
+        jnt_state = [0 for _ in range(self._num_joints)]
+
+        jnt_state[self._sense_jnt_idx] = self.get_jnt_state()[0]
 
         return np.eye(6)*pb.calculateMassMatrix(bodyUniqueId=self._obj_id, objPositions=jnt_state)[0][0]
 

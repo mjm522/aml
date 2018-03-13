@@ -49,9 +49,7 @@ class AMLRlEnv(gym.Env):
             
            setup_bullet_visualizer()
 
-        if set_gravity:
-
-            pb.setGravity(0,0,-9.8)
+        self._set_gravity = set_gravity
 
     
     def set_space_lims(self, obs_dim, action_dim, action_high, action_low, is_discrete=False):
@@ -88,6 +86,10 @@ class AMLRlEnv(gym.Env):
         pb.setPhysicsEngineParameter(numSolverIterations=150)
         
         pb.setTimeStep(self._time_step)
+
+        if self._set_gravity:
+
+            pb.setGravity(0,0,-9.8)
 
 
     def simple_step(self):

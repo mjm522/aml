@@ -30,18 +30,14 @@ class DMPManptln():
             
             self._env = env
 
-        self._finger_limits = self._env.get_hand_limits()
+        hand_info = self._env.get_hand_limits()
+
         self._num_fingers = self._env._num_fingers
-        self._num_joints_finger = len(self._finger_limits['lower'][0])
 
-        self._finger_joint_means  = np.zeros([self._num_fingers, self._num_joints_finger])
-        self._finger_joint_ranges = np.zeros([self._num_fingers, self._num_joints_finger])
-
-        for k in range(self._num_fingers):
-            for j in range(self._num_joints_finger):
-                self._finger_joint_means[k,j]  = 0.5*(self._finger_limits['lower'][k][j] + self._finger_limits['upper'][k][j])
-                self._finger_joint_ranges[k,j] = self._finger_limits['upper'][k][j] - self._finger_limits['lower'][k][j]
-
+        self._finger_joint_means  = hand_info['mean']
+        
+        self._finger_joint_ranges = hand_info['range']
+        
         self._dmp_list = None
 
         self.encode_dmps()

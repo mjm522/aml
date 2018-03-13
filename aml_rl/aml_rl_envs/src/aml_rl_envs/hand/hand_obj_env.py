@@ -88,9 +88,9 @@ class HandObjEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.5], [0.,0.,0.,1])
 
-        self._object = ManObject(urdf_root_path=config['urdf_root_path'], time_step=config['time_step'], 
+        self._object = ManObject(urdf_root_path=self._config['urdf_root_path'], time_step=self._config['time_step'], 
                                   pos=box_pos, ori=box_ori, scale=scale, 
-                                  use_fixed_Base = obj_base_fixed)
+                                  use_fixed_Base = obj_base_fixed, obj_type='cyl')
         
         base_hand_pos  = [0., 0., 0.7]
         
@@ -292,9 +292,9 @@ class HandObjEnv(AMLRlEnv):
 
         return self._object.get_mass_matrix()
 
-    def get_obj_curr_state(self, ori_as_euler=True):
+    def get_obj_curr_state(self, ori_type='eul'):
 
-        return self._object.get_curr_state(ori_as_euler=ori_as_euler)
+        return self._object.get_curr_state(ori_type=ori_type)
 
 
     def transfer_point_from_world_to_obj(self, point):
