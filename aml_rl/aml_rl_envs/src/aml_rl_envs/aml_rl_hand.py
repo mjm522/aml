@@ -44,11 +44,11 @@ class AMLRlHand(AMLRlRobot):
     
     def apply_action(self, finger_idx, motor_commands, Kp=None):
 
-        for action in range (len(motor_commands)):
+        for k in range (len(motor_commands)):
 
-            motor = self._finger_jnt_indices[finger_idx][action]
+            motor = self._finger_jnt_indices[finger_idx][k]
 
-            self.apply_ctrl(motor, action, Kp)
+            self.apply_ctrl(motor, motor_commands[k], Kp)
 
 
     def inv_kin(self, finger_idx, ee_pos, ee_ori=None):
@@ -156,9 +156,15 @@ class AMLRlHand(AMLRlRobot):
                   active_joints*finger_idx:active_joints*(finger_idx+1)]
 
 
-    def convert_fin_jnt_poss_to_list(self, fin_jnt_poss):
+    def convert_fin_jnt_poss_to_list(self, fin_jnt_poss, only_mov_jnts=False):
 
-        jnt_poss = np.zeros(self._tot_num_jnts).tolist()
+        if only_mov_jnts:
+
+            jnt_poss = np.zeros(len(self._jnt_indexs)).tolist()
+        
+        else:
+            
+            jnt_poss = np.zeros(self._tot_num_jnts).tolist()
         
         for k in range(self._num_fingers):
 

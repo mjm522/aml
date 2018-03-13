@@ -116,5 +116,31 @@ class AMLRlRobot(object):
             return pb.calculateInverseKinematics(self._robot_id, 
                                                 ee_idx, 
                                                 targetPosition=ee_pos, 
-                                                targetOrientation=ee_ori) 
+                                                targetOrientation=ee_ori)
+
+
+    def get_inv_dyn(self, js_pos, js_vel, js_acc=None):
+
+        if js_acc is None:
+
+            js_acc = [0. for _ in range(len(js_pos))]
+
+        if (not isinstance(js_pos, tuple)) or (not isinstance(js_pos, list)):
+
+            js_pos = tuple(js_pos)
+
+        if (not isinstance(js_vel, tuple)) or (not isinstance(js_vel, list)):
+            
+            js_vel = tuple(js_vel)
+
+        if (not isinstance(js_acc, tuple)) or (not isinstance(js_acc, list)):
+            
+            js_acc = tuple(js_acc)
+
+        tau = pb.calculateInverseDynamics(bodyUniqueId=self._robot_id,
+                                          objPositions=js_pos,
+                                          objVelocities=js_vel,
+                                          objAccelerations=js_acc)
+        
+        return np.asarray(tau)
 

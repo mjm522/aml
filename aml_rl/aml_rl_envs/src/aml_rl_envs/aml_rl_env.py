@@ -44,10 +44,8 @@ class AMLRlEnv(gym.Env):
         self._large_val_obs = self._config['large_val_observation']
         
         self.viewer = None
-        
-        if self._renders:
-            
-           setup_bullet_visualizer()
+         
+        setup_bullet_visualizer(self._renders)
 
         self._set_gravity = set_gravity
 
