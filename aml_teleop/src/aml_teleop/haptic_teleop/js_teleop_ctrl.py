@@ -82,11 +82,7 @@ class JSTeleopCtrl(HapticRobotInterface):
 
             return self._old_cmd
 
-        hap_limits = self._haptic._jnt_limits
-
         rbt_limits = self._robot._jnt_limits
-
-        hap_mean =  self._haptic._jnt_home
 
         cmd = self._robot_home.copy()
 
@@ -94,30 +90,7 @@ class JSTeleopCtrl(HapticRobotInterface):
 
             return
 
-        get_curr_js_haptic = self._haptic._state['position']
-
-        scale = np.zeros(len(self._hap_jnts))
-
-        if self._scale_from_home:
-
-            for k in range(len(self._hap_jnts)):
-
-                scale[k] = (get_curr_js_haptic[k] - hap_mean[k])/(hap_limits[k]['upper'] - hap_limits[k]['lower'])
-
-            scale[scale > 0.5]  = 0.5
-
-            scale[scale < -0.5] = -0.5
-
-        else:
-
-            for k in range(len(self._hap_jnts)):
-
-                scale[k] = (get_curr_js_haptic[k] - hap_limits[k]['lower'])/(hap_limits[k]['upper'] - hap_limits[k]['lower'])
-
-            scale[scale > 1.] = 1.
-
-            scale[scale < 0.] = 0.
-
+        scale = self._haptic.get_js_scale(self._scale_from_home)
 
         if self._scale_from_home:
 

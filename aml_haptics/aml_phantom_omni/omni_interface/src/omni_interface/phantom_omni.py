@@ -21,6 +21,16 @@ class PhantomOmni(object):
         ros_format
         """
 
+        self._scale = scale
+
+        #this flag is to for mapping into a calibration
+        #space
+        self._calibrated = False
+
+        #while doing the demonstrations, the white button
+        #has to be pressed
+        self._device_enabled = False
+
         self._omni_state = {'ee_pos': None, 'ee_vel': None, 'ee_ori': None}
 
         self._omni_js_state = {'names':[], 'js_pos':np.zeros(6)}
@@ -36,6 +46,8 @@ class PhantomOmni(object):
                             {'lower':3.92,   'upper':8.83},
                             {'lower':-0.5,   'upper':1.75},
                             {'lower':-2.58,  'upper':2.58}]
+
+        self._num_jnts = 6
 
         self._jnt_home = [0., 0.26888931, -0.63970184, 6.28073207, 1.56147123, 0.55215159]
 
@@ -53,15 +65,8 @@ class PhantomOmni(object):
 
         self._omni_ffbk_pub  = rospy.Publisher("/phantom/force_feedback", OmniFeedback, queue_size=10)
 
-        self._scale = scale
-
-        #this flag is to for mapping into a calibration
-        #space
-        self._calibrated = False
-
-        #while doing the demonstrations, the white button
-        #has to be pressed
-        self._device_enabled = False
+        #for the subscribers to start
+        rospy.sleep(1.)
 
         self._calib_pos = (0.,0.,0.)
 
@@ -231,6 +236,36 @@ class PhantomOmni(object):
             ee_pos = None
 
         return ee_pos, self._omni_state['ee_ori']
+
+    def get_js_scale(self, scale_from_home=False):
+
+        scale = np.zeros(self._num_jnts)
+
+        curr_js = self._state['position']
+
+        if scale_from_home:
+
+            for k in range(self._num_jnts):
+
+                scale[k] = (curr_js[k] - self._jnt_home[k])\
+                /(self._jnt_limits[k]['upper'] - self._jnt_limits[k]['lower'])
+
+            scale[scale > 0.5]  = 0.5
+
+            scale[scale < -0.5] = -0.5
+
+        else:
+
+            for k in range(self._num_jnts):
+
+                scale[k] = (curr_js[k] - self._jnt_limits[k]['lower'])\
+                         /(self._jnt_limits[k]['upper'] - self._jnt_limits[k]['lower'])
+
+            scale[scale > 1.] = 1.
+
+            scale[scale < 0.] = 0.
+
+        return scale
 
 
     def omni_pos_callback(self, msg):
