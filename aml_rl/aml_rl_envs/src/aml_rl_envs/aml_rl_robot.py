@@ -4,7 +4,7 @@ import pybullet as pb
 
 class AMLRlRobot(object):
 
-    def __init__(self, config):
+    def __init__(self, config, robot_id):
 
         self._config = config
 
@@ -18,7 +18,7 @@ class AMLRlRobot(object):
         
         self._ctrl_type = self._config['ctrl_type']
 
-        self._robot_id = None
+        self._robot_id = robot_id
 
     def simple_step(self):
         
@@ -31,7 +31,11 @@ class AMLRlRobot(object):
 
     def set_ctrl_mode(self):
 
+        self._tot_num_jnts = pb.getNumJoints(self._robot_id)
+
         self._jnt_indexs = self.get_movable_joints()
+
+        self._jnt_postns = [0. for _ in range(len(self._jnt_indexs))]
         
         #disable the default position_control mode. 
         for k, jnt_index in enumerate(self._jnt_indexs):
@@ -65,7 +69,7 @@ class AMLRlRobot(object):
 
         movable_jnts = []
         
-        for i in range (pb.getNumJoints(self._robot_id)):
+        for i in range (self._tot_num_jnts):
             
             jnt_info = pb.getJointInfo(self._robot_id, i)
             
