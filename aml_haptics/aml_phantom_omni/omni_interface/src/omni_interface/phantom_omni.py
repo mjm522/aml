@@ -1,5 +1,6 @@
 import tf
 import rospy
+import quaternion
 import numpy as np
 import pybullet as pb
 from sensor_msgs.msg import JointState 
@@ -96,8 +97,6 @@ class PhantomOmni(object):
 
 
     def _update_state(self):
-
-        print "HERE"
 
         now                = rospy.Time.now()
 

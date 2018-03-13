@@ -24,19 +24,14 @@ class QPPosGaits():
 
         self._dummy_env = HandObjEnv(config=HAND_OBJ_CONFIG, action_dim=18, randomize_box_ori=False,  keep_obj_fixed=True)
         
-        self._finger_limits = self._env.get_hand_limits()
+        hand_info = self._env.get_hand_limits()
+
         self._num_fingers = self._env._num_fingers
-        self._num_joints_finger = self._env._num_joints_finger-1
 
-        self._finger_joint_means  = np.zeros([self._num_fingers, self._num_joints_finger])
-        self._finger_joint_ranges = np.zeros([self._num_fingers, self._num_joints_finger])
-
-        for k in range(self._num_fingers):
-            for j in range(self._num_joints_finger):
-                self._finger_joint_means[k,j]  = 0.5*(self._finger_limits['lower'][k][j] + self._finger_limits['upper'][k][j])
-                self._finger_joint_ranges[k,j] = (self._finger_limits['upper'][k][j] - self._finger_limits['lower'][k][j])
-
-
+        self._finger_joint_means  = hand_info['mean']
+        
+        self._finger_joint_ranges = hand_info['range']
+        
     def get_hand_manipulability(self, finger_idx, new_finger_joint_pos):
         
         qh = 0.

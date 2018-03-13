@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import time
 import numpy as np
 import pybullet as pb
 from utils import rotz, roty, rotx
@@ -15,6 +16,8 @@ from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 class CollectManData():
 
     def __init__(self, env=None, use_ph_omni=False):
+
+        HAND_OBJ_CONFIG['ctrl_type'] = 'torq'
 
         if env is None:
             # self._env = HandObjEnv(action_dim=18, randomize_box_ori=False, keep_obj_fixed=True, config=HAND_OBJ_CONFIG)
@@ -50,14 +53,16 @@ class CollectManData():
 
         if self._use_ph_omni:
 
+            import rospy
+
+            rospy.init_node('teleop_bullet', anonymous=True)
+
             self._ph_omni = PhantomOmni()
 
-            #to avoid race condition 
-            while self._ph_omni._omni_state['ee_pos'] is None:
+            time.sleep(1)
 
-                print "Waiting for phantom omni ..."
+        print "Done"
 
-            self._ph_omni.update_omni_state(start=True)
 
     def discretize_obj_surface(self):
         '''
@@ -135,7 +140,7 @@ class CollectManData():
         self._data.append(data_point)
 
 
-    def get_reaction_force(self, finger_idx=1):
+    def get_reaction_force(self, finger_idx=0):
 
         data = self._env.get_contact_points_robot_object()
 
@@ -150,47 +155,23 @@ class CollectManData():
 
     def transform_demo_device_to_bullet(self):
 
-        if self._calib_pos is None:
-
-            print "Press the white button to calibrate..."
-
-            return (0.,0, 0.), (0., 0., 0., 1.)
-
-        hap_pos = 1e-2*self._ph_omni._omni_curr_ee_pos
-
-        hap_ori = self._ph_omni._omni_curr_ee_ori
-
-        pos, ori = pb.multiplyTransforms(tuple(hap_pos), tuple(hap_ori), self._calib_pos, self._calib_ori)
-
-        return pos, ori
+        return self._ph_omni.get_ee_pose_calib_space()
 
 
-    def calibration(self, finger_idx=1):
+    def calibration(self, finger_idx=0):
 
-        hap_pos = 1e-2*self._ph_omni._omni_curr_ee_pos
+        robot_curr_state = self._env.get_robot_curr_state()
 
-        hap_ori = self._ph_omni._omni_curr_ee_ori
+        ee_pos = robot_curr_state['pos_ee'][finger_idx]
 
-        inv_hap_pos, inv_hap_ori = pb.invertTransform(tuple(hap_pos), tuple(hap_ori))
+        ee_ori = robot_curr_state['ori_ee'][finger_idx] 
 
-        data = self._env._hand.get_ee_states(as_tuple=True)
+        self._ph_omni.calibration(ee_pos, ee_ori)
 
-        ee_pos = data[0][finger_idx]
-
-        ee_ori = data[1][finger_idx]
-
-        self._calib_pos, self._calib_ori = pb.multiplyTransforms(inv_hap_pos, inv_hap_ori, ee_pos, ee_ori)
-
-        self._calibrated = True
-
-        print "Transformation \n"
-
-        print self._calib_pos
-
-        print self._calib_ori
+        self._calibrated = self._ph_omni._calibrated
 
 
-    def move_relative_to_demo_device(self, finger_idx=1):
+    def move_relative_to_demo_device(self, finger_idx=0):
 
         if not self._calibrated:
             
@@ -198,13 +179,9 @@ class CollectManData():
 
         robot_curr_state = self._env.get_robot_curr_state()
 
-        # new_ee_pos = 1e-3*self._ph_omni._omni_curr_ee_pos
-
-        # new_ori = self._ph_omni._omni_curr_ee_ori #robot_curr_state['pos_ee'][finger_idx] + 1e-2*self._ph_omni._rel_ee_pos
-
         pos, ori = self.transform_demo_device_to_bullet()
 
-        draw_trajectory(self._old_ee_pos, pos)
+        # draw_trajectory(self._old_ee_pos, pos)
 
         self._old_ee_pos = pos
 
@@ -212,7 +189,7 @@ class CollectManData():
 
         # self._env._hand.applyAction(finger_idx, cmd)
 
-        self._env._hand.set_joint_state(finger_idx, cmd)
+        self._env._hand.set_fin_joint_state(finger_idx, cmd)
 
         # self._env._object.set_obj_pose(new_ee_pos, new_ori)
 
@@ -226,8 +203,6 @@ class CollectManData():
             keyboard_events = pb.getKeyboardEvents()
 
             if self._use_ph_omni:
-                
-                self._ph_omni.update_omni_state()
 
                 self.move_relative_to_demo_device()
 
@@ -267,10 +242,7 @@ class CollectManData():
 
                 self._env._reset(obj_base_fixed=False)
 
-                if self._use_ph_omni:
-
-                    self._ph_omni.update_omni_state(start=True)
-
+               
             
             if start_collection:
                 
@@ -280,10 +252,12 @@ class CollectManData():
 
             if self._use_ph_omni:
 
-                self._ph_omni.omni_force_feedback(self.get_reaction_force())
+                pass
+
+                # self._ph_omni.omni_force_feedback(self.get_reaction_force())
 
 if __name__ == '__main__':
     
-    cmd = CollectManData()
+    cmd = CollectManData(use_ph_omni=True)
     # cmd.discretize_obj_surface()
     cmd.run()

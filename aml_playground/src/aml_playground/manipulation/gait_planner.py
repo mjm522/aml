@@ -29,19 +29,14 @@ class GaitPlanner():
             
             self._env = env
 
-        self._finger_limits = self._env.get_hand_limits()
+        hand_info = self._env.get_hand_limits()
+
         self._num_fingers = self._env._num_fingers
-        self._num_joints_finger = self._env._num_joints_finger
 
-        self._finger_joint_means  = np.zeros([self._num_fingers, self._num_joints_finger])
-        self._finger_joint_ranges = np.zeros([self._num_fingers, self._num_joints_finger])
-
-        for k in range(self._num_fingers):
-            for j in range(self._num_joints_finger):
-                self._finger_joint_means[k,j]  = 0.5*(self._finger_limits['lower'][k][j] + self._finger_limits['upper'][k][j])
-                self._finger_joint_ranges[k,j] = (self._finger_limits['upper'][k][j] - self._finger_limits['lower'][k][j])
-
-
+        self._finger_joint_means  = hand_info['mean']
+        
+        self._finger_joint_ranges = hand_info['range']
+        
         self._opposite_fin_idx = [2,3,0,1]
 
         self._initial_cs = self.get_contact_points(in_obj_frame=True)
@@ -94,7 +89,7 @@ class GaitPlanner():
         
         # initial_cs = self.get_contact_points()
 
-        obj_ori = self._env.get_obj_curr_state(ori_as_euler=False)[1]
+        obj_ori = self._env.get_obj_curr_state(ori_type='mat')[1]
 
         #we need to keep the finger opposite to this
         # opp_fin_world = initial_cs[self._opposite_fin_idx[finger_to_switch]]
