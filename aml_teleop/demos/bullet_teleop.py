@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import time
 import rospy
 import numpy as np
 import pybullet as pb
@@ -22,8 +21,6 @@ class BulletTeleop():
 
         
     def run(self):
-
-        time.sleep(1)
 
         while not rospy.is_shutdown():
 

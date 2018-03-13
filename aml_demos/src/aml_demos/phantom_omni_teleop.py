@@ -32,7 +32,7 @@ def control_robot(arm, task_space):
         'robot_joints':[0,1,2,4,5,6], #these joints will be one to one mapped
         'haptic_joints':[0,1,2,3,4,5],
         'scale_from_home': True,
-        'robot_home': arm._untuck[0:arm.n_cmd()], # home position of baxter
+        'robot_home': arm._untuck[0:arm.n_cmd()], # home position of robot
         'rate': 200, # rate of the controller
         'ctrlr_type':'pos', #other options are 'vel', 'torq'
          
@@ -46,7 +46,7 @@ def control_robot(arm, task_space):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='baxter_teleop_ctrl')
+    parser = argparse.ArgumentParser(description='teleop_ctrl')
 
     parser.add_argument('-l', '--limb_name', type=str, default='right',  help='limb index-(left/right)')
 
