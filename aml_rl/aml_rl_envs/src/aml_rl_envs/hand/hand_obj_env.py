@@ -88,7 +88,9 @@ class HandObjEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.5], [0.,0.,0.,1])
 
-        self._object = ManObject(config=self._config, pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
+        self._object = ManObject(urdf_root_path=config['urdf_root_path'], time_step=config['time_step'], 
+                                  pos=box_pos, ori=box_ori, scale=scale, 
+                                  use_fixed_Base = obj_base_fixed)
         
         base_hand_pos  = [0., 0., 0.7]
         
@@ -100,8 +102,6 @@ class HandObjEnv(AMLRlEnv):
 
         self._num_fingers = self._hand._num_fingers
         
-        self._num_joints_finger = self._hand._num_joints_per_finger
-
         self.set_friction_properties()
 
         self._env_step_counter = 0

@@ -1,10 +1,10 @@
 import pybullet as pb
 
-def setup_bullet_visualizer():
+def setup_bullet_visualizer(render=True):
 
     cid = pb.connect(pb.SHARED_MEMORY)
         
-    if (cid<0):
+    if (cid < 0) and render:
         
         cid = pb.connect(pb.GUI)
     

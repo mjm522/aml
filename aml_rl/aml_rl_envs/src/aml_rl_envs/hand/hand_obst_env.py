@@ -93,7 +93,7 @@ class HandObstacleEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori)
  
-        self._object = ManObject(config=self._config, pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
+        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base = obj_base_fixed)
         
         base_hand_pos  = [0.4, 0., 2]
 
@@ -104,8 +104,6 @@ class HandObstacleEnv(AMLRlEnv):
         self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice = 'pincer')
 
         self._num_fingers = self._hand._num_fingers
-
-        self._num_joints_finger = self._hand._num_joints_per_finger
 
         self.set_friction_properties()
 
