@@ -7,7 +7,9 @@ from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 class PisaHand(AMLRlHand):
 
-    def __init__(self, config=AML_RL_ROBOT_CONFIG, scale=0.5, hand_type='right', use_fixed_Base=False):
+    def __init__(self, config=AML_RL_ROBOT_CONFIG, scale=1., 
+                       hand_type='right', use_fixed_base=False, 
+                       pos=(0.,0.,0.), ori=(0.,0.,0.,1.), j_pos=None):
 
         self._config = config
 
@@ -17,11 +19,17 @@ class PisaHand(AMLRlHand):
 
         self._scale = scale
 
-        self._use_fixed_base = use_fixed_Base
+        self._use_fixed_base = use_fixed_base
+
+        self._base_pos = pos
+
+        self._base_ori = ori
+
+        self._defualt_jnts = j_pos
 
         AMLRlHand.__init__(self, config, num_fingers=5)
 
-        setup_bullet_visualizer()
+        # setup_bullet_visualizer()
 
         self.reset()
  
@@ -47,6 +55,6 @@ class PisaHand(AMLRlHand):
                                     [25, 26, 27, 28, 29, 30, 31], # ring finger joints
                                     [32, 33, 34, 35, 36, 37, 38] ] # little finger joints
 
-        self.set_base_pose(pos=(0.,0.,0.), ori=(0.,0.,0.,1.))
+        self.set_base_pose(pos=self._base_pos, ori=self._base_ori)
 
         self.setup_hand()
