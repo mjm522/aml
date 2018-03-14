@@ -1,7 +1,6 @@
 import numpy as np
 import pybullet as pb
 from aml_rl_envs.aml_rl_robot import AMLRlRobot
-from aml_rl_envs.config import AML_RL_ROBOT_CONFIG
 
 
 class AMLRlHand(AMLRlRobot):
@@ -160,17 +159,23 @@ class AMLRlHand(AMLRlRobot):
 
         if only_mov_jnts:
 
-            jnt_poss = np.zeros(len(self._jnt_indexs)).tolist()
+            jnt_poss = []
         
         else:
-            
+
             jnt_poss = np.zeros(self._tot_num_jnts).tolist()
-        
+              
         for k in range(self._num_fingers):
 
             for j, idx in enumerate(self._finger_jnt_indices[k]):
 
-                jnt_poss[j] = fin_jnt_poss[k][j]
+                if only_mov_jnts:
+
+                    jnt_poss.append(fin_jnt_poss[k][j])
+
+                else:
+
+                    jnt_poss[idx] = fin_jnt_poss[k][j]
 
         return jnt_poss
 

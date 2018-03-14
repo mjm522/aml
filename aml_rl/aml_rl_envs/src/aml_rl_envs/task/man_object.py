@@ -25,7 +25,7 @@ class ManObject():
 
         self._old_state = None
 
-        self._obj_type = 'cyl'
+        self._obj_type = obj_type
 
         self._com = pos #centre of mass
         
@@ -43,11 +43,11 @@ class ManObject():
 
         if self._obj_type == 'cube':
 
-            urdf_file = join(self._urdf_root_path, "cylinder.urdf")
+            urdf_file = join(self._urdf_root_path, "cuboid.urdf")
 
         elif self._obj_type == 'cyl':
 
-             urdf_file = join(self._urdf_root_path, "cuboid.urdf") 
+             urdf_file = join(self._urdf_root_path, "cylinder.urdf") 
 
         else:
 

@@ -85,8 +85,8 @@ class AMLRlRobot(object):
     def apply_ctrl(self, motor, cmd, Kp=None):
 
         if self._ctrl_type == 'torque':
-                
-                pb.setJointMotorControl2(self._robot_id, motor, pb.TORQUE_CONTROL, force=cmd)
+
+            pb.setJointMotorControl2(self._robot_id, motor, pb.TORQUE_CONTROL, force=cmd)
             
         elif self._ctrl_type == 'pos':
             
@@ -101,6 +101,10 @@ class AMLRlRobot(object):
         elif self._ctrl_type == 'vel':
             
             pb.setJointMotorControl2(self._robot_id, motor, pb.VELOCITY_CONTROL, targetVelocity=cmd, force=self._max_force)
+
+        else:
+
+            raise Exception("Unknown control type ...")
 
 
     def get_ik(self, ee_idx, ee_pos, ee_ori=None):
