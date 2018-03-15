@@ -13,7 +13,7 @@ class JSController(Controller):
 
         Controller.__init__(self, robot_interface, config)
 
-        self._error  = {'js_pos' : np.zeros(self._robot._nu)}
+        self._error  = {'js_pos' : np.zeros(self._robot.n_cmd())}
  
         self._js_thr = config['js_pos_error_thr']
 
