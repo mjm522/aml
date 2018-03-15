@@ -3,7 +3,7 @@ import PyKDL as kdl
 
 class AMLPyKDL(object):
 
-    def __init__(self, kdl_chain, base_position):
+    def __init__(self, kdl_chain, base_position=np.zeros(3)):
 
         self._chain = kdl_chain
         
