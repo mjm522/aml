@@ -5,7 +5,7 @@ import copy
 
 import rospy
 
-from config import JS_POSTN_CNTLR_BAXTER as JS_POSTN_CNTLR
+from config import JS_POSTN_CNTLR
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
@@ -14,18 +14,6 @@ class JSPositionController(JSController):
     def __init__(self, robot_interface, config = JS_POSTN_CNTLR):
 
         JSController.__init__(self, robot_interface, config)
-
-        #proportional gain for position
-        self._kp_q        = self._config['kp_q']
-        #derivative gain for position
-        self._kd_dq       = self._config['kd_dq']
-
-        #proportional gain for null space controller
-        self._null_kp  = self._config['null_kp']
-        #derivative gain for null space controller
-        self._null_kd  = self._config['null_kd']
-        #null space control gain
-        self._alpha    = self._config['alpha']
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 

@@ -5,7 +5,7 @@ import copy
 
 import rospy
 
-from config import JS_POSTN_CNTLR_BAXTER as JS_POSTN_CNTLR
+from config import JS_POSTN_CNTLR
 from aml_ctrl.controllers.js_controller import JSController
 
 from aml_ctrl.utilities.utilities import quatdiff
@@ -16,21 +16,24 @@ class JSPositionController2(JSController):
         JSController.__init__(self, robot_interface, config)
 
         #proportional gain for position
-        self._kp_q        = self._config['kp_q']
-        #derivative gain for position
-        self._kd_dq       = self._config['kd_dq']
+        if isinstance(self._config['kp_q'], list):
+            self._kp_q        = np.array(self._config['kp_q'])
+        else:
+            self._kp_q        = np.array([self._config['kp_q']]*self._robot.n_cmd())
 
-        #proportional gain for null space controller
-        self._null_kp  = self._config['null_kp']
-        #derivative gain for null space controller
-        self._null_kd  = self._config['null_kd']
-        #null space control gain
-        self._alpha    = self._config['alpha']
+        # derivative gains
+        if isinstance(self._config['kd_dq'], list):
+            self._kd_dq        = np.array(self._config['kd_dq'])
+        else:
+            self._kd_dq        = np.array([self._config['kd_dq']]*self._robot.n_cmd())
+
 
         self._deactivate_wait_time = self._config['deactivate_wait_time']
 
 
         self._dq = np.zeros_like(self._goal_js_pos)
+
+        self._low_pass_alpha = self._config['velocity_low_pass_alpha']
 
         if 'rate' in self._config:
             self._rate = rospy.timer.Rate(self._config['rate'])
@@ -60,7 +63,7 @@ class JSPositionController2(JSController):
 
         q              = robot_state['position']
 
-        dq             = self._dq*0.99 + robot_state['velocity']*0.01
+        dq             = self._dq + (robot_state['velocity'] - self._dq)*self._low_pass_alpha
         self._dq = dq
 
         js_delta       = goal_js_pos-q
@@ -71,12 +74,12 @@ class JSPositionController2(JSController):
         if np.linalg.norm(js_delta) < 1e-3:
             js_delta = np.zeros_like(q)
 
-        u              = self._kp_q*js_delta + self._kd_dq*(goal_js_vel - dq)
+        u              = np.multiply(self._kp_q,js_delta) + np.multiply(self._kd_dq,(goal_js_vel - dq))
 
         if np.any(np.isnan(u)):
             u               = self._cmd
-        else:
-            self._cmd       = u
+
+        self._cmd       = u
 
         # Never forget to update the error
         self._error = {'js_pos': js_delta}

@@ -36,6 +36,7 @@ generate_messages(
   std_msgs
   sensor_msgs
   aml_perception
+  aml_services
 )
 
 catkin_package(CATKIN_DEPENDS message_runtime )

@@ -246,6 +246,12 @@ class BaxterArm(baxter_interface.limb.Limb):
 
     def get_state(self):
         return self._state
+
+    def n_cmd(self):
+        return self._nu
+
+    def n_joints(self):
+        return self._nq
         
 
     def _on_joint_states(self, msg):
