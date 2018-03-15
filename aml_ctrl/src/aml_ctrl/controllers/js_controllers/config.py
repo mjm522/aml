@@ -61,7 +61,7 @@ JS_VELOCITY_CNTLR_BAXTER = {
 
 JS_TORQUE_CNTLR_BAXTER = {
     'rate': 500,
-    'kp_q': 5., #gains for position
+    'kp_q': [5.]*7, #gains for position
     'kd_dq': np.sqrt(5.),
     'velocity_low_pass_alpha': 0.01, # low pass filter on the robot velocity readings
     'js_pos_error_thr' :0.1,

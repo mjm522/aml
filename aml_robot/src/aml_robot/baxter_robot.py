@@ -44,11 +44,6 @@ class BaxterArm(baxter_interface.limb.Limb):
         
         self._ready = True
 
-        #number of joints
-        self._nq = 7
-        #number of control commads
-        self._nu = 7
-
         self._limb = limb
 
         #these values are from the baxter urdf file
@@ -59,6 +54,11 @@ class BaxterArm(baxter_interface.limb.Limb):
                             {'lower':-3.059,          'upper':3.059},
                             {'lower':-1.57079632679,  'upper':2.094},
                             {'lower':-3.059,          'upper':3.059}]
+
+        #number of joints
+        self._nq = len(self._jnt_limits)
+        #number of control commads
+        self._nu = len(self._jnt_limits)
 
         if limb == 'left':
             #secondary goal for the manipulator
