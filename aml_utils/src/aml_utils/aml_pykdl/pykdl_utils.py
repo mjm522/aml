@@ -2,6 +2,7 @@
 
 import numpy as np
 import PyKDL as kdl
+from urdf_parser_py.urdf import URDF
 
 def euler_to_quat(r, p, y):
 
@@ -57,7 +58,10 @@ def urdf_inertial_to_kdl_rbi(i):
 
 
 # Returns a PyKDL.Tree generated from a urdf_parser_py.urdf.URDF object.
-def kdl_tree_from_urdf_model(urdf):
+def kdl_tree_from_urdf_model(urdf=None):
+
+    if urdf is None:
+        urdf = URDF.from_parameter_server(key='robot_description')
 
     root = urdf.get_root()
     tree = kdl.Tree(root)
