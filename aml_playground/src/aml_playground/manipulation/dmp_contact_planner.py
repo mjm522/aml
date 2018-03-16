@@ -1,17 +1,21 @@
 import numpy as np
 import pybullet as p
 from dmp_gaits import DMPGaits
-from hand_obj_env import HandObjEnv
 from dmp_manipulation import DMPManptln
-
+from aml_rl_envs.hand.hand_obj_env import HandObjEnv
+from aml_playground.manipulation.config import HAND_OBJ_CONFIG
 
 
 class DMPConPlan():
 
     def __init__(self):
 
-        self._env = HandObjEnv(renders=True, action_dim=18, randomize_box_ori=False, ctrlType='pos', keep_obj_fixed = False)
+        HAND_OBJ_CONFIG['ctrl_type'] = 'pos'
+
+        self._env = HandObjEnv(config=HAND_OBJ_CONFIG, action_dim=18, randomize_box_ori=False, keep_obj_fixed=True)
+        
         self._gaiter = DMPGaits(env=self._env)
+        
         self._maniptn =  DMPManptln(env=self._env)
 
 
@@ -35,13 +39,13 @@ class DMPConPlan():
                     if np.any(np.isnan(cmd)):
                         continue
 
-                    self._env._hand.applyAction(j, cmd)
+                    self._env._hand.apply_action(j, cmd)
                     
                 self._env.simple_step()
 
             for m in range(self._env._num_fingers):
 
-                gait_primitive = self._gaiter.update_dmp_params(finger_idx=m)
+                gait_primitive  = self._gaiter.update_dmp_params(finger_idx=m)
                 for n in range(gait_primitive.shape[0]):
 
                     if self._env._ctrl_type == 'pos':
@@ -52,7 +56,7 @@ class DMPConPlan():
                     if np.any(np.isnan(cmd)):
                         continue
 
-                    self._env._hand.applyAction(m, cmd)
+                    self._env._hand.apply_action(m, cmd)
                 
                     self._env.simple_step()
 

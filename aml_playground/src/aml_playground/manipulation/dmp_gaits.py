@@ -154,6 +154,8 @@ def main():
 
     while True:
 
+        dg._env.simple_step()
+
         for j in range(dg._num_fingers): #dg._num_fingers
 
             # dmp_primitive = dg.update_dmp_params(finger_idx=j, goal_offset=-goal_offsets[j], start_offset=-start_offsets[j])
@@ -168,10 +170,10 @@ def main():
                     ee_poss, ee_oris, ee_vels, ee_omgs = dg._env._hand.get_ee_states(as_tuple=True)
                     jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = dg._env._hand.get_jnt_states()
 
-                    print "target \t", dmp_primitive[k, 1:]
-                    print "cmd \t", cmd
-                    print "start ee\t", ee_poss[j]
-                    print "start js\t", jnt_poss[j]
+                    # print "target \t", dmp_primitive[k, 1:]
+                    # print "cmd \t", cmd
+                    # print "start ee\t", ee_poss[j]
+                    # print "start js\t", jnt_poss[j]
                 
                 else:
 
