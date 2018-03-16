@@ -144,7 +144,7 @@ class AMLRlHand(AMLRlRobot):
 
     def get_mass_matrix(self, finger_idx, jnt_poss):
 
-        jnt_pos = list(itertools.chain.from_iterable(jnt_poss))
+        jnt_pos = self.convert_fin_jnt_poss_to_list(jnt_poss)
 
         Mq = np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id, objPositions=jnt_pos))
 
@@ -228,7 +228,7 @@ class AMLRlHand(AMLRlRobot):
 
         jnt_poss = self.get_jnt_states()[0]
 
-        jnt_pos = list(itertools.chain.from_iterable(jnt_poss))
+        jnt_pos = self.convert_fin_jnt_poss_to_list(jnt_poss)
 
         hand_jacobian = None
 
