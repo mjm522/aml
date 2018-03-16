@@ -15,9 +15,9 @@ from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 
 class CollectManData():
 
-    def __init__(self, env=None, use_ph_omni=False):
+    def __init__(self, env=None, use_ph_omni=False, finger_idx=0):
 
-        HAND_OBJ_CONFIG['ctrl_type'] = 'torq'
+        HAND_OBJ_CONFIG['ctrl_type'] = 'torque'
 
         if env is None:
             # self._env = HandObjEnv(action_dim=18, randomize_box_ori=False, keep_obj_fixed=True, config=HAND_OBJ_CONFIG)
@@ -25,7 +25,15 @@ class CollectManData():
         else:
             self._env = env
 
+        self._fin_idx = finger_idx
+
         self._object = self._env._object
+
+        self._rbt_lims = self._env._hand.get_finger_limits()
+
+        self._fin_upper_lim = self._rbt_lims['lower'][self._fin_idx]
+        
+        self._fin_lower_lim = self._rbt_lims['upper'][self._fin_idx]
 
         self._angle_div = 30.
 
@@ -58,8 +66,6 @@ class CollectManData():
             rospy.init_node('teleop_bullet', anonymous=True)
 
             self._ph_omni = PhantomOmni()
-
-            time.sleep(1)
 
         print "Done"
 
@@ -140,15 +146,15 @@ class CollectManData():
         self._data.append(data_point)
 
 
-    def get_reaction_force(self, finger_idx=0):
+    def get_reaction_force(self):
 
         data = self._env.get_contact_points_robot_object()
 
-        if not data[finger_idx]['cn_force']:
+        if not data[self._fin_idx]['cn_force']:
 
             return np.zeros(3)
 
-        force = np.asarray(data[finger_idx]['cn_on_block'][0]) * data[finger_idx]['cn_force'][0]
+        force = np.asarray(data[self._fin_idx]['cn_on_block'][0]) * data[self._fin_idx]['cn_force'][0]
 
         return -force
 
@@ -158,24 +164,27 @@ class CollectManData():
         return self._ph_omni.get_ee_pose_calib_space()
 
 
-    def calibration(self, finger_idx=0):
+    def calibration(self):
 
         robot_curr_state = self._env.get_robot_curr_state()
 
-        ee_pos = robot_curr_state['pos_ee'][finger_idx]
+        ee_pos = robot_curr_state['pos_ee'][self._fin_idx]
 
-        ee_ori = robot_curr_state['ori_ee'][finger_idx] 
+        ee_ori = robot_curr_state['ori_ee'][self._fin_idx] 
 
         self._ph_omni.calibration(ee_pos, ee_ori)
 
         self._calibrated = self._ph_omni._calibrated
 
 
-    def move_relative_to_demo_device(self, finger_idx=0):
+    def move_in_ts(self):
 
         if not self._calibrated:
+
+            self.calibration()
+
+            self._calibrated = True
             
-            return
 
         robot_curr_state = self._env.get_robot_curr_state()
 
@@ -185,13 +194,31 @@ class CollectManData():
 
         self._old_ee_pos = pos
 
-        cmd = self._env.get_ik(finger_idx, pos, ori)
+        cmd = self._env.get_ik(self._fin_idx, pos, ori)
 
-        # self._env._hand.applyAction(finger_idx, cmd)
+        # self._env._hand.apply_action(finger_idx, cmd)
 
-        self._env._hand.set_fin_joint_state(finger_idx, cmd)
+        self._env._hand.set_fin_joint_state(self._fin_idx, cmd)
 
         # self._env._object.set_obj_pose(new_ee_pos, new_ori)
+
+    def move_in_js(self, scale_from_home=True):
+
+        scale = self._ph_omni.get_js_scale(scale_from_home=scale_from_home)
+
+        cmd = np.zeros(len(self._fin_upper_lim))
+
+        for k in range(len(self._fin_upper_lim)):
+
+            if scale_from_home:
+
+                cmd[k] += scale[k] * (self._fin_upper_lim[k] - self._fin_lower_lim[k])
+
+            else:
+
+                cmd[k] = self._fin_lower_lim[k] + scale[k] * (self._fin_upper_lim[k] - self._fin_lower_lim[k])
+
+        self._env._hand.set_fin_joint_state(self._fin_idx, cmd)
 
 
     def run(self):
@@ -204,16 +231,10 @@ class CollectManData():
 
             if self._use_ph_omni:
 
-                self.move_relative_to_demo_device()
+                # self.move_in_ts()
 
-                # self.transform_demo_device_to_bullet()
-
-                if self._ph_omni._omni_bt_state['white_bt']:
-
-                    print "Calibrating ..."
-
-                    self.calibration()
-
+                self.move_in_js()
+   
             # obj = self._env.get_obj_curr_state(ori_type='quat')
             # values = self._env.get_contact_points_robot_object()[1]['cp_on_block']
 
@@ -242,8 +263,6 @@ class CollectManData():
 
                 self._env._reset(obj_base_fixed=False)
 
-               
-            
             if start_collection:
                 
                 self.collect_data()
@@ -258,6 +277,6 @@ class CollectManData():
 
 if __name__ == '__main__':
     
-    cmd = CollectManData(use_ph_omni=True)
+    cmd = CollectManData(use_ph_omni=False)
     # cmd.discretize_obj_surface()
     cmd.run()
