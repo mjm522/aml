@@ -22,8 +22,9 @@ class Hand(AMLRlHand):
             self._robot_id = pb.loadURDF(join(config['urdf_root_path'], "hand/four_finger_hand.urdf"), useFixedBase=True, globalScaling=1)
 
             self._num_fingers = 4
-
         
+        self._default_j_pos = j_pos
+
         self._finger_radius = 0.05 # from urdf
 
         if self._num_fingers == 2:
@@ -38,15 +39,15 @@ class Hand(AMLRlHand):
        
         self._ee_indexs = [3,7,11,15]
 
-        for k in range(self._num_fingers):
-
-            self.set_fin_joint_state(k, j_pos)
-
         self.reset(pos, ori)
 
     def reset(self, pos = [1.5, 0., 2.75], ori = [0., 0., 0., 0]):
 
         self.set_base_pose(pos, ori)
+
+        for k in range(self._num_fingers):
+
+            self.set_fin_joint_state(k, self._default_j_pos)
 
         self.setup_hand()
         
