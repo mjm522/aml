@@ -317,11 +317,13 @@ public:
 
           
           //for box marker
-          if(calibrated) //(openni_rgb_markers[i].id == box_marker_id) && 
+          if(calibrated) 
           {
 
             std::stringstream ss;
-            ss << "box" << openni_rgb_markers[i].id;
+            ss << "box";
+            if (openni_rgb_markers[i].id != box_marker_id) // compatibility with old single marker tracker
+              ss << openni_rgb_markers[i].id;
             //keep in mind that this is called only if the marker on the box
             // is visible
             //only perform the following operations if we know the pose of openni camera w.r.t base
