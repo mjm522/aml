@@ -7,20 +7,21 @@ from hand import Hand
 import os
 import copy
 import random
-from man_object import ManObject
+
 from os.path import exists, join
 
+from aml_rl_envs.hand.hand import Hand
 from aml_rl_envs.aml_rl_env import AMLRlEnv
 from aml_rl_envs.config import urdf_root_path
 from aml_rl_envs.utils.math_utils import skew
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
+from aml_rl_envs.task.man_object import ManObject
 from aml_lfd.dmp.config import discrete_dmp_config
 
 from aml_rl_envs.utils.collect_demo import plot_demo, get_demo
 from aml_rl_envs.hand.config import HAND_OBJ_CONFIG, HAND_CONFIG
 
 class HandObstacleEnv(AMLRlEnv):
-
 
     def __init__(self, action_dim, demo2follow=None, 
                        action_high=None, action_low=None, 
@@ -93,13 +94,15 @@ class HandObstacleEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori)
  
-        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base=obj_base_fixed)
+        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base=obj_base_fixed, obj_type='cube')
         
         base_hand_pos  = [-0.7, 0., 2.1]
 
         base_hand_ori  = [0,1,0,0]
 
         hand_j_pos = [0, np.pi/2, 0.0, 0.000, 0, 1, -1.2, 0.00]
+
+        HAND_CONFIG.update(self._config)
 
         self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
 

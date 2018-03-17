@@ -28,15 +28,14 @@ class AMLRlRobot(object):
 
         pb.resetBasePositionAndOrientation(self._robot_id, pos, ori)
         
-
     def set_ctrl_mode(self):
 
         self._tot_num_jnts = pb.getNumJoints(self._robot_id)
 
         self._jnt_indexs = self.get_movable_joints()
 
-        self._jnt_postns = [0. for _ in range(len(self._jnt_indexs))]
-        
+        self._jnt_postns = self.get_jnt_state()[0]
+
         #disable the default position_control mode. 
         for k, jnt_index in enumerate(self._jnt_indexs):
             
@@ -147,4 +146,27 @@ class AMLRlRobot(object):
                                           objAccelerations=js_acc)
         
         return np.asarray(tau)
+
+
+    def get_jnt_state(self):
+
+        jnt_poss = []
+        jnt_vels = []
+        jnt_reaction_forces =  []
+        jnt_applied_torques  = []
+
+        for jnt_idx in self._jnt_indexs:
+
+            jnt_state = pb.getJointState(self._robot_id, jnt_idx)
+            
+            jnt_poss.append(jnt_state[0])
+            
+            jnt_vels.append(jnt_state[1])
+            
+            jnt_reaction_forces.append(jnt_state[2])
+            
+            jnt_applied_torques.append(jnt_state[3])
+
+
+        return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
 

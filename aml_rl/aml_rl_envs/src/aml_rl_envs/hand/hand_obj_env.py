@@ -2,19 +2,22 @@
 import time
 import numpy as np
 import pybullet as pb
-from hand import Hand
+
 
 import os
 import copy
 import random
-from man_object import ManObject
+
 from os.path import exists, join
+
+from aml_rl_envs.hand.hand import Hand
 
 from aml_rl_envs.aml_rl_env import AMLRlEnv
 from aml_rl_envs.config import urdf_root_path
 from aml_rl_envs.utils.math_utils import skew
 
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
+from aml_rl_envs.task.man_object import ManObject
 from aml_lfd.dmp.config import discrete_dmp_config
 from aml_rl_envs.config import AML_RL_ROBOT_CONFIG
 

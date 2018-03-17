@@ -137,9 +137,9 @@ class DMPManptln():
 
         config['extForce'] = external_force
 
-        new_dmp_traj, new_dmp_dtraj = dmp.generate_trajectory(config=config)
+        new_dmp_traj = dmp.generate_trajectory(config=config)
 
-        return new_dmp_traj, new_dmp_dtraj
+        return new_dmp_traj['pos'], new_dmp_traj['vel']
 
 
     def compute_B_matrix(self, cp_list, rtn_list=False):
@@ -276,7 +276,7 @@ def main():
                     if np.any(np.isnan(cmd)):
                         continue
                     
-                dm._env._hand.applyAction(j, cmd)
+                dm._env._hand.apply_action(j, cmd)
                 
             dm._env.simple_step()
 
