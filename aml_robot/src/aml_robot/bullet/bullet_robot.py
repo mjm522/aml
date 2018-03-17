@@ -28,7 +28,7 @@ class BulletRobot(object):
 
         _update_period = rospy.Duration(1.0/update_rate)
 
-        rospy.Timer(_update_period, self._update_state)
+        # rospy.Timer(_update_period, self._update_state)
 
         
     def configure_default_pos(self, pos, ori):
@@ -55,26 +55,29 @@ class BulletRobot(object):
                                                                 self._config['cam']['far_plane'])
 
 
+        print "Projection: \n", np.asarray(self._projection_matrix, dtype=np.float32).reshape(4,4)
+
+
     def get_image(self, display_image=False):
 
-        img_arr = pb.getCameraImage(self._config['cam']['image_width'], 
+        (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'], 
                                     self._config['cam']['image_height'], 
                                     self._view_matrix, self._projection_matrix, [0,1,0])
 
-
-        rgba_image   = np.asarray(img_arr[2], dtype=np.uint8).reshape(img_arr[0],img_arr[1], 4)
-        depth_image  = np.asarray(img_arr[3], dtype=np.float32).reshape(img_arr[0], img_arr[1])
-
+        # rgba to rgb
+        rgb_image = rgb_pixels[:,:,0:3]
+        depth_image  = depth_pixels 
         if display_image:
-            cv2.imshow("captured image", rgba_image)
-            cv2.waitKey()
+            bgr_image = rgb_image[:,:,range(2,-1,-1)]
+            cv2.imshow("captured image", bgr_image)
+            cv2.waitKey(1)
 
         # image = {'width': img_arr[0],
         #          'height':img_arr[1],
         #          'rgba':np.asarray(img_arr[2],  dtype=np.uint8),
         #          'depth':np.asarray(img_arr[3], dtype=np.float32)}
 
-        return rgba_image, depth_image
+        return rgb_image, depth_image
 
 
     # ----- If joint_idx is not specified, sensors for all joints are enabled
@@ -173,7 +176,7 @@ class BulletRobot(object):
 
         state['jacobian']        = None
         state['inertia']         = None
-        # state['rgb_image'], state['depth_image']  = self.get_image()
+        state['rgb_image'], state['depth_image']  = self.get_image(display_image=True)
         state['gravity_comp']    = None
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
         state['ee_point'], state['ee_ori']  = self.get_ee_pose()
