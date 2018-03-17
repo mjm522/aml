@@ -24,6 +24,8 @@ wstool merge sawyer_robot/sawyer_robot.rosinstall
 wstool update
 rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
+
+# -DCATKIN_BLACKLIST_PACKAGES="aml_sawyer_sim;sawyer_sim_controllers;sawyer_gazebo;sawyer_sim_hardware;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io"
 catkin_make
 cp ./src/aml/3rdparty/baxter.sh .
 cp ./src/aml/3rdparty/intera.sh .
