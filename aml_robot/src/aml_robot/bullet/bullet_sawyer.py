@@ -35,40 +35,6 @@ class BulletSawyerArm(BulletRobot):
         #number of control commads
         self._nu = 7
 
-        #these values are from the baxter urdf file
-        self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
-                            {'lower':-2.147,          'upper':1.047},
-                            {'lower':-3.05417993878,  'upper':3.05417993878},
-                            {'lower':-0.05,           'upper':2.618},
-                            {'lower':-3.059,          'upper':3.059},
-                            {'lower':-1.57079632679,  'upper':2.094},
-                            {'lower':-3.059,          'upper':3.059}]
-
-
-        if limb == 'left':
-            #secondary goal for the manipulator
-            self._limb_group = 0
-            self._q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
-            self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
-            self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
-        
-        elif limb == 'right':
-            self._limb_group = 1
-            self._q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
-            self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
-            self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
-                                                            
-        else:
-            print "Unknown limb idex"
-            raise ValueError
-
-
-        self._movable_joints = self._joint_idx
-
-        print "movable joints = ", self._movable_joints, len(self._movable_joints),
-
-        self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
-        self._time_now_old = self.get_time_in_seconds()
 
     def _configure_cuff(self):
         print "NOT IMPLEMENTED"

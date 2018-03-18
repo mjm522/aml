@@ -2,12 +2,14 @@
 
 import numpy as np
 import pybullet as pb
+import cv2
 import rospy
 import time
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 # from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 from aml_robot.bullet.bullet_sawyer import BulletSawyerArm
 from aml_io.io_tools import get_aml_package_path, get_abs_path
+from matplotlib import pyplot as plt
 
 
 def main():
@@ -77,6 +79,20 @@ def main():
 
         # self.step()
         sawyerArm._update_state()
+
+        state = sawyerArm.get_state()
+
+        bgr_image = state['rgb_image'][:,:,range(2,-1,-1)]
+        depth_image = state['depth_image']
+        cv2.imshow('captured image', bgr_image)
+
+        plt.figure(1)
+        plt.clf()
+        plt.imshow(depth_image, cmap='spectral', interpolation='nearest');
+
+        plt.show(block=False)
+
+        cv2.waitKey(1)
 
         # print sawyerArm.get_ee_velocity()
 
