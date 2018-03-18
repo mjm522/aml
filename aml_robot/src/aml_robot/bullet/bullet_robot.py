@@ -1,5 +1,5 @@
 import cv2
-import rospy
+# import rospy
 import numpy as np
 import pybullet as pb
 from config import config
@@ -26,9 +26,9 @@ class BulletRobot(object):
         if enable_force_torque_sensors:
             self.enable_force_torque_sensors()
 
-        _update_period = rospy.Duration(1.0/update_rate)
+        # _update_period = rospy.Duration(1.0/update_rate)
 
-        # rospy.Timer(_update_period, self._update_state)
+        # # rospy.Timer(_update_period, self._update_state)
 
         
     def configure_default_pos(self, pos, ori):
@@ -167,7 +167,12 @@ class BulletRobot(object):
 
     def _update_state(self, event = None):
 
-        now                      = rospy.Time.now()
+        class Time:
+            def __init__(self):
+                self.secs = 0
+                self.nsecs = 0
+
+        now                      = Time()#rospy.Time.now()
 
         state = {}
         
@@ -230,8 +235,10 @@ class BulletRobot(object):
         return pb.getBaseVelocity(self._id)
 
     def get_time_in_seconds(self):
-        time_now =  rospy.Time.now()
-        return time_now.secs + time_now.nsecs*1e-9
+        # time_now =  rospy.Time.now()
+
+        return 0.0
+        # return time_now.secs + time_now.nsecs*1e-9
 
 
     def get_movable_joints(self):

@@ -34,15 +34,16 @@ def main():
 
     # hole = pb.loadURDF(pih_world_config['hole_path'], useFixedBase=True)
 
-    catkin_ws_src_path = get_abs_path(get_aml_package_path()+'/../')
+    catkin_ws_src_path = get_abs_path(get_aml_package_path()+'/../..')
     print "catkin_ws_src_path:", catkin_ws_src_path
-    manipulator = pb.loadURDF(catkin_ws_src_path + "/sawyer_robot/sawyer_description/urdf/sawyer.urdf", useFixedBase=True)
-    pb.resetBasePositionAndOrientation(manipulator,[0,0,0],[0,0,0,1])
+    # "/sawyer_robot/sawyer_description/urdf/sawyer.urdf"
+    manipulator = pb.loadURDF(catkin_ws_src_path + '/src/aml/aml_rl/aml_rl_envs/src/aml_rl_envs/models/sawyer/sawyer2_with_pisa_hand.urdf', useFixedBase=True)
+    # pb.resetBasePositionAndOrientation(manipulator,[0,0,0],[0,0,0,1])
     # motors = [n for n in range(pb.getNumJoints(manipulator))]
 
     sawyerArm = BulletSawyerArm(manipulator)
 
-    sawyerArm.untuck_arm()
+    # sawyerArm.untuck_arm()
 
     # print pb.getNumJoints(manipulator), "HRERERERER"
     # print sawyerArm._id, sawyerArm._nq, sawyerArm._ee_link_idx, "HERER"
@@ -77,7 +78,7 @@ def main():
         # self.step()
         sawyerArm._update_state()
 
-        print sawyerArm.get_ee_velocity()
+        # print sawyerArm.get_ee_velocity()
 
         pb.stepSimulation()
 

@@ -1,20 +1,14 @@
 import roslib
 roslib.load_manifest('aml_robot')
 
-import rospy
+# import rospy
 
 import numpy as np
 import quaternion
 
-from std_msgs.msg import (
-    UInt16,
-)
-
 from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot import BulletRobot
-from aml_robot.sawyer_kinematics import sawyer_kinematics
-from aml_robot.sawyer_ik import IKSawyer
 
 # from aml_visual_tools.load_aml_logo import load_aml_logo
 
@@ -107,7 +101,8 @@ class BulletSawyerArm(BulletRobot):
         print "NOT IMPLEMENTED"
 
     def set_sampling_rate(self, sampling_rate=100):
-        self._pub_rate.publish(sampling_rate)
+        pass
+        # self._pub_rate.publish(sampling_rate)
 
     def tuck_arm(self):
         print "NOT IMPLEMENTED"
@@ -137,8 +132,8 @@ class BulletSawyerArm(BulletRobot):
 
         # self._ik_sawyer.configure_ik_service()
 
-        self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
-                                         UInt16, queue_size=10)
+        # self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
+        #                                  UInt16, queue_size=10)
 
         # self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', SEAJointState, self._gravity_comp_callback)
 
@@ -311,12 +306,12 @@ class BulletSawyerArm(BulletRobot):
     def ik(self, pos, ori=None):
         print 'NOT IMPLEMENTED'
 
-def main():
-    rospy.init_node("sawyer_arm_example")
+# def main():
+#     rospy.init_node("sawyer_arm_example")
 
-    arm = BulletSawyerArm('right')
+#     arm = BulletSawyerArm('right')
 
-    rospy.spin()
+#     rospy.spin()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
