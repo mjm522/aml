@@ -18,15 +18,23 @@ rm -rf intera*
 rm -rf sawyer*
 rm -rf aruco_ros
 wstool init .
-wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
+
+if [ "$ROS_DISTRO" == "indigo" ]; then
+  wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
+  BLACK_LISTED_PKGS_ARG=''
+else
+  wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall
+  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES="aml_sawyer_sim;sawyer_sim_controllers;sawyer_gazebo;sawyer_sim_hardware;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io"'
+fi
+
 wstool update
 wstool merge sawyer_robot/sawyer_robot.rosinstall
 wstool update
 rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
 
-# -DCATKIN_BLACKLIST_PACKAGES="aml_sawyer_sim;sawyer_sim_controllers;sawyer_gazebo;sawyer_sim_hardware;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io"
-catkin_make
+# 
+catkin_make ${BLACK_LISTED_PKGS_ARG}
 cp ./src/aml/3rdparty/baxter.sh .
 cp ./src/aml/3rdparty/intera.sh .
 
