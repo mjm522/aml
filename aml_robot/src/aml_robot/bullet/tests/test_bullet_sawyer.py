@@ -59,7 +59,7 @@ def main():
 
     # pm.run()
 
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(500)
 
     pb.setRealTimeSimulation(0)
 
@@ -72,6 +72,7 @@ def main():
     # rospy.on_shutdown(self.on_shutdown)
 
     # self._record_sample.start_record(task_action=pushes[idx])
+    plt.ion()
 
     while not rospy.is_shutdown():
 
@@ -87,12 +88,15 @@ def main():
         cv2.imshow('captured image', bgr_image)
 
         plt.figure(1)
-        plt.clf()
+        # plt.clf()
         plt.imshow(depth_image, cmap='spectral', interpolation='nearest');
+        plt.figure(2)
+        plt.imshow(state['rgb_image']);
+        plt.draw()
+        # plt.show(block=False)
+        plt.pause(0.00001)
 
-        plt.show(block=False)
-
-        cv2.waitKey(1)
+        # cv2.waitKey(1)
 
         # print sawyerArm.get_ee_velocity()
 
