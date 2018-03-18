@@ -34,3 +34,7 @@
     local-name: aruco_ros
     uri: https://github.com/eaa3/aruco_ros.git
     version: master
+- git:
+    local-name: pisa-iit-soft-hand
+    uri: https://github.com/eaa3/pisa-iit-soft-hand.git
+    version: master
