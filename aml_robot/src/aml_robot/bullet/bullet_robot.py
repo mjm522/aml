@@ -50,7 +50,7 @@ class BulletRobot(object):
                                                                 self._config['cam']['far_plane'])
 
 
-        print "Projection: \n", np.asarray(self._projection_matrix, dtype=np.float32).reshape(4,4)
+        # print "Projection: \n", np.asarray(self._projection_matrix, dtype=np.float32).reshape(4,4)
 
 
     def get_image(self):
@@ -169,7 +169,7 @@ class BulletRobot(object):
 
         state['jacobian']        = None
         state['inertia']         = None
-        state['rgb_image'], state['depth_image']  = self.get_image()
+        # state['rgb_image'], state['depth_image']  = self.get_image()
         state['gravity_comp']    = None
         state['timestamp']       = { 'secs' : now.secs, 'nsecs': now.nsecs }
         state['ee_point'], state['ee_ori']  = self.get_ee_pose()

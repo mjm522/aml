@@ -9,10 +9,11 @@ import quaternion
 from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot import BulletRobot
+from aml_robot.robot_interface import RobotInterface
 
 # from aml_visual_tools.load_aml_logo import load_aml_logo
 
-class BulletSawyerArm(BulletRobot):
+class BulletSawyerArm(RobotInterface):
 
     def __init__(self, robot_id, limb = "right", on_state_callback=None):
 
@@ -20,7 +21,8 @@ class BulletSawyerArm(BulletRobot):
         # load_aml_logo("/robot/head_display")
         # getNumJoints(bodyUniqueId)
 
-        BulletRobot.__init__(self,robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
+        self._bullet_robot = BulletRobot(robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
+        BulletRobot.__init__(self, robot_id, ee_link_idx = 16) 
 
         self._ready = False
 
