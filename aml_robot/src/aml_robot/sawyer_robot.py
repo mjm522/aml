@@ -8,6 +8,7 @@ import rospy
 import numpy as np
 import quaternion
 
+# General ROS imports
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -15,21 +16,23 @@ from std_msgs.msg import (
     UInt16,
 )
 
+# Intera SDK imports
 import intera_interface
 from intera_interface import CHECK_VERSION
 import intera_external_devices
-
 from intera_core_msgs.msg import SEAJointState
 
+# AML Robot specific imports
 from aml_robot.sawyer_kinematics import sawyer_kinematics
 from aml_robot.sawyer_ik import IKSawyer
 
+# AML additional imports
+
 from aml_perception import camera_sensor 
-
-#for computation of angular velocity
-from aml_math.quaternion_utils import compute_omg
-
+from aml_math.quaternion_utils import compute_omg # for computing orientation error
 from aml_visual_tools.load_aml_logo import load_aml_logo
+
+from aml_io.log_utils import aml_logging
 
 
 
@@ -38,6 +41,8 @@ from aml_visual_tools.load_aml_logo import load_aml_logo
 class SawyerArm(intera_interface.Limb):
 
     def __init__(self, limb = "right", on_state_callback=None):
+
+        self._logger = aml_logging.get_logger(__name__)
 
         #Load aml_logo
         load_aml_logo("/robot/head_display")
@@ -79,7 +84,7 @@ class SawyerArm(intera_interface.Limb):
         elif limb == 'right':
             self._limb_group = 1                                          
         else:
-            print "Unknown limb idex"
+            self._logger.error("Unknown limb idex")
             raise ValueError
 
 
@@ -89,6 +94,7 @@ class SawyerArm(intera_interface.Limb):
         #this will be useful to compute ee_velocity using finite differences
         self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
         self._time_now_old = self.get_time_in_seconds()
+
 
     def _configure_cuff(self):
 
@@ -109,7 +115,7 @@ class SawyerArm(intera_interface.Limb):
 
 
         except Exception as e:
-            print e
+            self._logger.warning(e)
             self._has_cuff = False
 
 
@@ -118,14 +124,14 @@ class SawyerArm(intera_interface.Limb):
         try: 
             self._gripper = intera_interface.Gripper(self._limb)
             if not (self._gripper.is_calibrated() or self._gripper.calibrate() == True):
-                rospy.logerr("({0}_gripper) calibration failed.".format(self._gripper.name))
+                self._logger.error("({0}_gripper) calibration failed.".format(self._gripper.name))
                 raise
 
             if self._has_cuff:
                 self._cuff.register_callback(self._close_action,'{0}_button_upper'.format(self._limb))
                 self._cuff.register_callback(self._open_action,'{0}_button_lower'.format(self._limb))
             
-            rospy.loginfo("{0} Cuff Control initialized...".format(self._gripper.name))
+            self._logger.info("{0} Cuff Control initialized...".format(self._gripper.name))
 
         except Exception as e:
             self._gripper = None
@@ -133,7 +139,7 @@ class SawyerArm(intera_interface.Limb):
 
     def _open_action(self, value):
         if value and self._gripper.is_ready():
-            rospy.logdebug("gripper open triggered")
+            self._logger.debug("gripper open triggered")
             self._gripper.open()
             if self._lights:
                 self._set_lights('red', False)
@@ -141,7 +147,7 @@ class SawyerArm(intera_interface.Limb):
 
     def _close_action(self, value):
         if value and self._gripper.is_ready():
-            rospy.logdebug("gripper close triggered")
+            self._logger.debug("gripper close triggered")
             self._gripper.close()
             if self._lights:
                 self._set_lights('green', False)
@@ -149,9 +155,9 @@ class SawyerArm(intera_interface.Limb):
 
     def _light_action(self, value):
         if value:
-            rospy.logdebug("cuff grasp triggered")
+            self._logger.debug("cuff grasp triggered")
         else:
-            rospy.logdebug("cuff release triggered")
+            self._logger.debug("cuff release triggered")
         if self._lights:
             self._set_lights('red', False)
             self._set_lights('green', False)
@@ -165,7 +171,7 @@ class SawyerArm(intera_interface.Limb):
         if self._has_cuff:
             self._cuff_state = value
         else:
-            print "CUFF NOT DETECTED"
+            self._logger.warning("CUFF NOT DETECTED")
 
     #this function returns self._cuff_state to be true
     #when arm is moved by a demonstrator, the moment arm stops 
@@ -177,19 +183,17 @@ class SawyerArm(intera_interface.Limb):
         if self._has_cuff:
             return self._cuff.cuff_button()
         else:
-            print "CUFF NOT DETECTED"
+            self._logger.warning("CUFF NOT DETECTED")
             return None
 
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)
 
     def tuck_arm(self):
-        print "NOT IMPLEMENTED"
+        self._logger.warning("NOT IMPLEMENTED")
 
     def untuck_arm(self):
         self.move_to_neutral()
-
-        print self.angles()
 
     def _configure(self, limb, on_state_callback):
         self._state = None

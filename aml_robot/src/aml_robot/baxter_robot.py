@@ -29,6 +29,8 @@ from aml_robot.baxter_ik import IKBaxter
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
 
+from aml_io.log_utils import aml_logging
+
 #from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 class BaxterArm(baxter_interface.limb.Limb):
@@ -37,6 +39,8 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         #Load aml_logo
         # load_aml_logo()
+
+        self._logger = aml_logging.get_logger(__name__)
 
         self._ready = False
 
@@ -74,7 +78,7 @@ class BaxterArm(baxter_interface.limb.Limb):
             self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
                                                             
         else:
-            print "Unknown limb idex"
+            self._logger.error("Unknown limb idex")
             raise ValueError
 
         self._cuff = baxter_interface.DigitalIO('%s_lower_cuff' % (limb,))
@@ -426,7 +430,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         return np.array(self._kinematics.inertia(argument))
 
     def set_gripper_speed(self, speed):
-        print "set_gripper_speed: not implemented"
+        self._logger.warning("set_gripper_speed: not implemented")
         pass
 
     def set_arm_speed(self,speed):
