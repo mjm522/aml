@@ -4,33 +4,47 @@ LEVELS = {'debug':    logging.DEBUG,
           'info':     logging.INFO,
           'warning':  logging.WARNING,
           'error':    logging.ERROR,
-          'critical': logging.CRITICAL}
+          'critical': logging.CRITICAL,
+          'all':      logging.NOTSET}
 
 class aml_logging(object):
 
-	# @classmethod
-	# def setup(cls, level_name):
-	# 	if level_name is None:
-	# 		level_name = 'info'
-	# 	level = LEVELS.get(level_name, logging.NOTSET)
- #    	logging.basicConfig(level=level)
+    @classmethod
+    def setup(cls, level_name = 'all'):
+        
+        level = LEVELS.get(level_name, logging.NOTSET)
+        print level, logging.NOTSET
+        # logging.setLevel(level)
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
 
-	@classmethod
-	def debug(cls, msg):
-		logging.debug(msg);
+    # @classmethod
+    # def get_logger(cls, name, level_name = 'info'):
+    #     logger = logging.getLogger(name)
+    #     level = LEVELS.get(level_name, logging.NOTSET)
 
-	@classmethod
-	def info(cls, msg):
-		logging.info(msg);
+    #     logger.setLevel(level)
+    #     # formatter = logger.Formatter('%(levelname)s: %(message)s')
+    #     # logger.setFormatter(formatter)
 
-	@classmethod
-	def warning(cls, msg):
-		logging.warning(msg);
+    #     return logger
 
-	@classmethod
-	def error(cls, msg):
-		logging.info(msg);
 
-	@classmethod
-	def critical(cls, msg):
-		logging.info(msg);
+    @classmethod
+    def debug(cls, msg):
+        logging.debug(msg)
+
+    @classmethod
+    def info(cls, msg):
+        logging.info(msg)
+
+    @classmethod
+    def warning(cls, msg):
+        logging.warning(msg)
+
+    @classmethod
+    def error(cls, msg):
+        logging.error(msg)
+
+    @classmethod
+    def critical(cls, msg):
+        logging.critical(msg)
