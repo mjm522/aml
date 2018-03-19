@@ -436,14 +436,14 @@ class BaxterArm(baxter_interface.limb.Limb):
 
 
 
-    def ik(self, pos, ori=None, use_service=False):
+    def ik(self, pos, ori=None, seed=None, use_service=False):
         success = False
         soln = None
 
         if use_service:
             success, soln =  self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
         else:
-            soln = self._kinematics.inverse_kinematics(position=pos,orientation=ori)
+            soln = self._kinematics.inverse_kinematics(position=pos,orientation=ori, seed=seed)
 
             if soln is not None:
                 success = True
