@@ -1,6 +1,12 @@
 import time
 import warnings
-import cPickle as pickle
+
+# For compatibility with python 2.7 and 3
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 from os.path import exists, join, dirname, abspath
 import os
 from aml_io.log_utils import aml_logging

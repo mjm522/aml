@@ -22,7 +22,6 @@ class BulletSawyerArm(RobotInterface):
         # getNumJoints(bodyUniqueId)
 
         self._bullet_robot = BulletRobot(robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
-        BulletRobot.__init__(self, robot_id, ee_link_idx = 16) 
 
         self._ready = False
 
@@ -38,48 +37,7 @@ class BulletSawyerArm(RobotInterface):
         self._nu = 7
 
 
-    def _configure_cuff(self):
-        print "NOT IMPLEMENTED"
 
-    def _configure_gripper(self):
-        print "NOT IMPLEMENTED"
-
-    def _open_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _close_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _light_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _set_lights(self, color, value):
-        print "NOT IMPLEMENTED"
-
-    def cuff_cb(self, value):
-        print "NOT IMPLEMENTED"
-
-#     #this function returns self._cuff_state to be true
-#     #when arm is moved by a demonstrator, the moment arm stops 
-#     #moving, the status returns to false
-#     #initial value of the cuff is None, it is made False by pressing the
-#     #cuff button once
-    @property
-    def get_lfd_status(self):
-        print "NOT IMPLEMENTED"
-
-    def set_sampling_rate(self, sampling_rate=100):
-        pass
-        # self._pub_rate.publish(sampling_rate)
-
-    def tuck_arm(self):
-        print "NOT IMPLEMENTED"
-
-    def untuck_arm(self):
-        # for i in range(len(self._movable_joints)):
-        #     self.set_jnt_state(self._movable_joints[i],self._untuck[i])
-        self.move_using_pos_control(self._movable_joints, self._untuck)
-        print "----------------------Untucking Complete"
 
     def _configure(self, limb, on_state_callback):
         self._state = None
@@ -120,34 +78,8 @@ class BulletSawyerArm(RobotInterface):
         # self._configure_gripper()
 
 
-    def _gravity_comp_callback(self, msg):
-        self._h = msg.gravity_model_effort
-#         # print "commanded_effort \n",   msg.commanded_effort
-#         # print "commanded_velocity \n", msg.commanded_velocity
-#         # print "commanded_position \n", msg.commanded_position
-#         # print "actual_position \n", msg.actual_position
-#         # print "actual_velocity \n", msg.actual_velocity
-#         # print "actual_effort \n", msg.actual_effort
-#         # print "gravity_model_effort \n", msg.gravity_model_effort
-#         # print "hysteresis_model_effort \n", msg.hysteresis_model_effort
-#         # print "crosstalk_model_effort \n", msg.crosstalk_model_effort
-#         # print "difference effort \n", np.array(msg.commanded_effort) - np.array(msg.actual_effort)
-#         # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
-#         # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
-
     def q_mean(self):
         return self._q_mean
-
-    def get_gripper_state(self):
-        print 'NOT IMPLEMENTED'
-
-
-    def set_gripper_speed(self, speed):
-        print 'NOT IMPLEMENTED'
-
-    def set_arm_speed(self,speed):
-        print 'NOT IMPLEMENTED'
-        
 
     def _on_joint_states(self, msg):
         print 'NOT IMPLEMENTED'
@@ -158,11 +90,6 @@ class BulletSawyerArm(RobotInterface):
     def get_base_link_name(self):
         print 'NOT IMPLEMENTED'
 
-    def exec_gripper_cmd(self, pos, force = None):
-        print 'NOT IMPLEMENTED'
-
-    def exec_gripper_cmd_delta(self, pos_delta, force_delta = None):
-        print 'NOT IMPLEMENTED'
 
     def exec_position_cmd(self, cmd):
         print 'NOT IMPLEMENTED'

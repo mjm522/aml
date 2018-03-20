@@ -1,6 +1,5 @@
 # General ROS imports
 import roslib
-
 roslib.load_manifest('aml_robot')
 import rospy
 

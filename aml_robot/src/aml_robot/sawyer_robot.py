@@ -3,17 +3,14 @@
 # General ROS imports
 import roslib
 roslib.load_manifest('aml_robot')
-
 import rospy
 
 from std_msgs.msg import (
     UInt16,
 )
 
-
 # Auxiliary imports
 import numpy as np
-
 
 # Intera SDK imports
 import intera_interface
@@ -34,8 +31,6 @@ from aml_robot.robot_interface import RobotInterface
 
 from aml_io.log_utils import aml_logging
 
-
-# from gps.proto.gps_pb2 import END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES
 
 class SawyerArm(intera_interface.Limb, RobotInterface):
     def __init__(self, limb="right", on_state_callback=None):
@@ -91,7 +86,6 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         # this will be useful to compute ee_velocity using finite differences
         self._ee_pos_old, self._ee_ori_old = self.ee_pose()
         self._time_now_old = self.time_in_seconds()
-
 
     def _configure_cuff(self):
 
@@ -542,7 +536,6 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             argument = dict(zip(self.joint_names(), joint_angles))
 
         return np.array(self._kinematics.inertia(argument))
-
 
     def inverse_kinematics(self, pos, ori=None):
 

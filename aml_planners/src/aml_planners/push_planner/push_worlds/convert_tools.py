@@ -1,4 +1,9 @@
-import StringIO
+# Compatibility with python 2.7 and 3
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from PIL import Image
 import cv2
 
