@@ -361,9 +361,9 @@ class BaxterArm(baxter_interface.limb.Limb):
         pose = np.array(self._kinematics.forward_position_kinematics(argument))
         position = pose[0:3][:, None]  # senting as  column vector
 
-        w = pose[6];
-        x = pose[3];
-        y = pose[4];
+        w = pose[6]
+        x = pose[3]
+        y = pose[4]
         z = pose[5]  # quarternions
 
         rotation = np.quarternion(w, x, y, z)
@@ -381,6 +381,11 @@ class BaxterArm(baxter_interface.limb.Limb):
         elif ori_type == 'eul':
 
             rotation = quaternion.as_euler_angles(rotation)
+        elif ori_type == 'quat':
+            pass
+
+
+
 
         return position, rotation
 
