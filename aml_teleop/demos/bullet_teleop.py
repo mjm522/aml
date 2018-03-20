@@ -24,7 +24,7 @@ class BulletTeleop():
 
         while not rospy.is_shutdown():
 
-            ee_pos, ee_ori = self._ph_om.get_ee_pose()
+            ee_pos, ee_ori = self._ph_om.ee_pose()
 
             if (ee_pos is not None) and (ee_ori is not None):
 

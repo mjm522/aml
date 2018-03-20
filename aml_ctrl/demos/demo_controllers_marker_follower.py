@@ -232,7 +232,7 @@ if __name__=="__main__":
     limb = r_limb
     ctrlr = set_controller(control_id, limb)
 
-    start_pos, start_ori = limb.get_ee_pose()
+    start_pos, start_ori = limb.ee_pose()
     goal_ori = start_ori#quaternion.as_float_array(start_ori)
     ctrlr.set_active(True)
 

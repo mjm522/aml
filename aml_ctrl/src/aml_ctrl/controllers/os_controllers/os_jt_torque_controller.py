@@ -47,7 +47,7 @@ class OSJTTorqueController(OSController):
         # calculate the jacobian of the end effector
         jac_ee         = robot_state['jacobian']
 
-        curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_pos, curr_ori  = self._robot.ee_pose()
         curr_vel, curr_omg  = self._robot.ee_velocity()
 
         delta_pos      = goal_pos - curr_pos

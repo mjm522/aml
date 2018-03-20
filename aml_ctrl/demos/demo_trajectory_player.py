@@ -39,7 +39,7 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
 
     else:
 
-        kwargs['start_pos'], kwargs['start_ori'] = robot_interface.get_ee_pose()
+        kwargs['start_pos'], kwargs['start_ori'] = robot_interface.ee_pose()
 
         kwargs['goal_pos'] = kwargs['start_pos'] + np.array([0.,0.,0.5])
 

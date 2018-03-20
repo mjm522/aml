@@ -8,7 +8,7 @@ def main(robot_interface):
 
     kwargs = {}
 
-    kwargs['start_pos'], kwargs['start_ori'] = robot_interface.get_ee_pose()
+    kwargs['start_pos'], kwargs['start_ori'] = robot_interface.ee_pose()
 
     kwargs['goal_pos'] = kwargs['start_pos'] + np.array([0.,0.,0.5])
 

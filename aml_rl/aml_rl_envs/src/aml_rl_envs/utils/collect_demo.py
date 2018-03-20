@@ -71,7 +71,7 @@ class CollectDemo():
         self._manipulator = manipulator
         
         #variable required for correct operation
-        self._traj_point_1, _  = self._manipulator.get_ee_pose()
+        self._traj_point_1, _  = self._manipulator.ee_pose()
 
         #for saving data
         self._ee_pos_array = []
@@ -132,7 +132,7 @@ class CollectDemo():
                     #start collecting demo point
                     self._demo_point_count += 1
 
-                    traj_point_2, _ = self._manipulator.get_ee_pose()
+                    traj_point_2, _ = self._manipulator.ee_pose()
 
                     ee_vel, ee_omg = self._manipulator.ee_velocity()
 

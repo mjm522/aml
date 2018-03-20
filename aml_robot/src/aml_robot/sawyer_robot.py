@@ -94,7 +94,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         intera_interface.RobotEnable(CHECK_VERSION).enable()
 
         # this will be useful to compute ee_velocity using finite differences
-        self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
+        self._ee_pos_old, self._ee_ori_old = self.ee_pose()
         self._time_now_old = self.get_time_in_seconds()
 
 
@@ -272,7 +272,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
 
         try:
-            state['ee_point'], state['ee_ori'] = self.get_ee_pose()
+            state['ee_point'], state['ee_ori'] = self.ee_pose()
         except:
             pass
 
@@ -449,7 +449,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
     def move_to_joint_position(self, joint_angles):
         self.move_to_joint_positions(dict(zip(self.joint_names(), joint_angles)))
 
-    def get_ee_pose(self):
+    def ee_pose(self):
 
         ee_point = self.endpoint_pose()['position']
         ee_point = np.array([ee_point.x, ee_point.y, ee_point.z])
@@ -480,7 +480,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
             time_now_new = self.get_time_in_seconds()
 
-            ee_pos_new, ee_ori_new = self.get_ee_pose()
+            ee_pos_new, ee_ori_new = self.ee_pose()
 
             dt = time_now_new - self._time_now_old
 

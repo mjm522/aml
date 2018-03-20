@@ -38,9 +38,9 @@ def test_reach_both_sides_box(right_arm, left_arm):
             box_pos = np.array([box_pos[0],box_pos[1],box_pos[2]])
             box_ori = np.quaternion(box_ori[3],box_ori[0],box_ori[1],box_ori[2])
 
-            left_pos,  left_ori  = ctrlr.left_arm.get_ee_pose()
+            left_pos,  left_ori  = ctrlr.left_arm.ee_pose()
     
-            right_pos, right_ori = ctrlr.right_arm.get_ee_pose()
+            right_pos, right_ori = ctrlr.right_arm.ee_pose()
 
             left_goal_pos  = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([box_length/2., -box_height/2.,0.]))
             right_goal_pos = box_pos + np.dot(quaternion.as_rotation_matrix(box_ori), np.array([-box_length/2.,-box_height/2.,0.]))

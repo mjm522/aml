@@ -189,7 +189,7 @@ class ManualDemoCollect():
 
             time.sleep(0.01)
 
-            ee_pos, ee_ori = self._robot.get_ee_pose()
+            ee_pos, ee_ori = self._robot.ee_pose()
             ee_vel, ee_omg = self._robot.ee_velocity()
 
             data[k, 2*num_joints:2*num_joints+3]     = ee_pos

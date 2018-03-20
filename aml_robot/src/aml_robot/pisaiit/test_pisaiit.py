@@ -42,7 +42,7 @@ _rs.enable()
 obj = SomeObj()
 
 limb = baxter_robot.BaxterArm('right',partial(callback,obj))
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_pos = np.array([0.95,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)

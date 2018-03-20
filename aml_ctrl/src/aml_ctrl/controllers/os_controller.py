@@ -19,7 +19,7 @@ class OSController(Controller):
         self._lin_thr = config['linear_error_thr']
         self._ang_thr = config['angular_error_thr']
 
-        self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
+        self._goal_pos, self._goal_ori  =  self._robot.ee_pose()
 
         self._goal_vel  = np.zeros(3)
         self._goal_omg  = np.zeros(3)
@@ -85,7 +85,7 @@ class OSController(Controller):
 
     def set_active(self, is_active):
 
-        self._goal_pos, self._goal_ori  =  self._robot.get_ee_pose()
+        self._goal_pos, self._goal_ori  =  self._robot.ee_pose()
 
         self._goal_vel  = np.zeros(3)
         self._goal_omg  = np.zeros(3)

@@ -193,7 +193,7 @@ class StochasticPushMachine(BoxObject):
 
     def goto_pose(self, goal_pos, goal_ori): 
 
-        start_pos, start_ori = self._robot.get_ee_pose()
+        start_pos, start_ori = self._robot.ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori

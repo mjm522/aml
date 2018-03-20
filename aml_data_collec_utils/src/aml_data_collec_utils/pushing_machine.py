@@ -249,7 +249,7 @@ class PushMachine(object):
 
     def goto_pose(self,goal_pos, goal_ori, ntrials = 1, disturb_on_fail = True): 
 
-        start_pos, start_ori = self._robot.get_ee_pose()
+        start_pos, start_ori = self._robot.ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
@@ -290,7 +290,7 @@ class PushMachine(object):
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
 
-        ee_pos, _ = self._robot.get_ee_pose()
+        ee_pos, _ = self._robot.ee_pose()
 
         success = success and self.goto_pose(goal_pos=ee_pos+reset_push['push_action'], goal_ori=None)
 

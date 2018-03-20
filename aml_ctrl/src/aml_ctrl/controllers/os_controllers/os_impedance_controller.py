@@ -85,7 +85,7 @@ class OSImpedanceController(OSController):
         else:
             ee_torque  = np.zeros(3)
 
-        curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_pos, curr_ori  = self._robot.ee_pose()
         curr_vel, curr_omg  = self._robot.ee_velocity()
 
         delta_pos      = self._goal_pos - curr_pos
@@ -163,7 +163,7 @@ class OSImpedanceController(OSController):
         else:
             ee_torque  = np.zeros(3)
 
-        curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_pos, curr_ori  = self._robot.ee_pose()
         curr_vel, curr_omg  = self._robot.ee_velocity()
 
         delta_pos      = self._goal_pos - curr_pos

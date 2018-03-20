@@ -97,7 +97,7 @@ class OSVelocityController(OSController):
         ee_xyz         = robot_state['ee_point']
         ee_ori         = robot_state['ee_ori']
 
-        curr_pos, curr_ori  = self._robot.get_ee_pose()
+        curr_pos, curr_ori  = self._robot.ee_pose()
 
         curr_vel       = robot_state['ee_vel']
         curr_omg       = robot_state['ee_omg']

@@ -21,7 +21,7 @@ rospy.init_node('sawyer_test', anonymous=True)
 limb = SawyerArm('right')
 limb.untuck_arm()
 
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_pos = start_pos + np.array([0.2,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)

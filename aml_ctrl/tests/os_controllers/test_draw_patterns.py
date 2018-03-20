@@ -19,7 +19,7 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight', ctrlr_
     else:
         raise("Unknown type of controller specified")
 
-    start_pos, start_ori  =  robot_interface.get_ee_pose()
+    start_pos, start_ori  =  robot_interface.ee_pose()
 
     # Generate trajectory to follow
     traj_to_follow = standard_shape_traj(curr_pos=start_pos, 
