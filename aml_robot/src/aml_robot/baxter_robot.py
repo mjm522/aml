@@ -367,7 +367,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         return ee_vel, ee_omg
 
 
-    def get_cartesian_pos_from_joints(self, joint_angles=None):
+    def get_cartesian_pos_from_joints(self, joint_angles=None, ori_type='mat'):
         
         if joint_angles is None:
             
@@ -382,13 +382,23 @@ class BaxterArm(baxter_interface.limb.Limb):
         position = pose[0:3][:,None] #senting as  column vector
         
         w = pose[6]; x = pose[3]; y = pose[4]; z = pose[5] #quarternions
+
+        rotation = np.quarternion(w,x,y,z)
         
         #formula for converting quarternion to rotation matrix
 
-        rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
-                             [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
-                             [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
-        
+        if ori_type == 'mat':
+
+            # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
+            #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
+            #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
+
+            rotation = quaternion.as_rotation_matrix(rotation)
+
+        elif ori_type == 'eul':
+
+            rotation = quaternion.as_euler_angles(rotation)
+
         return position, rotation
 
     def get_cartesian_vel_from_joints(self, joint_angles=None):
