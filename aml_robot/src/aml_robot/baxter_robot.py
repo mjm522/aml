@@ -363,7 +363,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         y = pose[4]
         z = pose[5]  # quarternions
 
-        rotation = quaternion.quarternion(w, x, y, z)
+        rotation = quaternion.quaternion(w, x, y, z)
 
         # formula for converting quarternion to rotation matrix
 
