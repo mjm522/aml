@@ -347,7 +347,7 @@ class BaxterArm(baxter_interface.limb.Limb):
 
         return ee_vel, ee_omg
 
-    def forward_kinematics(self, joint_angles=None, ori_type='mat'):
+    def forward_kinematics(self, joint_angles=None, ori_type='quat'):
 
         if joint_angles is None:
 
