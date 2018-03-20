@@ -95,7 +95,7 @@ def main():
         env.reset(noise=0.)
 
         #get data from the manipulator object
-        data  = env._manipulator.get_state()
+        data  = env._manipulator.state()
 
         #stack position and velocity
         observation = np.hstack([data['j_pos'], data['j_vel']])
@@ -123,7 +123,7 @@ def main():
             for _ in range(pih_world_config['steps_per_frame']): 
                 env.step()
 
-            data        = env._manipulator.get_state()
+            data        = env._manipulator.state()
 
             observation = np.hstack([data['j_pos'], data['j_vel']])
 

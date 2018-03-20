@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     # arm.untuck_arm()
 
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
 
     print("Starting position:", start_pos)
     

@@ -76,7 +76,7 @@ class LQRTrajFollow():
 
         dq    = x0[self.idx['q_dot']]
 
-        Mq    = self.robot.get_arm_inertia(joint_angles=q)
+        Mq    = self.robot.inertia(joint_angles=q)
         
         ddq   = np.dot(np.linalg.inv(Mq), u0)
         
@@ -340,6 +340,6 @@ if __name__=="__main__":
     
     arm  = BaxterArm('right')
 
-    arm.untuck_arm()
+    arm.untuck()
 
     find_optimal_control_sequence(robot_interface=arm, data=demo_data, dt=0.01)

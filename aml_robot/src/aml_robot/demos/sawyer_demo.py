@@ -31,11 +31,11 @@ rospy.init_node('sawyer_test', anonymous=True)
 obj = SomeObj()
 
 limb = SawyerArm('right',partial(callback,obj))
-limb.untuck_arm()
+limb.untuck()
 
 rospy.sleep(3)
 
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_pos = start_pos + np.array([0.2,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
@@ -47,12 +47,7 @@ rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
 
-	success, joints = limb.ik(goal_pos,goal_ori)
-
-	print success, joints
-
-	print "CURRENT STATE:", limb.angles()
-	limb.exec_position_cmd(joints)
+	print limb.state()['jacobian']
 
 	rate.sleep()
 

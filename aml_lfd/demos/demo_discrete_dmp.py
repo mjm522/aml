@@ -84,7 +84,7 @@ def setup_robot():
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
-    arm.untuck_arm()
+    arm.untuck()
 
     return arm
 

@@ -19,9 +19,9 @@ import quaternion
 rospy.init_node('sawyer_test', anonymous=True)
 
 limb = SawyerArm('right')
-limb.untuck_arm()
+limb.untuck()
 
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_pos = start_pos + np.array([0.2,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
@@ -30,7 +30,7 @@ goal_ori = quaternion.as_float_array(start_ori)
 rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():
 
-	print "JOINT EFFORTS:", limb.get_state()['effort']
+	print "JOINT EFFORTS:", limb.state()['effort']
 	print "TOOLTIP EFFORTS:", limb.endpoint_effort()
 
 	rate.sleep()

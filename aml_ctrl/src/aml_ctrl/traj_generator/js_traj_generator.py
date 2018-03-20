@@ -74,7 +74,7 @@ class JSTrajGenerator(TrajGenerator):
 
             else:
 
-                success, limb_joints = self._robot.ik(pos=goal_pos, ori=goal_ori)
+                success, limb_joints = self._robot.inverse_kinematics(pos=goal_pos, ori=goal_ori)
 
                 # print "limb joints \t", np.round(limb_joints ,3)
 

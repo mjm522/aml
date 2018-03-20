@@ -16,7 +16,7 @@ def test_ik_robot(robot_interface):
             goal_ori = ee_ori
 
             print "Goal pos:", goal_pos, " Goal orientation: ", ee_ori
-            soln =  robot_interface.ik(pos=goal_pos, ori=goal_ori)
+            soln =  robot_interface.inverse_kinematics(pos=goal_pos, ori=goal_ori)
 
             print "soln \t", np.round(soln, 3)
 

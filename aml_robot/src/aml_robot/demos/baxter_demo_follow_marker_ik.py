@@ -24,7 +24,7 @@ def processFeedback(feedback):
     goal_ori = quaternion.as_float_array(start_ori)
     goal_pos = np.array([p.x,p.y,p.z])
     if feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
-        success, goal_joint_angles = limb.ik(goal_pos,goal_ori)
+        success, goal_joint_angles = limb.inverse_kinematics(goal_pos, goal_ori)
         limb.exec_position_cmd(goal_joint_angles)
     rate.sleep()
 
@@ -42,15 +42,15 @@ if __name__=="__main__":
 
     r_limb = baxter_robot.BaxterArm('right')
     l_limb = baxter_robot.BaxterArm('left')
-    r_limb.untuck_arm()
-    l_limb.untuck_arm()
+    r_limb.untuck()
+    l_limb.untuck()
 
     limb = r_limb
 
     menu_handler.insert( "Right arm", callback=switchArm )
     menu_handler.insert( "Left arm", callback=switchArm )
 
-    start_pos, start_ori = limb.get_ee_pose()
+    start_pos, start_ori = limb.ee_pose()
 
     # create an interactive marker server on the topic namespace basic_control
     server = InteractiveMarkerServer("basic_control")

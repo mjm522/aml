@@ -68,9 +68,9 @@ if __name__ == '__main__':
     limb = 'left'
     arm = BaxterArm(limb)
 
-    arm.untuck_arm()
+    arm.untuck()
 
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
 
     print("Starting position:", start_pos)
     

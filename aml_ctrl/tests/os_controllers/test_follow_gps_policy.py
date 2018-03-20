@@ -7,9 +7,9 @@ def test_follow_gps_policy(vel_ee_master, master_arm, slave_arm, dt):
 
     ctrlr = OSBiArmController(master_arm=master_arm, slave_arm=slave_arm)
     
-    master_pos, master_ori   = master_arm.get_ee_pose()
+    master_pos, master_ori   = master_arm.ee_pose()
     # vel_ee_master = arm_l.get_ee_velocity()[0:3]
-    slave_pos, slave_ori = slave_arm.get_ee_pose()
+    slave_pos, slave_ori = slave_arm.ee_pose()
 
     pos_rel = slave_pos - master_pos
         
@@ -88,9 +88,9 @@ def test_follow_gps_policy2(arm_l, arm_r):
 
     baxter_ctrlr = MinJerkController(extern_call=True, trial_arm=arm_l, aux_arm=arm_r)
     
-    left_pos,  left_ori  = arm_l.get_ee_pose()
+    left_pos,  left_ori  = arm_l.ee_pose()
     
-    right_pos, right_ori = arm_r.get_ee_pose() 
+    right_pos, right_ori = arm_r.ee_pose()
 
     state_r  = arm_r._state
     state_r['jnt_start'] = arm_r.angles()
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
     
     if limb == 'left':
         goal_pos = start_pos + np.array([0.,0.8, 0.])

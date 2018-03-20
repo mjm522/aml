@@ -1,24 +1,19 @@
 import roslib
 roslib.load_manifest('aml_robot')
 
-import rospy
+# import rospy
 
 import numpy as np
 import quaternion
 
-from std_msgs.msg import (
-    UInt16,
-)
-
 from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot import BulletRobot
-from aml_robot.sawyer_kinematics import sawyer_kinematics
-from aml_robot.sawyer_ik import IKSawyer
+from aml_robot.robot_interface import RobotInterface
 
 # from aml_visual_tools.load_aml_logo import load_aml_logo
 
-class BulletSawyerArm(BulletRobot):
+class BulletSawyerArm(RobotInterface):
 
     def __init__(self, robot_id, limb = "right", on_state_callback=None):
 
@@ -26,7 +21,7 @@ class BulletSawyerArm(BulletRobot):
         # load_aml_logo("/robot/head_display")
         # getNumJoints(bodyUniqueId)
 
-        BulletRobot.__init__(self,robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
+        self._bullet_robot = BulletRobot(robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
 
         self._ready = False
 
@@ -41,82 +36,8 @@ class BulletSawyerArm(BulletRobot):
         #number of control commads
         self._nu = 7
 
-        #these values are from the baxter urdf file
-        self._jnt_limits = [{'lower':-1.70167993878,  'upper':1.70167993878},
-                            {'lower':-2.147,          'upper':1.047},
-                            {'lower':-3.05417993878,  'upper':3.05417993878},
-                            {'lower':-0.05,           'upper':2.618},
-                            {'lower':-3.059,          'upper':3.059},
-                            {'lower':-1.57079632679,  'upper':2.094},
-                            {'lower':-3.059,          'upper':3.059}]
 
 
-        if limb == 'left':
-            #secondary goal for the manipulator
-            self._limb_group = 0
-            self._q_mean  = np.array([ 0.0,  -0.55,  0.,   1.284, 0.,   0.262, 0.])
-            self._tuck   = np.array([-1.0,  -2.07,  3.0,  2.55,  0.0,  0.01,  0.0])
-            self._untuck = np.array([-0.08, -1.0,  -1.19, 1.94,  0.67, 1.03, -0.50])
-        
-        elif limb == 'right':
-            self._limb_group = 1
-            self._q_mean  = np.array([0.0,  -0.55,  0.,   1.284,  0.,   0.262, 0.])
-            self._tuck   = np.array([1.0,  -2.07, -3.0,  2.55,   0.0,  0.01,  0.0])
-            self._untuck = np.array([0.08, -1.0,   1.19, 1.94,  -0.67, 1.03,  0.50])
-                                                            
-        else:
-            print "Unknown limb idex"
-            raise ValueError
-
-
-        self._movable_joints = self._joint_idx
-
-        print "movable joints = ", self._movable_joints, len(self._movable_joints),
-
-        self._ee_pos_old, self._ee_ori_old = self.get_ee_pose()
-        self._time_now_old = self.get_time_in_seconds()
-
-    def _configure_cuff(self):
-        print "NOT IMPLEMENTED"
-
-    def _configure_gripper(self):
-        print "NOT IMPLEMENTED"
-
-    def _open_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _close_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _light_action(self, value):
-        print "NOT IMPLEMENTED"
-
-    def _set_lights(self, color, value):
-        print "NOT IMPLEMENTED"
-
-    def cuff_cb(self, value):
-        print "NOT IMPLEMENTED"
-
-#     #this function returns self._cuff_state to be true
-#     #when arm is moved by a demonstrator, the moment arm stops 
-#     #moving, the status returns to false
-#     #initial value of the cuff is None, it is made False by pressing the
-#     #cuff button once
-    @property
-    def get_lfd_status(self):
-        print "NOT IMPLEMENTED"
-
-    def set_sampling_rate(self, sampling_rate=100):
-        self._pub_rate.publish(sampling_rate)
-
-    def tuck_arm(self):
-        print "NOT IMPLEMENTED"
-
-    def untuck_arm(self):
-        # for i in range(len(self._movable_joints)):
-        #     self.set_jnt_state(self._movable_joints[i],self._untuck[i])
-        self.move_using_pos_control(self._movable_joints, self._untuck)
-        print "----------------------Untucking Complete"
 
     def _configure(self, limb, on_state_callback):
         self._state = None
@@ -137,8 +58,8 @@ class BulletSawyerArm(BulletRobot):
 
         # self._ik_sawyer.configure_ik_service()
 
-        self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
-                                         UInt16, queue_size=10)
+        # self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
+        #                                  UInt16, queue_size=10)
 
         # self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', SEAJointState, self._gravity_comp_callback)
 
@@ -157,34 +78,8 @@ class BulletSawyerArm(BulletRobot):
         # self._configure_gripper()
 
 
-    def _gravity_comp_callback(self, msg):
-        self._h = msg.gravity_model_effort
-#         # print "commanded_effort \n",   msg.commanded_effort
-#         # print "commanded_velocity \n", msg.commanded_velocity
-#         # print "commanded_position \n", msg.commanded_position
-#         # print "actual_position \n", msg.actual_position
-#         # print "actual_velocity \n", msg.actual_velocity
-#         # print "actual_effort \n", msg.actual_effort
-#         # print "gravity_model_effort \n", msg.gravity_model_effort
-#         # print "hysteresis_model_effort \n", msg.hysteresis_model_effort
-#         # print "crosstalk_model_effort \n", msg.crosstalk_model_effort
-#         # print "difference effort \n", np.array(msg.commanded_effort) - np.array(msg.actual_effort)
-#         # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
-#         # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
-
     def q_mean(self):
         return self._q_mean
-
-    def get_gripper_state(self):
-        print 'NOT IMPLEMENTED'
-
-
-    def set_gripper_speed(self, speed):
-        print 'NOT IMPLEMENTED'
-
-    def set_arm_speed(self,speed):
-        print 'NOT IMPLEMENTED'
-        
 
     def _on_joint_states(self, msg):
         print 'NOT IMPLEMENTED'
@@ -195,11 +90,6 @@ class BulletSawyerArm(BulletRobot):
     def get_base_link_name(self):
         print 'NOT IMPLEMENTED'
 
-    def exec_gripper_cmd(self, pos, force = None):
-        print 'NOT IMPLEMENTED'
-
-    def exec_gripper_cmd_delta(self, pos_delta, force_delta = None):
-        print 'NOT IMPLEMENTED'
 
     def exec_position_cmd(self, cmd):
         print 'NOT IMPLEMENTED'
@@ -311,12 +201,12 @@ class BulletSawyerArm(BulletRobot):
     def ik(self, pos, ori=None):
         print 'NOT IMPLEMENTED'
 
-def main():
-    rospy.init_node("sawyer_arm_example")
+# def main():
+#     rospy.init_node("sawyer_arm_example")
 
-    arm = BulletSawyerArm('right')
+#     arm = BulletSawyerArm('right')
 
-    rospy.spin()
+#     rospy.spin()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

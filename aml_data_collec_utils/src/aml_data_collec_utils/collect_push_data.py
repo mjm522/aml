@@ -78,7 +78,7 @@ class PushMachine(object):
                 self.send_left_arm_away()
                 order_of_sweep = ['left', 'back', 'front', 'right']
                 fsm_reset(self._right_arm, order_of_sweep, rate=15)
-                self._robot.untuck_arm()
+                self._robot.untuck()
                 os.system("spd-say 'Reseting box without human supervision'")
             else:
                 os.system("spd-say 'Please reset the box, Much appreciated dear human'")
@@ -99,7 +99,7 @@ class PushMachine(object):
             goals.reverse()
             success = success and self.goto_goals(goals[1:]) 
 
-            self._robot.untuck_arm()
+            self._robot.untuck()
 
             # self._sample_recorder.stop_record(task_status=success)
 
@@ -177,7 +177,7 @@ class PushMachine(object):
 
         idx = 0
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         rospy.on_shutdown(self.on_shutdown)
 
@@ -213,13 +213,13 @@ class PushMachine(object):
 
     def goto_pose(self,goal_pos, goal_ori): 
 
-        start_pos, start_ori = self._robot.get_ee_pose()
+        start_pos, start_ori = self._robot.ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
 
         goal_ori = quaternion.as_float_array(goal_ori)
-        success, js_pos = self._robot.ik(goal_pos,goal_ori)
+        success, js_pos = self._robot.inverse_kinematics(goal_pos, goal_ori)
 
         if success:
             self._robot.move_to_joint_position(js_pos)
@@ -235,7 +235,7 @@ class PushMachine(object):
 
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
-        ee_pos, _ = self._robot.get_ee_pose()
+        ee_pos, _ = self._robot.ee_pose()
 
         success = success and self.goto_pose(goal_pos=ee_pos+reset_push['push_action'], goal_ori=None)
 

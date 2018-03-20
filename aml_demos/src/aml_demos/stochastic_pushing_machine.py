@@ -193,13 +193,13 @@ class StochasticPushMachine(BoxObject):
 
     def goto_pose(self, goal_pos, goal_ori): 
 
-        start_pos, start_ori = self._robot.get_ee_pose()
+        start_pos, start_ori = self._robot.ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
 
         goal_ori = quaternion.as_float_array(goal_ori)
-        success, js_pos = self._robot.ik(goal_pos, goal_ori)
+        success, js_pos = self._robot.inverse_kinematics(goal_pos, goal_ori)
 
         if success:
             self._robot.move_to_joint_position(js_pos)
@@ -209,7 +209,7 @@ class StochasticPushMachine(BoxObject):
         return success
 
     def push_box(self, tgt_box_pose):
-        self._robot.untuck_arm()
+        self._robot.untuck()
         pre_push_action, push_action = self.compute_push_location(tgt_box_pose, image_input=True)
         #this is a hack when there is no way to get the transform sending arm away and bringing
         #back tends to give the tf correctly.

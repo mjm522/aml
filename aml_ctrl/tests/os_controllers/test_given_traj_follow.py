@@ -24,7 +24,7 @@ def test_position_controller(robot_interface, pos_traj, ori_traj=None):
     n_steps = len(pos_traj)
 
     if ori_traj is None:
-    	_, goal_ori = robot_interface.get_ee_pose()
+    	_, goal_ori = robot_interface.ee_pose()
 
     while not rospy.is_shutdown() and not finished:
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     limb = 'right'
     arm = BaxterArm(limb)
 
-    arm.untuck_arm()
+    arm.untuck()
 
     demo_idx = 6
 

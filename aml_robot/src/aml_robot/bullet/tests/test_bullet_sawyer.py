@@ -2,12 +2,14 @@
 
 import numpy as np
 import pybullet as pb
+import cv2
 import rospy
 import time
 from aml_playground.peg_in_hole.pih_worlds.bullet.config import pih_world_config
 # from aml_playground.peg_in_hole.pih_worlds.bullet.pih_world import PIHWorld
 from aml_robot.bullet.bullet_sawyer import BulletSawyerArm
 from aml_io.io_tools import get_aml_package_path, get_abs_path
+from matplotlib import pyplot as plt
 
 
 def main():
@@ -34,15 +36,16 @@ def main():
 
     # hole = pb.loadURDF(pih_world_config['hole_path'], useFixedBase=True)
 
-    catkin_ws_src_path = get_abs_path(get_aml_package_path()+'/../')
+    catkin_ws_src_path = get_abs_path(get_aml_package_path()+'/../..')
     print "catkin_ws_src_path:", catkin_ws_src_path
-    manipulator = pb.loadURDF(catkin_ws_src_path + "/sawyer_robot/sawyer_description/urdf/sawyer.urdf", useFixedBase=True)
-    pb.resetBasePositionAndOrientation(manipulator,[0,0,0],[0,0,0,1])
+    # "/sawyer_robot/sawyer_description/urdf/sawyer.urdf"
+    manipulator = pb.loadURDF(catkin_ws_src_path + '/src/aml/aml_rl/aml_rl_envs/src/aml_rl_envs/models/sawyer/sawyer2_with_pisa_hand.urdf', useFixedBase=True)
+    # pb.resetBasePositionAndOrientation(manipulator,[0,0,0],[0,0,0,1])
     # motors = [n for n in range(pb.getNumJoints(manipulator))]
 
     sawyerArm = BulletSawyerArm(manipulator)
 
-    sawyerArm.untuck_arm()
+    # sawyerArm.untuck_arm()
 
     # print pb.getNumJoints(manipulator), "HRERERERER"
     # print sawyerArm._id, sawyerArm._nq, sawyerArm._ee_link_idx, "HERER"
@@ -56,7 +59,7 @@ def main():
 
     # pm.run()
 
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(500)
 
     pb.setRealTimeSimulation(0)
 
@@ -69,6 +72,7 @@ def main():
     # rospy.on_shutdown(self.on_shutdown)
 
     # self._record_sample.start_record(task_action=pushes[idx])
+    plt.ion()
 
     while not rospy.is_shutdown():
 
@@ -77,7 +81,24 @@ def main():
         # self.step()
         sawyerArm._update_state()
 
-        print sawyerArm.get_ee_velocity()
+        state = sawyerArm.get_state()
+
+        bgr_image = state['rgb_image'][:,:,range(2,-1,-1)]
+        depth_image = state['depth_image']
+        cv2.imshow('captured image', bgr_image)
+
+        plt.figure(1)
+        # plt.clf()
+        plt.imshow(depth_image, cmap='spectral', interpolation='nearest');
+        plt.figure(2)
+        plt.imshow(state['rgb_image']);
+        plt.draw()
+        # plt.show(block=False)
+        plt.pause(0.00001)
+
+        # cv2.waitKey(1)
+
+        # print sawyerArm.get_ee_velocity()
 
         pb.stepSimulation()
 

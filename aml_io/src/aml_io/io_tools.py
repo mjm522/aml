@@ -1,7 +1,15 @@
 import time
 import warnings
-import cPickle as pickle
+
+# For compatibility with python 2.7 and 3
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 from os.path import exists, join, dirname, abspath
+import os
+from aml_io.log_utils import aml_logging
 
 def get_aml_package_path(aml_package_name=None):
 
@@ -19,6 +27,44 @@ def get_aml_package_path(aml_package_name=None):
 
 def get_abs_path(path):
     return abspath(path)
+
+
+def crawl(path, extension_filter='urdf'):
+
+    crawled_paths = {}
+    for dirpath, subs, files in os.walk(path):
+        for file in files:
+
+            if extension_filter is None:
+                crawled_paths[file] = os.path.join(dirpath, file)
+            elif file.split('.')[-1] == extension_filter:
+                crawled_paths[file] = os.path.join(dirpath, file)
+
+
+    return crawled_paths
+
+def get_file_path(file, search_paths):
+
+    if not isinstance(search_paths,list):
+        search_paths = [search_paths]
+
+
+
+    crawled_paths = {}
+    ext = file.split('.')[-1]
+
+    for path in search_paths:
+        crawled_paths.update(crawl(path,ext))
+
+
+    file_path = crawled_paths.get(file,None)
+
+    if file_path is None:
+        aml_logging.warning('File %s not found, returning None path.'%(file,))
+
+    return file_path
+
+
 
 
 def save_data(data, filename, append_to_file = False, over_write_existing=False):
@@ -43,7 +89,7 @@ def save_data(data, filename, append_to_file = False, over_write_existing=False)
 
 
 def load_data(filename):
-	
+    
     try:
         pkl_file = open(filename, 'rb')
     except Exception as e:

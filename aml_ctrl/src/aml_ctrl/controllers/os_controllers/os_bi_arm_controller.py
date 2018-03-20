@@ -28,18 +28,18 @@ class OSBiArmController(OSController):
 
         #left_arm is the master arm
         
-        jac_left = self._left_arm.get_jacobian_from_joints()
+        jac_left = self._left_arm.jacobian()
         
-        jac_right = self._right_arm.get_jacobian_from_joints()
+        jac_right = self._right_arm.jacobian()
 
         def make_skew(v):
             return np.array([[0., -v[2], v[1]],[v[2],0.,-v[0]],[-v[1],v[0],0.]])
 
         tmp1 = np.vstack([np.hstack([np.eye(3),-make_skew(rel_pos)]),np.hstack([np.zeros((3,3)),np.eye(3)])])
         
-        pos_ee_l, rot_ee_l = self._left_arm.get_cartesian_pos_from_joints()
+        pos_ee_l, rot_ee_l = self._left_arm.forward_kinematics()
         
-        pos_ee_r, rot_ee_r = self._right_arm.get_cartesian_pos_from_joints()
+        pos_ee_r, rot_ee_r = self._right_arm.forward_kinematics()
 
         tmp2 = np.vstack([np.hstack([-rot_ee_l,np.zeros((3,3))]),np.hstack([np.zeros((3,3)),-rot_ee_l])])
 

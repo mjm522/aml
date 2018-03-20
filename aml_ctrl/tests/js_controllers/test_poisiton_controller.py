@@ -15,14 +15,14 @@ def test_postn_controller(robot_interface):
     
     ctrlr.set_active(True)
 
-    start_js_pos = robot_interface.get_state()['position']
+    start_js_pos = robot_interface.state()['position']
     delta_js_pos = np.zeros_like(start_js_pos)
     delta_js_pos[5] -= 5.
 
     while not rospy.is_shutdown() and not finished:        
 
         goal_js_pos = start_js_pos + delta_js_pos
-        goal_js_vel = robot_interface.get_state()['velocity']
+        goal_js_vel = robot_interface.state()['velocity']
         goal_js_acc = np.zeros_like(goal_js_pos)
 
         print "Sending goal ",t, " goal_js_pos:", np.round(goal_js_pos.ravel(), 2)

@@ -42,7 +42,7 @@ _rs.enable()
 obj = SomeObj()
 
 limb = baxter_robot.BaxterArm('right',partial(callback,obj))
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_pos = np.array([0.95,-0.08,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
@@ -51,7 +51,7 @@ print "GOALORI: ", goal_ori
 rate = rospy.Rate(5) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
-	print(limb.ik(start_pos,goal_ori))
+	print(limb.inverse_kinematics(start_pos, goal_ori))
 	rate.sleep()
 
 	

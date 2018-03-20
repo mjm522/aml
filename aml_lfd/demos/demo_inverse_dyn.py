@@ -33,7 +33,7 @@ def main(robot_interface, load_from_demo, demo_idx):
 
     rate = rospy.Rate(sampling_rate)
 
-    arm.untuck_arm()
+    arm.untuck()
 
     print "Checking computed position commands ..."
     raw_input('Press any key to continue ...')
@@ -46,7 +46,7 @@ def main(robot_interface, load_from_demo, demo_idx):
 
     raw_input('Completed,  proceeding to torque control, press any key...')
 
-    arm.untuck_arm()
+    arm.untuck()
 
     print "Checking computed torque commands ..."
     raw_input('Press any key to continue ...')
@@ -62,7 +62,7 @@ def main(robot_interface, load_from_demo, demo_idx):
 
     raw_input('Completed,  proceeding to effort control, press any key...')
 
-    arm.untuck_arm()
+    arm.untuck()
 
     print "Checking computed effort commands ..."
     raw_input('Press any key to continue ...')

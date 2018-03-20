@@ -210,8 +210,8 @@ if __name__=="__main__":
 
         r_limb = ArmInterface('right')
         l_limb = ArmInterface('left')
-        r_limb.untuck_arm()
-        l_limb.untuck_arm()
+        r_limb.untuck()
+        l_limb.untuck()
 
         for arm in [r_limb, l_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
@@ -221,7 +221,7 @@ if __name__=="__main__":
 
         r_limb = ArmInterface('right')
         l_limb = r_limb
-        r_limb.untuck_arm()
+        r_limb.untuck()
 
         for arm in [r_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
@@ -232,7 +232,7 @@ if __name__=="__main__":
     limb = r_limb
     ctrlr = set_controller(control_id, limb)
 
-    start_pos, start_ori = limb.get_ee_pose()
+    start_pos, start_ori = limb.ee_pose()
     goal_ori = start_ori#quaternion.as_float_array(start_ori)
     ctrlr.set_active(True)
 

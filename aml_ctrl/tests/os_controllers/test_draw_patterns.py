@@ -8,7 +8,7 @@ from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionCo
 
 def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight', ctrlr_type='torque'):
     
-    robot_interface.untuck_arm()
+    robot_interface.untuck()
 
     if ctrlr_type == 'torque':
         ctrlr = OSTorqueController(robot_interface)
@@ -19,7 +19,7 @@ def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight', ctrlr_
     else:
         raise("Unknown type of controller specified")
 
-    start_pos, start_ori  =  robot_interface.get_ee_pose()
+    start_pos, start_ori  =  robot_interface.ee_pose()
 
     # Generate trajectory to follow
     traj_to_follow = standard_shape_traj(curr_pos=start_pos, 

@@ -1,5 +1,3 @@
-import cv2
-import rospy
 import numpy as np
 import pybullet as pb
 from config import config
@@ -26,10 +24,6 @@ class BulletRobot(object):
         if enable_force_torque_sensors:
             self.enable_force_torque_sensors()
 
-        _update_period = rospy.Duration(1.0/update_rate)
-
-        rospy.Timer(_update_period, self._update_state)
-
         
     def configure_default_pos(self, pos, ori):
 
@@ -39,6 +33,7 @@ class BulletRobot(object):
 
 
     def configure_camera(self):
+
 
         self._view_matrix = pb.computeViewMatrixFromYawPitchRoll(self._config['cam']['target_pos'], 
                                                                  self._config['cam']['distance'], 
@@ -55,26 +50,22 @@ class BulletRobot(object):
                                                                 self._config['cam']['far_plane'])
 
 
-    def get_image(self, display_image=False):
+        # print "Projection: \n", np.asarray(self._projection_matrix, dtype=np.float32).reshape(4,4)
 
-        img_arr = pb.getCameraImage(self._config['cam']['image_width'], 
+
+    def get_image(self):
+
+        _, _, self._view_matrix, _, _, _, _, _, _, _, _, _ = pb.getDebugVisualizerCamera()
+        (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'], 
                                     self._config['cam']['image_height'], 
-                                    self._view_matrix, self._projection_matrix, [0,1,0])
+                                    self._view_matrix, self._projection_matrix, [0,1,0], renderer=pb.ER_BULLET_HARDWARE_OPENG)
+
+        # rgba to rgb
+        rgb_image = rgb_pixels[:,:,0:3]
+        depth_image  = depth_pixels 
 
 
-        rgba_image   = np.asarray(img_arr[2], dtype=np.uint8).reshape(img_arr[0],img_arr[1], 4)
-        depth_image  = np.asarray(img_arr[3], dtype=np.float32).reshape(img_arr[0], img_arr[1])
-
-        if display_image:
-            cv2.imshow("captured image", rgba_image)
-            cv2.waitKey()
-
-        # image = {'width': img_arr[0],
-        #          'height':img_arr[1],
-        #          'rgba':np.asarray(img_arr[2],  dtype=np.uint8),
-        #          'depth':np.asarray(img_arr[3], dtype=np.float32)}
-
-        return rgba_image, depth_image
+        return rgb_image, depth_image
 
 
     # ----- If joint_idx is not specified, sensors for all joints are enabled
@@ -164,7 +155,12 @@ class BulletRobot(object):
 
     def _update_state(self, event = None):
 
-        now                      = rospy.Time.now()
+        class Time:
+            def __init__(self):
+                self.secs = 0
+                self.nsecs = 0
+
+        now                      = Time()#rospy.Time.now()
 
         state = {}
         
@@ -227,8 +223,10 @@ class BulletRobot(object):
         return pb.getBaseVelocity(self._id)
 
     def get_time_in_seconds(self):
-        time_now =  rospy.Time.now()
-        return time_now.secs + time_now.nsecs*1e-9
+        # time_now =  rospy.Time.now()
+
+        return 0.0
+        # return time_now.secs + time_now.nsecs*1e-9
 
 
     def get_movable_joints(self):

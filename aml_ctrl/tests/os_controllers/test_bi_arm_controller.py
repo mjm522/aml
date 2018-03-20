@@ -15,7 +15,7 @@ def test_coop_position_control():
     baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
 
-    start_pos, start_ori  =  arm_l.get_ee_pose()
+    start_pos, start_ori  =  arm_l.ee_pose()
     goal_pos = start_pos + np.array([0.,0.8, 0.])
     angle    = 90.0
     axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
@@ -23,8 +23,8 @@ def test_coop_position_control():
 
     baxter_ctrlr.configure(start_pos, start_ori, goal_pos, goal_ori)
 
-    left_pos, left_ori   = arm_l.get_ee_pose()
-    right_pos, right_ori = arm_r.get_ee_pose()
+    left_pos, left_ori   = arm_l.ee_pose()
+    right_pos, right_ori = arm_r.ee_pose()
 
     pos_rel = right_pos - left_pos
         
@@ -67,7 +67,7 @@ def test_coop_position_control():
 
         time.sleep(0.1)
 
-    final_pos, final_ori  =  arm_l.get_ee_pose()
+    final_pos, final_ori  =  arm_l.ee_pose()
     print "ERROR in position \t", np.linalg.norm(final_pos-goal_pos)
     print "ERROR in orientation \t", np.linalg.norm(final_ori-goal_ori)
 
@@ -81,7 +81,7 @@ def test_coop_torque_control():
     #baxter_ctrlr.set_neutral()
     baxter_ctrlr.untuck_arms()
 
-    start_pos, start_ori  =  arm_l.get_ee_pose()
+    start_pos, start_ori  =  arm_l.ee_pose()
     goal_pos = start_pos + np.array([0.,-0.0, 0.9])
     angle    = 45.0
     axis     = np.array([1.,0.,0.]); axis = np.sin(0.5*angle*np.pi/180.)*axis/np.linalg.norm(axis)
@@ -89,8 +89,8 @@ def test_coop_torque_control():
 
     baxter_ctrlr.configure(start_pos, start_ori, goal_pos, goal_ori)
 
-    left_pos, left_ori   = arm_l.get_ee_pose()
-    right_pos, right_ori = arm_r.get_ee_pose()
+    left_pos, left_ori   = arm_l.ee_pose()
+    right_pos, right_ori = arm_r.ee_pose()
 
     pos_rel = right_pos - left_pos
         
@@ -169,7 +169,7 @@ def test_coop_torque_control():
     arm_l.exec_position_cmd2(np.zeros(7))
     arm_r.exec_position_cmd2(np.zeros(7))
     
-    final_pos, final_ori  =  arm_l.get_ee_pose()
+    final_pos, final_ori  =  arm_l.ee_pose()
     print "ERROR in position \t", np.linalg.norm(final_pos-goal_pos)
     print "ERROR in orientation \t", np.linalg.norm(final_ori-goal_ori)
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
     
     if limb == 'left':
         goal_pos = start_pos + np.array([0.,0.8, 0.])

@@ -36,10 +36,10 @@ _rs.enable()
 
 # limb = baxter_robot.BaxterArm('right',callback)
 limb = baxter_robot.BaxterArm('right')
-limb.untuck_arm()
+limb.untuck()
 
 
-start_pos, start_ori = limb.get_ee_pose()
+start_pos, start_ori = limb.ee_pose()
 
 goal_ori = quaternion.as_float_array(start_ori)
 incr = np.array([0.005,-0.05,-0.05])
@@ -49,10 +49,10 @@ while not rospy.is_shutdown():
     goal_pos = start_pos + incr
     # print "GOALORI: ", goal_ori
     print "GOAL POSITION:", goal_pos
-    current_ee_pos, current_ee_ori = limb.get_ee_pose()
+    current_ee_pos, current_ee_ori = limb.ee_pose()
     print "ACTUAL POSITION:", current_ee_pos
 
-    success, goal_joint_angles = limb.ik(goal_pos,goal_ori)
+    success, goal_joint_angles = limb.inverse_kinematics(goal_pos, goal_ori)
     if not success:
         incr = - incr
     # print success, goal_angles

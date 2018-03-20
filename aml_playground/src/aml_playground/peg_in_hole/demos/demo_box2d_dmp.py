@@ -118,7 +118,7 @@ class Box2dDMP():
 
                 set_point = np.hstack([des_path[k,:], 0.05])#np.hstack([self._dmp._traj_data[k,1:], 0.])#np.hstack([des_path[k,:], 0.1]) #np.array([2., 5., -np.pi/2]) #
 
-                data = self._pih_manipulator.get_state()
+                data = self._pih_manipulator.state()
                 data['set_point'] = set_point
 
                 print len(manipulator_data)

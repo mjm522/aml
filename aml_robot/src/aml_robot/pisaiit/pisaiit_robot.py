@@ -1,21 +1,14 @@
 import roslib
-roslib.load_manifest('aml_robot')
 
+roslib.load_manifest('aml_robot')
 import rospy
 
-import numpy as np
-import quaternion
-
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import Float32
 
 from aml_robot.robot_interface import RobotInterface
 
 
 class PisaIITHand(RobotInterface):
-
-
     def __init__(self, robot_name, on_state_callback=None):
         """
         Class constructor
@@ -26,18 +19,12 @@ class PisaIITHand(RobotInterface):
         none, store the trajectories
         """
 
-        
-
-
         self._ready = False
 
         # Configuring hand (setting up publishers, variables, etc)
         self._configure(robot_name, on_state_callback)
 
-        self._ready = True # Hand is ready to be used
-
-
-
+        self._ready = True  # Hand is ready to be used
 
     def _update_state(self):
 
@@ -88,14 +75,8 @@ class PisaIITHand(RobotInterface):
         # Parent constructor
         # baxter_interface.limb.Limb.__init__(self, limb)
 
-        #self._kinematics = baxter_kinematics(self)
+        # self._kinematics = baxter_kinematics(self)
 
-        #self._ik_baxter = IKBaxter(limb=self)
-
-        #self._ik_baxter.configure_ik_service()
-
-        # self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
-        #                                  UInt16, queue_size=10)
 
         self._pos_cmd_pub = rospy.Publisher('soft_hand_pos_cmd', Float32, queue_size=10)
         self._sh_current_status = rospy.Publisher('soft_hand_read_current', Float32, queue_size=10)
@@ -106,96 +87,82 @@ class PisaIITHand(RobotInterface):
         # self._ee_force = None
         # self._ee_torque = None
 
-
     def _on_joint_states(self, msg):
-        
+
         # Updates internal state
 
         if self._ready:
             self._state = self._update_state()
             self._on_state_callback(self._state)
 
+    def exec_position_cmd(self, cmd):
+        pass
 
-    def get_state(self):
+    def exec_velocity_cmd(self, cmd):
+        pass
+
+    def angles(self):
+        pass
+
+    def q_mean(self):
+        pass
+
+    def inertia(self, joint_angles=None):
+        pass
+
+    def exec_position_cmd_delta(self, cmd):
+        pass
+
+    def cartesian_velocity(self, joint_velocities=None):
+        pass
+
+    def inverse_kinematics(self, position, orientation=None):
+        pass
+
+    def move_to_joint_pos_delta(self, cmd):
+        pass
+
+    def n_cmd(self):
+        pass
+
+    def n_joints(self):
+        pass
+
+    def tuck(self):
+        pass
+
+    def joint_efforts(self):
+        pass
+
+    def ee_velocity(self, numerical=False):
+        pass
+
+    def forward_kinematics(self, joint_angles=None):
+        pass
+
+    def untuck(self):
+        pass
+
+    def joint_velocities(self):
+        pass
+
+    def joint_names(self):
+        pass
+
+    def move_to_joint_position(self, cmd):
+        pass
+
+    def jacobian(self, joint_angles=None):
+        pass
+
+    def state(self):
         return self._state
 
-    def get_end_effector_link_name(self):
-        ''' todo '''
+    def ee_pose(self):
         pass
 
-    
-    def get_base_link_name(self):
-        ''' todo '''
+    def set_sampling_rate(self, sampling_rate=100):
         pass
 
-    
-    def exec_position_cmd(self, cmd):
-        ''' todo '''
-        self._pos_cmd_pub.publish(float(cmd))
-
-    def exec_position_cmd_delta(self,cmd):
-        ''' todo '''
-        pass
-
-    def move_to_joint_pos_delta(self,cmd):
-        ''' todo '''
-        pass
-
-    def move_to_joint_pos(self,cmd):
-        ''' todo '''
-        pass
-
-    def exec_velocity_cmd(self,cmd):
-        ''' todo '''
-        pass
-
-    def exec_torque_cmd(self,cmd):
-        ''' todo '''
-        pass
-
-    def move_to_joint_position(self, joint_angles):
-        ''' todo '''
-        pass
-    
-    def get_ee_pose(self):
-        ''' todo '''
-        pass
-
-    def get_time_in_seconds(self):
-        time_now =  rospy.Time.now()
-        return time_now.secs + time_now.nsecs*1e-9
-
-    def get_ee_velocity(self, real_robot=True):
-        ''' todo '''
-        pass
-
-
-    def get_cartesian_pos_from_joints(self, joint_angles=None):
-        ''' todo '''
-
-        pass
-    def get_cartesian_vel_from_joints(self, joint_angles=None):
-        ''' todo '''
-
-        pass
-
-    def get_jacobian_from_joints(self, joint_angles=None):
-        ''' todo '''
-
-        pass
-
-
-    def get_inertia(self, joint_angles=None):
-        ''' todo '''
-
-        pass
-
-    def set_speed(self,speed):
-        ''' todo '''
-
-        pass
-
-    def ik(self, pos, ori=None):
-        ''' todo '''
-
+    def exec_torque_cmd(self, cmd):
         pass

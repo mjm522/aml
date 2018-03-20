@@ -50,7 +50,7 @@ class PushMachine(object):
         order_of_sweep = ['left', 'back', 'front', 'right']
         fsm_reset(self._right_arm, order_of_sweep, rate=15)
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
         os.system("spd-say 'Reseting box without human supervision'")
         #os.system("spd-say 'Please reset the box, Much appreciated dear human'")
         #raw_input("Press enter to continue...")
@@ -69,7 +69,7 @@ class PushMachine(object):
         goals.reverse()
         success = success and self.goto_goals(goals[1:]) 
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         timeelapsed = rospy.Time.now() - start
 
@@ -214,7 +214,7 @@ class PushMachine(object):
 
         idx = 0
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         rospy.on_shutdown(self.on_shutdown)
 
@@ -249,7 +249,7 @@ class PushMachine(object):
 
     def goto_pose(self,goal_pos, goal_ori, ntrials = 1, disturb_on_fail = True): 
 
-        start_pos, start_ori = self._robot.get_ee_pose()
+        start_pos, start_ori = self._robot.ee_pose()
 
         if goal_ori is None:
              goal_ori = start_ori
@@ -262,7 +262,7 @@ class PushMachine(object):
         for i in range(ntrials):
 
             # goal_pos_test = (goal_pos + np.random.randn(3)*0.005).astype(float)
-            success, js_pos = self._robot.ik(goal_pos_test,goal_ori)
+            success, js_pos = self._robot.inverse_kinematics(goal_pos_test, goal_ori)
 
             print "Trying to push... Status:", success
 
@@ -290,7 +290,7 @@ class PushMachine(object):
             success = success and self.goto_pose(goal_pos=goal['pos'], goal_ori=None)
 
 
-        ee_pos, _ = self._robot.get_ee_pose()
+        ee_pos, _ = self._robot.ee_pose()
 
         success = success and self.goto_pose(goal_pos=ee_pos+reset_push['push_action'], goal_ori=None)
 

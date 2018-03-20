@@ -92,7 +92,7 @@ if __name__ == '__main__':
     
     arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
 
-    arm.untuck_arm()
+    arm.untuck()
 
     control_robot(arm, args.task_space)
 

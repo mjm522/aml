@@ -99,7 +99,7 @@ class ActorCriticGainLearner(object):
             state = self._env.reset(noise=0.)
 
             #get data from the manipulator object
-            data  = self._env._manipulator.get_state()
+            data  = self._env._manipulator.state()
 
             #stack position and velocity
             state = np.hstack([data['j_pos'], data['j_vel']])
@@ -126,7 +126,7 @@ class ActorCriticGainLearner(object):
                 if render:
                     self._viewer.draw()
 
-                data       = self._env._manipulator.get_state()
+                data       = self._env._manipulator.state()
 
                 next_state = np.hstack([data['j_pos'], data['j_vel']])
 

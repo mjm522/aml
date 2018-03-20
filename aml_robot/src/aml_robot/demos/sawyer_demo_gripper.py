@@ -32,7 +32,7 @@ gclosed_pos = 0.015
 def goto_waypoints(wpts,limb):
 
     for wpt in wpts:
-        limb.move_to_joint_pos(wpt)
+        limb.move_to_joint_position(wpt)
 
 
 limb = SawyerArm('right')
@@ -52,7 +52,7 @@ toggle_close = False
 while not rospy.is_shutdown():
 
 
-    print "CURRENT GRIPPER STATE:", limb.get_gripper_state()
+    print "CURRENT GRIPPER STATE:", limb.gripper_state()
     
 
     if toggle_close:

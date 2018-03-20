@@ -82,7 +82,7 @@ class DDPTrajFollow():
 
         dq    = x0[self.idx['dq']]
 
-        Mq    = self.robot.get_arm_inertia(joint_angles=q)
+        Mq    = self.robot.inertia(joint_angles=q)
 
         ## for our feedback controllers it's important to have past inputs and
         ## change in inputs stored into the state:
@@ -545,6 +545,6 @@ if __name__=="__main__":
     demo_data = load_demo_data(demo_idx=6)
 
     arm  = BaxterArm('right')
-    arm.untuck_arm()
+    arm.untuck()
     
     find_optimal_control_sequence(robot_interface=arm, data=demo_data, dt=0.01)
