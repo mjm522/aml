@@ -17,9 +17,6 @@ from baxter_kinematics import baxter_kinematics
 import numpy as np
 import quaternion
 
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-
 from aml_perception import camera_sensor
 
 # for computation of angular velocity
@@ -308,7 +305,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         ee_point = np.array([ee_point.x, ee_point.y, ee_point.z])
 
         ee_ori = self.endpoint_pose()['orientation']
-        ee_ori = np.quaternion(ee_ori.w, ee_ori.x, ee_ori.y, ee_ori.z)  # Hamilton notation
+        ee_ori = quaternion.quaternion(ee_ori.w, ee_ori.x, ee_ori.y, ee_ori.z)  # Hamilton notation
 
         return ee_point, ee_ori
 
@@ -366,7 +363,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         y = pose[4]
         z = pose[5]  # quarternions
 
-        rotation = np.quarternion(w, x, y, z)
+        rotation = quaternion.quarternion(w, x, y, z)
 
         # formula for converting quarternion to rotation matrix
 
