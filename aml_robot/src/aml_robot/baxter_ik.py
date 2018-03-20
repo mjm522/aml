@@ -14,10 +14,12 @@ from baxter_core_msgs.srv import (
     SolvePositionIKRequest,
 )
 
+from sensor_msgs.msg import JointState
+
 import struct
 
 
-class IKBaxter():
+class IKBaxter(object):
     def __init__(self, limb):
 
         self._limb = limb.name
@@ -54,7 +56,7 @@ class IKBaxter():
         else:
             return right_pose['pos'], right_pose['ori']
 
-    def ik_servive_request(self, pos, ori):
+    def ik_service_request(self, pos, ori, seed_angles=None, null_space_goal=None, use_advanced_options=False):
 
         self.ikreq = SolvePositionIKRequest()
 
@@ -83,6 +85,41 @@ class IKBaxter():
             )
         )
         self.ikreq.pose_stamp.append(ik_msg)
+
+        if use_advanced_options:
+            # Optional Advanced IK parameters
+            # rospy.loginfo("Running Advanced IK Service Client example.")
+            # The joint seed is where the IK position solver starts its optimization
+            self.ikreq.seed_mode = self.ikreq.SEED_USER
+            seed = JointState()
+            seed.name = self.arm.joint_names()
+
+            if seed_angles is None:
+                seed.position = [0.7, 0.4, -1.7, 1.4, -1.1, -1.6, -0.4]
+            else:
+                seed.position = seed_angles
+            self.ikreq.seed_angles.append(seed)
+
+            # Once the primary IK task is solved, the solver will then try to bias the
+            # the joint angles toward the goal joint configuration. The null space is
+            # the extra degrees of freedom the joints can move without affecting the
+            # primary IK task.
+
+            if null_space_goal is not None:
+                self.ikreq.use_nullspace_goal.append(True)
+                # The nullspace goal can either be the full set or subset of joint angles
+                goal = JointState()
+                goal.name = self.arm.joint_names()
+                
+                goal.position = null_space_goal
+                self.ikreq.nullspace_goal.append(goal)
+                # The gain used to bias toward the nullspace goal. Must be [0.0, 1.0]
+                # If empty, the default gain of 0.4 will be used
+                self.ikreq.nullspace_gain.append(0.4)
+
+        else:
+            pass
+            # rospy.loginfo("Running Simple IK Service Client example.")
 
         try:
             rospy.wait_for_service(self.ns, 5.0)

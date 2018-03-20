@@ -1,34 +1,39 @@
+# General ROS imports
 import roslib
 
 roslib.load_manifest('aml_robot')
-
 import rospy
-
-import baxter_interface
-import baxter_external_devices
 
 from std_msgs.msg import (
     UInt16,
 )
-from baxter_core_msgs.msg import SEAJointState, EndpointState
-from baxter_interface import CHECK_VERSION
-from baxter_kinematics import baxter_kinematics
 
+# Auxiliary imports
 import numpy as np
 import quaternion
 
-from aml_perception import camera_sensor
+# Baxter SDK imports
+import baxter_interface
+from baxter_core_msgs.msg import SEAJointState, EndpointState
+from baxter_interface import CHECK_VERSION
 
-# for computation of angular velocity
-from aml_math.quaternion_utils import compute_omg
-
+# AML Robot specific imports
 from aml_robot.baxter_ik import IKBaxter
+from aml_robot.baxter_kinematics import baxter_kinematics
+
+# AML additional imports
+from aml_perception import camera_sensor
+from aml_math.quaternion_utils import compute_omg  # for computing orientation error
+from aml_robot.robot_interface import RobotInterface
+from aml_io.log_utils import aml_logging
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
 
 
-class BaxterArm(baxter_interface.limb.Limb):
+class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
     def __init__(self, limb, on_state_callback=None):
+
+        self._logger = aml_logging.get_logger(__name__)
 
         # Load aml_logo
         # load_aml_logo()
@@ -69,7 +74,7 @@ class BaxterArm(baxter_interface.limb.Limb):
             self._untuck = np.array([0.08, -1.0, 1.19, 1.94, -0.67, 1.03, 0.50])
 
         else:
-            print "Unknown limb idex"
+            self._logger.error("Unknown limb idex")
             raise ValueError
 
         self._cuff = baxter_interface.DigitalIO('%s_lower_cuff' % (limb,))
@@ -176,15 +181,14 @@ class BaxterArm(baxter_interface.limb.Limb):
         def to_list(ls):
             return [ls[n] for n in joint_names]
 
-        state = {}
-        state['position'] = np.array(to_list(joint_angles))
-        state['velocity'] = np.array(to_list(joint_velocities))
-        state['effort'] = np.array(to_list(joint_efforts))
-        state['jacobian'] = self.jacobian(None)
-        state['inertia'] = self.inertia(None)
-        state['rgb_image'] = self._camera._curr_rgb_image
-        state['depth_image'] = self._camera._curr_depth_image
-        state['gravity_comp'] = np.array(self._h)
+        state = {'position': np.array(to_list(joint_angles)),
+                 'velocity': np.array(to_list(joint_velocities)),
+                 'effort': np.array(to_list(joint_efforts)),
+                 'jacobian': self.jacobian(None),
+                 'inertia': self.inertia(None),
+                 'rgb_image': self._camera._curr_rgb_image,
+                 'depth_image': self._camera._curr_depth_image,
+                 'gravity_comp': np.array(self._h)}
 
         if self._ee_force is not None:
             state['ee_force'] = np.array([self._ee_force.x, self._ee_force.y, self._ee_force.z])
@@ -381,9 +385,6 @@ class BaxterArm(baxter_interface.limb.Limb):
         elif ori_type == 'quat':
             pass
 
-
-
-
         return position, rotation
 
     def cartesian_velocity(self, joint_angles=None):
@@ -420,19 +421,18 @@ class BaxterArm(baxter_interface.limb.Limb):
         return np.array(self._kinematics.inertia(argument))
 
     def set_gripper_speed(self, speed):
-        print "set_gripper_speed: not implemented"
+        self._logger.warning("set_gripper_speed: not implemented")
         pass
 
     def set_arm_speed(self, speed):
-
         self.set_joint_position_speed(speed)
 
-    def inverse_kinematics(self, pos, ori=None, seed=None, use_service=False):
+    def inverse_kinematics(self, pos, ori=None, seed=None, null_space_goal = None, use_service=False):
         success = False
         soln = None
 
         if use_service:
-            success, soln = self._ik_baxter.ik_servive_request(pos=pos, ori=ori)
+            success, soln = self._ik_baxter.ik_service_request(pos=pos, ori=ori, seed_angles=seed, null_space_goal=null_space_goal, use_advanced_options=True)
         else:
             soln = self._kinematics.inverse_kinematics(position=pos, orientation=ori, seed=seed)
 
@@ -442,7 +442,7 @@ class BaxterArm(baxter_interface.limb.Limb):
         return success, soln
 
 
-class BaxterButtonStatus():
+class BaxterButtonStatus(object):
     def __init__(self):
         self.left_cuff_btn = baxter_interface.DigitalIO('left_lower_cuff')
         self.left_dash_btn = baxter_interface.DigitalIO('left_upper_button')
