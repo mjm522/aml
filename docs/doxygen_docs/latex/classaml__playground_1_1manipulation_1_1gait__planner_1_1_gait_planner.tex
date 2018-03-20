@@ -1,0 +1,58 @@
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner}{\section{aml\-\_\-playground.\-manipulation.\-gait\-\_\-planner.\-Gait\-Planner Class Reference}
+\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner}\index{aml\-\_\-playground.\-manipulation.\-gait\-\_\-planner.\-Gait\-Planner@{aml\-\_\-playground.\-manipulation.\-gait\-\_\-planner.\-Gait\-Planner}}
+}
+
+
+Collaboration diagram for aml\-\_\-playground.\-manipulation.\-gait\-\_\-planner.\-Gait\-Planner\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a8cc77e441e8b38edcffd13130b154503}{def {\bfseries \-\_\-\-\_\-init\-\_\-\-\_\-}}\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a8cc77e441e8b38edcffd13130b154503}
+
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a7994340dc6e488e22019fe34e7df5fc3}{def {\bfseries check\-\_\-contact}}\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a7994340dc6e488e22019fe34e7df5fc3}
+
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a67c7b6cd7c492d64f56e5d63567f5df1}{def {\bfseries get\-\_\-contact\-\_\-points}}\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a67c7b6cd7c492d64f56e5d63567f5df1}
+
+\item 
+def \hyperlink{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_aa1a7dd03caf658db066022907956d05f}{find\-\_\-new\-\_\-fin\-\_\-pos}
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a1908bc4760665b00835639d68ec479ef}{def {\bfseries move\-\_\-to\-\_\-home}}\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_a1908bc4760665b00835639d68ec479ef}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_aa1a7dd03caf658db066022907956d05f}{\index{aml\-\_\-playground\-::manipulation\-::gait\-\_\-planner\-::\-Gait\-Planner@{aml\-\_\-playground\-::manipulation\-::gait\-\_\-planner\-::\-Gait\-Planner}!find\-\_\-new\-\_\-fin\-\_\-pos@{find\-\_\-new\-\_\-fin\-\_\-pos}}
+\index{find\-\_\-new\-\_\-fin\-\_\-pos@{find\-\_\-new\-\_\-fin\-\_\-pos}!aml_playground::manipulation::gait_planner::GaitPlanner@{aml\-\_\-playground\-::manipulation\-::gait\-\_\-planner\-::\-Gait\-Planner}}
+\subsubsection[{find\-\_\-new\-\_\-fin\-\_\-pos}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-playground.\-manipulation.\-gait\-\_\-planner.\-Gait\-Planner.\-find\-\_\-new\-\_\-fin\-\_\-pos (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{finger\-\_\-to\-\_\-switch}
+\end{DoxyParamCaption}
+)}}\label{classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner_aa1a7dd03caf658db066022907956d05f}
+\begin{DoxyVerb}this is a simple heuristic
+Assumption, if one finger is being switched, then
+all other three fingers are in contact.
+In case of these four fingers, there is an opposite finger for each finger
+So ideally to maintain stability, opposite finger contacts has to fall
+within their friction cones. An easy way to do this is to give the target point of
+the new finger as exactly opposite to the finger being switched.
+
+this heuristic takes the assumption that the object is symmetrical in x and y axis!
+
+Possible issue: does not check for kinematic feasibility
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-playground/src/aml\-\_\-playground/manipulation/gait\-\_\-planner.\-py\end{DoxyCompactItemize}

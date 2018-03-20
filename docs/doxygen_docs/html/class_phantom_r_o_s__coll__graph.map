@@ -1,0 +1,3 @@
+<map id="PhantomROS" name="PhantomROS">
+<area shape="rect" id="node2" href="$struct_omni_state.html" title="{OmniState\n|+ position\l+ velocity\l+ inp_vel1\l+ inp_vel2\l+ inp_vel3\l+ out_vel1\l+ out_vel2\l+ out_vel3\l+ pos_hist1\l+ pos_hist2\l+ rot\l+ joints\l+ force\l+ thetas\l+ buttons\l+ buttons_prev\l+ lock\l+ lock_pos\l+ rot\l+ close_gripper\l+ units_ratio\l|}" alt="" coords="31,5,141,376"/>
+</map>

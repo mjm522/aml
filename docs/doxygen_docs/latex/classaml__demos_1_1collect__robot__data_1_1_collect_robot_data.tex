@@ -1,0 +1,73 @@
+\hypertarget{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data}{\section{aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data Class Reference}
+\label{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data}\index{aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data@{aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data}}
+}
+
+
+Inheritance diagram for aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_ac8644f09b7d5a1ed4dd235db59e5ab9b}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+\hypertarget{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_afae93440b8a2cd7ecc60bb7345eba322}{def {\bfseries collect\-\_\-data}}\label{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_afae93440b8a2cd7ecc60bb7345eba322}
+
+\item 
+\hypertarget{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_aeb31b2aa40679320d2353bb6a7d7c305}{def {\bfseries save\-\_\-data\-\_\-now}}\label{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_aeb31b2aa40679320d2353bb6a7d7c305}
+
+\item 
+\hypertarget{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_aa47c96043ddbfe1566600c02659c3bc0}{def {\bfseries run}}\label{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_aa47c96043ddbfe1566600c02659c3bc0}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}The class that collects all data regarding a robot
+To use the sample recorder, do the following.
+Turn on the robot, get the lfd button status of the robot (e.g. baxter)
+when the robot arm is moving this value is usually unset.
+When the arm stops it generates an interrupt which is caught by the
+code and the recording stops.
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_ac8644f09b7d5a1ed4dd235db59e5ab9b}{\index{aml\-\_\-demos\-::collect\-\_\-robot\-\_\-data\-::\-Collect\-Robot\-Data@{aml\-\_\-demos\-::collect\-\_\-robot\-\_\-data\-::\-Collect\-Robot\-Data}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_demos::collect_robot_data::CollectRobotData@{aml\-\_\-demos\-::collect\-\_\-robot\-\_\-data\-::\-Collect\-Robot\-Data}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-demos.\-collect\-\_\-robot\-\_\-data.\-Collect\-Robot\-Data.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{robot\-\_\-interface, }
+\item[{}]{config}
+\end{DoxyParamCaption}
+)}}\label{classaml__demos_1_1collect__robot__data_1_1_collect_robot_data_ac8644f09b7d5a1ed4dd235db59e5ab9b}
+\begin{DoxyVerb}Constructor of the class
+Args:
+robot_interface : the handle to the robot object
+config: params:
+        data_folder_path: folder in which data has to be stored
+        data_name_prefix: specific name of each data sample
+        num_samples_per_file : number of samples per file
+        sampling_rate: at what rate data needs to be sampled from the robot
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-demos/src/aml\-\_\-demos/collect\-\_\-robot\-\_\-data.\-py\end{DoxyCompactItemize}

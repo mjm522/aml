@@ -1,6 +1,11 @@
 var searchData=
 [
+  ['mancntrlr',['ManCntrlr',['../classaml__playground_1_1manipulation_1_1manipulation__ctrlr_1_1_man_cntrlr.html',1,'aml_playground::manipulation::manipulation_ctrlr']]],
+  ['mancntrlr',['ManCntrlr',['../classaml__playground_1_1manipulation_1_1manipulation__ctrlr2_1_1_man_cntrlr.html',1,'aml_playground::manipulation::manipulation_ctrlr2']]],
+  ['manipulableobject',['ManipulableObject',['../classaml__grasp_1_1manipulable__object_1_1_manipulable_object.html',1,'aml_grasp::manipulable_object']]],
   ['manipulator',['Manipulator',['../classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1box2d_1_1manipulator_1_1_manipulator.html',1,'aml_playground::peg_in_hole::pih_worlds::box2d::manipulator']]],
+  ['manobject',['ManObject',['../classaml__rl__envs_1_1task_1_1man__object_1_1_man_object.html',1,'aml_rl_envs::task::man_object']]],
+  ['manualdemocollect',['ManualDemoCollect',['../classaml__rl__envs_1_1utils_1_1manual__control__collect__demo_1_1_manual_demo_collect.html',1,'aml_rl_envs::utils::manual_control_collect_demo']]],
   ['markerodometry',['MarkerOdometry',['../class_marker_odometry.html',1,'']]],
   ['masterplotter',['MasterPlotter',['../classsrc_1_1aml__visual__tools_1_1master__client__plotter_1_1_master_plotter.html',1,'src::aml_visual_tools::master_client_plotter']]],
   ['mdnpushfwdmodel',['MDNPushFwdModel',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1mdn__push__fwd__model_1_1_m_d_n_push_fwd_model.html',1,'src::aml_dl::mdn::model::mdn_push_fwd_model']]],
@@ -10,8 +15,11 @@ var searchData=
   ['mixtureofgaussians',['MixtureOfGaussians',['../classsrc_1_1aml__dl_1_1mdn_1_1model_1_1tf__mdn__model_1_1_mixture_of_gaussians.html',1,'src::aml_dl::mdn::model::tf_mdn_model']]],
   ['modecommandcallback',['modeCommandCallback',['../classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html#aff0207bdb9a7d00b791ce5edc6ee27b9',1,'baxter_gazebo_plugin::BaxterGazeboRosControlPlugin::modeCommandCallback()'],['../classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin.html#aa9ffbc75bbe5769b77c7cf837920afc7',1,'sawyer_gazebo_plugin::SawyerGazeboRosControlPlugin::modeCommandCallback()']]],
   ['modify_5ftraj',['modify_traj',['../classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html#ab61b672735f26076de753af61ad0fd6c',1,'aml_opt::pi_traj_opt::pi_traj_opt::PITrajOpt']]],
+  ['move_5fto_5fjoint_5fpos_5fdelta',['move_to_joint_pos_delta',['../classaml__robot_1_1robot__interface_1_1_robot_interface.html#a22eced2db066966c126a6e542f8633ca',1,'aml_robot::robot_interface::RobotInterface']]],
+  ['move_5fto_5fjoint_5fposition',['move_to_joint_position',['../classaml__robot_1_1robot__interface_1_1_robot_interface.html#a4a551823396bea099ab4668fe2f170d5',1,'aml_robot::robot_interface::RobotInterface']]],
   ['mppicontroller',['MPPIController',['../classaml__opt_1_1mppi__controller_1_1mppi__controller_1_1_m_p_p_i_controller.html',1,'aml_opt::mppi_controller::mppi_controller']]],
   ['mppipushingservice',['MPPIPushingService',['../classsrc_1_1aml__services_1_1mppi__pushing__service_1_1_m_p_p_i_pushing_service.html',1,'src::aml_services::mppi_pushing_service']]],
   ['mujocorobot',['MujocoRobot',['../classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html',1,'aml_robot::mujoco::mujoco_robot']]],
-  ['mujocoviewer',['MujocoViewer',['../classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer.html',1,'aml_robot::mujoco::mujoco_viewer']]]
+  ['mujocoviewer',['MujocoViewer',['../classaml__robot_1_1mujoco_1_1mujoco__viewer_1_1_mujoco_viewer.html',1,'aml_robot::mujoco::mujoco_viewer']]],
+  ['multiplepromps',['MultiplePROMPs',['../classaml__lfd_1_1promp_1_1discrete__promp_1_1_multiple_p_r_o_m_ps.html',1,'aml_lfd::promp::discrete_promp']]]
 ];

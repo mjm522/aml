@@ -3,7 +3,8 @@
 }
 
 
-Inheritance diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor\-:\nopagebreak
+Inheritance diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,7 +13,8 @@ Inheritance diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Senso
 \end{figure}
 
 
-Collaboration diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor\-:\nopagebreak
+Collaboration diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -30,14 +32,61 @@ Collaboration diagram for aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sen
 \item 
 \hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a95227671ed4cf14c09493d81bc619ea7}{def {\bfseries shutdown}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a95227671ed4cf14c09493d81bc619ea7}
 
-\end{DoxyCompactItemize}
-\subsection*{Public Attributes}
-\begin{DoxyCompactItemize}
 \item 
-\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_af2ce3908d0143e32e9bc38d087440873}{{\bfseries rgb\-\_\-image\-\_\-pub}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_af2ce3908d0143e32e9bc38d087440873}
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_adfbd28ea71c000f8ea5fed25868fb15f}{def {\bfseries set\-\_\-intrinsics}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_adfbd28ea71c000f8ea5fed25868fb15f}
 
+\item 
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a57e0a5307a84544f0c0c5f8f1c0bc86b}{def {\bfseries intrinsics}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a57e0a5307a84544f0c0c5f8f1c0bc86b}
+
+\item 
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a0a599df52837dc5fc2debac009cbab99}{def {\bfseries rgb\-\_\-image}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a0a599df52837dc5fc2debac009cbab99}
+
+\item 
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_ad77338064fe84b1932656006fdf5f366}{def {\bfseries depth\-\_\-image}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_ad77338064fe84b1932656006fdf5f366}
+
+\item 
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_abcd2dd8b9c56b814fccc4ae487835962}{def {\bfseries cloud}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_abcd2dd8b9c56b814fccc4ae487835962}
+
+\item 
+def \hyperlink{classaml__perception_1_1camera__sensor_1_1_camera_sensor_aa13c3fd9edecf042fb0a63daa1b2fc9a}{deproject}
+\item 
+def \hyperlink{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a12f9efec439335da2874a9be29c63271}{project}
 \end{DoxyCompactItemize}
 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_aa13c3fd9edecf042fb0a63daa1b2fc9a}{\index{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor@{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor}!deproject@{deproject}}
+\index{deproject@{deproject}!aml_perception::camera_sensor::CameraSensor@{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor}}
+\subsubsection[{deproject}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor.\-deproject (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{depth\-\_\-image}
+\end{DoxyParamCaption}
+)}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_aa13c3fd9edecf042fb0a63daa1b2fc9a}
+\begin{DoxyVerb}Deprojects a depth image (2D numpy float array) into a point cloud
+Params:
+
+depth_image: (HxW numpy array of floats) 2D depth image to project
+Returns:
+3xN numpy float array of 3D points
+\end{DoxyVerb}
+ \hypertarget{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a12f9efec439335da2874a9be29c63271}{\index{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor@{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor}!project@{project}}
+\index{project@{project}!aml_perception::camera_sensor::CameraSensor@{aml\-\_\-perception\-::camera\-\_\-sensor\-::\-Camera\-Sensor}}
+\subsubsection[{project}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-perception.\-camera\-\_\-sensor.\-Camera\-Sensor.\-project (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{points}
+\end{DoxyParamCaption}
+)}}\label{classaml__perception_1_1camera__sensor_1_1_camera_sensor_a12f9efec439335da2874a9be29c63271}
+\begin{DoxyVerb}Projects a set of points into the camera given by these parameters
+
+Params:
+points: (3xN numpy array of floats) 3D points to project
+Returns:
+2xN numpy float array of 2D image coordinates
+1xN binary numpy array indicating whether or not point projected outside of image
+\end{DoxyVerb}
+ 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 

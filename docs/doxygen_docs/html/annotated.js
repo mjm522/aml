@@ -12,8 +12,14 @@ var annotated =
           [ "js_postn_controller", null, [
             [ "JSPositionController", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller" ]
           ] ],
+          [ "js_postn_controller2", null, [
+            [ "JSPositionController2", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller2_1_1_j_s_position_controller2.html", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller2_1_1_j_s_position_controller2" ]
+          ] ],
           [ "js_torque_controller", null, [
             [ "JSTorqueController", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller" ]
+          ] ],
+          [ "js_velocity_controller", null, [
+            [ "JSVelocityController", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__velocity__controller_1_1_j_s_velocity_controller.html", "classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__velocity__controller_1_1_j_s_velocity_controller" ]
           ] ]
         ] ],
         [ "os_controller", null, [
@@ -102,12 +108,31 @@ var annotated =
       ] ]
     ] ],
     [ "aml_demos", null, [
+      [ "collect_robot_data", null, [
+        [ "Task", "classaml__demos_1_1collect__robot__data_1_1_task.html", "classaml__demos_1_1collect__robot__data_1_1_task" ],
+        [ "CollectRobotData", "classaml__demos_1_1collect__robot__data_1_1_collect_robot_data.html", "classaml__demos_1_1collect__robot__data_1_1_collect_robot_data" ]
+      ] ],
+      [ "collect_robot_data2", null, [
+        [ "AgentProxy", "classaml__demos_1_1collect__robot__data2_1_1_agent_proxy.html", "classaml__demos_1_1collect__robot__data2_1_1_agent_proxy" ]
+      ] ],
       [ "general_pushing_machine", null, [
         [ "Task", "classaml__demos_1_1general__pushing__machine_1_1_task.html", "classaml__demos_1_1general__pushing__machine_1_1_task" ],
         [ "GeneralPushingMachine", "classaml__demos_1_1general__pushing__machine_1_1_general_pushing_machine.html", "classaml__demos_1_1general__pushing__machine_1_1_general_pushing_machine" ]
       ] ],
+      [ "joint_sliders", null, [
+        [ "DummyController", "classaml__demos_1_1joint__sliders_1_1_dummy_controller.html", "classaml__demos_1_1joint__sliders_1_1_dummy_controller" ],
+        [ "FloatSlider", "classaml__demos_1_1joint__sliders_1_1_float_slider.html", "classaml__demos_1_1joint__sliders_1_1_float_slider" ],
+        [ "StatePopup", "classaml__demos_1_1joint__sliders_1_1_state_popup.html", "classaml__demos_1_1joint__sliders_1_1_state_popup" ],
+        [ "BackgroundWorker", "classaml__demos_1_1joint__sliders_1_1_background_worker.html", "classaml__demos_1_1joint__sliders_1_1_background_worker" ],
+        [ "SliderWindow", "classaml__demos_1_1joint__sliders_1_1_slider_window.html", "classaml__demos_1_1joint__sliders_1_1_slider_window" ]
+      ] ],
       [ "stochastic_pushing_machine", null, [
         [ "StochasticPushMachine", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine.html", "classaml__demos_1_1stochastic__pushing__machine_1_1_stochastic_push_machine" ]
+      ] ]
+    ] ],
+    [ "aml_grasp", null, [
+      [ "manipulable_object", null, [
+        [ "ManipulableObject", "classaml__grasp_1_1manipulable__object_1_1_manipulable_object.html", "classaml__grasp_1_1manipulable__object_1_1_manipulable_object" ]
       ] ]
     ] ],
     [ "aml_io", null, [
@@ -115,6 +140,7 @@ var annotated =
         [ "DataManager", "classaml__io_1_1data__manager_1_1_data_manager.html", "classaml__io_1_1data__manager_1_1_data_manager" ]
       ] ],
       [ "log_utils", null, [
+        [ "AMLLogger", "classaml__io_1_1log__utils_1_1_a_m_l_logger.html", "classaml__io_1_1log__utils_1_1_a_m_l_logger" ],
         [ "aml_logging", "classaml__io_1_1log__utils_1_1aml__logging.html", "classaml__io_1_1log__utils_1_1aml__logging" ]
       ] ]
     ] ],
@@ -143,7 +169,8 @@ var annotated =
       [ "promp", null, [
         [ "discrete_promp", null, [
           [ "Phase", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_phase.html", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_phase" ],
-          [ "DiscretePROMP", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p" ]
+          [ "DiscretePROMP", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p.html", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_discrete_p_r_o_m_p" ],
+          [ "MultiplePROMPs", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_multiple_p_r_o_m_ps.html", "classaml__lfd_1_1promp_1_1discrete__promp_1_1_multiple_p_r_o_m_ps" ]
         ] ],
         [ "promp_ctrl", null, [
           [ "PROMPCtrl", "classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl.html", "classaml__lfd_1_1promp_1_1promp__ctrl_1_1_p_r_o_m_p_ctrl" ]
@@ -173,6 +200,10 @@ var annotated =
           [ "PITrajOpt", "classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt.html", "classaml__opt_1_1pi__traj__opt_1_1pi__traj__opt_1_1_p_i_traj_opt" ]
         ] ]
       ] ]
+    ] ],
+    [ "aml_pcloud", null, [
+      [ "PclRosConversions", "classaml__pcloud_1_1_pcl_ros_conversions.html", "classaml__pcloud_1_1_pcl_ros_conversions" ],
+      [ "PCLProcessor", "classaml__pcloud_1_1_p_c_l_processor.html", "classaml__pcloud_1_1_p_c_l_processor" ]
     ] ],
     [ "aml_perception", null, [
       [ "camera_sensor", null, [
@@ -274,6 +305,44 @@ var annotated =
       ] ]
     ] ],
     [ "aml_playground", null, [
+      [ "manipulation", null, [
+        [ "analyze_man_data", null, [
+          [ "AnalyzeManData", "classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data.html", "classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data" ]
+        ] ],
+        [ "collect_man_data", null, [
+          [ "CollectManData", "classaml__playground_1_1manipulation_1_1collect__man__data_1_1_collect_man_data.html", "classaml__playground_1_1manipulation_1_1collect__man__data_1_1_collect_man_data" ]
+        ] ],
+        [ "contact_planner", null, [
+          [ "ContactPlanner", "classaml__playground_1_1manipulation_1_1contact__planner_1_1_contact_planner.html", "classaml__playground_1_1manipulation_1_1contact__planner_1_1_contact_planner" ]
+        ] ],
+        [ "dmp_contact_planner", null, [
+          [ "DMPConPlan", "classaml__playground_1_1manipulation_1_1dmp__contact__planner_1_1_d_m_p_con_plan.html", "classaml__playground_1_1manipulation_1_1dmp__contact__planner_1_1_d_m_p_con_plan" ]
+        ] ],
+        [ "dmp_gaits", null, [
+          [ "DMPGaits", "classaml__playground_1_1manipulation_1_1dmp__gaits_1_1_d_m_p_gaits.html", "classaml__playground_1_1manipulation_1_1dmp__gaits_1_1_d_m_p_gaits" ]
+        ] ],
+        [ "dmp_manipulation", null, [
+          [ "DMPManptln", "classaml__playground_1_1manipulation_1_1dmp__manipulation_1_1_d_m_p_manptln.html", "classaml__playground_1_1manipulation_1_1dmp__manipulation_1_1_d_m_p_manptln" ]
+        ] ],
+        [ "gait_planner", null, [
+          [ "GaitPlanner", "classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner.html", "classaml__playground_1_1manipulation_1_1gait__planner_1_1_gait_planner" ]
+        ] ],
+        [ "manipulation_ctrlr", null, [
+          [ "ManCntrlr", "classaml__playground_1_1manipulation_1_1manipulation__ctrlr_1_1_man_cntrlr.html", "classaml__playground_1_1manipulation_1_1manipulation__ctrlr_1_1_man_cntrlr" ]
+        ] ],
+        [ "manipulation_ctrlr2", null, [
+          [ "ManCntrlr", "classaml__playground_1_1manipulation_1_1manipulation__ctrlr2_1_1_man_cntrlr.html", "classaml__playground_1_1manipulation_1_1manipulation__ctrlr2_1_1_man_cntrlr" ]
+        ] ],
+        [ "promp_gaits", null, [
+          [ "PROMPGaits", "classaml__playground_1_1manipulation_1_1promp__gaits_1_1_p_r_o_m_p_gaits.html", "classaml__playground_1_1manipulation_1_1promp__gaits_1_1_p_r_o_m_p_gaits" ]
+        ] ],
+        [ "qp_pos_gaits", null, [
+          [ "QPPosGaits", "classaml__playground_1_1manipulation_1_1qp__pos__gaits_1_1_q_p_pos_gaits.html", "classaml__playground_1_1manipulation_1_1qp__pos__gaits_1_1_q_p_pos_gaits" ]
+        ] ],
+        [ "qp_vel_gaits", null, [
+          [ "QPVelGaits", "classaml__playground_1_1manipulation_1_1qp__vel__gaits_1_1_q_p_vel_gaits.html", "classaml__playground_1_1manipulation_1_1qp__vel__gaits_1_1_q_p_vel_gaits" ]
+        ] ]
+      ] ],
       [ "peg_in_hole", null, [
         [ "controller", null, [
           [ "actor_critic_gain_learner", null, [
@@ -344,6 +413,74 @@ var annotated =
         ] ]
       ] ]
     ] ],
+    [ "aml_rl_envs", null, [
+      [ "aml_rl_env", null, [
+        [ "AMLRlEnv", "classaml__rl__envs_1_1aml__rl__env_1_1_a_m_l_rl_env.html", "classaml__rl__envs_1_1aml__rl__env_1_1_a_m_l_rl_env" ]
+      ] ],
+      [ "aml_rl_hand", null, [
+        [ "AMLRlHand", "classaml__rl__envs_1_1aml__rl__hand_1_1_a_m_l_rl_hand.html", "classaml__rl__envs_1_1aml__rl__hand_1_1_a_m_l_rl_hand" ]
+      ] ],
+      [ "aml_rl_robot", null, [
+        [ "AMLRlRobot", "classaml__rl__envs_1_1aml__rl__robot_1_1_a_m_l_rl_robot.html", "classaml__rl__envs_1_1aml__rl__robot_1_1_a_m_l_rl_robot" ]
+      ] ],
+      [ "dlr_hand", null, [
+        [ "dlr_hand", null, [
+          [ "DLRHand", "classaml__rl__envs_1_1dlr__hand_1_1dlr__hand_1_1_d_l_r_hand.html", "classaml__rl__envs_1_1dlr__hand_1_1dlr__hand_1_1_d_l_r_hand" ]
+        ] ],
+        [ "dlr_hand_obj_env", null, [
+          [ "DLRHandObjEnv", "classaml__rl__envs_1_1dlr__hand_1_1dlr__hand__obj__env_1_1_d_l_r_hand_obj_env.html", "classaml__rl__envs_1_1dlr__hand_1_1dlr__hand__obj__env_1_1_d_l_r_hand_obj_env" ]
+        ] ]
+      ] ],
+      [ "hand", null, [
+        [ "hand", null, [
+          [ "Hand", "classaml__rl__envs_1_1hand_1_1hand_1_1_hand.html", "classaml__rl__envs_1_1hand_1_1hand_1_1_hand" ]
+        ] ],
+        [ "hand_obj_env", null, [
+          [ "HandObjEnv", "classaml__rl__envs_1_1hand_1_1hand__obj__env_1_1_hand_obj_env.html", "classaml__rl__envs_1_1hand_1_1hand__obj__env_1_1_hand_obj_env" ]
+        ] ],
+        [ "hand_obst_env", null, [
+          [ "HandObstacleEnv", "classaml__rl__envs_1_1hand_1_1hand__obst__env_1_1_hand_obstacle_env.html", "classaml__rl__envs_1_1hand_1_1hand__obst__env_1_1_hand_obstacle_env" ]
+        ] ]
+      ] ],
+      [ "kuka", null, [
+        [ "kuka", null, [
+          [ "Kuka", "classaml__rl__envs_1_1kuka_1_1kuka_1_1_kuka.html", "classaml__rl__envs_1_1kuka_1_1kuka_1_1_kuka" ]
+        ] ],
+        [ "kuka_env", null, [
+          [ "KukaEnv", "classaml__rl__envs_1_1kuka_1_1kuka__env_1_1_kuka_env.html", "classaml__rl__envs_1_1kuka_1_1kuka__env_1_1_kuka_env" ]
+        ] ]
+      ] ],
+      [ "pisa_hand", null, [
+        [ "pisa_hand", null, [
+          [ "PisaHand", "classaml__rl__envs_1_1pisa__hand_1_1pisa__hand_1_1_pisa_hand.html", "classaml__rl__envs_1_1pisa__hand_1_1pisa__hand_1_1_pisa_hand" ]
+        ] ],
+        [ "pisa_hand_obj_env", null, [
+          [ "PisaHandObjEnv", "classaml__rl__envs_1_1pisa__hand_1_1pisa__hand__obj__env_1_1_pisa_hand_obj_env.html", "classaml__rl__envs_1_1pisa__hand_1_1pisa__hand__obj__env_1_1_pisa_hand_obj_env" ]
+        ] ]
+      ] ],
+      [ "sawyer", null, [
+        [ "sawyer", null, [
+          [ "Sawyer", "classaml__rl__envs_1_1sawyer_1_1sawyer_1_1_sawyer.html", "classaml__rl__envs_1_1sawyer_1_1sawyer_1_1_sawyer" ]
+        ] ],
+        [ "sawyer_env", null, [
+          [ "SawyerEnv", "classaml__rl__envs_1_1sawyer_1_1sawyer__env_1_1_sawyer_env.html", "classaml__rl__envs_1_1sawyer_1_1sawyer__env_1_1_sawyer_env" ]
+        ] ]
+      ] ],
+      [ "task", null, [
+        [ "man_object", null, [
+          [ "ManObject", "classaml__rl__envs_1_1task_1_1man__object_1_1_man_object.html", "classaml__rl__envs_1_1task_1_1man__object_1_1_man_object" ]
+        ] ]
+      ] ],
+      [ "utils", null, [
+        [ "collect_demo", null, [
+          [ "CollectDemo", "classaml__rl__envs_1_1utils_1_1collect__demo_1_1_collect_demo.html", "classaml__rl__envs_1_1utils_1_1collect__demo_1_1_collect_demo" ],
+          [ "SmoothDemoTraj", "classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj.html", "classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj" ]
+        ] ],
+        [ "manual_control_collect_demo", null, [
+          [ "ManualDemoCollect", "classaml__rl__envs_1_1utils_1_1manual__control__collect__demo_1_1_manual_demo_collect.html", "classaml__rl__envs_1_1utils_1_1manual__control__collect__demo_1_1_manual_demo_collect" ]
+        ] ]
+      ] ]
+    ] ],
     [ "aml_robot", null, [
       [ "baxter_ik", null, [
         [ "IKBaxter", "classaml__robot_1_1baxter__ik_1_1_i_k_baxter.html", "classaml__robot_1_1baxter__ik_1_1_i_k_baxter" ]
@@ -402,6 +539,14 @@ var annotated =
           ] ]
         ] ]
       ] ],
+      [ "pisaiit", null, [
+        [ "pisaiit_robot", null, [
+          [ "PisaIITHand", "classaml__robot_1_1pisaiit_1_1pisaiit__robot_1_1_pisa_i_i_t_hand.html", "classaml__robot_1_1pisaiit_1_1pisaiit__robot_1_1_pisa_i_i_t_hand" ]
+        ] ],
+        [ "test_pisaiit", null, [
+          [ "SomeObj", "classaml__robot_1_1pisaiit_1_1test__pisaiit_1_1_some_obj.html", "classaml__robot_1_1pisaiit_1_1test__pisaiit_1_1_some_obj" ]
+        ] ]
+      ] ],
       [ "robot_interface", null, [
         [ "RobotInterface", "classaml__robot_1_1robot__interface_1_1_robot_interface.html", "classaml__robot_1_1robot__interface_1_1_robot_interface" ]
       ] ],
@@ -415,9 +560,38 @@ var annotated =
         [ "SawyerArm", "classaml__robot_1_1sawyer__robot_1_1_sawyer_arm.html", "classaml__robot_1_1sawyer__robot_1_1_sawyer_arm" ]
       ] ]
     ] ],
+    [ "aml_teleop", null, [
+      [ "haptic_teleop", null, [
+        [ "haptic_robot_interface", null, [
+          [ "HapticRobotInterface", "classaml__teleop_1_1haptic__teleop_1_1haptic__robot__interface_1_1_haptic_robot_interface.html", "classaml__teleop_1_1haptic__teleop_1_1haptic__robot__interface_1_1_haptic_robot_interface" ]
+        ] ],
+        [ "js_teleop_ctrl", null, [
+          [ "JSTeleopCtrl", "classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl.html", "classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl" ]
+        ] ],
+        [ "os_teleop_ctrl", null, [
+          [ "OSTeleopCtrl", "classaml__teleop_1_1haptic__teleop_1_1os__teleop__ctrl_1_1_o_s_teleop_ctrl.html", "classaml__teleop_1_1haptic__teleop_1_1os__teleop__ctrl_1_1_o_s_teleop_ctrl" ]
+        ] ]
+      ] ],
+      [ "teleop", null, [
+        [ "TeleOp", "classaml__teleop_1_1teleop_1_1_tele_op.html", "classaml__teleop_1_1teleop_1_1_tele_op" ]
+      ] ]
+    ] ],
+    [ "aml_utils", null, [
+      [ "aml_pykdl", null, [
+        [ "aml_pykdl", null, [
+          [ "AMLPyKDL", "classaml__utils_1_1aml__pykdl_1_1aml__pykdl_1_1_a_m_l_py_k_d_l.html", "classaml__utils_1_1aml__pykdl_1_1aml__pykdl_1_1_a_m_l_py_k_d_l" ]
+        ] ]
+      ] ]
+    ] ],
     [ "arm_kinematics", "namespacearm__kinematics.html", "namespacearm__kinematics" ],
     [ "baxter_gazebo_plugin", null, [
       [ "BaxterGazeboRosControlPlugin", "classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html", "classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin" ]
+    ] ],
+    [ "bullet_teleop", null, [
+      [ "BulletTeleop", "classbullet__teleop_1_1_bullet_teleop.html", "classbullet__teleop_1_1_bullet_teleop" ]
+    ] ],
+    [ "demo_aml_kdl", null, [
+      [ "DemoKDL", "classdemo__aml__kdl_1_1_demo_k_d_l.html", "classdemo__aml__kdl_1_1_demo_k_d_l" ]
     ] ],
     [ "demo_box2d_dmp", null, [
       [ "Box2dDMP", "classdemo__box2d__dmp_1_1_box2d_d_m_p.html", "classdemo__box2d__dmp_1_1_box2d_d_m_p" ]
@@ -435,6 +609,16 @@ var annotated =
       [ "InteraSDKTest", "classjoint__position__wobble_1_1_intera_s_d_k_test.html", "classjoint__position__wobble_1_1_intera_s_d_k_test" ]
     ] ],
     [ "kinematics", "namespacekinematics.html", "namespacekinematics" ],
+    [ "omni_interface", null, [
+      [ "phantom_omni", null, [
+        [ "PhantomOmni", "classomni__interface_1_1phantom__omni_1_1_phantom_omni.html", "classomni__interface_1_1phantom__omni_1_1_phantom_omni" ]
+      ] ]
+    ] ],
+    [ "omni_pykdl", null, [
+      [ "omni_pykdl", null, [
+        [ "OmniPyKDL", "classomni__pykdl_1_1omni__pykdl_1_1_omni_py_k_d_l.html", "classomni__pykdl_1_1omni__pykdl_1_1_omni_py_k_d_l" ]
+      ] ]
+    ] ],
     [ "sawyer_en", "namespacesawyer__en.html", "namespacesawyer__en" ],
     [ "sawyer_gazebo_plugin", null, [
       [ "SawyerGazeboRosControlPlugin", "classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin.html", "classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin" ]
@@ -526,5 +710,7 @@ var annotated =
     [ "BoxAR", "class_box_a_r.html", "class_box_a_r" ],
     [ "comm_settings", "structcomm__settings.html", "structcomm__settings" ],
     [ "MarkerOdometry", "class_marker_odometry.html", "class_marker_odometry" ],
+    [ "OmniState", "struct_omni_state.html", "struct_omni_state" ],
+    [ "PhantomROS", "class_phantom_r_o_s.html", "class_phantom_r_o_s" ],
     [ "PisaSoftHand", "class_pisa_soft_hand.html", "class_pisa_soft_hand" ]
 ];

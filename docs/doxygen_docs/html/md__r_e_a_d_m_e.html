@@ -100,13 +100,24 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 <div class="title">Advanced Manipulation Learning (AML) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>Dependencies</h2>
+<div class="textblock"><h2>Live Docs for AML</h2>
+<ul>
+<li>Live documentation for AML can be found <a href="https://docs.google.com/document/d/1_xM5TvY-ARBdU3P3D4MrxzcuUbaHkiwEP5UDHMdy4yM/edit?usp=sharing">here</a></li>
+<li>Also see the docs folder in the AML root directory for the doxygen documentation.</li>
+</ul>
+<h2>Setting up AML - The Very Simple Way</h2>
+<ul>
+<li>A set of scripts for installing AML natively in your host machine, or for getting it setup in a docker container can be found <a href="https://github.com/eaa3/aml_install">here</a></li>
+</ul>
+<h2>Setting AML manually</h2>
+<h3>Dependencies</h3>
 <ul>
 <li><a href="http://wiki.ros.org/indigo/Installation/Ubuntu">ROS (Indigo)</a></li>
 <li><a href="http://sdk.rethinkrobotics.com/wiki/Hello_Baxter">BaxterSDK</a></li>
 <li><a href="http://sdk.rethinkrobotics.com/wiki/Simulator_Installation">Baxter Simulator</a></li>
+<li><a href="http://sdk.rethinkrobotics.com/intera/Main_Page">Saywer Robot</a></li>
 </ul>
-<h3>Python Libraries</h3>
+<h4>Python Libraries</h4>
 <ul>
 <li><a href="http://www.numpy.org/">numpy</a></li>
 <li><a href="https://pypi.python.org/pypi/numpy-quaternion">numpy-quaternion</a></li>
@@ -115,13 +126,14 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 <li><a href="https://github.com/pybox2d/pybox2d">pybox2d</a></li>
 <li><a href="https://pypi.python.org/pypi/Pillow/4.1.1">Pillow</a></li>
 <li><a href="https://pypi.python.org/pypi/scipy/0.19.0">Scipy</a></li>
+<li><a href="https://pandas.pydata.org/">Pandas</a></li>
 <li><a href="https://pypi.python.org/pypi/six/1.10.0">six</a></li>
 <li><a href="https://pypi.python.org/pypi/decorator/4.0.11">decorator</a></li>
 <li><a href="https://pypi.python.org/pypi/matplotlib/2.0.1">matplotlib</a></li>
 <li><a href="https://pypi.python.org/pypi/ipython/6.0.0">ipython</a></li>
 <li><a href="https://github.com/opencv/opencv">cv2</a></li>
 </ul>
-<h4>This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.</h4>
+<h5>This document lists various setup instructions after a fresh installation of Ubuntu 14.04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.</h5>
 <ol type="1">
 <li>Installing ROS - Indigo: Follow instructions on this <a href="http://wiki.ros.org/indigo/Installation/Ubuntu">page</a>. <b>Important Note:</b> install “desktop-full” version</li>
 <li>Installing virtual environment<ul>
@@ -149,7 +161,7 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 <li>Create a new workspace and clone aml repository in it ``` mkdir ~/catkin_ws cd catkin_ws mkdir baxter_ws cd baxter_ws mkdir src cd src git clone <a href="https://github.com/RobotsLab/AML.git">https://github.com/RobotsLab/AML.git</a> ```</li>
 <li>Baxter simulator setup<ul>
 <li>Dependencies ``` sudo apt-get install gazebo2 ros-indigo-qt-build ros-indigo-driver-common ros-indigo-gazebo-ros-control ros-indigo-gazebo-ros-pkgs ros-indigo-ros-control ros-indigo-control-toolbox ros-indigo-realtime-tools ros-indigo-ros-controllers ros-indigo-xacro python-wstool ros-indigo-tf-conversions ros-indigo-kdl-parser ```</li>
-<li>Simulator (specific versions) ``` cd ~/catkin_workspaces/baxter_ws/src wstool init . wstool merge baxter_simulator_with_aml.rosinstall (take this file from aml/3rdparty) baxter_simulator.rosinstall wstool update ```</li>
+<li>Simulator (specific versions) ``` cd ~/catkin_workspaces/baxter_ws/src wstool init . wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall wstool update wstool merge sawyer_robot/sawyer_robot.rosinstall wstool update ```</li>
 </ul>
 </li>
 </ol>
@@ -158,9 +170,8 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 <li>Final step ``` cd ../ catkin_make ```</li>
 </ul>
 <p>Few other dependencies</p>
-<p>``` pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide ```</p>
+<p>``` pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide pandas pip install pybullet pip install git+git://github.com/pybox2d/pybox2d ```</p>
 <ol type="1">
-<li>Installing pybox2d - follow instructions in this https://github.com/pybox2d/pybox2d/blob/master/INSTALL.md "page".</li>
 <li><p class="startli">Installing opencv for python</p>
 <p class="startli"><b>Note:</b> this compilation could take a while! And install this only after removing opencv-python (this is unofficial version) if installed previously.</p>
 <ul>
@@ -171,7 +182,7 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html','');});
 </ul>
 </li>
 </ol>
-<h4>Possible Errors:</h4>
+<h5>Possible Errors:</h5>
 <ol type="1">
 <li><p class="startli">Could not find any downloads that satisfy the requirement tensorflow</p>
 <p class="startli"><b>Solution:</b> <code>pip install --upgrade pip</code></p>
