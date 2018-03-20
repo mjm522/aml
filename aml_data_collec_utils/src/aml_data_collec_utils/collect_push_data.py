@@ -219,7 +219,7 @@ class PushMachine(object):
              goal_ori = start_ori
 
         goal_ori = quaternion.as_float_array(goal_ori)
-        success, js_pos = self._robot.ik(goal_pos,goal_ori)
+        success, js_pos = self._robot.inverse_kinematics(goal_pos, goal_ori)
 
         if success:
             self._robot.move_to_joint_position(js_pos)

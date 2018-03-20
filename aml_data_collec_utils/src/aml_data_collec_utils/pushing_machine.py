@@ -262,7 +262,7 @@ class PushMachine(object):
         for i in range(ntrials):
 
             # goal_pos_test = (goal_pos + np.random.randn(3)*0.005).astype(float)
-            success, js_pos = self._robot.ik(goal_pos_test,goal_ori)
+            success, js_pos = self._robot.inverse_kinematics(goal_pos_test, goal_ori)
 
             print "Trying to push... Status:", success
 

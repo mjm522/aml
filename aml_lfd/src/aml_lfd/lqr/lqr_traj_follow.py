@@ -76,7 +76,7 @@ class LQRTrajFollow():
 
         dq    = x0[self.idx['q_dot']]
 
-        Mq    = self.robot.get_arm_inertia(joint_angles=q)
+        Mq    = self.robot.inertia(joint_angles=q)
         
         ddq   = np.dot(np.linalg.inv(Mq), u0)
         

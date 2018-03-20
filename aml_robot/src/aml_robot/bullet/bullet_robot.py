@@ -58,7 +58,7 @@ class BulletRobot(object):
         _, _, self._view_matrix, _, _, _, _, _, _, _, _, _ = pb.getDebugVisualizerCamera()
         (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'], 
                                     self._config['cam']['image_height'], 
-                                    self._view_matrix, self._projection_matrix, [0,1,0])
+                                    self._view_matrix, self._projection_matrix, [0,1,0], renderer=pb.ER_BULLET_HARDWARE_OPENG)
 
         # rgba to rgb
         rgb_image = rgb_pixels[:,:,0:3]

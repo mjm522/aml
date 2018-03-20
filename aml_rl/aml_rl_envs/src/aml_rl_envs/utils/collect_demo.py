@@ -134,7 +134,7 @@ class CollectDemo():
 
                     traj_point_2, _ = self._manipulator.get_ee_pose()
 
-                    ee_vel, ee_omg = self._manipulator.get_ee_velocity()
+                    ee_vel, ee_omg = self._manipulator.ee_velocity()
 
                     jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self._manipulator.get_jnt_state()
 

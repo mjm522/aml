@@ -27,7 +27,7 @@ goal_pos = start_pos + np.array([0.2,0.10,-0.11])
 goal_ori = quaternion.as_float_array(start_ori)
 print "GOALORI: ", goal_ori
 
-success, joints = limb.ik(goal_pos,goal_ori)
+success, joints = limb.inverse_kinematics(goal_pos, goal_ori)
 
 rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():

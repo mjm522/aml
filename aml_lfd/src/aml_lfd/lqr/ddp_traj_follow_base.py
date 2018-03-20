@@ -82,7 +82,7 @@ class DDPTrajFollow():
 
         dq    = x0[self.idx['dq']]
 
-        Mq    = self.robot.get_arm_inertia(joint_angles=q)
+        Mq    = self.robot.inertia(joint_angles=q)
 
         ## for our feedback controllers it's important to have past inputs and
         ## change in inputs stored into the state:

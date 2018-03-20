@@ -80,7 +80,7 @@ class OSPositionController(OSController):
         error          = 100.
 
         curr_pos, curr_ori  = self._robot.get_ee_pose()
-        curr_vel, curr_omg  = self._robot.get_ee_velocity()
+        curr_vel, curr_omg  = self._robot.ee_velocity()
 
         delta_pos      = goal_pos - curr_pos
 
