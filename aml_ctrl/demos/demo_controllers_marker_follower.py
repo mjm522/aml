@@ -210,8 +210,8 @@ if __name__=="__main__":
 
         r_limb = ArmInterface('right')
         l_limb = ArmInterface('left')
-        r_limb.untuck_arm()
-        l_limb.untuck_arm()
+        r_limb.untuck()
+        l_limb.untuck()
 
         for arm in [r_limb, l_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
@@ -221,7 +221,7 @@ if __name__=="__main__":
 
         r_limb = ArmInterface('right')
         l_limb = r_limb
-        r_limb.untuck_arm()
+        r_limb.untuck()
 
         for arm in [r_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons

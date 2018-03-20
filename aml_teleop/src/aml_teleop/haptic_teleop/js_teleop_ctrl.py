@@ -128,7 +128,7 @@ class JSTeleopCtrl(HapticRobotInterface):
 
             goal_js_pos = self.compute_cmd()
 
-            goal_js_vel = self._robot.get_state()['velocity']
+            goal_js_vel = self._robot.state()['velocity']
 
             goal_js_acc = np.zeros_like(goal_js_pos)
 

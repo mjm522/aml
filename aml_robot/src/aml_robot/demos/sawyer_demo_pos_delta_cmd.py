@@ -19,7 +19,7 @@ import quaternion
 rospy.init_node('sawyer_test', anonymous=True)
 
 limb = SawyerArm('right')
-limb.untuck_arm()
+limb.untuck()
 
 start_pos, start_ori = limb.ee_pose()
 

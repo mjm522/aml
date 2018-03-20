@@ -72,9 +72,9 @@ if __name__ == '__main__':
     limb = 'left'
     arm = BaxterArm(limb)
 
-    arm.untuck_arm()
+    arm.untuck()
 
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
     
     if limb == 'left':
         # goal_pos = start_pos + np.array([0.,0.35, 0.])

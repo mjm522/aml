@@ -8,7 +8,7 @@ from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionCo
 
 def test_draw_pattern(robot_interface, no_set_points = 32, shape='eight', ctrlr_type='torque'):
     
-    robot_interface.untuck_arm()
+    robot_interface.untuck()
 
     if ctrlr_type == 'torque':
         ctrlr = OSTorqueController(robot_interface)

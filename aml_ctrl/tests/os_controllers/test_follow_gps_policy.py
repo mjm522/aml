@@ -132,7 +132,7 @@ if __name__ == '__main__':
     from aml_robot.baxter_robot import BaxterArm
     limb = 'right'
     arm = BaxterArm(limb)
-    start_pos, start_ori  =  arm.get_ee_pose()
+    start_pos, start_ori  =  arm.ee_pose()
     
     if limb == 'left':
         goal_pos = start_pos + np.array([0.,0.8, 0.])

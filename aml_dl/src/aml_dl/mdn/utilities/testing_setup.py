@@ -88,7 +88,7 @@ class TestSetup(BoxObject):
         push 3 - side a of box
         '''
         for k in range(4):
-            self._robot.untuck_arm()
+            self._robot.untuck()
             goals = self.pack_push_goals(pushes[k])
             curr_state =  self._box.get_curr_image()
             s_box_pose, s_box_pos, s_box_q = self._box.get_pose()
@@ -97,7 +97,7 @@ class TestSetup(BoxObject):
                 
                 goals.reverse()
                 success = self.goto_goals(goals[1:])
-                self._robot.untuck_arm()
+                self._robot.untuck()
                 if success:
                     final_state =  self._box.get_curr_image()
                     f_box_pose, f_box_pos, f_box_q = self._box.get_pose()

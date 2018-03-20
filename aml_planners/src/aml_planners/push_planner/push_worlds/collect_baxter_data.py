@@ -47,7 +47,7 @@ class CollectBaxterData():
 
     def collect_push(self):
 
-        state0 = self._world.get_state()
+        state0 = self._world.state()
 
         action = [self.get_push_action(self._config['side_to_push'])]
 
@@ -55,7 +55,7 @@ class CollectBaxterData():
             ## Send action to world
             sucess = self._world.apply_push(action)
 
-        statef = self._world.get_state()
+        statef = self._world.state()
         
         tmp = pd.DataFrame(np.reshape(np.r_[state0[:3],action[0],statef[:3]],(1,7)), columns=['xi','yi','thetai',
                                                                                               'action',

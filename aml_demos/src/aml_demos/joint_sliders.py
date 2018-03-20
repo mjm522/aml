@@ -132,7 +132,7 @@ class StatePopup(qtg.QWidget):
         event.accept()
 
     def refresh(self):
-        state = self.parent.arm.get_state()
+        state = self.parent.arm.state()
         keys = sorted(k for k in state.keys() if k not in self.ignore)
         pad = max(len(k) for k in keys) + 2
         values = [state[k].tolist() if isinstance(state[k], np.ndarray) else state[k] for k in keys]
@@ -281,7 +281,7 @@ class SliderWindow(qtg.QWidget):
 
         def callback():
             self._controller.set_active(False)
-            self.arm.tuck_arm()
+            self.arm.tuck()
             self._controller.set_active(True)
             
 
@@ -291,7 +291,7 @@ class SliderWindow(qtg.QWidget):
 
         def callback():
             self._controller.set_active(False)
-            self.arm.untuck_arm()
+            self.arm.untuck()
             self._controller.set_active(True)
 
         BackgroundWorker(self, callback)
@@ -345,7 +345,7 @@ class SliderWindow(qtg.QWidget):
 
     def sync_sliders(self):
         ''' update the slider and slider labels based on the robot configuration '''
-        joint_positions = self.arm.get_state()['position']
+        joint_positions = self.arm.state()['position']
         for i in range(self.num_joints):
             val = joint_positions[i]
             # don't want to disrupt the user if they are currently dragging a slider

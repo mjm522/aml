@@ -105,7 +105,7 @@ def test_saved_test_locations(arm):
 
     for k in range(num_points):
 
-        arm.untuck_arm()
+        arm.untuck()
 
         robot_pos, robot_ori = arm.ee_pose()
         

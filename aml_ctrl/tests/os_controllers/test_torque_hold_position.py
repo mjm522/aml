@@ -7,7 +7,7 @@ from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionCo
 
 def test_maintain_position(robot_interface):
 
-    robot_interface.untuck_arm()
+    robot_interface.untuck()
 
     ctrlr = OSTorqueController(robot_interface)
 

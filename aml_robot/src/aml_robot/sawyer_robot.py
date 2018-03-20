@@ -6,9 +6,6 @@ roslib.load_manifest('aml_robot')
 
 import rospy
 
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-
 from std_msgs.msg import (
     UInt16,
 )
@@ -16,8 +13,6 @@ from std_msgs.msg import (
 
 # Auxiliary imports
 import numpy as np
-import quaternion
-import abc
 
 
 # Intera SDK imports
@@ -95,7 +90,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         # this will be useful to compute ee_velocity using finite differences
         self._ee_pos_old, self._ee_ori_old = self.ee_pose()
-        self._time_now_old = self.get_time_in_seconds()
+        self._time_now_old = self.time_in_seconds()
 
 
     def _configure_cuff(self):
@@ -188,10 +183,10 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
     def set_sampling_rate(self, sampling_rate=100):
         self._pub_rate.publish(sampling_rate)
 
-    def tuck_arm(self):
+    def tuck(self):
         self._logger.warning("NOT IMPLEMENTED")
 
-    def untuck_arm(self):
+    def untuck(self):
         self.move_to_neutral()
 
     def _configure(self, limb, on_state_callback):
@@ -281,7 +276,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         except:
             pass
 
-        state['gripper_state'] = self.get_gripper_state()
+        state['gripper_state'] = self.gripper_state()
 
         # ee_velocity              = self.endpoint_velocity()['linear']
         # state['ee_velocity']     = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
@@ -325,10 +320,10 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
     def n_joints(self):
         return self._nq
 
-    def get_state(self):
+    def state(self):
         return self._state
 
-    def get_gripper_state(self):
+    def gripper_state(self):
         gripper_state = {}
 
         if self._gripper is not None:
@@ -353,10 +348,10 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             self._state = self._update_state()
             self._on_state_callback(self._state)
 
-    def get_end_effector_link_name(self):
+    def end_effector_link_name(self):
         return self._kinematics._tip_link
 
-    def get_base_link_name(self):
+    def base_link_name(self):
         return self._kinematics._base_link
 
     def exec_gripper_cmd(self, pos, force=None):
@@ -421,14 +416,6 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         self.move_to_joint_positions(joint_command)
 
-    def move_to_joint_pos(self, cmd):
-        curr_q = self.joint_angles()
-        joint_names = self.joint_names()
-
-        joint_command = dict([(joint, cmd[i]) for i, joint in enumerate(joint_names)])
-
-        self.move_to_joint_positions(joint_command)
-
     def exec_velocity_cmd(self, cmd):
 
         joint_names = self.joint_names()
@@ -459,7 +446,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         return ee_point, ee_ori
 
-    def get_time_in_seconds(self):
+    def time_in_seconds(self):
         time_now = rospy.Time.now()
         return time_now.secs + time_now.nsecs * 1e-9
 
@@ -478,7 +465,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         else:
 
-            time_now_new = self.get_time_in_seconds()
+            time_now_new = self.time_in_seconds()
 
             ee_pos_new, ee_ori_new = self.ee_pose()
 

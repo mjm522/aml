@@ -50,7 +50,7 @@ class PushMachine(object):
         order_of_sweep = ['left', 'back', 'front', 'right']
         fsm_reset(self._right_arm, order_of_sweep, rate=15)
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
         os.system("spd-say 'Reseting box without human supervision'")
         #os.system("spd-say 'Please reset the box, Much appreciated dear human'")
         #raw_input("Press enter to continue...")
@@ -69,7 +69,7 @@ class PushMachine(object):
         goals.reverse()
         success = success and self.goto_goals(goals[1:]) 
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         timeelapsed = rospy.Time.now() - start
 
@@ -214,7 +214,7 @@ class PushMachine(object):
 
         idx = 0
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         rospy.on_shutdown(self.on_shutdown)
 

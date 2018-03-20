@@ -78,7 +78,7 @@ class PushMachine(object):
                 self.send_left_arm_away()
                 order_of_sweep = ['left', 'back', 'front', 'right']
                 fsm_reset(self._right_arm, order_of_sweep, rate=15)
-                self._robot.untuck_arm()
+                self._robot.untuck()
                 os.system("spd-say 'Reseting box without human supervision'")
             else:
                 os.system("spd-say 'Please reset the box, Much appreciated dear human'")
@@ -99,7 +99,7 @@ class PushMachine(object):
             goals.reverse()
             success = success and self.goto_goals(goals[1:]) 
 
-            self._robot.untuck_arm()
+            self._robot.untuck()
 
             # self._sample_recorder.stop_record(task_status=success)
 
@@ -177,7 +177,7 @@ class PushMachine(object):
 
         idx = 0
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         rospy.on_shutdown(self.on_shutdown)
 

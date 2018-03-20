@@ -209,7 +209,7 @@ class StochasticPushMachine(BoxObject):
         return success
 
     def push_box(self, tgt_box_pose):
-        self._robot.untuck_arm()
+        self._robot.untuck()
         pre_push_action, push_action = self.compute_push_location(tgt_box_pose, image_input=True)
         #this is a hack when there is no way to get the transform sending arm away and bringing
         #back tends to give the tf correctly.

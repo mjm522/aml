@@ -31,7 +31,7 @@ rospy.init_node('sawyer_test', anonymous=True)
 obj = SomeObj()
 
 limb = SawyerArm('right',partial(callback,obj))
-limb.untuck_arm()
+limb.untuck()
 
 rospy.sleep(3)
 
@@ -47,7 +47,7 @@ rate = rospy.Rate(10) # 10hz
 while not rospy.is_shutdown():
 	obj.c += 1
 
-	print limb.get_state()['jacobian']
+	print limb.state()['jacobian']
 
 	rate.sleep()
 

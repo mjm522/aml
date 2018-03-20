@@ -265,7 +265,7 @@ class PushMachine(object):
 
             success = self.goto_goals(goals[1:])
 
-            self._robot.untuck_arm()
+            self._robot.untuck()
 
             self._record_sample.record_once(task_action=None, task_status=success)
 
@@ -333,7 +333,7 @@ class PushMachine(object):
 
         idx = 0
 
-        self._robot.untuck_arm()
+        self._robot.untuck()
 
         rospy.on_shutdown(self.on_shutdown)
 

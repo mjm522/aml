@@ -545,6 +545,6 @@ if __name__=="__main__":
     demo_data = load_demo_data(demo_idx=6)
 
     arm  = BaxterArm('right')
-    arm.untuck_arm()
+    arm.untuck()
     
     find_optimal_control_sequence(robot_interface=arm, data=demo_data, dt=0.01)

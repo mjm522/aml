@@ -30,7 +30,7 @@ class CollectGravityCompData():
 
         for k in range(self._data_cnt):
             cmd = self.choose_random_jnt_confgn()
-            self._robot.move_to_joint_pos(cmd)
+            self._robot.move_to_joint_position(cmd)
 
         np.savetxt('gravity_comp_input_data.txt',  np.asarray(self._input_data).squeeze())
         np.savetxt('gravity_comp_output_data.txt', np.asarray(self._output_data).squeeze())

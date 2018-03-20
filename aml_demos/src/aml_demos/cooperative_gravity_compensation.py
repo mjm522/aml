@@ -29,11 +29,11 @@ def main_coop_gravity_comp_demo():
     arm_master = BaxterArm(master_limb)
     arm_slave  = BaxterArm(slave_limb)
 
-    arm_master.untuck_arm()
-    arm_slave.untuck_arm()
+    arm_master.untuck()
+    arm_slave.untuck()
 
-    master_start_pos, master_start_ori  =  arm_master.get_ee_pose()
-    slave_start_pos,  slave_start_ori   =  arm_slave.get_ee_pose()
+    master_start_pos, master_start_ori  =  arm_master.ee_pose()
+    slave_start_pos,  slave_start_ori   =  arm_slave.ee_pose()
 
     ctrlr_slave = Controller(arm_slave)
 
@@ -48,8 +48,8 @@ def main_coop_gravity_comp_demo():
 
     while not rospy.is_shutdown():
 
-        master_pos, master_ori =  arm_master.get_ee_pose()
-        slave_pos,  slave_ori  =  arm_slave.get_ee_pose()
+        master_pos, master_ori =  arm_master.ee_pose()
+        slave_pos,  slave_ori  =  arm_slave.ee_pose()
 
 
         #find the rotation to coordinate frame

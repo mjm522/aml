@@ -57,7 +57,7 @@ class RobotInterface(object):
         raise NotImplementedError("move_to_joint_pos_delta: NO EFFECT, NOT IMPLEMENTED")
 
     @abc.abstractmethod
-    def move_to_joint_pos(self,cmd):
+    def move_to_joint_position(self,cmd):
         """
         Not implemented
         """
@@ -78,7 +78,14 @@ class RobotInterface(object):
         raise NotImplementedError("exec_torque_cmd: NO EFFECT, NOT IMPLEMENTED")
 
     @abc.abstractmethod
-    def move_to_home(self):
+    def untuck(self):
+        """
+        Not implemented
+        """
+        raise NotImplementedError("move_to_home: NO EFFECT, NOT IMPLEMENTED")
+
+    @abc.abstractmethod
+    def tuck(self):
         """
         Not implemented
         """

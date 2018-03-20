@@ -108,7 +108,7 @@ class DDP_TrajFollowClass():
         ##
         genq = x0[self.idx['genq']]
 
-        Mq   = self.right_arm.get_arm_inertia(joint_angles=genq[:7])
+        Mq   = self.right_arm.inertia(joint_angles=genq[:7])
 
         ## for our feedback controllers it's important to have past inputs and
         ## change in inputs stored into the state:
@@ -125,7 +125,7 @@ class DDP_TrajFollowClass():
 
         x1[self.idx['genq']] = x1_genq
        
-        J = self.right_arm.get_jacobian_from_joints(joint_angles=x1_genq[:7])
+        J = self.right_arm.jacobian(joint_angles=x1_genq[:7])
 
         ee_pose_dot = np.dot(J, dgenq[:7])
 

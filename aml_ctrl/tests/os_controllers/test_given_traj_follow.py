@@ -66,7 +66,7 @@ if __name__ == '__main__':
     limb = 'right'
     arm = BaxterArm(limb)
 
-    arm.untuck_arm()
+    arm.untuck()
 
     demo_idx = 6
 
