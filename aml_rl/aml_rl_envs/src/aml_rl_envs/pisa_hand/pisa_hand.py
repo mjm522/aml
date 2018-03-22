@@ -9,7 +9,9 @@ class PisaHand(AMLRlHand):
 
     def __init__(self, config=AML_RL_ROBOT_CONFIG, scale=1., 
                        hand_type='right', use_fixed_base=False, 
-                       pos=(0.,0.,0.), ori=(0.,0.,0.,1.), j_pos=None):
+                       pos=(0.,0.,0.), ori=(0.,0.,0.,1.), j_pos=None, call_renderer=False):
+
+        config['call_renderer'] = call_renderer
 
         self._config = config
 
@@ -28,8 +30,6 @@ class PisaHand(AMLRlHand):
         self._defualt_jnts = j_pos
 
         AMLRlHand.__init__(self, config, num_fingers=5)
-
-        # setup_bullet_visualizer()
 
         self.reset()
  

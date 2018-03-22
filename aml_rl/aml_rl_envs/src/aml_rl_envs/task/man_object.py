@@ -96,30 +96,55 @@ class ManObject():
         return pb.getBasePositionAndOrientation(self._obj_id)
 
 
-    def get_curr_state(self, ori_type='eul'):
+    def get_curr_state(self, ori_type='eul', as_tuple=False):
 
         link_state = pb.getLinkState(self._obj_id, self._sense_jnt_idx , computeLinkVelocity = 1)
 
-        pos = np.asarray(link_state[0])
+        if as_tuple:
+            pos = link_state[0]
+        else:
+            pos = np.asarray(link_state[0])
         
         if ori_type == 'eul':
-            ori = np.asarray(pb.getEulerFromQuaternion(link_state[1]))
+            ori = pb.getEulerFromQuaternion(link_state[1])
         
         elif ori_type == 'quat':
-            ori = np.asarray(link_state[1])
+            ori = link_state[1]
 
         elif ori_type == 'mat':
-            ori = np.asarray(pb.getMatrixFromQuaternion(link_state[1])).reshape(3,3)
+            ori = pb.getMatrixFromQuaternion(link_state[1])
+
+        if not as_tuple:
+
+            ori = np.asarray(ori)
+
+            if ori_type == 'mat':
+
+                ori = ori.reshape(3,3)
+
         
         vel = np.asarray(link_state[6]) 
         omg = np.asarray(link_state[7])
 
         if self._old_state is None:
+
             lin_acc = np.zeros_like(vel)
+
             ang_acc = np.zeros_like(omg)
+
         else:
+
             lin_acc = (vel - self._old_state[2])/self._time_step
+            
             ang_acc = (omg - self._old_state[3])/self._time_step
+
+
+        if as_tuple:
+
+            vel = tuple(vel)
+            omg = tuple(omg)
+            lin_acc = tuple(lin_acc)
+            ang_acc = tuple(ang_acc)
 
         self._old_state = (pos, ori, vel, omg, lin_acc, ang_acc)
 
