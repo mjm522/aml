@@ -1,0 +1,62 @@
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data}{\section{aml\-\_\-playground.\-manipulation.\-analyze\-\_\-man\-\_\-data.\-Analyze\-Man\-Data Class Reference}
+\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data}\index{aml\-\_\-playground.\-manipulation.\-analyze\-\_\-man\-\_\-data.\-Analyze\-Man\-Data@{aml\-\_\-playground.\-manipulation.\-analyze\-\_\-man\-\_\-data.\-Analyze\-Man\-Data}}
+}
+
+
+Collaboration diagram for aml\-\_\-playground.\-manipulation.\-analyze\-\_\-man\-\_\-data.\-Analyze\-Man\-Data\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a868f5f81731ed23696d7feb9176b0af1}{def {\bfseries \-\_\-\-\_\-init\-\_\-\-\_\-}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a868f5f81731ed23696d7feb9176b0af1}
+
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a7c58aac6ead60846e1a3ed2b6c5e4e35}{def {\bfseries load\-\_\-data}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a7c58aac6ead60846e1a3ed2b6c5e4e35}
+
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a725c36f3701f283c4dd8542825ca31e5}{def {\bfseries visualize}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a725c36f3701f283c4dd8542825ca31e5}
+
+\item 
+def \hyperlink{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a54434caa38b5cabef973ee9b5007d0e0}{process\-\_\-data}
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a1ac0d693df003ed36257050cd82c77d4}{def {\bfseries get\-\_\-force\-\_\-torques}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a1ac0d693df003ed36257050cd82c77d4}
+
+\item 
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_af75e93192ac769eb68dc19378c05fcdd}{def {\bfseries run}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_af75e93192ac769eb68dc19378c05fcdd}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a54434caa38b5cabef973ee9b5007d0e0}{\index{aml\-\_\-playground\-::manipulation\-::analyze\-\_\-man\-\_\-data\-::\-Analyze\-Man\-Data@{aml\-\_\-playground\-::manipulation\-::analyze\-\_\-man\-\_\-data\-::\-Analyze\-Man\-Data}!process\-\_\-data@{process\-\_\-data}}
+\index{process\-\_\-data@{process\-\_\-data}!aml_playground::manipulation::analyze_man_data::AnalyzeManData@{aml\-\_\-playground\-::manipulation\-::analyze\-\_\-man\-\_\-data\-::\-Analyze\-Man\-Data}}
+\subsubsection[{process\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-playground.\-manipulation.\-analyze\-\_\-man\-\_\-data.\-Analyze\-Man\-Data.\-process\-\_\-data (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{finger\-\_\-idx = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)}}\label{classaml__playground_1_1manipulation_1_1analyze__man__data_1_1_analyze_man_data_a54434caa38b5cabef973ee9b5007d0e0}
+\begin{DoxyVerb}each data point keys: 'obj_state', 'robot_state', 'cp_obj_table', 'cp_obj_obstacle', 'cp_obj_robot'
+
+robot_state keys: 'pos_js', 'vel_js', 'rea_force_js', 'apl_torque_js', 'pos_ee', 'vel_ee' 
+
+obj_kin_state : each row: pos, ori, vel, omg, lin_acc, ang_acc
+
+obj_dyn_state : each row: jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque
+
+cp_obj_table keys: 'cp_on_block', 'cp_on_table', 'cn_on_table', 'c_dist', 'cn_force'
+
+cp_obj_robot each element (= number of fingers) keys: 'cp_on_finger','cp_on_block','cn_on_block','c_dist','cn_force'
+
+cp_obj_obstacle keys: 'cp_on_block', 'cp_on_obstacle', 'cn_on_obstacle', 'c_dist', 'cn_force'\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-playground/src/aml\-\_\-playground/manipulation/analyze\-\_\-man\-\_\-data.\-py\end{DoxyCompactItemize}

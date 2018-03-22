@@ -27,5 +27,7 @@ var classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot =
     [ "set_jnt_state", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#a38011296832f23eb67baf1659e4a9099", null ],
     [ "set_joint_torques", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#ae26eef83ee4b61ab862e9c5221cce502", null ],
     [ "set_joint_velocities", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#a6887b7c121e80a302f9e77dc94c9c39a", null ],
-    [ "set_pos_ori", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#a9a5f1f2cc810da7412e7daf368567bc2", null ]
+    [ "set_pos_ori", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#a9a5f1f2cc810da7412e7daf368567bc2", null ],
+    [ "nsecs", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#abb74eba05243f830c2e80b35ff3f94aa", null ],
+    [ "secs", "classaml__robot_1_1bullet_1_1bullet__robot_1_1_bullet_robot.html#a3cdc1bf005b6630f0203ed619efea025", null ]
 ];

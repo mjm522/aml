@@ -1,0 +1,7 @@
+<map id="aml_haptics/aml_phantom_omni" name="aml_haptics/aml_phantom_omni">
+<area shape="rect" id="node2" href="dir_9f719663d8a1eb4edf3a71edd2ff9e4b.html" title="omni_common" alt="" coords="280,63,387,111"/>
+<area shape="rect" id="node3" href="dir_96ae82ca87ad27e70ae66ba4901b1b36.html" title="omni_interface" alt="" coords="149,63,256,111"/>
+<area shape="rect" id="node4" href="dir_167f4db812fde6feecb7e094415df27a.html" title="omni_pykdl" alt="" coords="37,63,125,111"/>
+<area shape="rect" id="clust2" href="dir_e67b9eadbd347e12d176a14835c91f9d.html" alt="" coords="27,52,557,121"/>
+<area shape="rect" id="clust1" href="dir_ac5fa33f33e0d833a300e2c97d3fdf8c.html" title="aml_haptics" alt="" coords="16,16,568,132"/>
+</map>

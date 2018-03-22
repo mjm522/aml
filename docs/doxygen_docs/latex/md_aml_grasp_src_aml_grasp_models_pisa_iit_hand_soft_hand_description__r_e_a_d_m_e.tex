@@ -1,0 +1,17 @@
+If you want to use the Pisa/\-I\-I\-T soft hand in your U\-R\-D\-F, you can do so by including the model\-:
+
+{\ttfamily $<$xacro\-:include filename=\char`\"{}\$(find soft\-\_\-hand\-\_\-description)/model/soft\-\_\-hand.\-urdf.\-xacro\char`\"{}/$>$}
+
+And then, using as many hands as you want as\-:
+
+``` $<$xacro\-:soft\-\_\-hand name=\char`\"{}\-M\-Y\-H\-A\-N\-D\char`\"{} parent=\char`\"{}\-P\-A\-R\-E\-N\-T\char`\"{} with\-Adaptive\-Transmission=\char`\"{}true\char`\"{} use\-Mimic\-Tag=\char`\"{}false\char`\"{} left=\char`\"{}true\char`\"{}$>$ $<$origin xyz=\char`\"{}0 0 0\char`\"{} rpy=\char`\"{}0 0 0\char`\"{}$>$ $<$/xacro\-:soft\-\_\-hand$>$ ``` Where\-:
+
+{\ttfamily name} is the name of your hand, it is useful for namespaces, controllers, etc.
+
+{\ttfamily parent} is the link you are attaching your hand to, placed at {\ttfamily $<$origin...}
+
+{\ttfamily with\-Adaptive\-Transmission} used for simulation purposes for now.
+
+{\ttfamily use\-Mimic\-Tag} is to have only one joint that controls all joints in a pure-\/kinematics-\/like motion, it affects only the visualization. In simulation, the mimicking is done by the hardware interface, and in real, you only have one motor reading.
+
+{\ttfamily left} is to define whether you are using a right or left hand. 

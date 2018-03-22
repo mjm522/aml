@@ -11,11 +11,11 @@ from std_msgs.msg import (
 
 # Auxiliary imports
 import numpy as np
+import quaternion
 
 # Intera SDK imports
 import intera_interface
 from intera_interface import CHECK_VERSION
-import intera_external_devices
 from intera_core_msgs.msg import SEAJointState
 
 # AML Robot specific imports
@@ -475,7 +475,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         return ee_vel, ee_omg
 
-    def forward_kinematics(self, joint_angles=None):
+    def forward_kinematics(self, joint_angles=None, ori_type='quat'):
 
         if joint_angles is None:
 
@@ -489,16 +489,28 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         pose = np.array(self._kinematics.forward_position_kinematics(argument))
         position = pose[0:3][:, None]  # senting as  column vector
 
-        w = pose[6];
-        x = pose[3];
-        y = pose[4];
+        w = pose[6]
+        x = pose[3]
+        y = pose[4]
         z = pose[5]  # quarternions
+
+        rotation = quaternion.quaternion(w, x, y, z)
 
         # formula for converting quarternion to rotation matrix
 
-        rotation = np.array([[1. - 2. * (y ** 2 + z ** 2), 2. * (x * y - z * w), 2. * (x * z + y * w)], \
-                             [2. * (x * y + z * w), 1. - 2. * (x ** 2 + z ** 2), 2. * (y * z - x * w)], \
-                             [2. * (x * z - y * w), 2. * (y * z + x * w), 1. - 2. * (x ** 2 + y ** 2)]])
+        if ori_type == 'mat':
+
+            # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
+            #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
+            #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
+
+            rotation = quaternion.as_rotation_matrix(rotation)
+
+        elif ori_type == 'eul':
+
+            rotation = quaternion.as_euler_angles(rotation)
+        elif ori_type == 'quat':
+            pass
 
         return position, rotation
 
@@ -537,9 +549,17 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         return np.array(self._kinematics.inertia(argument))
 
-    def inverse_kinematics(self, pos, ori=None):
+    def inverse_kinematics(self, pos, ori=None, seed=None, null_space_goal = None, use_service=False):
+        success = False
+        soln = None
 
-        success, soln = self._ik_sawyer.ik_servive_request(pos=pos, ori=ori)
+        if use_service:
+            success, soln = self._ik_baxter.ik_service_request(pos=pos, ori=ori, seed_angles=seed, null_space_goal=null_space_goal, use_advanced_options=True)
+        else:
+            soln = self._kinematics.inverse_kinematics(position=pos, orientation=ori, seed=seed)
+
+            if soln is not None:
+                success = True
 
         return success, soln
 

@@ -1,0 +1,84 @@
+\hypertarget{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj}{\section{aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj Class Reference}
+\label{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj}\index{aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj@{aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj}}
+}
+
+
+Collaboration diagram for aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a31074d37701acc6650d272337db5b488}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_aae8e664e639b49b5381ac3407e51496a}{smooth\-\_\-traj}
+\item 
+def \hyperlink{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a2e36204c4e5ebcb238da048b2f156b6d}{savitsky\-\_\-gollay\-\_\-filter}
+\item 
+def \hyperlink{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_ad187102e7dc7ffd7e2061ce2ef8b5c4e}{plot}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}A class to smoothen the demonstrated trajectories
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a31074d37701acc6650d272337db5b488}{\index{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_rl_envs::utils::collect_demo::SmoothDemoTraj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj2smooth}
+\end{DoxyParamCaption}
+)}}\label{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a31074d37701acc6650d272337db5b488}
+\begin{DoxyVerb}Constructor of the class 
+Args: 
+traj_to_smooth: expects np.array([no_of_data_points, number_of_dimension])
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_ad187102e7dc7ffd7e2061ce2ef8b5c4e}{\index{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}!plot@{plot}}
+\index{plot@{plot}!aml_rl_envs::utils::collect_demo::SmoothDemoTraj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}}
+\subsubsection[{plot}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj.\-plot (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_ad187102e7dc7ffd7e2061ce2ef8b5c4e}
+\begin{DoxyVerb}plot the original and smoothe trajectory
+\end{DoxyVerb}
+ \hypertarget{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a2e36204c4e5ebcb238da048b2f156b6d}{\index{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}!savitsky\-\_\-gollay\-\_\-filter@{savitsky\-\_\-gollay\-\_\-filter}}
+\index{savitsky\-\_\-gollay\-\_\-filter@{savitsky\-\_\-gollay\-\_\-filter}!aml_rl_envs::utils::collect_demo::SmoothDemoTraj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}}
+\subsubsection[{savitsky\-\_\-gollay\-\_\-filter}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj.\-savitsky\-\_\-gollay\-\_\-filter (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{traj}
+\end{DoxyParamCaption}
+)}}\label{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_a2e36204c4e5ebcb238da048b2f156b6d}
+\begin{DoxyVerb}this is a smoothing filter that helps to make 
+the exploratory trajectories smooth.
+This is an optional part and is implemented depending on the self._smooth_traj variable
+Args:
+traj: input trajectory
+\end{DoxyVerb}
+ \hypertarget{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_aae8e664e639b49b5381ac3407e51496a}{\index{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}!smooth\-\_\-traj@{smooth\-\_\-traj}}
+\index{smooth\-\_\-traj@{smooth\-\_\-traj}!aml_rl_envs::utils::collect_demo::SmoothDemoTraj@{aml\-\_\-rl\-\_\-envs\-::utils\-::collect\-\_\-demo\-::\-Smooth\-Demo\-Traj}}
+\subsubsection[{smooth\-\_\-traj}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-rl\-\_\-envs.\-utils.\-collect\-\_\-demo.\-Smooth\-Demo\-Traj.\-smooth\-\_\-traj (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__rl__envs_1_1utils_1_1collect__demo_1_1_smooth_demo_traj_aae8e664e639b49b5381ac3407e51496a}
+\begin{DoxyVerb}This function takes each dimension and smooths it out
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-rl/aml\-\_\-rl\-\_\-envs/src/aml\-\_\-rl\-\_\-envs/utils/collect\-\_\-demo.\-py\end{DoxyCompactItemize}

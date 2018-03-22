@@ -1,13 +1,31 @@
-\subsection*{Dependencies}
+\subsection*{Live Docs for A\-M\-L}
+
+
+\begin{DoxyItemize}
+\item Live documentation for A\-M\-L can be found \href{https://docs.google.com/document/d/1_xM5TvY-ARBdU3P3D4MrxzcuUbaHkiwEP5UDHMdy4yM/edit?usp=sharing}{\tt here}
+\item Also see the docs folder in the A\-M\-L root directory for the doxygen documentation.
+\end{DoxyItemize}
+
+\subsection*{Setting up A\-M\-L -\/ The Very Simple Way}
+
+
+\begin{DoxyItemize}
+\item A set of scripts for installing A\-M\-L natively in your host machine, or for getting it setup in a docker container can be found \href{https://github.com/eaa3/aml_install}{\tt here}
+\end{DoxyItemize}
+
+\subsection*{Setting A\-M\-L manually}
+
+\subsubsection*{Dependencies}
 
 
 \begin{DoxyItemize}
 \item \href{http://wiki.ros.org/indigo/Installation/Ubuntu}{\tt R\-O\-S (Indigo)}
 \item \href{http://sdk.rethinkrobotics.com/wiki/Hello_Baxter}{\tt Baxter\-S\-D\-K}
 \item \href{http://sdk.rethinkrobotics.com/wiki/Simulator_Installation}{\tt Baxter Simulator}
+\item \href{http://sdk.rethinkrobotics.com/intera/Main_Page}{\tt Saywer Robot}
 \end{DoxyItemize}
 
-\subsubsection*{Python Libraries}
+\paragraph*{Python Libraries}
 
 
 \begin{DoxyItemize}
@@ -18,6 +36,7 @@
 \item \href{https://github.com/pybox2d/pybox2d}{\tt pybox2d}
 \item \href{https://pypi.python.org/pypi/Pillow/4.1.1}{\tt Pillow}
 \item \href{https://pypi.python.org/pypi/scipy/0.19.0}{\tt Scipy}
+\item \href{https://pandas.pydata.org/}{\tt Pandas}
 \item \href{https://pypi.python.org/pypi/six/1.10.0}{\tt six}
 \item \href{https://pypi.python.org/pypi/decorator/4.0.11}{\tt decorator}
 \item \href{https://pypi.python.org/pypi/matplotlib/2.0.1}{\tt matplotlib}
@@ -25,7 +44,7 @@
 \item \href{https://github.com/opencv/opencv}{\tt cv2}
 \end{DoxyItemize}
 
-\paragraph*{This document lists various setup instructions after a fresh installation of Ubuntu 14.\-04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.}
+\subparagraph*{This document lists various setup instructions after a fresh installation of Ubuntu 14.\-04 on your machine. The end part of the document also contains some of the possible errors during installation and their solutions.}
 
 
 \begin{DoxyEnumerate}
@@ -58,7 +77,7 @@ b. \href{https://developer.nvidia.com/cudnn}{\tt C\-U\-D\-A\-N\-N}
 \item Baxter simulator setup
 \begin{DoxyItemize}
 \item Dependencies ``` sudo apt-\/get install gazebo2 ros-\/indigo-\/qt-\/build ros-\/indigo-\/driver-\/common ros-\/indigo-\/gazebo-\/ros-\/control ros-\/indigo-\/gazebo-\/ros-\/pkgs ros-\/indigo-\/ros-\/control ros-\/indigo-\/control-\/toolbox ros-\/indigo-\/realtime-\/tools ros-\/indigo-\/ros-\/controllers ros-\/indigo-\/xacro python-\/wstool ros-\/indigo-\/tf-\/conversions ros-\/indigo-\/kdl-\/parser ```
-\item Simulator (specific versions) ``` cd $\sim$/catkin\-\_\-workspaces/baxter\-\_\-ws/src wstool init . wstool merge baxter\-\_\-simulator\-\_\-with\-\_\-aml.\-rosinstall (take this file from aml/3rdparty) baxter\-\_\-simulator.\-rosinstall wstool update ```
+\item Simulator (specific versions) ``` cd $\sim$/catkin\-\_\-workspaces/baxter\-\_\-ws/src wstool init . wstool merge aml/3rdparty/baxter/rethink\-\_\-packages.\-rosinstall wstool update wstool merge sawyer\-\_\-robot/sawyer\-\_\-robot.\-rosinstall wstool update ```
 \end{DoxyItemize}
 \end{DoxyEnumerate}
 
@@ -71,11 +90,10 @@ Check if any other unmet dependencies, run this line from ws folder ``` rosdep i
 
 Few other dependencies
 
-``` pip install numpy numpy-\/quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six Py\-Side ```
+``` pip install numpy numpy-\/quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six Py\-Side pandas pip install pybullet pip install git+git\-://github.com/pybox2d/pybox2d ```
 
 
 \begin{DoxyEnumerate}
-\item Installing pybox2d -\/ follow instructions in this https\-://github.com/pybox2d/pybox2d/blob/master/\-I\-N\-S\-T\-A\-L\-L.\-md \char`\"{}page\char`\"{}.
 \item Installing opencv for python
 
 {\bfseries Note\-:} this compilation could take a while! And install this only after removing opencv-\/python (this is unofficial version) if installed previously.
@@ -87,7 +105,7 @@ Few other dependencies
 \end{DoxyItemize}
 \end{DoxyEnumerate}
 
-\paragraph*{Possible Errors\-:}
+\subparagraph*{Possible Errors\-:}
 
 
 \begin{DoxyEnumerate}

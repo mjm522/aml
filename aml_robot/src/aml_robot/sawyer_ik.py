@@ -55,7 +55,7 @@ class IKSawyer():
         else:
             return right_pose['pos'], right_pose['ori']
 
-    def ik_servive_request(self, pos, ori, use_advanced_options = False):
+    def ik_service_request(self, pos, ori, seed_angles = None, null_space_goal = None, use_advanced_options = False):
 
         self.ikreq = SolvePositionIKRequest()
         
@@ -87,32 +87,36 @@ class IKSawyer():
         # Add desired pose for inverse kinematics
         self.ikreq.pose_stamp.append(ik_msg)
         # Request inverse kinematics from base to "right_hand" link
-        self.ikreq.tip_names.append('right_hand')
+        self.ikreq.tip_names.append(self._limb + '_hand')
 
-        if (use_advanced_options):
+        if use_advanced_options:
             # Optional Advanced IK parameters
             # rospy.loginfo("Running Advanced IK Service Client example.")
             # The joint seed is where the IK position solver starts its optimization
             self.ikreq.seed_mode = self.ikreq.SEED_USER
             seed = JointState()
-            seed.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
-                         'right_j4', 'right_j5', 'right_j6']
-            seed.position = [0.7, 0.4, -1.7, 1.4, -1.1, -1.6, -0.4]
+            seed.name = self.arm.joint_names()
+            # ['right_j0', 'right_j1', 'right_j2', 'right_j3','right_j4', 'right_j5', 'right_j6']
+
+            if seed_angles is not None:
+                seed.position = [0.7, 0.4, -1.7, 1.4, -1.1, -1.6, -0.4]
             self.ikreq.seed_angles.append(seed)
 
             # Once the primary IK task is solved, the solver will then try to bias the
             # the joint angles toward the goal joint configuration. The null space is 
             # the extra degrees of freedom the joints can move without affecting the
             # primary IK task.
-            self.ikreq.use_nullspace_goal.append(True)
-            # The nullspace goal can either be the full set or subset of joint angles
-            goal = JointState()
-            goal.name = ['right_j1', 'right_j2', 'right_j3']
-            goal.position = [0.1, -0.3, 0.5]
-            self.ikreq.nullspace_goal.append(goal)
-            # The gain used to bias toward the nullspace goal. Must be [0.0, 1.0]
-            # If empty, the default gain of 0.4 will be used
-            self.ikreq.nullspace_gain.append(0.4)
+
+            if null_space_goal is not None:
+                self.ikreq.use_nullspace_goal.append(True)
+                # The nullspace goal can either be the full set or subset of joint angles
+                goal = JointState()
+                goal.name = self.arm.joint_names()
+                goal.position = null_space_goal
+                self.ikreq.nullspace_goal.append(goal)
+                # The gain used to bias toward the nullspace goal. Must be [0.0, 1.0]
+                # If empty, the default gain of 0.4 will be used
+                self.ikreq.nullspace_gain.append(0.4)
         else:
             pass
             # rospy.loginfo("Running Simple IK Service Client example.")
@@ -125,7 +129,7 @@ class IKSawyer():
             success_flag = False
 
         # Check if result valid, and type of seed ultimately used to get solution
-        if (resp.result_type[0] > 0):
+        if resp.result_type[0] > 0:
             seed_str = {
                         self.ikreq.SEED_USER: 'User Provided Seed',
                         self.ikreq.SEED_CURRENT: 'Current Joint Angles',

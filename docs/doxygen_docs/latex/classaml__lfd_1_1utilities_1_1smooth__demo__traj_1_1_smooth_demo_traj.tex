@@ -34,12 +34,16 @@ def \hyperlink{classaml__lfd_1_1utilities_1_1smooth__demo__traj_1_1_smooth_demo_
 \subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-lfd.\-utilities.\-smooth\-\_\-demo\-\_\-traj.\-Smooth\-Demo\-Traj.\-\_\-\-\_\-init\-\_\-\-\_\- (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
-\item[{}]{traj2smooth}
+\item[{}]{traj2smooth, }
+\item[{}]{window\-\_\-len = {\ttfamily 5}, }
+\item[{}]{poly\-\_\-order = {\ttfamily 2}}
 \end{DoxyParamCaption}
 )}}\label{classaml__lfd_1_1utilities_1_1smooth__demo__traj_1_1_smooth_demo_traj_ac035d625248a7ff7c5302aa8e14dcf14}
 \begin{DoxyVerb}Constructor of the class 
 Args: 
 traj_to_smooth: expects np.array([no_of_data_points, number_of_dimension])
+window_len : length of the convolutional window (has to be an odd number)
+poly_order : any number less than the window len and > 0
 \end{DoxyVerb}
  
 

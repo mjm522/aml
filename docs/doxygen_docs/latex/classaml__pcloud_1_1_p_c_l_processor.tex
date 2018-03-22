@@ -1,0 +1,128 @@
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor}{\section{aml\-\_\-pcloud\-:\-:P\-C\-L\-Processor Class Reference}
+\label{classaml__pcloud_1_1_p_c_l_processor}\index{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}}
+}
+
+
+Collaboration diagram for aml\-\_\-pcloud\-:\-:P\-C\-L\-Processor\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classaml__pcloud_1_1_p_c_l_processor__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_add331335b42412c0351a0c4ae6d3230e}{Point\-Cloud\-Ptr {\bfseries get\-Cloud\-From\-Pcd\-File} (std\-::string \&input\-\_\-file)}\label{classaml__pcloud_1_1_p_c_l_processor_add331335b42412c0351a0c4ae6d3230e}
+
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a3d384355834f360c8d4cd8d14f046f1b}{void {\bfseries save\-To\-Pcd\-File} (std\-::string filename, const Point\-Cloud\-Ptr cloud)}\label{classaml__pcloud_1_1_p_c_l_processor_a3d384355834f360c8d4cd8d14f046f1b}
+
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a1d6da7c112b055342e0e0b43b6e852af}{Point\-Cloud\-Ptr {\bfseries downsample\-Cloud} (const Point\-Cloud\-Ptr cloud, std\-::vector$<$ float $>$ \&leaf\-\_\-sizes)}\label{classaml__pcloud_1_1_p_c_l_processor_a1d6da7c112b055342e0e0b43b6e852af}
+
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a5709601bfeca02f810f783d9079ba25b}{Point\-Cloud\-Ptr {\bfseries get\-Points\-Not\-In\-Plane} (const Point\-Cloud\-Ptr input\-\_\-cloud)}\label{classaml__pcloud_1_1_p_c_l_processor_a5709601bfeca02f810f783d9079ba25b}
+
+\item 
+Point\-Cloud\-Ptr \hyperlink{classaml__pcloud_1_1_p_c_l_processor_a4f066df5ae0e421f358d17529d6234d8}{compute\-Normal\-For\-All\-Points} (const Point\-Cloud\-Ptr cloud)
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a872ffec38fa09684c2a0f8873876346f}{void {\bfseries compute\-Normal\-For\-All\-Points} (const Point\-Cloud\-Ptr cloud, Normal\-Cloud\-Ptr cloud\-\_\-normals)}\label{classaml__pcloud_1_1_p_c_l_processor_a872ffec38fa09684c2a0f8873876346f}
+
+\item 
+void \hyperlink{classaml__pcloud_1_1_p_c_l_processor_afaa37a472ad7a626b6bd9bbf347ee38f}{fit\-Plane\-And\-Get\-Curvature} (const Point\-Cloud\-Ptr cloud, std\-::vector$<$ int $>$ indices, std\-::vector$<$ float $>$ \&plane\-\_\-parameters, float \&curvature)
+\item 
+Point\-Cloud\-Ptr \hyperlink{classaml__pcloud_1_1_p_c_l_processor_a5a1ef67cd7cbea80867faf9cd7c5bae7}{transform\-Point\-Cloud} (const Point\-Cloud\-Ptr input\-\_\-cloud, std\-::vector$<$ float $>$ trans\-\_\-mat\-\_\-array)
+\item 
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a1e1cd933a9103ed9cc220193a1f3bfa4}{Point\-Cloud\-Ptr {\bfseries add\-Point\-Clouds} (const Point\-Cloud\-Ptr cloud\-\_\-base, const Point\-Cloud\-Ptr cloud\-\_\-add)}\label{classaml__pcloud_1_1_p_c_l_processor_a1e1cd933a9103ed9cc220193a1f3bfa4}
+
+\item 
+std\-::vector$<$ float $>$ \hyperlink{classaml__pcloud_1_1_p_c_l_processor_abe5d3ad887e0fa6be0dd751afa2c465f}{compute\-Centroid} (const Point\-Cloud\-Ptr input\-\_\-cloud\-\_\-ptr)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_abe5d3ad887e0fa6be0dd751afa2c465f}{\index{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}!compute\-Centroid@{compute\-Centroid}}
+\index{compute\-Centroid@{compute\-Centroid}!aml_pcloud::PCLProcessor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}}
+\subsubsection[{compute\-Centroid}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ float $>$ aml\-\_\-pcloud\-::\-P\-C\-L\-Processor\-::compute\-Centroid (
+\begin{DoxyParamCaption}
+\item[{const Point\-Cloud\-Ptr}]{input\-\_\-cloud\-\_\-ptr}
+\end{DoxyParamCaption}
+)}}\label{classaml__pcloud_1_1_p_c_l_processor_abe5d3ad887e0fa6be0dd751afa2c465f}
+compute\-Centroid function
+
+This function computes the centroid of a given cloud 
+\begin{DoxyParams}{Parameters}
+{\em input\-\_\-cloud} & the cloud \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the centroid (x,y,z) 
+\end{DoxyReturn}
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a4f066df5ae0e421f358d17529d6234d8}{\index{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}!compute\-Normal\-For\-All\-Points@{compute\-Normal\-For\-All\-Points}}
+\index{compute\-Normal\-For\-All\-Points@{compute\-Normal\-For\-All\-Points}!aml_pcloud::PCLProcessor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}}
+\subsubsection[{compute\-Normal\-For\-All\-Points}]{\setlength{\rightskip}{0pt plus 5cm}Point\-Cloud\-Ptr aml\-\_\-pcloud\-::\-P\-C\-L\-Processor\-::compute\-Normal\-For\-All\-Points (
+\begin{DoxyParamCaption}
+\item[{const Point\-Cloud\-Ptr}]{cloud}
+\end{DoxyParamCaption}
+)}}\label{classaml__pcloud_1_1_p_c_l_processor_a4f066df5ae0e421f358d17529d6234d8}
+compute\-Normal\-For\-All\-Points function
+
+Computes the normals for all points in a given point cloud.
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+cloud of normals 
+\end{DoxyReturn}
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_afaa37a472ad7a626b6bd9bbf347ee38f}{\index{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}!fit\-Plane\-And\-Get\-Curvature@{fit\-Plane\-And\-Get\-Curvature}}
+\index{fit\-Plane\-And\-Get\-Curvature@{fit\-Plane\-And\-Get\-Curvature}!aml_pcloud::PCLProcessor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}}
+\subsubsection[{fit\-Plane\-And\-Get\-Curvature}]{\setlength{\rightskip}{0pt plus 5cm}void aml\-\_\-pcloud\-::\-P\-C\-L\-Processor\-::fit\-Plane\-And\-Get\-Curvature (
+\begin{DoxyParamCaption}
+\item[{const Point\-Cloud\-Ptr}]{cloud, }
+\item[{std\-::vector$<$ int $>$}]{indices, }
+\item[{std\-::vector$<$ float $>$ \&}]{plane\-\_\-parameters, }
+\item[{float \&}]{curvature}
+\end{DoxyParamCaption}
+)}}\label{classaml__pcloud_1_1_p_c_l_processor_afaa37a472ad7a626b6bd9bbf347ee38f}
+fit\-Plane\-And\-Get\-Curvature function Compute the Least-\/\-Squares plane fit for a given set of points, using their indices, and return the estimated plane parameters together with the surface curvature. 
+\begin{DoxyParams}{Parameters}
+{\em cloud} & \\
+\hline
+{\em indices} & $<$optional$>$ the indices of the cloud points to be used for computation\\
+\hline
+{\em plane} & parameters the plane parameters as\-: a, b, c, d (ax + by + cz + d = 0) \\
+\hline
+{\em curvature} & the estimated surface curvature as a measure of lambda\-\_\-0/(lambda\-\_\-0 + lambda\-\_\-1 + lambda\-\_\-2) \\
+\hline
+\end{DoxyParams}
+\hypertarget{classaml__pcloud_1_1_p_c_l_processor_a5a1ef67cd7cbea80867faf9cd7c5bae7}{\index{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}!transform\-Point\-Cloud@{transform\-Point\-Cloud}}
+\index{transform\-Point\-Cloud@{transform\-Point\-Cloud}!aml_pcloud::PCLProcessor@{aml\-\_\-pcloud\-::\-P\-C\-L\-Processor}}
+\subsubsection[{transform\-Point\-Cloud}]{\setlength{\rightskip}{0pt plus 5cm}Point\-Cloud\-Ptr aml\-\_\-pcloud\-::\-P\-C\-L\-Processor\-::transform\-Point\-Cloud (
+\begin{DoxyParamCaption}
+\item[{const Point\-Cloud\-Ptr}]{input\-\_\-cloud, }
+\item[{std\-::vector$<$ float $>$}]{trans\-\_\-mat\-\_\-array}
+\end{DoxyParamCaption}
+)}}\label{classaml__pcloud_1_1_p_c_l_processor_a5a1ef67cd7cbea80867faf9cd7c5bae7}
+transform\-Point\-Cloud function
+
+This function takes a point cloud and transforms it according to the transformation defined in trans\-\_\-mat 
+\begin{DoxyParams}{Parameters}
+{\em input\-\_\-cloud} & the cloud \\
+\hline
+{\em trans\-\_\-mat\-\_\-array} & the 4x4 transformation matrix flattened as std\-::vector$<$float$>$ \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the transformed cloud 
+\end{DoxyReturn}
+Initialize a new point cloud to save the data
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-perception/include/pcl\-\_\-processing.\-h\item 
+aml\-\_\-perception/src/aml\-\_\-perception/pcl\-\_\-processing.\-cpp\end{DoxyCompactItemize}

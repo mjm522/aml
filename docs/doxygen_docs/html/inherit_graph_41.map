@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classkinematics_1_1position__kinematics.html" title="kinematics::position\l_kinematics" alt="" coords="5,5,144,46"/>
+<area shape="rect" id="node2" href="$classaml__rl__envs_1_1aml__rl__env_1_1_a_m_l_rl_env.html" title="aml_rl_envs.aml_rl\l_env.AMLRlEnv" alt="" coords="99,169,229,210"/>
+<area shape="rect" id="node3" href="$classaml__rl__envs_1_1dlr__hand_1_1dlr__hand__obj__env_1_1_d_l_r_hand_obj_env.html" title="aml_rl_envs.dlr_hand.dlr\l_hand_obj_env.DLRHandObjEnv" alt="" coords="278,5,493,46"/>
+<area shape="rect" id="node4" href="$classaml__rl__envs_1_1hand_1_1hand__obj__env_1_1_hand_obj_env.html" title="aml_rl_envs.hand.hand\l_obj_env.HandObjEnv" alt="" coords="307,70,463,111"/>
+<area shape="rect" id="node5" href="$classaml__rl__envs_1_1hand_1_1hand__obst__env_1_1_hand_obstacle_env.html" title="aml_rl_envs.hand.hand\l_obst_env.HandObstacleEnv" alt="" coords="289,135,481,177"/>
+<area shape="rect" id="node6" href="$classaml__rl__envs_1_1kuka_1_1kuka__env_1_1_kuka_env.html" title="aml_rl_envs.kuka.kuka\l_env.KukaEnv" alt="" coords="307,201,463,242"/>
+<area shape="rect" id="node7" href="$classaml__rl__envs_1_1pisa__hand_1_1pisa__hand__obj__env_1_1_pisa_hand_obj_env.html" title="aml_rl_envs.pisa_hand.pisa\l_hand_obj_env.PisaHandObjEnv" alt="" coords="279,266,492,307"/>
+<area shape="rect" id="node8" href="$classaml__rl__envs_1_1sawyer_1_1sawyer__env_1_1_sawyer_env.html" title="aml_rl_envs.sawyer.sawyer\l_env.SawyerEnv" alt="" coords="293,331,477,373"/>
 </map>

@@ -1,2 +1,3 @@
 <map id="aml_robot.sawyer_robot.SawyerArm" name="aml_robot.sawyer_robot.SawyerArm">
+<area shape="rect" id="node3" href="$classaml__robot_1_1robot__interface_1_1_robot_interface.html" title="{aml_robot.robot_interface.\lRobotInterface\n||+ set_sampling_rate()\l+ exec_position_cmd()\l+ exec_position_cmd_delta()\l+ move_to_joint_pos_delta()\l+ move_to_joint_position()\l+ exec_velocity_cmd()\l+ exec_torque_cmd()\l+ untuck()\l+ tuck()\l+ q_mean()\l+ n_cmd()\l+ n_joints()\l+ state()\l+ angles()\l+ joint_names()\l+ joint_efforts()\l+ joint_velocities()\l+ ee_pose()\l+ ee_velocity()\l+ forward_kinematics()\l+ inverse_kinematics()\l+ cartesian_velocity()\l+ jacobian()\l+ inertia()\l}" alt="" coords="176,131,365,560"/>
 </map>

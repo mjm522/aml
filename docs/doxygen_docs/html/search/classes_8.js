@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['jscontroller',['JSController',['../classaml__ctrl_1_1controllers_1_1js__controller_1_1_j_s_controller.html',1,'aml_ctrl::controllers::js_controller']]],
-  ['jspositioncontroller',['JSPositionController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__postn__controller_1_1_j_s_position_controller.html',1,'aml_ctrl::controllers::js_controllers::js_postn_controller']]],
-  ['jstorquecontroller',['JSTorqueController',['../classaml__ctrl_1_1controllers_1_1js__controllers_1_1js__torque__controller_1_1_j_s_torque_controller.html',1,'aml_ctrl::controllers::js_controllers::js_torque_controller']]],
-  ['jstrajgenerator',['JSTrajGenerator',['../classaml__ctrl_1_1traj__generator_1_1js__traj__generator_1_1_j_s_traj_generator.html',1,'aml_ctrl::traj_generator::js_traj_generator']]]
+  ['ikbaxter',['IKBaxter',['../classaml__robot_1_1baxter__ik_1_1_i_k_baxter.html',1,'aml_robot::baxter_ik']]],
+  ['iksawyer',['IKSawyer',['../classaml__robot_1_1sawyer__ik_1_1_i_k_sawyer.html',1,'aml_robot::sawyer_ik']]],
+  ['info',['INFO',['../structarm__kinematics_1_1_i_n_f_o.html',1,'arm_kinematics']]],
+  ['interagrippergazeboroscontrolplugin',['InteraGripperGazeboRosControlPlugin',['../classintera__gripper__gazebo__plugin_1_1_intera_gripper_gazebo_ros_control_plugin.html',1,'intera_gripper_gazebo_plugin']]],
+  ['interasdktest',['InteraSDKTest',['../classjoint__position__wobble_1_1_intera_s_d_k_test.html',1,'joint_position_wobble']]]
 ];

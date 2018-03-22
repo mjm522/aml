@@ -7,6 +7,7 @@ var classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot =
     [ "get_compensation_forces", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a7acbea899a6e19dd0544e7ed91c09b80", null ],
     [ "get_ee_pose", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a7d56bde9444f10024c3e8efc721c9f8f", null ],
     [ "get_ee_velocity", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#ac368649b02e383db1de34378ae14066b", null ],
+    [ "get_state", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#aed5a762d049a169f35799364acb09b8e", null ],
     [ "inv_dyn", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a7f7654c35957ca875c923c79a8859d29", null ],
     [ "reset_model", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#ae604beca2f4fc6a0ee451f48f6e62e44", null ],
     [ "robot_state_set_start_end_index", "classaml__robot_1_1mujoco_1_1mujoco__robot_1_1_mujoco_robot.html#a196732855d5a685a8ef331f601411335", null ],

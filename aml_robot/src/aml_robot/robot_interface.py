@@ -2,8 +2,6 @@ import roslib
 roslib.load_manifest('aml_robot')
 
 import abc
-import numpy as np
-
 
 class RobotInterface(object):
     __metaclass__ = abc.ABCMeta

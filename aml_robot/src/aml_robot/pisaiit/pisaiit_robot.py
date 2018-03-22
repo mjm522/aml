@@ -1,11 +1,13 @@
+# General ROS imports
 import roslib
-
 roslib.load_manifest('aml_robot')
 import rospy
-
 from std_msgs.msg import Float32
 
+# AML additional imports
 from aml_robot.robot_interface import RobotInterface
+from aml_io.log_utils import aml_logging
+
 
 
 class PisaIITHand(RobotInterface):
@@ -18,6 +20,8 @@ class PisaIITHand(RobotInterface):
         Returns:
         none, store the trajectories
         """
+
+        self._logger = aml_logging.get_logger(__name__)
 
         self._ready = False
 
@@ -72,8 +76,6 @@ class PisaIITHand(RobotInterface):
         else:
             self._on_state_callback = lambda m: None
 
-        # Parent constructor
-        # baxter_interface.limb.Limb.__init__(self, limb)
 
         # self._kinematics = baxter_kinematics(self)
 
@@ -96,10 +98,16 @@ class PisaIITHand(RobotInterface):
             self._on_state_callback(self._state)
 
     def exec_position_cmd(self, cmd):
-        pass
+        self._pos_cmd_pub(float(cmd))
+
+    def exec_position_cmd_delta(self, cmd):
+        self._logger.warning("Position command delta not implemented.")
 
     def exec_velocity_cmd(self, cmd):
-        pass
+        self._logger.warning("Velocity commands not implemented.")
+
+    def exec_torque_cmd(self, cmd):
+        self._logger.warning("Torque commands not implemented.")
 
     def angles(self):
         pass
@@ -110,10 +118,10 @@ class PisaIITHand(RobotInterface):
     def inertia(self, joint_angles=None):
         pass
 
-    def exec_position_cmd_delta(self, cmd):
+    def cartesian_velocity(self, joint_velocities=None):
         pass
 
-    def cartesian_velocity(self, joint_velocities=None):
+    def forward_kinematics(self, joint_angles=None):
         pass
 
     def inverse_kinematics(self, position, orientation=None):
@@ -137,9 +145,6 @@ class PisaIITHand(RobotInterface):
     def ee_velocity(self, numerical=False):
         pass
 
-    def forward_kinematics(self, joint_angles=None):
-        pass
-
     def untuck(self):
         pass
 
@@ -159,10 +164,7 @@ class PisaIITHand(RobotInterface):
         return self._state
 
     def ee_pose(self):
-        pass
+        self._logger.warning("ee_pose commands not implemented.")
 
     def set_sampling_rate(self, sampling_rate=100):
-        pass
-
-    def exec_torque_cmd(self, cmd):
         pass

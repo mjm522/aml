@@ -1,0 +1,97 @@
+\hypertarget{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl}{\section{aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl Class Reference}
+\label{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl}\index{aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl@{aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl}}
+}
+
+
+Inheritance diagram for aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a93d5c051fbc01517899303e8acccc869}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a2eccb0872b1e3f49d77e1ed1889e4565}{compute\-\_\-cmd}
+\item 
+def \hyperlink{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a98ba6c0c014f32e056e4a9f3e012710a}{run}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This class creates a interface between a haptic device and a robot\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a93d5c051fbc01517899303e8acccc869}{\index{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!aml_teleop::haptic_teleop::js_teleop_ctrl::JSTeleopCtrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{haptic\-\_\-interface, }
+\item[{}]{robot\-\_\-interface, }
+\item[{}]{config}
+\end{DoxyParamCaption}
+)}}\label{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a93d5c051fbc01517899303e8acccc869}
+\begin{DoxyVerb} constructor of the class
+ Args:
+ haptic_interface : interface to a haptic device this should of type aml_haptics
+ robot_interface : interface to a robot this should of type aml_robot eg: baxter_robot
+ config :
+    Args: 
+robot_joints : the indices of robot joints that should be controlled (type: list)
+haptic_joints : corresponding haptic joints (type : list)
+scale_from_home : if the home of haptic device equals home of robot (type : bool)
+robot_home : if scale_from_home is set, then the home position of robot must be passed in (type : np.array)
+rate : the rate of the controller in Hz (type int)
+ctrlr_type : type of the controller (either = pos, vel, or torq)\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a2eccb0872b1e3f49d77e1ed1889e4565}{\index{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}!compute\-\_\-cmd@{compute\-\_\-cmd}}
+\index{compute\-\_\-cmd@{compute\-\_\-cmd}!aml_teleop::haptic_teleop::js_teleop_ctrl::JSTeleopCtrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}}
+\subsubsection[{compute\-\_\-cmd}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl.\-compute\-\_\-cmd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a2eccb0872b1e3f49d77e1ed1889e4565}
+\begin{DoxyVerb}this function computes the mapping between
+the haptic master and the robot slave
+if scale_from_home is set, then a motion of the 
+haptic master from its home is mapped to motion of robot from its home
+
+if scale_from_home is not set, then it does a linear mapping between
+the joints
+
+in case the robot has more joints than the haptic master
+the corresponding non-used joints will be set the the home joint position
+\end{DoxyVerb}
+ \hypertarget{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a98ba6c0c014f32e056e4a9f3e012710a}{\index{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}!run@{run}}
+\index{run@{run}!aml_teleop::haptic_teleop::js_teleop_ctrl::JSTeleopCtrl@{aml\-\_\-teleop\-::haptic\-\_\-teleop\-::js\-\_\-teleop\-\_\-ctrl\-::\-J\-S\-Teleop\-Ctrl}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def aml\-\_\-teleop.\-haptic\-\_\-teleop.\-js\-\_\-teleop\-\_\-ctrl.\-J\-S\-Teleop\-Ctrl.\-run (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classaml__teleop_1_1haptic__teleop_1_1js__teleop__ctrl_1_1_j_s_teleop_ctrl_a98ba6c0c014f32e056e4a9f3e012710a}
+\begin{DoxyVerb}the main code that sends control commands to the
+robot
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+aml\-\_\-teleop/src/aml\-\_\-teleop/haptic\-\_\-teleop/js\-\_\-teleop\-\_\-ctrl.\-py\end{DoxyCompactItemize}

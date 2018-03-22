@@ -18,7 +18,7 @@ class sawyer_kinematics(object):
         self._sawyer = URDF.from_parameter_server(key='robot_description')
         self._kdl_tree = kdl_tree_from_urdf_model(self._sawyer)
         self._base_link = self._sawyer.get_root()
-        self._tip_link = limb.name + '_gripper'
+        self._tip_link = limb.name + '_hand'
         self._tip_frame = PyKDL.Frame()
         self._arm_chain = self._kdl_tree.getChain(self._base_link,
                                                   self._tip_link)

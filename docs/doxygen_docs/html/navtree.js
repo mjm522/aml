@@ -1,6 +1,9 @@
 var NAVTREE =
 [
   [ "Active Manipulation Learning", "index.html", [
+    [ "Soft Hand model", "md_aml_grasp_src_aml_grasp_models_pisa_iit_hand_soft_hand_description__r_e_a_d_m_e.html", null ],
+    [ "phantom-omni", "md_aml_haptics_aml_phantom_omni_omni_common__r_e_a_d_m_e.html", null ],
+    [ "Soft Hand model", "md_aml_rl_aml_rl_envs_src_aml_rl_envs_models_pisa_iit_hand_soft_hand_description__r_e_a_d_m_e.html", null ],
     [ "# sawyer_simulator", "md_aml_sawyer_sim__r_e_a_d_m_e.html", null ],
     [ "Advanced Manipulation Learning (AML)", "md__r_e_a_d_m_e.html", null ],
     [ "Todo List", "todo.html", null ],
@@ -34,13 +37,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classaml__ctrl_1_1controllers_1_1os__controllers_1_1os__impedance__controller_1_1_o_s_impedance_controller.html#a741b56ef41e3f1097ba991a9d24868e8",
-"classaml__lfd_1_1ilqr_1_1ilqr__traj__follow_1_1_d_d_p___traj_follow_class.html#a0688bdd96bc836e5de454dc7241d64b8",
-"classaml__planners_1_1push__planner_1_1forward__models_1_1dropout_n_n__model_1_1_dropout_n_n.html#a9a1861ba56e922597c40297029fe2228",
-"classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1bullet_1_1pih__world_1_1_p_i_h_world.html#a39c3f19a9be1cf34e371dfecfad0ea6b",
-"classaml__robot_1_1mujoco_1_1push__world_1_1collect__push__data__sim_1_1_box_object.html#a1cd7b6ef72aa2bff61a2743cf9911a53",
-"classsrc_1_1aml__dl_1_1gp_1_1simple__gp_1_1_gaussian_process.html#af7e308a75a4a1f246dfb68f31bd5fbcd",
-"qbmove__communications_8h.html#a5fdc7facea201bfce4ad308105f88d0c"
+".html",
+"classaml__data__collec__utils_1_1core_1_1data__recorder_1_1_data_recorder.html#acc481956358b64a8038370f5a8fc9f49",
+"classaml__lfd_1_1lqr_1_1ddp__traj__follow__base_1_1_d_d_p_traj_follow.html#a843d69188b565822569099d0832f2b60",
+"classaml__planners_1_1push__planner_1_1push__worlds_1_1box_1_1_box.html#a3960a65bf0e4e1338eb2277f5f8aa8a3",
+"classaml__playground_1_1peg__in__hole_1_1pih__worlds_1_1box2d_1_1pih__world_1_1_p_i_h_world.html#af59365b266aa7cea629f9a4482100de3",
+"classaml__robot_1_1baxter__robot_1_1_baxter_arm.html#a36fadfba465952cb96a7ea86f351e738",
+"classaml__robot_1_1robot__interface_1_1_robot_interface.html#a1e098c633ec0abc0ce593d96a21b4818",
+"classscripts_1_1camera__calib_1_1_baxter_eye_hand_calib.html#ad87ce37e7087b0c8a5219821b4712e27",
+"globals_eval.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

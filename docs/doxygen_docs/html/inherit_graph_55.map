@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classtest__finger__hitting__box_1_1_push_machine.html" title="test_finger_hitting\l_box.PushMachine" alt="" coords="5,5,139,46"/>
+<area shape="rect" id="node2" href="$classbaxter__gazebo__plugin_1_1_baxter_gazebo_ros_control_plugin.html" title="baxter_gazebo_plugin\l::BaxterGazeboRosControlPlugin" alt="" coords="227,5,442,46"/>
+<area shape="rect" id="node3" href="$classintera__gripper__gazebo__plugin_1_1_intera_gripper_gazebo_ros_control_plugin.html" title="intera_gripper_gazebo\l_plugin::InteraGripperGazebo\lRosControlPlugin" alt="" coords="239,69,430,125"/>
+<area shape="rect" id="node4" href="$classsawyer__gazebo__plugin_1_1_sawyer_gazebo_ros_control_plugin.html" title="sawyer_gazebo_plugin\l::SawyerGazeboRosControlPlugin" alt="" coords="224,149,445,190"/>
 </map>
