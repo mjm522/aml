@@ -35,13 +35,12 @@ source ${ROOT_DIR}/aml_aliases.sh
 #        --hostname="aml_container" \
 #       --privileged \ (We need to use --privileged flag if we are in the same network as the host to render 3D graphical interfaces (gazebo,rviz, etc))
 # When the operator executes docker run --privileged, Docker will enable access to all devices on the host as well as set some configuration in AppArmor or SELinux to allow the container nearly all the same access to the host as processes running outside containers on the host. 
-#
+#       --hostname="aml_container" \
 
 xdocker run -it \
        --user=$(id -u) \
        --env="DISPLAY" \
        --network="host" \
-       --hostname="aml_container" \
        --privileged \
        --env="QT_X11_NO_MITSHM=1" \
        --workdir="/home/$USER" \
