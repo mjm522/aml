@@ -38,3 +38,8 @@
     local-name: pisa-iit-soft-hand
     uri: https://github.com/eaa3/pisa-iit-soft-hand.git
     version: master
+- git:
+    local-name: sawyer_simulator
+    uri: https://github.com/RethinkRobotics/sawyer_simulator.git
+    version: master
+    
