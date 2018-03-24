@@ -17,6 +17,7 @@ rm -rf baxter*
 rm -rf intera*
 rm -rf sawyer*
 rm -rf aruco_ros
+rm -rf pisa-iit-soft-hand
 wstool init .
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
