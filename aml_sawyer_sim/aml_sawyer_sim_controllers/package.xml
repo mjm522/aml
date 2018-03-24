@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <name>aml_sawyer_sim_controllers</name>
+  <version>0.0.0</version>
+  <description>aml_sawyer_sim_controllers</description>
+
+  <maintainer email="ahayashi@todo.todo">ahayashi</maintainer>
+  <maintainer email="exa371@bham.ac.uk">Ermano Arruda</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>controller_interface</build_depend>
+  <build_depend>control_toolbox</build_depend>
+  <build_depend>effort_controllers</build_depend>
+  <build_depend>intera_core_msgs</build_depend>
+
+  <run_depend>controller_interface</run_depend>
+  <run_depend>control_toolbox</run_depend>
+  <run_depend>effort_controllers</run_depend>
+  <run_depend>intera_core_msgs</run_depend>
+
+  <export>
+    <controller_interface plugin="${prefix}/config/sawyer_sim_controllers_plugins.xml"/>
+  </export>
+</package>

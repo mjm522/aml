@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>aml_sawyer_simulator</name>
+  <version>0.0.0</version>
+  <description>aml_sawyer_simulator</description>
+
+  <maintainer email="ahayashi@todo.todo">ahayashi</maintainer>
+  <maintainer email="exa371@bham.ac.uk">Ermano Arruda</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>aml_sawyer_sim_description</run_depend>
+  <run_depend>aml_sawyer_gazebo</run_depend>
+  <run_depend>aml_sawyer_sim_hardware</run_depend>
+  <run_depend>aml_sawyer_sim_kinematics</run_depend>
+  <run_depend>aml_sawyer_sim_controllers</run_depend>
+  <run_depend>intera_tools_description</run_depend>
+
+  <export>
+    <metapackage />
+  </export>
+</package>
