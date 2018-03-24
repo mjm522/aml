@@ -21,14 +21,18 @@ wstool init .
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
   wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
-  BLACK_LISTED_PKGS_ARG=''
-else
+  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES="gazebo_ros_soft_hand;soft_hand_ros_control"'
+elif [ "$ROS_DISTRO" == "kinetic" ]; then
   wstool merge aml/3rdparty/baxter/rethink_packages.rosinstall
-  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES="aml_sawyer_sim;sawyer_sim_controllers;sawyer_gazebo;sawyer_sim_hardware;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io"'
+  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES="aml_sawyer_sim;aml_sawyer_simulator;aml_sawyer_sim_controllers;aml_sawyer_gazebo;aml_sawyer_sim_hardware;aml_sawyer_sim_kinematics"'
+  #;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io
+else
+    echo "ROS_DISTRO is not indigo or kinetic, may not be fully compatible"
 fi
 
 wstool update
 wstool merge sawyer_robot/sawyer_robot.rosinstall
+wstool merge sawyer_simulator/sawyer_simulator.rosinstall
 wstool update
 rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
