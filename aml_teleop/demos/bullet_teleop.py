@@ -15,9 +15,9 @@ class BulletTeleop():
         #phantom omni gives in mm, scale accordingly
         self._ph_om = PhantomOmni(scale=1e-2)
 
-        self._robot = ManObject(scale=0.5, use_fixed_Base=False, obj_type='cube', render=True)
+        # self._robot = ManObject(scale=0.5, use_fixed_Base=False, obj_type='cube', render=True)
 
-        # self._robot = PisaHand(scale=3.5, use_fixed_base=False, hand_type='right', call_renderer=True)
+        self._robot = PisaHand(scale=3.5, use_fixed_base=False, hand_type='right', call_renderer=True)
 
         
     def run(self):
