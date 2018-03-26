@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
+from aml_io.log_utils import aml_logging
 from aml_io.io_tools import save_data, load_data
 
 class PITrajOpt(object):
@@ -34,7 +35,9 @@ class PITrajOpt(object):
 
         visualize_fn: handle to the plotting tool, this function accepts and an entire trajectory sample to display it
         """
-        
+
+        self._logger = aml_logging.get_logger(__name__)
+
         self._N        = config['timesteps']
         self._K        = config['no_rollouts']
         self._h        = config['h']
@@ -175,6 +178,9 @@ class PITrajOpt(object):
         if self._traj_file_name is not None:
             save_data(traj_final, self._traj_file_name)
         
-        raw_input("Waiting...")
+        self._logger.info("completed iterations")
+        
+        return traj_final
+        
 
 
