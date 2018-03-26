@@ -23,6 +23,8 @@ def main():
 
                 env.simple_step()
 
+                raw_input()
+
             time.sleep(0.01)
 
 

@@ -31,9 +31,9 @@ class HandObjEnv(AMLRlEnv):
                         randomize_box_ori=True, keep_obj_fixed = True, 
                         config=HAND_OBJ_CONFIG):
 
-        self._goal_block_pos = np.array([0, 0, 0.75]) #x,y,z
+        self._goal_block_pos = np.array([0, 0, 0.]) #x,y,z
         
-        self._goal_obj_ori = np.array([0.0, 0.00, -1.158])
+        self._goal_obj_ori = np.array([0.0, 0.0, 2.45]) #1.97831951
 
         self._randomize_box_ori = randomize_box_ori
 
@@ -58,11 +58,20 @@ class HandObjEnv(AMLRlEnv):
 
         self._config = config
 
-        AMLRlEnv.__init__(self, config, set_gravity=False)
+        AMLRlEnv.__init__(self, config, set_gravity=True)
 
         self._reset(obj_base_fixed = keep_obj_fixed)
 
         obs_dim = len(self.get_extended_observation())
+
+        if HAND_OBJ_CONFIG['ctrl_type'] ==  'pos':
+
+            hand_info = self._hand.get_joint_limits()
+
+            action_high = hand_info['upper']
+
+            action_low = hand_info['lower']
+
 
         self.set_space_lims(obs_dim, action_dim, action_high, action_low)
 
@@ -101,7 +110,7 @@ class HandObjEnv(AMLRlEnv):
 
         hand_j_pos = [0.014906321431778925, 0.9418708340321089, -2.070697592866243, 0.0]#, 0.01464389158008051, 0.7442819989476841, -1.6298398854594098, 0.0]
 
-        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos)
+        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
 
         self._num_fingers = self._hand._num_fingers
         
@@ -109,12 +118,7 @@ class HandObjEnv(AMLRlEnv):
 
         self._env_step_counter = 0
         
-        pb.stepSimulation()
-      
-        if self._renders and self._demo2follow is not None:
-            plot_demo(trajectory=self._demo2follow[0])
-            plot_demo(trajectory=self._demo2follow[1])
-            plot_demo(trajectory=self._demo2follow[2])
+        self.simple_step()
 
         return np.array(self._observation)
 
@@ -305,7 +309,9 @@ class HandObjEnv(AMLRlEnv):
         if isinstance(point, np.ndarray) or isinstance(point, list):
             point = tuple(point)
 
-        obj_pos, obj_ori = self._object.get_base_pose()
+        # obj_pos, obj_ori = self._object.get_base_pose()
+
+        obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
 
         inv_obj_pos, inv_obj_ori = pb.invertTransform(obj_pos, obj_ori)
 
@@ -318,7 +324,8 @@ class HandObjEnv(AMLRlEnv):
         if isinstance(point, np.ndarray) or isinstance(point, list):
             point = tuple(point)
 
-        obj_pos, obj_ori = self._object.get_base_pose()
+        # obj_pos, obj_ori = self._object.get_base_pose()
+        obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
 
         point_pos_in_world, point_ori_in_world = pb.multiplyTransforms(obj_pos, obj_ori, point, (0.0, 0.0, 0.0, 1.0))
 
@@ -337,7 +344,8 @@ class HandObjEnv(AMLRlEnv):
 
         ee_poss, ee_oris, ee_vels, ee_omgs = self._hand.get_ee_states(as_tuple=True)
 
-        obj_pos, obj_ori = self._object.get_base_pose()
+        # obj_pos, obj_ori = self._object.get_base_pose()
+        obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
 
         dummy_contact_point_list = [tuple(np.asarray(obj_pos) + np.array([-0.34, 0., 0.])), tuple(np.asarray(obj_pos) + np.array([0.34, 0., 0.])) ]
         
@@ -392,7 +400,9 @@ class HandObjEnv(AMLRlEnv):
             ee_pos = ee_poss[fin_no]
             ee_ori = ee_oris[fin_no]
 
-            obj_pos, obj_ori = self._object.get_base_pose()
+            # obj_pos, obj_ori = self._object.get_base_pose()
+
+            obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
 
             inv_ee_pos,inv_ee_ori = pb.invertTransform(ee_pos, ee_ori)
 
@@ -400,7 +410,6 @@ class HandObjEnv(AMLRlEnv):
 
             obj_euler_ee = pb.getEulerFromQuaternion(obj_ori_ee)
 
-            #we return the relative x,y position and euler angle of block in gripper space
             obj_ee_pose = [obj_pos_ee[0],obj_pos_ee[1], obj_pos_ee[2], obj_euler_ee[0], obj_euler_ee[1], obj_euler_ee[2]]
 
             self._observation.extend(list(obj_ee_pose))
@@ -462,25 +471,16 @@ class HandObjEnv(AMLRlEnv):
 
     def _step(self, action):
 
-        if self._demo2follow is None:
-            
-            raise Exception("No dmp given...")
-
-        return self.run_dmp(phase_start1=action[0], start_offset1=np.zeros(3), goal_offset1=np.zeros(3), Kp1=np.ones(3),
-                            phase_start2=action[1], start_offset2=np.zeros(3), goal_offset2=np.zeros(3), Kp2=np.ones(3),
-                            phase_start3=action[2], start_offset3=np.zeros(3), goal_offset3=np.zeros(3), Kp3=np.ones(3))
-
-        # return self.run_dmp(start_offset1=action[:3], goal_offset1=action[3:6], Kp1=action[6:9],
-        #                     start_offset2=action[9:12], goal_offset2=action[12:15], Kp2=action[15:])
+        return self.step2(action)
 
      
-    def step2(self, action, Kp):
+    def step2(self, action, Kp=None):
 
-        self._hand.applyAction(action, Kp1)
+        self._hand.apply_jnt_ctrl(action)
 
-        pb.stepSimulation()
+        self.simple_step()
 
-        done = self._termination()
+        done = self.termination()
 
         self._env_step_counter += 1
 
@@ -498,15 +498,19 @@ class HandObjEnv(AMLRlEnv):
     
     def termination(self):
 
-        obj_pos, obj_ori = self._object.get_base_pose()
+        # obj_pos, obj_ori = self._object.get_base_pose()
+
+        obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
 
         if (self._terminated or self._env_step_counter>self._max_steps):
             self._observation = self.get_extended_observation()
             return True
 
-        if np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(obj_ori)) - self._goal_obj_ori) < 0.06:#(actualEndEffectorPos[2] <= -0.43):
+        if np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(obj_ori)) - self._goal_obj_ori) < 0.01:
             self._terminated = 1
             self._observation = self.get_extended_observation()
+
+            print "here"
             return True
 
         return False
@@ -520,17 +524,18 @@ class HandObjEnv(AMLRlEnv):
         for fin_no in range(self._hand._num_fingers):
 
             #rewards is height of target object
-            obj_pos, obj_ori = self._object.get_base_pose()
+            # obj_pos, obj_ori = self._object.get_base_pose()
+            obj_pos, obj_ori = self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
             
-            distance_to_obj = np.linalg.norm(np.asarray(obj_pos) - ee_poss[fin_no])
+            # distance_to_obj = np.linalg.norm(np.asarray(obj_pos) - ee_poss[fin_no])
 
-            if distance_to_obj < 0.9:
+            # if distance_to_obj < 0.9:
                 
-                reward +=  2./distance_to_obj
+            #     reward +=  2./distance_to_obj
 
             distance_to_goal = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(obj_ori)) - self._goal_obj_ori)
               
-            if distance_to_goal < 0.9:
+            if distance_to_goal < 0.1:
                 
                 reward = reward + 10/distance_to_goal
 
