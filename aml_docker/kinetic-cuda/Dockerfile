@@ -78,10 +78,11 @@ RUN apt-get update && \
                        ros-kinetic-octomap-rviz-plugins \
                        gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-pkgs ros-kinetic-control-toolbox \
                        ros-kinetic-realtime-tools ros-kinetic-ros-controllers \
-                       ros-kinetic-tf-conversions ros-kinetic-kdl-parser \
+                       ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-sns-ik-lib \
                        ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control \
                        build-essential python-dev swig python-pygame && \
     rm -rf /var/lib/apt/lists/*
+ 
 
 RUN pip install --upgrade pip && \
     pip install protobuf && \

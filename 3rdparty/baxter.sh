@@ -31,7 +31,7 @@ fi
 #your_hostname="my_computer.local"
 
 # Specify ROS distribution (e.g. indigo, hydro, etc.)
-ros_version="indigo"
+ros_version="${ROS_DISTRO}"
 #-----------------------------------------------------------------------------#
 
 tf=$(mktemp)

@@ -3,19 +3,18 @@
 import rospy
 
 from aml_robot.pisaiit.pisaiit_robot import PisaIITHand
+from aml_io.log_utils import aml_logging
 
 from functools import partial
 
 import numpy as np
-import quaternion
 
+logger = aml_logging.get_logger(__name__)
 
 def callback(agent, msg):
-    pass
+    global logger
+    logger.info("Look: %s Count: %d"%(msg,agent.c))
 
-
-# print(agent.c)
-# print("Hello!")
 
 
 class SomeObj:
@@ -23,19 +22,30 @@ class SomeObj:
         self.c = 0
 
 
-rospy.init_node('baxter_test', anonymous=True)
+
+
+rospy.init_node('pisa_iit_soft_hand_test', anonymous=True)
 
 obj = SomeObj()
 
 robot = PisaIITHand('right', partial(callback, obj))
-start_pos, start_ori = robot.ee_pose()
 
-goal_pos = np.array([0.95, -0.08, -0.11])
-goal_ori = quaternion.as_float_array(start_ori)
-print "GOALORI: ", goal_ori
+cmds_close = np.arange(0.0,1.0,0.05)
+cmds_open = cmds_close[::-1]
+cmds = np.hstack([cmds_close, cmds_open])
+cmd_idx = 0
+logger.info(cmds)
 
-rate = rospy.Rate(5)  # 10hz
+rate = rospy.Rate(10)  # 10hz
 while not rospy.is_shutdown():
     obj.c += 1
-    print(robot.inverse_kinematics(start_pos, goal_ori))
+
+    cmd = cmds[cmd_idx:cmd_idx+1]
+    cmd_idx = (cmd_idx+1)%len(cmds)
+    # logger.info("CMD: %lf State %s"%(cmd, robot.state()))
+    robot.exec_position_cmd(cmd)
+    if cmd_idx == (len(cmds)-1):
+        logger.debug("Exiting demo!")
+        break
+
     rate.sleep()

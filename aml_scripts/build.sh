@@ -11,32 +11,21 @@
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $ROOT_DIR
-cd ../..
-rm .rosinstall*
-rm -rf baxter*
-rm -rf intera*
-rm -rf sawyer*
-rm -rf aruco_ros
-rm -rf pisa-iit-soft-hand
-wstool init .
+cd ../../..
+
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
-  wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
   BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control'
 elif [ "$ROS_DISTRO" == "kinetic" ]; then
-  wstool merge aml/3rdparty/baxter/rethink_packages_kinetic.rosinstall
-  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control;aml_sawyer_simulator;aml_sawyer_sim_controllers;aml_sawyer_gazebo;aml_sawyer_sim_hardware;aml_sawyer_sim_kinematics;aml_sawyer_gazebo'
+  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control;aml_sawyer_simulator;aml_sawyer_sim_controllers;aml_sawyer_gazebo;aml_sawyer_sim_hardware;aml_sawyer_sim_kinematics;aml_sawyer_gazebo;aml_sawyer_sim_examples'
   #;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io
 else
     echo "ROS_DISTRO is not indigo or kinetic, may not be fully compatible"
 fi
 
-wstool update
-wstool merge sawyer_robot/sawyer_robot.rosinstall
-wstool merge sawyer_simulator/sawyer_simulator.rosinstall
-wstool update
-rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
-cd ..
 
+catkin_make ${BLACK_LISTED_PKGS_ARG}
+cp ./src/aml/3rdparty/baxter.sh .
+cp ./src/aml/3rdparty/intera.sh .
 
-./src/aml/aml_scripts/build.sh
+cd $ROOT_DIR

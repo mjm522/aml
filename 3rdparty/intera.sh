@@ -30,7 +30,7 @@ if [ "${1}" == "sim" ]; then
 fi
 
 # Specify ROS distribution (e.g. indigo, hydro, etc.)
-ros_version="indigo"
+ros_version="${ROS_DISTRO}"
 #-----------------------------------------------------------------------------#
 
 tf=$(mktemp)

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##################################################################################
 ######### What this script does ##################################################
@@ -31,7 +31,7 @@ sudo apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compile
                        ros-kinetic-octomap-rviz-plugins \
                        gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-pkgs ros-kinetic-control-toolbox \
                        ros-kinetic-realtime-tools ros-kinetic-ros-controllers \
-                       ros-kinetic-tf-conversions ros-kinetic-kdl-parser \
+                       ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-sns-ik-lib \
                        ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control \
                        build-essential python-dev swig python-pygame && \
 sudo rm -rf /var/lib/apt/lists/*

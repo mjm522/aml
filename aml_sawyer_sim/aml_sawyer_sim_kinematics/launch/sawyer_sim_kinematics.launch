@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="urdf"
+    command="$(find xacro)/xacro --inorder '$(find aml_sawyer_sim_description)/urdf/sawyer.xacro'" />
+  <param name="root_name" value="base" />
+  <param name="grav_right_name" value="right_hand" />
+
+  <!-- load left and right tip name -->
+  <param name="right_tip_name" value="right_hand" />
+  <node name="aml_sawyer_sim_kinematics_right" pkg="aml_sawyer_sim_kinematics" type="aml_sawyer_kinematics" respawn="false" output="screen" args="right">
+  </node>
+
+
+</launch>
