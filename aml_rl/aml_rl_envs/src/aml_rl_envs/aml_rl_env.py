@@ -52,6 +52,10 @@ class AMLRlEnv(gym.Env):
     
     def set_space_lims(self, obs_dim, action_dim, action_high, action_low, is_discrete=False):
 
+        self._action_dim = action_dim
+
+        self._obs_dim = obs_dim
+
         obs_high = np.array([self._large_val_obs] * obs_dim) 
 
         if (is_discrete):
@@ -70,15 +74,15 @@ class AMLRlEnv(gym.Env):
                 
                 action_low = -action_high
 
-            self.action_space = spaces.Box(action_low, action_high)
+            self._action_space = spaces.Box(action_low, action_high)
         
-        self.observation_space = spaces.Box(-obs_high, obs_high)
+        self._observation_space = spaces.Box(-obs_high, obs_high)
 
 
     def setup_env(self):
 
         self._terminated = 0
-        
+
         pb.resetSimulation()
         
         pb.setPhysicsEngineParameter(numSolverIterations=150)
@@ -88,6 +92,8 @@ class AMLRlEnv(gym.Env):
         if self._set_gravity:
 
             pb.setGravity(0,0,-9.8)
+
+        self.simple_step()
 
 
     def simple_step(self):

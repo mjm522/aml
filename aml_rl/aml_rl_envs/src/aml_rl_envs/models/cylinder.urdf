@@ -4,7 +4,7 @@
    <link name="capsuleobject">
     <visual>
       <geometry>
-        <cylinder length="0.65" radius="0.3"/>
+        <cylinder length="0.65" radius="0.30"/>
       </geometry>
       <material name="black">
         <color rgba="0. 0 0 1"/>
@@ -13,7 +13,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.65" radius="0.3"/>
+        <cylinder length="0.65" radius="0.30"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0. 0 0"/>
     </collision>
@@ -39,7 +39,7 @@
     </inertial>
   </link>
 
-  <joint name="joint1" type="fixed">
+  <joint name="joint1" type="continuous">
     <parent link="base_link"/>
     <child link="capsuleobject"/>
     <origin xyz="0 0 0" rpy="0 0 0" />

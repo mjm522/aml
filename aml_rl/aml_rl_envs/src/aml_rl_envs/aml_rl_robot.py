@@ -1,6 +1,6 @@
 import numpy as np
 import pybullet as pb
-
+from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 class AMLRlRobot(object):
 
@@ -17,6 +17,13 @@ class AMLRlRobot(object):
         self._max_force = self._config['max_force']
         
         self._ctrl_type = self._config['ctrl_type']
+
+        if 'call_renderer' in self._config.keys():
+
+            if self._config['call_renderer']:
+                
+                setup_bullet_visualizer()
+
 
         self._robot_id = robot_id
 
@@ -169,4 +176,38 @@ class AMLRlRobot(object):
 
 
         return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
+
+    
+    def apply_jnt_ctrl(self, cmd, Kp=None):
+
+        assert len(self._jnt_indexs) == len(cmd)
+
+        for j, idx in enumerate(self._jnt_indexs):
+
+            self.apply_ctrl(idx, cmd[j])
+
+
+    def get_joint_limits(self):
+
+        num_jnts = len(self._jnt_indexs)
+
+        lower_lim = np.zeros(num_jnts)
+
+        upper_lim = np.zeros(num_jnts)
+
+        mean_ = np.zeros(num_jnts)
+
+        range_ = np.zeros(num_jnts)
+
+        for k, idx in enumerate(self._jnt_indexs):
+
+            lower_lim[k] = pb.getJointInfo(self._robot_id, idx)[8]
+            
+            upper_lim[k] = pb.getJointInfo(self._robot_id, idx)[9]
+
+            mean_[k] = 0.5*( lower_lim[k] + upper_lim[k] )
+
+            range_[k] = ( upper_lim[k] - lower_lim[k])
+                
+        return {'lower': lower_lim, 'upper':upper_lim, 'mean':mean_, 'range': range_}
 
