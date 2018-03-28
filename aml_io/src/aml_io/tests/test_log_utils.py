@@ -8,24 +8,24 @@ class TestLogger():
 
         self._logger = aml_logging.get_logger(__name__)
 
-        self._logger.debug("This is a debug message with array arguments:", np.random.randn(3), np.random.randn(3))
-        self._logger.debug("This is a debug message with integer argument:", 123)
+        self._logger.debug("This is a debug message with array arguments:{}".format(np.random.randn(3),))
+        self._logger.debug("This is a debug message with integer argument:%d"%(123,))
         self._logger.debug("This is a debug message with no arguments")
 
-        self._logger.info("This is a info message with array arguments:", np.random.randn(3))
-        self._logger.info("This is a info message with integer argument:", 123)
+        self._logger.info("This is a info message with array arguments:{}".format(np.random.randn(3),))
+        self._logger.info("This is a info message with integer argument:%d"%(123,))
         self._logger.info("This is a info message with no arguments")
 
-        self._logger.warning("This is a warning message with array arguments:", np.random.randn(3))
-        self._logger.warning("This is a warning message with integer argument:", 123)
+        self._logger.warning("This is a warning message with array arguments:{}".format(np.random.randn(3),))
+        self._logger.warning("This is a warning message with integer argument:%d"%(123,))
         self._logger.warning("This is a warning message with no arguments")
 
-        self._logger.error("This is a error message with array arguments:", np.random.randn(3))
-        self._logger.error("This is a error message with integer argument:", 123)
+        self._logger.error("This is a error message with array arguments:{}".format(np.random.randn(3),))
+        self._logger.error("This is a error message with integer argument:%d"%(123,))
         self._logger.error("This is a error message with no arguments")
 
-        self._logger.critical("This is a critical message with array arguments:", np.random.randn(3))
-        self._logger.critical("This is a critical message with integer argument:", 123)
+        self._logger.critical("This is a critical message with array arguments:{}".format(np.random.randn(3),))
+        self._logger.critical("This is a critical message with integer argument:%d"%(123,))
         self._logger.critical("This is a critical message with no arguments")
 
 

@@ -35,25 +35,20 @@ class AMLLogger(object):
 
         self._logger.setLevel(level)
 
-    def debug(self, msg, *args):
-        if args: msg += ' {}'
-        self._logger.debug(msg.format(args))
+    def debug(self, msg):
+        self._logger.debug(msg)
 
-    def info(self, msg, *args):
-        if args: msg += ' {}'
-        self._logger.info(msg.format(args))
+    def info(self, msg):
+        self._logger.info(msg)
 
-    def warning(self, msg, *args):
-        if args: msg += ' {}'
-        self._logger.warning(msg.format(args))
+    def warning(self, msg):
+        self._logger.warning(msg)
 
-    def error(self, msg, *args):
-        if args: msg += ' {}'
-        self._logger.error(msg.format(args))
+    def error(self, msg):
+        self._logger.error(msg)
 
-    def critical(self, msg, *args):
-        if args: msg += ' {}'
-        self._logger.critical(msg.format(args))
+    def critical(self, msg):
+        self._logger.critical(msg)
 
     def setLevel(self, level_name):
         level = LEVELS.get(level_name, logging.NOTSET)
