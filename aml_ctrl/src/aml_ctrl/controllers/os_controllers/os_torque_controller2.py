@@ -11,7 +11,7 @@ from aml_ctrl.controllers.os_controller import OSController
 from aml_ctrl.utilities.utilities import quatdiff
 
 
-class OSTorqueController(OSController):
+class OSTorqueController2(OSController):
     """
     This class is an implementation fo the Operational Space velocity control 
     controller specified in http://journals.sagepub.com/doi/abs/10.1177/0278364908091463
@@ -99,7 +99,7 @@ class OSTorqueController(OSController):
 
         # convert the mass compensation into end effector space
         Mx_inv         = np.dot(jac_ee, np.dot(np.linalg.inv(Mq), jac_ee.T))
-        svd_u, svd_s, svd_v = np.linalg.svd(Mx_inv, full_matrices=True)
+        svd_u, svd_s, svd_v = np.linalg.svd(Mx_inv)
 
         # cut off any singular values that could cause control problems
         singularity_thresh  = .00025
@@ -109,7 +109,7 @@ class OSTorqueController(OSController):
 
         # numpy returns U,S,V.T, so have to transpose both here
         # convert the mass compensation into end effector space
-        Mx   = np.dot(svd_u, np.dot(np.diag(svd_s), svd_v))#np.dot(svd_v.T, np.dot(np.diag(svd_s), svd_u.T))
+        Mx   = np.dot(svd_v.T, np.dot(np.diag(svd_s), svd_u.T))
 
 
         delta_pos      = goal_pos - curr_pos
@@ -128,12 +128,12 @@ class OSTorqueController(OSController):
 
 
         x_des   = self._kp_p*delta_pos + self._kd_p*delta_vel
+        print Mx
         if self._orientation_ctrl:
 
             if np.linalg.norm(delta_ori) < self._angular_threshold:
                 delta_ori = np.zeros(delta_ori.shape)
                 delta_omg = np.zeros(delta_omg.shape)
-
 
 
 
@@ -147,7 +147,7 @@ class OSTorqueController(OSController):
         a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
  
         # calculate desired force in (x,y,z) space
-        Fx                  = np.dot(Mx, np.hstack([x_des, omg_des])) #+ 0.*a_g)
+        Fx                  = np.hstack([x_des, omg_des]) #np.dot(Mx, np.hstack([x_des, omg_des])) #+ 0.*a_g)
 
 
         # transform into joint space, add vel and gravity compensation
