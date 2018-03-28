@@ -2,8 +2,12 @@
   
   <!-- this is for getting the tf transform of the robot -->
 
-  <param name="robot_description" command="cat $(find omni_description)/urdf/omni.urdf" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <param name="omni_robot_description" command="cat $(find omni_description)/urdf/omni.urdf"/>
+  <node name="omni_robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+  <remap from="robot_description" to="omni_robot_description" /> 
+  <remap from="joint_states" to="omni_joint_states" /> 
+  </node>
+
 
   <arg name="reference_frame" default="/base"/>
   <arg name="units" default="mm"/>

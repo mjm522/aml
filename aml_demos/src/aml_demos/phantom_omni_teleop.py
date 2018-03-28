@@ -19,7 +19,7 @@ def control_robot(arm, task_space):
         config_os_teleop = {
 
         'rate': 200, # rate of the controller
-        'ctrlr_type':'torq', #other options are 'vel', 'torq'
+        'ctrlr_type':'pos', #other options are 'vel', 'torq', 'pos'
   
          }
 
@@ -48,9 +48,9 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='teleop_ctrl')
 
-    parser.add_argument('-l', '--limb_name', type=str, default='right',  help='limb index-(left/right)')
+    parser.add_argument('-l', '--limb_name', type=str, default='left',  help='limb index-(left/right)')
 
-    parser.add_argument('-t', '--task_space', type=bool, default=False,  help='task space')
+    parser.add_argument('-t', '--task_space', type=bool, default=True,  help='task space')
 
     parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
 
@@ -70,9 +70,9 @@ if __name__ == '__main__':
         
         from aml_robot.baxter_robot import BaxterArm as ArmInterface
         
-        max_speed = 10.0
+        max_speed = 0.2
 
-        sampling_rate = 100
+        sampling_rate = 200
     
     elif args.arm_interface == "sawyer":
         

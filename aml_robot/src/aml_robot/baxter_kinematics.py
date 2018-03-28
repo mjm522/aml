@@ -47,7 +47,7 @@ class baxter_kinematics(object):
         self._baxter = URDF.from_parameter_server(key='robot_description')
         self._kdl_tree = kdl_tree_from_urdf_model(self._baxter)
         self._base_link = self._baxter.get_root()
-        self._tip_link = limb.name + '_hand' #'_gripper'
+        self._tip_link = limb.name + '_gripper' #'_gripper'
         self._tip_frame = PyKDL.Frame()
         self._arm_chain = self._kdl_tree.getChain(self._base_link,
                                                   self._tip_link)
