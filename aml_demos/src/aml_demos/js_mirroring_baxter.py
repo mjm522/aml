@@ -89,7 +89,7 @@ class JSMirroringBaxter():
 
         cmd = self._arm_slave._untuck
 
-        scale = self.master_js_scale(self._scale_from_home)
+        scale = self.master_js_scale()
 
         if self._scale_from_home:
 
