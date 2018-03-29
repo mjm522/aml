@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-import quaternion
 import numpy as np
 from aml_robot.baxter_robot import BaxterArm
 from aml_ctrl.controllers.js_controllers.js_postn_controller import JSPositionController 
@@ -11,6 +10,10 @@ from aml_ctrl.controllers.js_controllers.js_velocity_controller import JSVelocit
 Controller = JSPositionController
 
 class JSMirroringBaxter():
+    """
+    This class implements a mirroring of the baxter robot
+    This could also be used for other robots as well
+    """
 
     def __init__(self, master_limb='left', slave_limb='right'):
 

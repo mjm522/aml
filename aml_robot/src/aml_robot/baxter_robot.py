@@ -46,20 +46,6 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
 
         self._limb = limb
 
-        # these values are from the baxter urdf file
-        self._jnt_limits = [{'lower': -1.70167993878, 'upper': 1.70167993878},
-                            {'lower': -2.147, 'upper': 1.047},
-                            {'lower': -3.05417993878, 'upper': 3.05417993878},
-                            {'lower': -0.05, 'upper': 2.618},
-                            {'lower': -3.059, 'upper': 3.059},
-                            {'lower': -1.57079632679, 'upper': 2.094},
-                            {'lower': -3.059, 'upper': 3.059}]
-
-        # number of joints
-        self._nq = len(self._jnt_limits)
-        # number of control commads
-        self._nu = len(self._jnt_limits)
-
         if limb == 'left':
             # secondary goal for the manipulator
             self._limb_group = 0
@@ -67,15 +53,38 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
             self._tuck = np.array([-1.0, -2.07, 3.0, 2.55, 0.0, 0.01, 0.0])
             self._untuck = np.array([-0.08, -1.0, -1.19, 1.94, 0.67, 1.03, -0.50])
 
+            # these values are from the baxter urdf file
+            self._jnt_limits = [{'lower': -1.70167993878, 'upper': 1.70167993878},
+                            {'lower': -2.147, 'upper': 1.047},
+                            {'lower': -3.05417993878, 'upper': 3.05417993878},
+                            {'lower': -0.05, 'upper': 2.618},
+                            {'lower': -3.059, 'upper': 3.059},
+                            {'lower': -1.57079632679, 'upper': 2.094},
+                            {'lower': -3.059, 'upper': 3.059}]
+
         elif limb == 'right':
             self._limb_group = 1
             self._q_mean = np.array([0.0, -0.55, 0., 1.284, 0., 0.262, 0.])
             self._tuck = np.array([1.0, -2.07, -3.0, 2.55, 0.0, 0.01, 0.0])
             self._untuck = np.array([0.08, -1.0, 1.19, 1.94, -0.67, 1.03, 0.50])
 
+            # these values are from the baxter urdf file
+            self._jnt_limits = [{'lower': 1.70167993878, 'upper': -1.70167993878},
+                            {'lower': -2.147, 'upper': 1.047},
+                            {'lower': 3.05417993878, 'upper': -3.05417993878},
+                            {'lower': -0.05, 'upper': 2.618},
+                            {'lower': 3.059, 'upper': -3.059},
+                            {'lower': -1.57079632679, 'upper': 2.094},
+                            {'lower': 3.059, 'upper': -3.059}]
+
         else:
             self._logger.error("Unknown limb idex")
             raise ValueError
+
+        # number of joints
+        self._nq = len(self._jnt_limits)
+        # number of control commads
+        self._nu = len(self._jnt_limits)
 
         self._cuff = baxter_interface.DigitalIO('%s_lower_cuff' % (limb,))
 
