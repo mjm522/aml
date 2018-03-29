@@ -15,7 +15,7 @@ class JSMirroringBaxter():
     This could also be used for other robots as well
     """
 
-    def __init__(self, master_limb='left', slave_limb='right'):
+    def __init__(self, master_limb='left', slave_limb='right', sampling_rate=500, ctrlr_rate=500):
 
         self._arm_master = BaxterArm(master_limb)
         self._arm_slave  = BaxterArm(slave_limb)
@@ -34,26 +34,30 @@ class JSMirroringBaxter():
 
         self._scale_from_home = False
 
-        self._num_master_jnts = 7
+        self._num_master_jnts = self._arm_master._nu
 
-        self._num_slave_jnts = 7
+        self._num_slave_jnts = self._arm_slave._nu
         
-        self._rate = 500 #Hz
+        self._rate = ctrlr_rate #Hz
 
-        self._arm_slave.set_sampling_rate(500)
+        self._arm_slave.set_sampling_rate(sampling_rate)
 
-        self._arm_master.set_sampling_rate(500)
+        self._arm_master.set_sampling_rate(sampling_rate)
         
         self._ctrlr_slave.set_active(True)
 
 
-    def master_js_scale(self, scale_from_home=False):
+    def master_js_scale(self):
+        """
+        this function finds the js scale of the master robot
+        in a range 0 to 1
+        """
 
         scale = np.zeros(self._num_master_jnts)
 
         curr_js = self._arm_master.state()['position']
 
-        if scale_from_home:
+        if self._scale_from_home:
 
             for k in range(self._num_master_jnts):
 
@@ -78,6 +82,10 @@ class JSMirroringBaxter():
         return scale
 
     def compute_cmd(self):
+        """
+        once the scale is computed it is translated into
+        the command of the slave robot
+        """
 
         cmd = self._arm_slave._untuck
 
@@ -101,6 +109,10 @@ class JSMirroringBaxter():
 
 
     def run(self):
+        """
+        ctrlr function,
+        computes the scale and find the required velocity
+        """
 
         rate = rospy.timer.Rate(self._rate)
 
