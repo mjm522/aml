@@ -45,7 +45,7 @@ class Controller(object):
 
         # Read state
 
-        self._state = self._robot._state
+        self._state = self._robot.state()
 
         # Update command
 
