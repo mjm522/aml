@@ -1,212 +1,181 @@
 import roslib
+
 roslib.load_manifest('aml_robot')
 
 # import rospy
 
 import numpy as np
 import quaternion
+import pybullet as pb
 
 from aml_math.quaternion_utils import compute_omg
 
-from aml_robot.bullet.bullet_robot import BulletRobot
+from aml_robot.bullet.bullet_robot2 import BulletRobot2
 from aml_robot.robot_interface import RobotInterface
+from aml_io.io_tools import get_file_path, get_aml_package_path
+
 
 # from aml_visual_tools.load_aml_logo import load_aml_logo
 
 class BulletSawyerArm(RobotInterface):
 
-    def __init__(self, robot_id, limb = "right", on_state_callback=None):
+    def __init__(self, limb="right", on_state_callback=None):
 
-        #Load aml_logo
-        # load_aml_logo("/robot/head_display")
-        # getNumJoints(bodyUniqueId)
 
-        self._bullet_robot = BulletRobot(robot_id, ee_link_idx = 16) # hardcoded from the sawyer urdf
+        self._phys_id = pb.connect(pb.SHARED_MEMORY)
 
-        self._ready = False
+    
+        if (self._phys_id<0):
+            self._phys_id = pb.connect(pb.UDP,"127.0.0.1")
+
+        pb.resetSimulation()
+
+        pb.setGravity(0., 0.,0.0)
+        pb.setTimeStep(0.001)
+        pb.setRealTimeSimulation(1)
+
+
+        # description_path = config['description_path']
+        # extension = description_path.split('.')[-1]
+        # if extension == "urdf":
+        #     self._id = pb.loadURDF(config['description_path'])
+        # elif extension == "xml":
+        #     self._id = pb.loadMJCF(config['description_path'])[0]
+
+        models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
+        sawyer_path = get_file_path('sawyer2.urdf', models_path)
+        robot_id = pb.loadURDF(sawyer_path, useFixedBase=True)
+
+        self._bullet_robot = BulletRobot2(robot_id=robot_id, ee_link_idx=16, ee_link_name="right_hand")  # hardcoded from the sawyer urdf
 
         self._limb = limb
 
-        self._configure(limb,on_state_callback)
-        
+        self._joint_names = ['right_j%s' % (s,) for s in range(0, 7)]
+
+        all_joint_dict = self._bullet_robot.get_joint_dict()
+        self._joints = [all_joint_dict[joint_name] for joint_name in self._joint_names]
+
+        self._nq = len(self._joint_names)
+        self._nu = len(self._joint_names)
+
+        self._jnt_limits = [{'lower': -1.70167993878, 'upper': 1.70167993878},
+                            {'lower': -2.147, 'upper': 1.047},
+                            {'lower': -3.05417993878, 'upper': 3.05417993878},
+                            {'lower': -0.05, 'upper': 2.618},
+                            {'lower': -3.059, 'upper': 3.059},
+                            {'lower': -1.57079632679, 'upper': 2.094},
+                            {'lower': -3.059, 'upper': 3.059}]
+
+        self._tuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00])
+        self._untuck = self._tuck
+
         self._ready = True
 
-        #number of joints
-        self._nq = 7
-        #number of control commads
-        self._nu = 7
 
-
-
-
-    def _configure(self, limb, on_state_callback):
-        self._state = None
-
-        if on_state_callback:
-            self._on_state_callback = on_state_callback
-        else:
-            self._on_state_callback = lambda m: None
-
-        # Parent constructor
-        # intera_interface.Limb.__init__(self, limb)
-
-        # bullet_interface(self,limb)
-
-        # self._kinematics = sawyer_kinematics(self)
-
-        # self._ik_sawyer = IKSawyer(limb=self)
-
-        # self._ik_sawyer.configure_ik_service()
-
-        # self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
-        #                                  UInt16, queue_size=10)
-
-        # self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques', SEAJointState, self._gravity_comp_callback)
-
-        #gravity + feed forward torques
-        self._h = [0. for _ in range(7)]
-
-        self.set_sampling_rate()
-
-        # self.set_command_timeout(0.2)
-
-        self._camera = None
-        self._gripper = None
-        self._cuff = None
-
-        # self._configure_cuff()
-        # self._configure_gripper()
-
-
-    def q_mean(self):
-        return self._q_mean
 
     def _on_joint_states(self, msg):
         print 'NOT IMPLEMENTED'
 
-    def get_end_effector_link_name(self):
-        print 'NOT IMPLEMENTED'
-    
-    def get_base_link_name(self):
-        print 'NOT IMPLEMENTED'
-
-
     def exec_position_cmd(self, cmd):
-        print 'NOT IMPLEMENTED'
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
 
-    def exec_position_cmd_delta(self,cmd):
-        print 'NOT IMPLEMENTED'
+    def exec_position_cmd_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
 
-    def move_to_joint_pos_delta(self,cmd):
-        curr_q = self._state['position']
-        # joint_names = self.joint_names()
-        vals = [i+j for i,j in zip(curr_q,cmd)]
+    def move_to_joint_position(self, cmd):
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
 
-        self.move_to_joint_pos(vals)
-
-    def move_to_joint_pos(self,cmd):
-
-        self.move_using_pos_control(self._movable_joints, cmd)
-
-    def exec_velocity_cmd(self,cmd):
-                
-        self.set_joint_velocities(cmd)
-
-    def exec_torque_cmd(self,cmd):
-
-        self.set_joint_torques(cmd)
-
-#     def move_to_joint_position(self, joint_angles):
-#         self.move_to_joint_positions(dict(zip(self.joint_names(),joint_angles)))
+    def move_to_joint_pos_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
 
 
-    def get_ee_velocity(self, from_bullet=True):
-        
-        if from_bullet:
+    def exec_velocity_cmd(self, cmd):
 
-            return self.get_ee_velocity_from_bullet()
+        self._bullet_robot.set_joint_velocities(cmd, self._joints)
 
-        else:
+    def exec_torque_cmd(self, cmd):
 
-            #this is a simple finite difference based velocity computation
-            #please note that this might produce a bug since self._goal_ori_old gets 
-            #updated only if get_ee_vel is called. 
-            #TODO : to update in get_ee_pose or find a better way to compute velocity
-
-            time_now_new = self.get_time_in_seconds()
-            
-            ee_pos_new, ee_ori_new = self.get_ee_pose()  
-
-            dt = time_now_new-self._time_now_old
-
-            ee_vel = (ee_pos_new - self._ee_pos_old)/dt
-
-            ee_omg = compute_omg(ee_ori_new, self._ee_ori_old)/dt
-
-            self._goal_ori_old = ee_ori_new
-            self._goal_pos_old = ee_pos_new
-            self._time_now_old = time_now_new
-        
-        return ee_vel, ee_omg
+        self._bullet_robot.set_joint_torques(cmd, self._joints)
 
 
-    def get_cartesian_pos_from_joints(self, joint_angles=None):
-        
-        print 'NOT IMPLEMENTED'
-        # if joint_angles is None:
-            
-        #     argument = None
-        
-        # else:
-            
-        #     argument = dict(zip(self.joint_names(),joint_angles))
-        
-        # #combine the names and joint angles to a dictionary, that only is accepted by kdl
-        # pose = np.array(self._kinematics.forward_position_kinematics(argument))
-        # position = pose[0:3][:,None] #senting as  column vector
-        
-        # w = pose[6]; x = pose[3]; y = pose[4]; z = pose[5] #quarternions
-        
-        # #formula for converting quarternion to rotation matrix
 
-        # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
-        #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
-        #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
-        
-        # return position, rotation
-
-    def get_cartesian_vel_from_joints(self, joint_angles=None):
+    def forward_kinematics(self, joint_angles=None):
 
         print 'NOT IMPLEMENTED'
-        
-#         if joint_angles is None:
-            
-#             argument = None
-        
-#         else:
-            
-#             argument = dict(zip(self.joint_names(),joint_angles))
-        
-#         #combine the names and joint angles to a dictionary, that only is accepted by kdl
-#         return np.array(self._kinematics.forward_velocity_kinematics(argument))[0:3] #only position
-
-    def get_jacobian_from_joints(self, joint_angles=None):
-        print "NOT IMPLEMENTED: cannot calculate jacobians for the movable joints alone"
 
 
-    def get_arm_inertia(self, joint_angles=None):
-        
-        return self.get_inertia_matrix()
+    def inverse_kinematics(self, position, orientation=None):
+        return self._bullet_robot.inverse_kinematics(position, orientation)[self._joints]
 
-    def ik(self, pos, ori=None):
-        print 'NOT IMPLEMENTED'
 
-# def main():
-#     rospy.init_node("sawyer_arm_example")
+    def ee_pose(self):
+        return self._bullet_robot.ee_pose()
 
-#     arm = BulletSawyerArm('right')
 
-#     rospy.spin()
+    def set_sampling_rate(self, sampling_rate=100):
+        pass
 
-# if __name__ == '__main__':
-#     main()
+    def untuck(self):
+        self.exec_position_cmd(self._tuck)
+
+    def tuck(self):
+        self.exec_position_cmd(self._tuck)
+
+    def _update_state(self):
+        pass
+
+    def cartesian_velocity(self, joint_deltas=None):
+        pass
+
+    def jacobian(self, joint_angles=None):
+        return self._bullet_robot.jacobian(joint_angles)
+
+    def inertia(self, joint_angles=None):
+        return self._bullet_robot.inertia(joint_angles)
+
+    def q_mean(self):
+        return self._bullet_robot.q_mean()[self._joints]
+
+    def state(self):
+
+        joint_angles = self.angles()
+        joint_velocities = self.joint_velocities()
+        joint_efforts = self.joint_efforts()
+
+        state = {}
+        state['position'] = joint_angles
+        state['velocity'] = joint_velocities
+        state['effort'] = joint_efforts
+        state['jacobian'] = self.jacobian(None)
+        state['inertia'] = self.inertia(None)
+
+        state['ee_point'], state['ee_ori'] = self.ee_pose()
+
+        state['ee_vel'], state['ee_omg'] = self.ee_velocity()
+
+        # state['gripper_state'] = self.gripper_state()
+
+
+        return state
+
+
+    def angles(self):
+        return self._bullet_robot.angles()[self._joints]
+
+    def joint_velocities(self):
+        return self._bullet_robot.joint_velocities()[self._joints]
+
+    def joint_efforts(self):
+        return self._bullet_robot.joint_efforts()[self._joints]
+
+    def ee_velocity(self, numerical=False):
+        return self._bullet_robot.ee_velocity(numerical)
+
+    def n_cmd(self):
+        return self._nu
+
+    def n_joints(self):
+        return self._nq
+
+    def joint_names(self):
+        return self._joint_names

@@ -72,7 +72,7 @@ class JSTorqueController(JSController):
         if np.linalg.norm(dq) < 1e-3:
             dq = np.zeros_like(q)
 
-        h              = robot_state['gravity_comp']
+        # h              = robot_state['gravity_comp']
 
         # calculate the jacobian of the end effector
         jac_ee         = robot_state['jacobian']

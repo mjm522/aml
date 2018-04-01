@@ -17,4 +17,4 @@ CAM_INFO ={
 }
 
 
-config = {'cam':CAM_INFO}
+config = {'cam': CAM_INFO }
