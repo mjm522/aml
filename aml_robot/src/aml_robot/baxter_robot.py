@@ -317,13 +317,13 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
         time_now = rospy.Time.now()
         return time_now.secs + time_now.nsecs * 1e-9
 
-    def ee_velocity(self, real_robot=True):
+    def ee_velocity(self, from_sensors=True):
         # this is a simple finite difference based velocity computation
         # please note that this might produce a bug since self._goal_ori_old gets
         # updated only if get_ee_vel is called.
         # TODO : to update in get_ee_pose or find a better way to compute velocity
         # Simulated robot always returns 0 for linear and angular velocities
-        if real_robot:
+        if from_sensors:
 
             ee_velocity = self.endpoint_velocity()['linear']
             ee_vel = np.array([ee_velocity.x, ee_velocity.y, ee_velocity.z])
