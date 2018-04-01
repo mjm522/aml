@@ -29,6 +29,8 @@ def main_coop_gravity_comp_demo():
     arm_master = BaxterArm(master_limb)
     arm_slave  = BaxterArm(slave_limb)
 
+
+
     arm_master.untuck()
     arm_slave.untuck()
 
@@ -38,9 +40,12 @@ def main_coop_gravity_comp_demo():
     ctrlr_slave = Controller(arm_slave)
 
     cmd = np.zeros(7)
-    rate = 200 #Hz
+    rate = 500 #Hz
     rate = rospy.timer.Rate(rate)
 
+    arm_slave.set_sampling_rate(500)
+    arm_master.set_sampling_rate(500)
+    
     rel_pos = (slave_start_pos - master_start_pos)*0.90#np.array([-0.00507125, -0.2750604, -0.00270199]) #np.array([-0.00507125, -0.85750604, -0.00270199]) 
     rel_ori = slave_start_ori.conjugate()*master_start_ori
 

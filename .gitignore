@@ -45,5 +45,6 @@ aml_playground/src/aml_playground/peg_in_hole/demos/episode_reward.txt
 aml_lfd/src/aml_lfd/promp/promp_trial.py
 aml_playground/src/aml_playground/peg_in_hole/demos/analyse_data.py
 aml_data/
+aml_datasource/
 
 0_VRDemoSettings.txt

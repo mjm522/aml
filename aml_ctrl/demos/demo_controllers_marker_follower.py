@@ -28,12 +28,21 @@ from interactive_markers.interactive_marker_server import *
 
 from aml_visual_tools.rviz_markers import RvizMarkers
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
+from aml_ctrl.controllers.os_controllers.os_torque_controller2 import OSTorqueController2
 from aml_ctrl.controllers.os_controllers.os_postn_controller import OSPositionController
 from aml_ctrl.controllers.os_controllers.os_velocity_controller import OSVelocityController
 from aml_ctrl.controllers.os_controllers.os_impedance_controller import OSImpedanceController
 
+from aml_ctrl.controllers.os_controllers.config import ALL_CONFIGS
+
+from aml_io.log_utils import aml_logging
+
 menu_handler      = MenuHandler()
 destinationMarker = RvizMarkers()
+
+arm_interface = "sawyer"
+
+logger = aml_logging.get_logger(__name__)
 
 
 global multiple_goals
@@ -79,7 +88,7 @@ def process_feedback(feedback):
 
         set_points = []
 
-    rate.sleep()
+    # rate.sleep()
 
 def switch_arm(armfeedback):
     """
@@ -104,14 +113,38 @@ def set_controller(controller_id, arm):
     if controller_defined:
         ctrlr.set_active(False)
 
+    controllers = [None, 'position_', 'torque_', 'torque_', 'torque_']
+
+    controller_config_name = controllers[controller_id] + arm_interface
+
+    config = ALL_CONFIGS[controller_config_name]
+
+    logger.info('Selected Controller: %s'%(controller_config_name,))
+
     if controller_id == 1:
-        controller = OSPositionController(arm)
+        
+        controller = OSPositionController(arm,config)
+
     elif controller_id == 2:
-        controller = OSVelocityController(arm)
+
+        if arm_interface == "baxter":
+            controller = OSTorqueController(arm, config)#OSVelocityController(arm)
+        else:
+            controller = OSTorqueController2(arm, config)#OSVelocityController(arm)
+
     elif controller_id == 3:
-        controller = OSTorqueController(arm)
+
+        if arm_interface == "baxter":
+            controller = OSTorqueController(arm, config)
+        else:
+            controller = OSTorqueController2(arm, config)
+
     elif controller_id == 4:
-        controller = OSImpedanceController(arm)
+        
+        if arm_interface == "baxter":
+            controller = OSTorqueController(arm, config)
+        else:
+            controller = OSTorqueController2(arm, config)#OSImpedanceController(arm)
 
     controller_defined = True
     return controller
@@ -215,7 +248,7 @@ if __name__=="__main__":
 
         for arm in [r_limb, l_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
-            arm.set_sampling_rate(sampling_rate=1000) # Arm should report its state as fast as possible.
+            arm.set_sampling_rate(sampling_rate=500) # Arm should report its state as fast as possible.
             # arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
     elif args.arm_interface == "sawyer":
 
@@ -225,9 +258,10 @@ if __name__=="__main__":
 
         for arm in [r_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
-            arm.set_sampling_rate(sampling_rate=500) # Arm should report its state as fast as possible.
+            arm.set_sampling_rate(sampling_rate=900) # Arm should report its state as fast as possible.
             # arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
 
+    arm_interface = args.arm_interface
 
     limb = r_limb
     ctrlr = set_controller(control_id, limb)
