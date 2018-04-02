@@ -1,7 +1,7 @@
 io:
   # Sawyer SDK Controllers: Gripper --------------------------
   right_gripper_controller:
-    type: sawyer_sim_controllers/SawyerGripperController
+    type: aml_sawyer_sim_controllers/SawyerGripperController
     topic: /io/end_effector/right_gripper/command
     properties: /io/end_effector/right_gripper/config
     joints:
