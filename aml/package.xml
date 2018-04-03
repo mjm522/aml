@@ -43,7 +43,7 @@
   <run_depend>aml_drivers</run_depend>
   <run_depend>aml_planners</run_depend>
   <run_depend>aml_services</run_depend>
-  <run_depend>aml_sawyer_sim</run_depend>
+  <run_depend>aml_sawyer_simulator</run_depend>
 <!--   <run_depend>sawyer_gazebo</run_depend> -->
 
   <export>
