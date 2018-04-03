@@ -14,8 +14,13 @@ class sawyer_kinematics(object):
     """
     Sawyer Kinematics with PyKDL
     """
-    def __init__(self, limb):
-        self._sawyer = URDF.from_parameter_server(key='robot_description')
+    def __init__(self, limb, description = None):
+
+        if description is None:
+            self._sawyer = URDF.from_parameter_server(key='robot_description')
+        else:
+            self._sawyer = URDF.from_xml_file(description)
+
         self._kdl_tree = kdl_tree_from_urdf_model(self._sawyer)
         self._base_link = self._sawyer.get_root()
         self._tip_link = limb.name + '_hand'
