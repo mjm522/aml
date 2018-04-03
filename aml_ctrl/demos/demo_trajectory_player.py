@@ -3,10 +3,14 @@
 from aml_ctrl.controllers.os_controllers.os_torque_controller import OSTorqueController
 from aml_ctrl.controllers.os_controllers.os_postn_controller  import OSPositionController
 from aml_ctrl.controllers.js_controllers.js_postn_controller  import JSPositionController
+from aml_ctrl.controllers.js_controllers.js_torque_controller  import JSTorqueController
+from aml_ctrl.controllers.js_controllers.js_velocity_controller  import JSVelocityController
 from aml_ctrl.traj_generator.os_traj_generator import OSTrajGenerator
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 from aml_ctrl.traj_player.traj_player import TrajPlayer
+
+Controller = JSVelocityController
 
 import os
 import rospy
@@ -94,8 +98,10 @@ if __name__ == '__main__':
     if args.arm_interface == "baxter":
         from aml_robot.baxter_robot import BaxterArm as ArmInterface
         max_speed = 10.0
-    else:
+    elif args.arm_interface == "sawyer":
         from aml_robot.sawyer_robot import SawyerArm as ArmInterface
+    elif args.arm_interface =="sawyer_bullet":
+        from aml_robot.bullet.bullet_sawyer import BulletSawyerArm as ArmInterface
     
     limb = 'right'
     
