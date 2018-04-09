@@ -7,7 +7,7 @@ robot:
 
   # Sawyer SDK Controllers: Head --------------------------
   head_position_controller:
-    type: sawyer_sim_controllers/SawyerHeadController
+    type: aml_sawyer_sim_controllers/SawyerHeadController
     topic: /robot/head/command_head_pan
     joints:
           head_controller:
@@ -16,7 +16,7 @@ robot:
 
   # Sawyer SDK Controllers: Position --------------------------
   right_joint_position_controller:
-    type: sawyer_sim_controllers/SawyerPositionController
+    type: aml_sawyer_sim_controllers/SawyerPositionController
     topic: /robot/limb/right/joint_command
     joints:
       right_j0_controller:
@@ -43,7 +43,7 @@ robot:
 
   # Sawyer SDK Controllers: Velocity --------------------------
   right_joint_velocity_controller:
-    type: sawyer_sim_controllers/SawyerVelocityController
+    type: aml_sawyer_sim_controllers/SawyerVelocityController
     topic: /robot/limb/right/joint_command
     joints:
       right_j0_controller:
@@ -100,7 +100,7 @@ robot:
 
   # Sawyer SDK Controllers: Effort --------------------------
   right_joint_effort_controller:
-    type: sawyer_sim_controllers/SawyerEffortController
+    type: aml_sawyer_sim_controllers/SawyerEffortController
     topic: /robot/limb/right/joint_command
     joints:
       right_j0_controller:
