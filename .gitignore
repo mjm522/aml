@@ -39,7 +39,7 @@ aml_dl/src/aml_dl/mdn/model/tests2.py
 
 .idea
 
-aml_rl/rl_algos
+aml_rl/rl_algos/old
 
 aml_playground/src/aml_playground/peg_in_hole/demos/episode_reward.txt
 aml_lfd/src/aml_lfd/promp/promp_trial.py

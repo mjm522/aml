@@ -1,6 +1,6 @@
-<library path="lib/libsawyer_sim_controllers">
+<library path="lib/libaml_sawyer_sim_controllers">
 
-  <class name="sawyer_sim_controllers/SawyerPositionController" 
+  <class name="aml_sawyer_sim_controllers/SawyerPositionController" 
 	 type="sawyer_sim_controllers::SawyerPositionController" 
 	 base_class_type="controller_interface::ControllerBase">
     <description>
@@ -8,7 +8,7 @@
     </description>
   </class>
 
-  <class name="sawyer_sim_controllers/SawyerVelocityController" 
+  <class name="aml_sawyer_sim_controllers/SawyerVelocityController" 
 	 type="sawyer_sim_controllers::SawyerVelocityController" 
 	 base_class_type="controller_interface::ControllerBase">
     <description>
@@ -16,7 +16,7 @@
     </description>
   </class>
 
-  <class name="sawyer_sim_controllers/SawyerEffortController" 
+  <class name="aml_sawyer_sim_controllers/SawyerEffortController" 
 	 type="sawyer_sim_controllers::SawyerEffortController" 
 	 base_class_type="controller_interface::ControllerBase">
     <description>
@@ -24,7 +24,7 @@
     </description>
   </class>
   
-    <class name="sawyer_sim_controllers/SawyerHeadController" 
+    <class name="aml_sawyer_sim_controllers/SawyerHeadController" 
 	 type="sawyer_sim_controllers::SawyerHeadController" 
 	 base_class_type="controller_interface::ControllerBase">
     <description>
@@ -32,7 +32,7 @@
     </description>
   </class>
 
-  <class name="sawyer_sim_controllers/SawyerGripperController"
+  <class name="aml_sawyer_sim_controllers/SawyerGripperController"
 	 type="sawyer_sim_controllers::SawyerGripperController"
 	 base_class_type="controller_interface::ControllerBase">
     <description>

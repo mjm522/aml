@@ -21,13 +21,13 @@
 
   <!-- ros_control plugin -->
   <gazebo>
-    <plugin name="sawyer_arm_control" filename="libsawyer_gazebo_ros_control.so">
+    <plugin name="sawyer_arm_control" filename="libaml_sawyer_gazebo_ros_control.so">
       <robotNamespace>/robot</robotNamespace>
     </plugin>
   </gazebo>
 
   <gazebo>
-    <plugin name="sawyer_effector_control" filename="libintera_gripper_gazebo_ros_control.so">
+    <plugin name="sawyer_effector_control" filename="libaml_intera_gripper_gazebo_ros_control.so">
       <robotNamespace>/io</robotNamespace>
     </plugin>
   </gazebo>

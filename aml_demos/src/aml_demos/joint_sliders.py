@@ -40,8 +40,9 @@ class DummyController(object):
     def set_goal(self, goal_js_pos, goal_js_vel=None, goal_js_acc=None):
         ''' Using control interface as defined in AML '''
 
-        joint_command = dict(zip(self.arm.joint_names(),goal_js_pos))
-        self.arm.move_to_joint_positions(joint_command, timeout=self._config['timeout'], threshold=self._config['js_pos_error_thr'])
+        # joint_command = dict(zip(self.arm.joint_names(),goal_js_pos))
+        self.arm.move_to_joint_position(goal_js_pos)
+        # self.arm.move_to_joint_position(joint_command, timeout=self._config['timeout'], threshold=self._config['js_pos_error_thr'])
 
     def wait_until_goal_reached(self, timeout = 5.0):
         ''' just dummy '''
@@ -354,7 +355,7 @@ class SliderWindow(qtg.QWidget):
                 self.joint_slider_labels[i].setText('{:.3f}'.format(val))
 
 def main():
-    if len(sys.argv) < 3 or sys.argv[1] not in ['left', 'right'] or sys.argv[2] not in ['baxter', 'sawyer']:
+    if len(sys.argv) < 3 or sys.argv[1] not in ['left', 'right'] or sys.argv[2] not in ['baxter', 'sawyer', 'sawyer_bullet']:
         print('usage: ./joint_sliders.py (left|right) (baxter|sawyer)')
         sys.exit(1)
 
@@ -377,8 +378,11 @@ def main():
     min_speed = 0.01
     if arm_interface == "baxter":
         from aml_robot.baxter_robot import BaxterArm as ArmInterface
-    else:
+    elif arm_interface == "sawyer":
         from aml_robot.sawyer_robot import SawyerArm as ArmInterface
+    elif arm_interface =="sawyer_bullet":
+        from aml_robot.bullet.bullet_sawyer import BulletSawyerArm as ArmInterface
+
 
     print "ARM INTERFACE",arm_interface
 
