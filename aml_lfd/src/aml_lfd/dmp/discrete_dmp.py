@@ -3,6 +3,7 @@ import numpy.matlib as npm
 # from aml_lfd.lfd import LfD
 from scipy.interpolate import interp1d
 
+np.random.seed(123)
 
 class DiscreteDMP(object):
     """
@@ -61,7 +62,7 @@ class DiscreteDMP(object):
             raise("The trajectory does not have same number of dimensions as specified")
         self._demo_traj = np.vstack([trajectory, npm.repmat(trajectory[-1,:],20,1)])
         self._traj_data = self.process_trajectory()
-        self._config['original_scaling'] = self._traj_data[-1,1:] - self._traj_data[1,1:] + 1e-5
+        self._original_scaling = self._traj_data[-1,1:] - self._traj_data[1,1:] + 1e-5
 
     def get_time_stamps(self):
         """
@@ -199,7 +200,7 @@ class DiscreteDMP(object):
         #assign the computed weights
         self._Ws = w
 
-    def generate_trajectory(self, config=None):
+    def generate_trajectory_old(self, config=None):
         """
         this function is to generate a new DMP trajectory from already trained system
         Args: 
@@ -248,6 +249,8 @@ class DiscreteDMP(object):
         #generate the trajectory
         #by rolling out out point at a time
 
+        do_print = True
+
         while u > 1e-3:
 
             if config['goal_thresh'] is not None:
@@ -260,7 +263,7 @@ class DiscreteDMP(object):
             forces = np.dot(self._Ws.T, kf/np.sum(kf))
 
             if  self._type == 1:
-                scaling = np.multiply((goals - config['y0']), 1./config['original_scaling'])
+                scaling = np.multiply((goals - config['y0']), 1./self._original_scaling)
                 ddy = K * (goals - y) - D * dy + np.multiply(scaling, forces.T) * u
             elif  self._type == 2 or self._type == 3:
                 scaling = goals - config['y0']
@@ -301,17 +304,206 @@ class DiscreteDMP(object):
             timestamps = np.hstack([timestamps, t])
 
         #append the trajectory
-        traj   = np.hstack([np.asarray(timestamps)[:,None], Y])
-        dtraj  = np.hstack([np.asarray(timestamps)[:,None], dY])
-        ddtraj = np.hstack([np.asarray(timestamps)[:,None], ddY])
+        # traj   = np.hstack([np.asarray(timestamps)[:,None], Y])
+        # dtraj  = np.hstack([np.asarray(timestamps)[:,None], dY])
+        # ddtraj = np.hstack([np.asarray(timestamps)[:,None], ddY])
 
         traj_data = {
+        'time_stamps':timestamps,
         #computed traj of the trajectory
-        'pos':traj,
+        'pos':Y,
         #computed vel of the trajectory
-        'vel':dtraj,
+        'vel':dY,
         #computed acc of the trajectory
-        'acc':ddtraj,
+        'acc':ddY,
+        }
+
+        return traj_data
+
+    def reset_cs(self):
+
+        self._u_roll = 1.
+        self._t_roll = 0.
+
+    def configure_rollout(self, config):
+
+        self._goals_roll = config['goals']
+        self._y0_roll = config['y0']
+        self._dy_roll =  config['dy']
+        self._tau_roll = config['tau']
+        self._dt_roll = config['dt']
+        self._K_roll = config['K']
+        self._D_roll = config['D']
+
+        self._goal_thresh_roll = config['goal_thresh']
+        
+        self._ax_roll = config['ax']
+
+
+    def step_cs(self):
+        """
+        stepping the canonical system
+        this controlls the rolling out of the dmp
+        """
+
+        #canonical system rollout based on the type of the system
+        if  self._type == 1 or self._type == 2:
+            #u = np.exp(float(ax)*t/tau)
+            self._u_roll = self._u_roll + 1./self._tau_roll * self._ax_roll * self._u_roll * self._dt_roll
+        elif  self._type == 3:
+            phasestop = 1 + config['ac'] * np.sqrt(np.sum((yreal - y)**2))
+            self._u_roll = self._u_roll + 1./self._tau_roll * self._ax_roll * self._u_roll * self._dt_roll / phasestop
+
+        self._t_roll += self._dt_roll
+
+
+    def step_dmp(self, y, dy, feedback):
+        """
+        Steps through the next trajectory,
+        make sure that step_cs is called before this
+        if a feedback is present in the system, it should be of a 
+        force type, it is fed into the system and is used to modify
+        the force felt by the basis function
+        """
+
+        kf = self._kernel_fcn(np.array([[self._u_roll]]))
+
+        forces = np.dot(self._Ws.T, kf/np.sum(kf)) + feedback
+
+        if  self._type == 1:
+            scaling = np.multiply((self._goals_roll - self._y0_roll), 1./self._original_scaling)
+            ddy = self._K_roll * (self._goals_roll - y) - self._D_roll * dy + np.multiply(scaling, forces.T) * self._u_roll
+        elif  self._type == 2 or self._type == 3:
+            scaling = self._goals_roll - self._y0_roll
+            ddy = self._K_roll * (self._goals_roll - y) - self._D_roll * dy - self._K_roll * scaling * self._u_roll + self._K_roll * forces.T * self._u_roll
+        
+        # Euler Method, integration
+        dy = dy + self._dt_roll * ddy/self._tau_roll
+
+        y = y + dy * self._dt_roll/self._tau_roll
+
+        return y, dy, ddy
+
+
+    def next_traj_point(self, y, dy, feedback=None):
+        """
+        this function steps through one step of the canonical system
+        and one step of the next traj, it also increments the time.
+        feedback argument can be given to supply the ready feedback available
+        in the system. this feedback should be of a force type or should be proportional
+        to the acceleration change present in the system
+        """
+
+        if feedback is None:
+
+            feedback = np.zeros([self._dof]).reshape(self._dof, 1)
+
+        y, dy, ddy = self.step_dmp(y, dy, feedback)
+
+        self.step_cs()
+
+        done = (np.linalg.norm(y-self._goals_roll) < self._goal_thresh_roll) or (self._u_roll < 1e-3)
+
+        return self._t_roll, y, dy, ddy, done
+
+
+    def phase_stop_dmp(self, y, yreal, dyreal, timestamp, ext_force=np.array([0,0,0,0])):
+        """
+        this particular function is called for phase stop of the dmp
+        in case the actual robot is not able to catch up with the system
+        for example, due to a collission, this function is called.
+        """
+
+        Ky = 300.
+        Dy = np.sqrt(4*Ky)
+        ddyreal = Ky * (y - yreal) - Dy * dyreal
+        if (timestamp >= ext_force[1]) and (timestamp < ext_force[1] + ext_force[2]):
+            ddyreal = ddyreal + ext_force[3:]
+        
+        dyreal = dyreal + ddyreal * self._dt_roll
+        yreal = yreal + dyreal * self._dt_roll
+
+        return yreal, dyreal, ddyreal
+
+
+    def generate_trajectory(self, config=None):
+        """
+        this function is to generate a new DMP trajectory from already trained system
+        Args: 
+        config : contains all parameters like the input
+        dt: time step
+        K: porportional gain of the dmp
+        D: derivative gain of the dmp
+        y: the start location of the dmp
+        dy the start velocity of the dmp
+        goals: goals to which the dmp has to move - helps in spatial scaling
+        tau: temporatl scale constant
+        ext_force: optional parameter, denotes the external peturbation to a dmp, example, collision
+        """
+
+        if config is None:
+            config = self._config
+
+        self.configure_rollout(config)
+
+        if self._Ws is None:
+            raise Exception("The DMP was not trained, call train method first before calling generate_trajectory")
+
+        y  = config['y0']
+        dy = config['dy']
+
+        idx    = 1
+        
+        yreal  = y
+        dyreal = dy
+        Y      = yreal
+        dY     = dyreal
+        ddY    = np.zeros_like(dyreal)
+
+        timestamps = np.array([0])
+        
+        #generate the trajectory
+        #by rolling out out point at a time
+
+        self.reset_cs()
+
+        done = False
+
+        while not done:
+
+            if config['goal_thresh'] is not None:
+                if np.linalg.norm(y-self._goals_roll) < self._goal_thresh_roll:
+                    break
+
+            idx += 1
+
+            t, y, dy, ddy, done = self.next_traj_point(y, dy)
+
+            if  self._type == 1 or self._type == 2:
+                
+                Y   = np.vstack([Y, y])
+                dY  = np.vstack([dY, dy])
+                ddY = np.vstack([ddY, ddy])
+            
+            #for the phase stop allowing type of DMP
+            elif  self._type == 3:
+
+                yreal, dyreal, ddyreal =  self.phase_stop_dmp(y, yreal, dyreal, timestamps[idx-1])
+
+                Y   = np.vstack([Y, yreal])
+                dY  = np.vstack([dY, dyreal])
+                ddY = np.vstack([ddY, ddyreal])
+            
+            timestamps = np.hstack([timestamps, t])
+
+        traj_data = {
+        'time_stamps':timestamps,
+        #computed traj of the trajectory
+        'pos':Y,
+        #computed vel of the trajectory
+        'vel':dY,
+        #computed acc of the trajectory
+        'acc':ddY,
         }
 
         return traj_data
