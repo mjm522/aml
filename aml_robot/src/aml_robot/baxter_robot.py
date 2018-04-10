@@ -36,7 +36,7 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
         self._logger = aml_logging.get_logger(__name__)
 
         # Load aml_logo
-        # load_aml_logo()
+        load_aml_logo()
 
         self._ready = False
 
