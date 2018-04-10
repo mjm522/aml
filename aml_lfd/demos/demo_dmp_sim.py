@@ -43,7 +43,10 @@ def test_dmp(dmp):
     else:
         test_config['extForce'] = np.array([0,0,0,0])
 
-    test_traj = dmp.generate_trajectory(config=test_config)['pos']
+    gen_traj = dmp.generate_trajectory(config=test_config)
+
+    time_stamps = gen_traj['time_stamps']
+    test_traj   = gen_traj['pos']
 
     #in 2D only maximum only two dimensions can be plotted
 
@@ -52,12 +55,12 @@ def test_dmp(dmp):
 
     plt.figure(1)
     plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')
-    plt.plot(test_traj[:,1], test_traj[:,2], 'r--')
+    plt.plot(test_traj[:,0], test_traj[:,1], 'r--')
 
     plt.figure(2)
     for k in range(dmp._dof):
 
-        plt.plot(test_traj[:,0], test_traj[:,k+1])
+        plt.plot(time_stamps, test_traj[:,k])
 
     plt.show()
 
