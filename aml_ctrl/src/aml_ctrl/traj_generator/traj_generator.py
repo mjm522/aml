@@ -19,6 +19,8 @@ class TrajGenerator(object):
 
         self._load_from_demo = load_from_demo
 
+        self._demo_path = None
+
         if load_from_demo:
             #configure required demo index
             self.configure_demo(**kwargs)
