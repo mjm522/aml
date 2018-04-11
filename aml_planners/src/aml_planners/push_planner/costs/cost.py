@@ -1,9 +1,9 @@
 
 
 class Cost(object):
-	"""
-	Abstract class of the various types of cost
-	"""
+    """
+    Abstract class of the various types of cost
+    """
 
     def __init__(self, config):
         """ Not implemented """

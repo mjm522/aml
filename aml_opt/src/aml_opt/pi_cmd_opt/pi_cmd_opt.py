@@ -145,7 +145,7 @@ class PICmdOpt(object):
 
         return np.sum(delus_samples, axis=0).T
 
-    def run(self, u_list):
+    def run(self, u_list, rtn_ss=False):
         """
         this is function that could be parrallelized to perform parralled rollouts of several
         rollouts for a given set of u_list by perturbing this same list in different amounts
@@ -171,6 +171,12 @@ class PICmdOpt(object):
 
             # print "Elapsed time \t", toc
 
-            u_list = u_list + delta_u
+            u_list = self.put_control_constraints( u_list + delta_u.reshape(u_list.shape) )
 
-        return u_list, xs_samples, traj_prob, delus_samples
+        if rtn_ss:
+
+            return u_list, xs_samples, traj_prob, delus_samples, ss
+        
+        else:
+
+            return u_list, xs_samples, traj_prob, delus_samples

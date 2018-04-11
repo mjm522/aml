@@ -46,8 +46,6 @@ class OptimCmd(PICmdOpt):
 
     def forward_rollout(self, u_list, k):
 
-        N = u_list.shape[1]
-
         xs_samples = np.zeros((self._N, self._state_dim)) # Forward trajectory samples
         delus_samples = np.zeros((self._N, self._cmd_dim))
         

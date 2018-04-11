@@ -92,7 +92,6 @@ class MPPIController(object):
         Args:
         t = time index
         """
-        
         return self._rho[t]*np.random.randn(self._cmd_dim) #/np.sqrt(self._dt))
 
         # return self._rho*np.random.randn(self._K, self._N, self._cmd_dim)/np.sqrt(self._dt)
@@ -309,7 +308,7 @@ class MPPIController(object):
             u_list, xs_samples, traj_prob, delus_samples = self.fun_to_parrallelize(u_list)
 
             print "New u_list \n", u_list
-            
+
             itr += 1
             
             print "Old rho \n", self._rho
