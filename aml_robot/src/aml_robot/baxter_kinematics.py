@@ -43,8 +43,12 @@ class baxter_kinematics(object):
     Baxter Kinematics with PyKDL
     """
 
-    def __init__(self, limb):
-        self._baxter = URDF.from_parameter_server(key='robot_description')
+    def __init__(self, limb, description = None):
+        if description is None:
+            self._baxter = URDF.from_parameter_server(key='robot_description')
+        else:
+            self._baxter = URDF.from_xml_file(description)
+
         self._kdl_tree = kdl_tree_from_urdf_model(self._baxter)
         self._base_link = self._baxter.get_root()
         self._tip_link = limb.name + '_gripper' #'_gripper'

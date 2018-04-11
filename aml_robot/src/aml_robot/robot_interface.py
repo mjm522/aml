@@ -130,6 +130,11 @@ class RobotInterface(object):
         raise NotImplementedError("angles: NO EFFECT, NOT IMPLEMENTED")
 
     @abc.abstractproperty
+    def joint_limits(self):
+
+        return self._jnt_limits
+
+    @abc.abstractproperty
     def joint_names(self):
         """
         Returns list of joint names for this robot

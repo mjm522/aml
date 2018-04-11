@@ -244,6 +244,10 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
 
         return np.array(to_list(joint_angles))
 
+    def joint_limits(self):
+
+        return self._jnt_limits
+
     def q_mean(self):
         return self._q_mean
 

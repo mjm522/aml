@@ -16,7 +16,7 @@ class Controller(object):
 
         self._robot    = robot_interface
 
-        self._cmd      = np.zeros(self._robot._nu)
+        self._cmd      = np.zeros(self._robot.n_cmd())
 
         self._last_time = rospy.Time.now()
 

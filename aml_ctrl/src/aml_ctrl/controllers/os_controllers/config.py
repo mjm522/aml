@@ -125,7 +125,7 @@ OS_TORQUE_CNTLR_REAL_SAWYER = {
     'linear_error_thr': 0.025,
     'angular_error_thr': 0.01,
     'integrate_jnt_velocity': False,
-    'deactivate_wait_time': 50
+    'deactivate_wait_time': 5
 }
 
 
@@ -156,6 +156,8 @@ ALL_CONFIGS = {
     'torque_baxter': OS_TORQUE_CNTLR_REAL_BAXTER,
     'position_sawyer' : OS_POSTN_CNTLR_REAL_SAWYER,
     'torque_sawyer': OS_TORQUE_CNTLR_REAL_SAWYER,
+    'position_sawyer_bullet' : OS_POSTN_CNTLR_REAL_SAWYER,
+    'torque_sawyer_bullet': OS_TORQUE_CNTLR_REAL_SAWYER,
 
 }
 

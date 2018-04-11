@@ -83,7 +83,7 @@ class OSTorqueController(OSController):
 
         dq             = robot_state['velocity']
 
-        h              = robot_state['gravity_comp']
+        # h              = robot_state['gravity_comp']
 
         # calculate the jacobian of the end effector
         jac_ee         = robot_state['jacobian']
@@ -144,7 +144,7 @@ class OSTorqueController(OSController):
             omg_des = np.zeros(3)
 
         #print "h: ", h
-        a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
+        # a_g                 = -np.dot(np.dot(jac_ee, np.linalg.inv(Mq)), h)
  
         # calculate desired force in (x,y,z) space
         Fx                  = np.dot(Mx, np.hstack([x_des, omg_des])) #+ 0.*a_g)
