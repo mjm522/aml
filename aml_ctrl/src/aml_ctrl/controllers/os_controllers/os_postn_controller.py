@@ -65,7 +65,7 @@ class OSPositionController(OSController):
 
         goal_omg       = self._goal_omg
         
-        robot_state    = self._robot._state
+        robot_state    = self._robot.state()
 
         q              = robot_state['position']
 

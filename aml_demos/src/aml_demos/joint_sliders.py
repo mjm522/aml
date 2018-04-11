@@ -228,10 +228,17 @@ class SliderWindow(qtg.QWidget):
         self.joint_sliders = []
         self.joint_slider_labels = []
         for i, name in enumerate(self.joint_names):
-            limits = self.arm._jnt_limits[i]
+
+            joint_limits = self.arm.joint_limits()
+            limits = joint_limits[i]
 
             slider_vbox = qtg.QVBoxLayout()
-            description = my_descriptions[name.split('_')[1]]
+
+            try:
+                description = my_descriptions[name.split('_')[1]]
+            except:
+                description = dict(zip(self.arm.joint_names(),self.arm.joint_names()))
+
             name_label = qtg.QLabel('{}\n{}'.format(name, description))
             center(name_label)
             slider_vbox.addWidget(name_label)

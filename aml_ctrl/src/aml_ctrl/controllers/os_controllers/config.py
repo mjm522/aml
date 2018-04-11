@@ -125,7 +125,7 @@ OS_TORQUE_CNTLR_REAL_SAWYER = {
     'linear_error_thr': 0.025,
     'angular_error_thr': 0.01,
     'integrate_jnt_velocity': False,
-    'deactivate_wait_time': 50
+    'deactivate_wait_time': 5
 }
 
 

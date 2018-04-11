@@ -1,10 +1,10 @@
 <launch>
 
-    <arg name="demo_folder" default="right_sawyer_exp_test"/>
-    <arg name="arm_interface" default="baxter"/>
+    <arg name="demo_folder" default="left_sawyer_exp_test"/>
+    <arg name="arm_interface" default="sawyer_bullet"/>
     <arg name="backward_playback" default=""/> <!-- or <arg name="backward_playback" default=""/> -->
-    <arg name="control_loop_rate" default="200"/>
-    <arg name="timeout" default="0.1"/>
+    <arg name="control_loop_rate" default="900"/>
+    <arg name="timeout" default="0.01"/>
     <arg name="traj_idx" default="0"/>
     <arg name="arm_speed" default="5.0"/>
     <arg name="gripper_speed" default="0.25"/>

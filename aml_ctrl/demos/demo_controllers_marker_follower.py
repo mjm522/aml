@@ -60,7 +60,7 @@ def process_feedback(feedback):
     p = feedback.pose.position
     q = feedback.pose.orientation
 
-    print feedback.marker_name + "_marker is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z)
+    logger.info(feedback.marker_name + "_marker is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z))
 
     goal_pos = np.array([p.x,p.y,p.z])
     goal_ori = np.quaternion(q.w, q.x,q.y,q.z)
@@ -231,8 +231,12 @@ if __name__=="__main__":
     if args.arm_interface == "baxter":
         from aml_robot.baxter_robot import BaxterArm as ArmInterface
         max_speed = 10.0
-    else:
+    elif args.arm_interface == "sawyer":
+
         from aml_robot.sawyer_robot import SawyerArm as ArmInterface
+    elif args.arm_interface =="sawyer_bullet":
+
+        from aml_robot.bullet.bullet_sawyer import BulletSawyerArm as ArmInterface
 
     print "ARM INTERFACE",args.arm_interface
 
@@ -260,6 +264,12 @@ if __name__=="__main__":
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
             arm.set_sampling_rate(sampling_rate=900) # Arm should report its state as fast as possible.
             # arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
+    elif args.arm_interface == "sawyer_bullet":
+
+        r_limb = ArmInterface('right')
+        l_limb = r_limb
+        r_limb.untuck()
+
 
     arm_interface = args.arm_interface
 

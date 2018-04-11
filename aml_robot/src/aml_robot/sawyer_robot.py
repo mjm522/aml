@@ -291,6 +291,10 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             all_angles.append(self._gripper.get_position())
         return np.array(all_angles)
 
+    def joint_limits(self):
+
+        return self._jnt_limits
+
     def velocities(self, include_gripper=False):
         joint_velocities = self.joint_velocities()
 

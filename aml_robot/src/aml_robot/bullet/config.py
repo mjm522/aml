@@ -18,3 +18,9 @@ CAM_INFO ={
 
 
 config = {'cam': CAM_INFO }
+
+
+SAWYER_BULLET_CONFIG = {
+	'ee_link_idx': 16,
+	'ee_link_name': 'right_hand'
+}

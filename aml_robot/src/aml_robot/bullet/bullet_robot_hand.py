@@ -1,19 +1,21 @@
 import numpy as np
 import quaternion
 
-from aml_math.quaternion_utils import compute_omg
+from aml_robot.bullet.bullet_robot2 import BulletRobot2
 
 import pybullet as pb
 
 
-class BulletRobot2(object):
-    def __init__(self, robot_id, config):
+class BulletRobotHand(BulletRobot2):
+    def __init__(self, robot_id, ee_link_idx=16, ee_link_name="right_hand"):
 
         """
         :param config: configuration for this robot
         """
 
-        self._id = robot_id
+        BulletRobot2.__init__(self, robot_id = robot_id, ee_link_idx=16, ee_link_name=ee_link_name)
+
+
 
         # self._config = config
         # description_path = config['description_path']
@@ -37,15 +39,15 @@ class BulletRobot2(object):
 
         self._all_joint_dict = dict(zip(self._all_joint_names, self._all_joints))
 
-        self._ee_link_name = config['ee_link_name']#ee_link_name  # config['ee_link_name']
+        self._ee_link_name = ee_link_name  # config['ee_link_name']
 
-        self._ee_link_idx = config['ee_link_idx']#ee_link_idx  # config['ee_link_idx'] # saywer ee idx: 16
+        self._ee_link_idx = ee_link_idx  # config['ee_link_idx'] # saywer ee idx: 16
 
         self._joint_limits = self.get_joint_limits()
 
     def state(self):
         """
-        
+
         :return: returns dictionary containing current state of the robot
         """
 
@@ -68,14 +70,14 @@ class BulletRobot2(object):
 
     def jacobian(self, joint_angles=None):
         """
-        
+
         :param joint_angles: 
         Optional parameter. If different than None, then returned jacobian will be evaluated at given joint_angles.
         Otherwise the returned jacobian will be evaluated at current robot joint angles
-        
+
         :return: 
         Jacobian evaluated at current joint angles or optionally at joint_angles
-        
+
         """
 
         if joint_angles is None:
@@ -95,7 +97,7 @@ class BulletRobot2(object):
 
     def ee_pose(self):
         """
-        
+
         :return: end-effector pose of this robot in the format (position,orientation)
         Note: orientation is a quaternion following Hamilton convention, i.e. (w, x, y, z)
         """
@@ -103,7 +105,7 @@ class BulletRobot2(object):
 
     def ee_velocity(self, numerical=False):
         """
-        
+
         :param numerical: flag indicating if end-effector velocity should be computed numerically or not.
         :return: end-effector velocity, which includes linear and angular velocities, i.e. (v,omega)
         """
@@ -112,7 +114,7 @@ class BulletRobot2(object):
 
     def inertia(self, joint_angles=None):
         """
-        
+
         :param joint_angles: optional parameter, if not None, then returned inertia is evaluated at given joint_angles.
         Otherwise, returned inertia tensor is evaluated at current joint angles.
         :return: Joint space inertia tensor
@@ -127,7 +129,7 @@ class BulletRobot2(object):
 
     def inverse_kinematics(self, position, orientation=None):
         """
-        
+
         :param position: target position
         :param orientation: target orientation in quaternion format (w, x, y , z)
         :return: joint positions that take the end effector to the desired target position and/or orientation
@@ -154,7 +156,7 @@ class BulletRobot2(object):
 
     def joint_names(self):
         """
-        
+
         :return: joint names for this robot
         """
         return self._all_joint_names
@@ -166,7 +168,7 @@ class BulletRobot2(object):
     def angles(self):
 
         """
-        
+
         :return: current joint angles
         """
         return self.get_joint_state()[0]
@@ -174,31 +176,31 @@ class BulletRobot2(object):
     def joint_velocities(self):
 
         """
-        
-        
+
+
         :return: current joint velocities
         """
         return self.get_joint_state()[1]
 
     def joint_efforts(self):
         """
-        
-        
+
+
         :return: current joint efforts
         """
         return self.get_joint_state()[3]
 
     def n_joints(self):
         """
-        
+
         :return: number of joint this robot has
         """
         return self._nq
 
     def n_cmd(self):
         """
-        
-        
+
+
         :return: number of controllable degrees of freedom that this robot has
         """
         return self._nu
@@ -300,18 +302,6 @@ class BulletRobot2(object):
         return np.array(joint_angles), np.array(joint_velocities), np.array(joint_reaction_forces), np.array(
             joint_efforts)
 
-    def set_jnt_state(self, jnt_state):
-
-        num_jnts = pb.getNumJoints(self._id)
-
-        if len(jnt_state) < num_jnts:
-            raise Exception ("Incorrect number of joint state values given")
-
-        else:
-            for jnt_idx in range(num_jnts):
-
-                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
-
     def get_movable_joints(self):
 
         movable_joints = []
@@ -347,8 +337,6 @@ class BulletRobot2(object):
 
             range_[k] = (upper_lim[k] - lower_lim[k])
 
-        # [dict([x]) for x in zip(['upper'] * a.n_cmd(), a._bullet_robot.get_joint_limits()['upper'])]
-        #
         return {'lower': lower_lim, 'upper': upper_lim, 'mean': mean_, 'range': range_}
 
     def get_joint_by_name(self, joint_name):
@@ -356,13 +344,6 @@ class BulletRobot2(object):
             return self._all_joint_dict[joint_name]
         else:
             raise Exception("Joint name does not exist!")
-
-
-    def configure_default_pos(self, pos, ori):
-
-        self._default_pos = pos
-        self._default_ori = ori
-        self.set_default_pos_ori()
 
     def set_default_pos_ori(self):
 
@@ -391,16 +372,16 @@ class BulletRobot2(object):
                 pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL,
                                          targetPosition=angles[k], force=0.5)
 
-    # def get_image(self):
-    #
-    #     _, _, self._view_matrix, _, _, _, _, _, _, _, _, _ = pb.getDebugVisualizerCamera()
-    #     (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'],
-    #                                                             self._config['cam']['image_height'],
-    #                                                             self._view_matrix, self._projection_matrix, [0, 1, 0],
-    #                                                             renderer=pb.ER_BULLET_HARDWARE_OPENG)
-    #
-    #     # rgba to rgb
-    #     rgb_image = rgb_pixels[:, :, 0:3]
-    #     depth_image = depth_pixels
-    #
-    #     return rgb_image, depth_image
+                # def get_image(self):
+                #
+                #     _, _, self._view_matrix, _, _, _, _, _, _, _, _, _ = pb.getDebugVisualizerCamera()
+                #     (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'],
+                #                                                             self._config['cam']['image_height'],
+                #                                                             self._view_matrix, self._projection_matrix, [0, 1, 0],
+                #                                                             renderer=pb.ER_BULLET_HARDWARE_OPENG)
+                #
+                #     # rgba to rgb
+                #     rgb_image = rgb_pixels[:, :, 0:3]
+                #     depth_image = depth_pixels
+                #
+                #     return rgb_image, depth_image
