@@ -41,9 +41,9 @@ class SawyerEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707])
 
-        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"cuboid.urdf"), useFixedBase=True, globalScaling = 0.15)
+        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole.urdf"), useFixedBase=True, globalScaling = 0.15)
         
-        pb.resetBasePositionAndOrientation(self._box_id, [0.6, 0.1, -.62], pb.getQuaternionFromEuler([1.57, 0., 1.57])) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.7, 0.1, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57])) 
                         
         self._sawyer = Sawyer(config=SAWYER_CONFIG)
         
