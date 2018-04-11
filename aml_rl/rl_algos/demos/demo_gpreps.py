@@ -4,12 +4,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from rl_algos.agents.gpreps import GPREPSOpt
 
-
 random_state = np.random.RandomState(0)
 initial_params = 4.0 * np.ones(1)
 n_samples_per_update = 30
 variance = 0.03
-n_episodes = 70
+n_episodes = 64#200#200
 rewards = []
 test_contexts = np.arange(-6, 6, 0.1)
 

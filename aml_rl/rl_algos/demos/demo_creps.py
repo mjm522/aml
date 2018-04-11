@@ -9,7 +9,7 @@ random_state = np.random.RandomState(0)
 initial_params = 4.0 * np.ones(1)
 n_samples_per_update = 30
 variance = 0.03
-n_episodes = 64
+n_episodes = 200#64
 rewards = []
 test_contexts = np.arange(-6, 6, 0.1)
 

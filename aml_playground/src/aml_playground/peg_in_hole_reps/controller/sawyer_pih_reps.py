@@ -5,6 +5,7 @@ from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_lfd.dmp.config import discrete_dmp_config
 from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.sawyer.sawyer_peg_env import SawyerEnv
+from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 from aml_ctrl.traj_generator.os_traj_generator import OSTrajGenerator
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
@@ -28,12 +29,13 @@ class SawyerPegREPS():
 
         if joint_space:
             self._gen_traj = JSTrajGenerator(load_from_demo=True, **kwargs)
+            self._demo_traj = self._gen_traj.generate_traj()['pos_traj']
         else:
-            self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
-
-        self._demo_traj = self._gen_traj.generate_traj()['pos_traj']
-
-        # plot_demo(self._demo_traj.T)
+            #in this file, the orientation is in [w,x,y,z] format
+            #pos, ori, vel, omg is the sequence in which data is stored
+            path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states.csv'
+            self._demo_traj = load_csv_data(path_to_demo)[:, :3]
+            # self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
 
         self._dof = self._demo_traj.shape[1]
 

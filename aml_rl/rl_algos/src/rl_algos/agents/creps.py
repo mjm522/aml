@@ -16,6 +16,8 @@ Artificial Intelligence 247 (2017): 415-439.
 
 """
 
+np.random.seed(123) 
+
 class CREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 

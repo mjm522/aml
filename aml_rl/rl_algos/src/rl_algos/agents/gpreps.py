@@ -7,6 +7,9 @@ from aml_io.log_utils import aml_logging
 from scipy.optimize import fmin_l_bfgs_b
 from rl_algos.utils.utils import logsumexp
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
+from rl_algos.forward_models.context_model import ContextModel
+from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
+
 
 """
 
@@ -18,6 +21,8 @@ Artificial Intelligence 247 (2017): 415-439.
 
 """
 
+np.random.seed(123) 
+
 class GPREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 
@@ -26,7 +31,7 @@ class GPREPSOpt():
         self._logger = aml_logging.get_logger(__name__)
 
         #epsilon in the algorithm
-        self._entropy_boud = entropy_bound
+        self._entropy_bound = entropy_bound
         #initial params
         self._w_init = initial_params
         #pi(w|s) in the algorithm
@@ -55,66 +60,34 @@ class GPREPSOpt():
 
         self._itr = 0
 
+        self._context_model = ContextModel(context_dim=1, 
+                                           num_data_points=self._num_samples_fwd_data)
+
+        self._traj_model = TrajRolloutModel(w_dim=self._w_dim, cost=self._env.reward, 
+                                            context_model=self._context_model, num_data_points=self._num_samples_fwd_data)
+
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 
         self._context_obs_history = deque(maxlen=self._num_samples_per_update)
         self._policy_w_history = deque(maxlen=self._num_samples_per_update)
         self._rewards_history = deque(maxlen=self._num_samples_per_update)
 
-        #data storing for data collection
-        self._context_data = deque(maxlen=self._num_samples_fwd_data)
-        self._w_data = deque(maxlen=self._num_samples_fwd_data)
-        self._reward_data = deque(maxlen=self._num_samples_fwd_data)
-
-
-    def learn_context_model(self):
-        # X = np.linspace(0, 1, S.shape[0])[:, None]
-        # kernel1 = GPy.kern.RBF(input_dim=1, variance=.01, lengthscale=.1)
-        # self._context_model = GPy.models.GPRegression(X=X,  Y=S, kernel=kernel1)
-        S = np.asarray(self._context_data)
-
-        self._context_model = {'mean':np.mean(S), 'std': np.std(S)}
-
-
-    def learn_reward_model(self):
-
-        S = np.asarray(self._context_data)
-        W = np.asarray(self._w_data)
-        R = np.asarray(self._reward_data)
-
-        kernel = GPy.kern.RBF(input_dim=2, variance=.1, lengthscale=.1)
-
-        self._reward_model  = GPy.models.GPRegression(X=np.hstack([S, W]),  Y=R, kernel=kernel)
-
-        self._reward_model.optimize('bfgs')
-
 
     def sample_context(self):
 
-        mean = self._context_model['mean']
-        std  = self._context_model['std']
-
-        # if len(mean) ==  1:
-
-        return np.asarray([np.random.normal(loc=mean, scale=std)])
-
-        # else:
-
-        #     return np.random.multivariate_normal(mean, cov)
-
+        return self._context_model.sample()
 
     def predict_reward(self, s, w):
 
-        mu_r, sigma_r = self._reward_model.predict(np.hstack([s, w[0] ])[None,:])
+        new_mu = self._traj_model.predict(s=s, w=w[0])
 
-        return None, mu_r
+        return None, new_mu
 
     def learn_fwd_model(self):
 
-        self.learn_reward_model()
+        self._context_model.fit()
 
-        self.learn_context_model()
-
+        self._traj_model.fit()
 
 
     def artificial_data(self):
@@ -123,9 +96,9 @@ class GPREPSOpt():
         s_i = self.sample_context()
 
         #compute policy params for each context
-        w_i = self._policy.compute_w(s_i)
+        w_i = self._policy.compute_w(context=s_i)
         #execute the policy in the environment
-        tau_i, R_sw_i = self.predict_reward(w_i, s_i)
+        tau_i, R_sw_i = self.predict_reward(s=s_i, w=w_i)
 
         #store the data
         self._context_obs_history.append(self._policy.transform_context(s_i))
@@ -163,7 +136,7 @@ class GPREPSOpt():
         def g(x):  # Objective function
             eta = x[0]
             theta = x[1:]
-            return (eta * self._entropy_boud + theta.T.dot(S.mean(axis=0)) +
+            return (eta * self._entropy_bound + theta.T.dot(S.mean(axis=0)) +
                     eta * logsumexp((R - theta.dot(S.T)) / eta,
                                     b=1.0 / n_samples_per_update))
 
@@ -202,7 +175,7 @@ class GPREPSOpt():
 
     def collect_data(self):
 
-        if len(self._context_data) < self._num_data_to_collect:
+        if len(self._context_model._data) < self._num_data_to_collect:
 
             num_trials = 20
         else:
@@ -217,17 +190,16 @@ class GPREPSOpt():
             #execute the policy in the environment
             tau_k, R_sw_k = self._env.execute_policy(w_k, s_k)
 
-            self._context_data.append(s_k)
-            self._w_data.append(w_k)
-            self._reward_data.append(R_sw_k)
+            self._context_model.add_data(datum=s_k)
+
+            self._traj_model.add_data(w=w_k, r=R_sw_k)
 
             if num_trials == 20:
 
                 self._context_obs_history.append(self._policy.transform_context(s_k))
                 self._policy_w_history.append(w_k)
                 self._rewards_history.append(R_sw_k)
-
-            
+    
         if num_trials == 20:
 
             weights, eta, theta = self.opt_dual_function()
