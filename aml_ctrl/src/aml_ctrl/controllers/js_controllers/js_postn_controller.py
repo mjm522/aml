@@ -42,7 +42,7 @@ class JSPositionController(JSController):
 
             goal_js_acc       = self._goal_js_acc
 
-        robot_state    = self.state()
+        robot_state    = self._robot.state()
 
         q              = robot_state['position']
 
