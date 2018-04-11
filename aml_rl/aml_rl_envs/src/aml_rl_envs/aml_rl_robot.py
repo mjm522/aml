@@ -36,6 +36,9 @@ class AMLRlRobot(object):
         pb.resetBasePositionAndOrientation(self._robot_id, pos, ori)
 
     def get_ee_state(self, ee_idx, as_tuple=True):
+        """
+        returns orientation in bullet format quaternion [x,y,z,w]
+        """
 
         link_state = pb.getLinkState(self._robot_id, ee_idx, computeLinkVelocity = 1)
 

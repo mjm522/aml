@@ -193,3 +193,16 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
+    def _simulation_reward(self, traj, end_id = 200, scale = 1):
+        '''
+            Computing reward for the given (forward-simulated) trajectory
+        '''
+
+        reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+
+        traj_end_vector = traj[-1, :] - traj[-end_id, :]
+        traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+
+        cos_angle = np.dot(traj_end_vector, reference_vector)
+
+        return abs(scale*cos_angle)

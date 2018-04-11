@@ -26,7 +26,7 @@ class Sawyer(AMLRlRobot):
 
         pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000, 1.0000],[0.000000,0.000000,0.000000,1.000000])
         
-        self._jnt_postns=[ 0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684, -0.006539, 0.000048, 0.0, 0.000000, -0.000043, 0.299960, 0.000000, -0.000200 ]
+        self._jnt_postns=[-5.26523437e-02, -1.18152539e+00, -2.35156250e-03,  2.05699707e+00, 3.74414063e-03,  6.67680664e-01,  3.31310840e+00]
         
         self._movable_jnts = self.get_movable_joints()
         
@@ -46,7 +46,7 @@ class Sawyer(AMLRlRobot):
                 
                 self._motor_indices.append(i)
 
-        self.set_ctrl_mode()
+        self.set_ctrl_mode(jnt_postns=self._jnt_postns)
 
 
     def get_action_dim(self):
