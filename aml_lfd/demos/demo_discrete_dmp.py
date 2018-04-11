@@ -69,12 +69,12 @@ def test_dmp(dmp, speed=1., plot_trained=False):
     test_traj = dmp.generate_trajectory(config=test_config)
 
     if plot_trained:
-        plot_traj([dmp._traj_data[:,1:], test_traj[:,1:]])
+        plot_traj([dmp._traj_data[:,0:], test_traj[:,0:]])
 
     test_traj = {
-    'pos_traj': test_traj['pos'][:,1:],
-    'vel_traj':test_traj['vel'][:,1:],
-    'acc_traj':test_traj['acc'][:,1:]
+    'pos_traj': test_traj['pos'],
+    'vel_traj':test_traj['vel'],
+    'acc_traj':test_traj['acc']
     }
     
     return test_traj
@@ -102,7 +102,8 @@ def main():
     rospy.init_node('dmp_demo')
     
     limb = 'left'
-    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/dmp/' + limb + '/' + limb +'_dmp_01.pkl'
+    # path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/dmp/' + limb + '/' + limb +'_dmp_01.pkl'
+    path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/left_demo_data/left_demo_data' + '_01.pkl'
 
     from aml_robot.baxter_robot import BaxterArm
 
@@ -116,8 +117,9 @@ def main():
     dmp = train_dmp(trajectory['pos_traj'])
     test_traj = test_dmp(dmp, speed=5.,plot_trained=False)
     
-    test_on_robot(robot_interface=arm,
-                  des_path=test_traj)
+    for k in range(20):
+        test_on_robot(robot_interface=arm,
+                      des_path=test_traj)
 
 
 if __name__ == '__main__':

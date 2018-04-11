@@ -47,7 +47,15 @@ class ManObject():
 
         elif self._obj_type == 'cyl':
 
-             urdf_file = join(self._urdf_root_path, "cylinder.urdf") 
+             urdf_file = join(self._urdf_root_path, "cylinder.urdf")
+
+        elif self._obj_type == 'cuboid_on_pin':
+
+             urdf_file = join(self._urdf_root_path, "cuboid_on_pin.urdf")
+
+        elif self._obj_type == 'sphere':
+
+             urdf_file = join(self._urdf_root_path, "sphere.urdf") 
 
         else:
 
@@ -59,7 +67,13 @@ class ManObject():
 
         self._num_joints = pb.getNumJoints(self._obj_id)
 
-        self._sense_jnt_idx = range(self._num_joints)[-1]
+        if self._num_joints == 0:
+
+            self._sense_jnt_idx = 0
+
+        else:
+
+            self._sense_jnt_idx = range(self._num_joints)[-1]
         
         #disable the default position_control mode. 
         for jointIndex in range (self._num_joints):

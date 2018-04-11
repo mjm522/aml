@@ -12,10 +12,18 @@ class OSTrajGenerator(TrajGenerator):
 
     def get_demo_traj(self):
 
-        ee_pos_traj, ee_ori_traj, ee_vel_traj, ee_omg_traj, ee_acc_traj, ee_ang_traj =\
-        get_os_traj(limb_name=self._limb_name, demo_idx=self._demo_idx)
+        if self._demo_path is not None:
 
-        self._timesteps = len(js_pos)
+            demo_idx = None
+        else:
+            demo_idx = self._demo_idx
+
+        os_pos_traj, os_ori_traj, os_vel_traj, \
+        os_omg_traj, os_acc_traj, os_ang_traj = get_os_traj(limb_name=self._limb_name, 
+                                                            demo_idx=demo_idx, 
+                                                            file_path=self._demo_path)
+
+        self._timesteps = len(os_pos_traj)
 
         #position trajectories
 
@@ -29,11 +37,11 @@ class OSTrajGenerator(TrajGenerator):
         #orientation trajectories
 
         #position trajectory
-        self._traj['ori_traj'] = ee_ori_traj
+        self._traj['ori_traj'] = os_ori_traj
         #velocity trajectory
-        self._traj['omg_traj'] = ee_omg_traj
+        self._traj['omg_traj'] = os_omg_traj
         #acceleration trajectory
-        self._traj['ang_traj'] = ee_ang_traj
+        self._traj['ang_traj'] = os_ang_traj
 
 
     def get_traj_interp(self):

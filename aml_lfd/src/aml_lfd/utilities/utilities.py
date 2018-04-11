@@ -4,33 +4,35 @@ import numpy as np
 from aml_io.io_tools import load_data
 from os.path import join, dirname, abspath
 
-def load_demo_data(limb_name, demo_idx, debug=False):
+def load_demo_data(limb_name, demo_idx, file_path, debug=False):
 
-    #get the folder that contains the demos
-    data_folder_path = '/'.join(dirname(dirname(abspath(__file__))).split('/')[:-2]) + '/data/'
+    if file_path is None:
+    
+        #get the folder that contains the demos
+        data_folder_path = '/'.join(dirname(dirname(abspath(__file__))).split('/')[:-2]) + '/data/'
 
-    if debug:
-        #for debugging purposes, load a known trajectory
-        try:
-            file_path = data_folder_path + 'debug.txt'
-            demo_data = np.loadtxt(file_path, dtype='float', delimiter=',')
+        if debug:
+            #for debugging purposes, load a known trajectory
+            try:
+                file_path = data_folder_path + 'debug.txt'
+                demo_data = np.loadtxt(file_path, dtype='float', delimiter=',')
 
-        except Exception as e:
-            print "Data file cannot be loaded"
-            raise e
+            except Exception as e:
+                print "Data file cannot be loaded"
+                raise e
 
-    else:
-
-        try:
+        else:
 
             file_path   = data_folder_path + limb_name + '_demo_data' +  ('_sample_%02d.pkl' % demo_idx)
             
-            #loads binary file
-            demo_data   = load_data(file_path)
+
+    try:
+        #loads binary file
+        demo_data   = load_data(file_path)
         
-        except Exception as e:
-            print "Data file cannot be loaded, check demo index..."
-            raise e
+    except Exception as e:
+        print "Data file cannot be loaded, check demo index..."
+        raise e
 
     return demo_data
 
@@ -90,11 +92,11 @@ def js_inverse_dynamics(limb_name, demo_idx, h_component=True):
 
     return tau
 
-def get_os_traj(limb_name, demo_idx, debug=False):
+def get_os_traj(limb_name, demo_idx, debug=False, file_path=None):
 
     #NOT COMPATABLE WITH THE NEW DATA RECORDER, CHANGE THIS FUNCTION
     
-    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=debug)
+    demo_data   = load_demo_data(limb_name=limb_name, demo_idx=demo_idx, debug=debug, file_path=file_path)
     #the limb on which demo was taken
     ee_pos_traj = []
     ee_vel_traj = []
@@ -110,15 +112,12 @@ def get_os_traj(limb_name, demo_idx, debug=False):
 
     else:
 
-        for arm_data in demo_data['state']:
-            ee_pos_traj.append(arm_data['ee_pos'])
-            ee_ori_traj.append(arm_data['ee_ori'])
-            
-            if arm_data.has_key('ee_vel'):
-                ee_vel_traj.append(arm_data['ee_vel'])
-            
-            if arm_data.has_key('ee_omg'):
-                ee_omg_traj.append(arm_data['ee_omg'])
+        for k in range(demo_data[0].size):
+        
+            ee_pos_traj.append(demo_data[0].get(k,['ee_point']))
+            ee_ori_traj.append(demo_data[0].get(k,['ee_ori']))
+            ee_vel_traj.append(demo_data[0].get(k,['ee_vel']))
+            ee_omg_traj.append(demo_data[0].get(k,['ee_omg']))
 
         #check is the list is empty
         if ee_vel_traj:

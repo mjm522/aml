@@ -12,6 +12,8 @@ from aml_ctrl.traj_player.traj_player import TrajPlayer
 
 Controller = JSVelocityController
 
+from aml_rl_envs.sawyer.sawyer_env import SawyerEnv
+
 import os
 import rospy
 import numpy as np
@@ -63,6 +65,8 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
     traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=traj, timeout=timeout, rate=rate)
 
     traj_player.player()
+
+
 
 if __name__ == '__main__':
 
