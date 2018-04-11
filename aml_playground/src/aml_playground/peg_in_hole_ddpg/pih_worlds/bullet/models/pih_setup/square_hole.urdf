@@ -1,0 +1,302 @@
+<robot name="square_hole">
+
+  <link name="base">
+    <visual>
+      <geometry>
+        <box size="1 0.7 0.3"/>
+      </geometry>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1 0.7 0.3"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side1">
+    <visual>
+      <geometry>
+        <box size="1 0.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0.15 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1 0.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0.15 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side2">
+    <visual>
+      <geometry>
+        <box size="1 0.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 -0.15 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1 0.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 -0.15 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="top">
+    <visual>
+      <geometry>
+        <box size="1 0.7 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.7"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1 0.7 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.7"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="back">
+    <visual>
+      <geometry>
+        <box size="0.3 1.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.3 1.3 1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="table">
+    <visual>
+      <geometry>
+        <box size="4 2 0.5"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="1.2 0 -0.25"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="4 2 0.5"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="1.2 0 -0.25"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="groove_side1">
+    <visual>
+      <geometry>
+        <box size="2.7 0.3 0.6"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.3"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="2.7 0.3 0.6"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.3"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link> 
+
+  <link name="groove_side2">
+    <visual>
+      <geometry>
+        <box size="2.7 0.3 0.6"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.3"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="2.7 0.3 0.6"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.3"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="groove_base">
+    <visual>
+      <geometry>
+        <box size="2.7 0.7 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.15"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="2.7 0.7 0.3"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.15"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <joint name="base_to_right" type="fixed">
+    <parent link="base"/>
+    <child link="side1"/>
+    <origin xyz="0 0.35 0"/>
+  </joint>
+
+  <joint name="base_to_left" type="fixed">
+    <parent link="base"/>
+    <child link="side2"/>
+    <origin xyz="0 -0.35 0"/>
+  </joint>
+
+  <joint name="base_to_top" type="fixed">
+    <parent link="base"/>
+    <child link="top"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <joint name="base_to_back" type="fixed">
+    <parent link="base"/>
+    <child link="back"/>
+    <origin xyz="-0.65 0 0"/>
+  </joint>
+
+  <joint name="base_to_table" type="fixed">
+    <parent link="base"/>
+    <child link="table"/>
+    <origin xyz="0 0 -0.15"/>
+  </joint>  
+
+  <joint name="table_to_groove1" type="fixed">
+    <parent link="table"/>
+    <child link="groove_side1"/>
+    <origin xyz="1.85 0.5 0"/>
+  </joint>  
+
+  <joint name="table_to_groove2" type="fixed">
+    <parent link="table"/>
+    <child link="groove_side2"/>
+    <origin xyz="1.85 -0.5 0"/>
+  </joint>  
+
+  <joint name="table_to_groove_base" type="fixed">
+    <parent link="table"/>
+    <child link="groove_base"/>
+    <origin xyz="1.85 0 0"/>
+  </joint>  
+
+
+</robot>
