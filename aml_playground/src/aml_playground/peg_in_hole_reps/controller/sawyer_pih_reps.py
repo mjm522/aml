@@ -3,6 +3,7 @@ import numpy as np
 from rl_algos.agents.gpreps import GPREPSOpt
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
 from aml_lfd.dmp.config import discrete_dmp_config
+from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.sawyer.sawyer_peg_env import SawyerEnv
 from aml_ctrl.traj_generator.os_traj_generator import OSTrajGenerator
 from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
@@ -31,6 +32,8 @@ class SawyerPegREPS():
             self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
 
         self._demo_traj = self._gen_traj.generate_traj()['pos_traj']
+
+        # plot_demo(self._demo_traj.T)
 
         self._dof = self._demo_traj.shape[1]
 

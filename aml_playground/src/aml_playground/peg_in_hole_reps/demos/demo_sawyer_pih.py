@@ -1,6 +1,5 @@
-
+import time
 import numpy as np
-
 from aml_playground.peg_in_hole_reps.controller.sawyer_pih_reps import SawyerPegREPS
 
 
@@ -21,6 +20,8 @@ def main(joint_space=True):
             cmd = ps._env._sawyer.inv_kin(ee_pos=traj[k, :].tolist())
 
         ps._env._sawyer.apply_action(cmd)
+
+        time.sleep(0.01)
                 
         ps._env.simple_step()
         
