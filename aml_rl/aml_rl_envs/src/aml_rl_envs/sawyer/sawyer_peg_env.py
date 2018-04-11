@@ -27,7 +27,7 @@ class SawyerEnv(AMLRlEnv):
         
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
-        self.reset()
+        self._reset()
         
         obs_dim = len(self.get_extended_observation())
 
@@ -39,11 +39,11 @@ class SawyerEnv(AMLRlEnv):
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5)
         
-        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.7], [0, 0, -0.707, 0.707])
+        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707])
 
-        self._box_id =pb.loadURDF(os.path.join(self._urdf_root_path,"cuboid.urdf"), useFixedBase=False, globalScaling = 0.55)
+        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"cuboid.urdf"), useFixedBase=True, globalScaling = 0.15)
         
-        pb.resetBasePositionAndOrientation(self._box_id, [0.5, 0,-0.35], [0, 0, -0.707, 0.707]) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.6, 0.1, -.62], pb.getQuaternionFromEuler([1.57, 0., 1.57])) 
                         
         self._sawyer = Sawyer(config=SAWYER_CONFIG)
         

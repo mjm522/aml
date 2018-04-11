@@ -4,7 +4,7 @@ from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 class AMLRlRobot(object):
 
-    def __init__(self, config, robot_id):
+    def __init__(self, config, robot_id=None):
 
         self._config = config
 
@@ -34,14 +34,38 @@ class AMLRlRobot(object):
     def set_base_pose(self, pos, ori):
 
         pb.resetBasePositionAndOrientation(self._robot_id, pos, ori)
+
+    def get_ee_state(self, ee_idx, as_tuple=True):
+
+        link_state = pb.getLinkState(self._robot_id, ee_idx, computeLinkVelocity = 1)
+
+        if not as_tuple:
+            ee_pos = np.asarray(link_state[0])
+            ee_ori = np.asarray(link_state[1])
+            ee_vel = np.asarray(link_state[2])
+            ee_omg = np.asarray(link_state[3])
+        else:
+            ee_pos = link_state[0]
+            ee_ori = link_state[1]
+            ee_vel = link_state[2]
+            ee_omg = link_state[3]
+
+        return ee_pos, ee_ori, ee_vel, ee_omg
         
-    def set_ctrl_mode(self):
+    def set_ctrl_mode(self, jnt_postns=None):
 
         self._tot_num_jnts = pb.getNumJoints(self._robot_id)
 
         self._jnt_indexs = self.get_movable_joints()
 
-        self._jnt_postns = self.get_jnt_state()[0]
+        if jnt_postns is None:
+
+            self._jnt_postns = self.get_jnt_state()[0]
+        
+        else:
+            assert(len(self._jnt_indexs) == len(jnt_postns))
+            
+            self._jnt_postns = jnt_postns
 
         #disable the default position_control mode. 
         for k, jnt_index in enumerate(self._jnt_indexs):
@@ -75,7 +99,7 @@ class AMLRlRobot(object):
 
         movable_jnts = []
         
-        for i in range (self._tot_num_jnts):
+        for i in range (pb.getNumJoints(self._robot_id)):
             
             jnt_info = pb.getJointInfo(self._robot_id, i)
             

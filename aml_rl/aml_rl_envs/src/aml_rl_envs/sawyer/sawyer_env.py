@@ -29,7 +29,7 @@ class SawyerEnv(AMLRlEnv):
         
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
-        self.reset()
+        self._reset()
         
         obs_dim = len(self.get_extended_observation())
 

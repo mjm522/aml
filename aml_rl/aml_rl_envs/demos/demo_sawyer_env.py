@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import time
 from aml_rl_envs.sawyer.sawyer_env import SawyerEnv
 

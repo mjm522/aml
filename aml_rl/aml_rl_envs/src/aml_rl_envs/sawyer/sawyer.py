@@ -12,7 +12,7 @@ class Sawyer(AMLRlRobot):
 
         self._config = config
 
-        self._ee_index = 24
+        self._ee_index = 16
 
         self._gripper_index = 7
 
@@ -22,9 +22,9 @@ class Sawyer(AMLRlRobot):
  
     def reset(self):
 
-        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_gripper.urdf"), useFixedBase=True)
+        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_peg.urdf"), useFixedBase=True)
 
-        pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000,0.070000],[0.000000,0.000000,0.000000,1.000000])
+        pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000, 1.0000],[0.000000,0.000000,0.000000,1.000000])
         
         self._jnt_postns=[ 0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684, -0.006539, 0.000048, 0.0, 0.000000, -0.000043, 0.299960, 0.000000, -0.000200 ]
         
@@ -61,17 +61,11 @@ class Sawyer(AMLRlRobot):
         
         observation = []
         
-        ee_state = pb.getLinkState(self._robot_id, self._ee_index)
-        
-        ee_vel   = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1)
-
         jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self.get_jnt_state()
         
-        pos = ee_state[0]
+        pos, ori, vel, omg  = self.ee_state()
         
-        orn = ee_state[1]
-        
-        euler = pb.getEulerFromQuaternion(orn)
+        euler = pb.getEulerFromQuaternion(ori)
         
         observation.extend(jnt_pos)
         
@@ -79,10 +73,21 @@ class Sawyer(AMLRlRobot):
 
         observation.extend(list(pos))
         # observation.extend(list(euler))
-        observation.extend(list(ee_vel[0]))
+        observation.extend(list(vel))
         # observation.extend(list(ee_vel[1]))
 
         return observation
+
+    def ee_state(self, as_tuple=True):
+
+        return self.get_ee_state(self._ee_index, as_tuple)
+
+
+    def inv_kin(self, ee_pos, ee_ori=None):
+
+        cmd = self.get_ik(ee_idx=self._ee_index, ee_pos=ee_pos, ee_ori=ee_ori)
+        #we delete the corresponding head ik from this
+        return np.delete(cmd, 1, 0)
 
 
     def set_joint_state(self, joint_state):
