@@ -24,7 +24,9 @@ class AMLRlRobot(object):
 
             self._renders = self._config['call_renderer']
 
-            self._cid = setup_bullet_visualizer(self._renders)
+            if self._cid is None:
+
+                self._cid = setup_bullet_visualizer(self._renders)
 
         self._robot_id = robot_id
 
