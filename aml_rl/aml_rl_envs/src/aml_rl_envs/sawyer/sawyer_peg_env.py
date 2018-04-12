@@ -46,18 +46,10 @@ class SawyerEnv(AMLRlEnv):
         pb.resetBasePositionAndOrientation(self._box_id, [0.7, 0.1, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
                         
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
-        
-        if self._demo2follow is not None:
-            #first joint position in the demo
-            self._sawyer.set_joint_state(self._demo2follow[0, :9])
 
         self.simple_step()
         
         self._observation = self.get_extended_observation()
-
-        if self._renders and self._demo2follow is not None:
-            
-            plot_demo(trajectory=self._demo2follow, start_idx=18)
 
         return np.array(self._observation)
 
@@ -193,7 +185,7 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def _simulation_reward(self, traj, end_id = 200, scale = 1):
+    def reward(self, traj, end_id = 200, scale = 1):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
@@ -206,3 +198,62 @@ class SawyerEnv(AMLRlEnv):
         cos_angle = np.dot(traj_end_vector, reference_vector)
 
         return abs(scale*cos_angle)
+
+    def fwd_simulate(self, dmp, joint_space = False):
+        """
+        implement the dmp
+        """
+        # return np.random.randn(220,3)
+        ee_traj = []
+
+
+        for k in range(dmp.shape[0]):
+
+            if joint_space:
+
+                cmd = dmp[k, :]
+
+            else:
+
+                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
+
+            self._sawyer.apply_action(cmd)
+
+            ee_pos, ee_ori = self._sawyer.get_ee_pose()
+            ee_traj.append(ee_pos)
+            
+            # import time
+            # time.sleep(0.01)
+            self.simple_step()
+            
+
+
+        return np.asarray(ee_traj)
+        
+    def context(self):
+        """
+        Context is the top face of the box.
+
+            Top face of box:
+                # x : (0.7, 0.7 + 0.15*0.55)
+                # y : (0.1, 0.1 - 0.15*1.90)
+                # z : (0.62, 0.62 + 0.15*2.40)
+        """
+
+        x = np.random.uniform(0.7, 0.7 + 0.15*0.55)
+        y = np.random.uniform(0.1, 0.1 - 0.15*1.90)
+
+        context = np.array([x,y])
+
+        return context
+
+
+    def execute_policy(self, w, s):
+
+        dmp = self._demo2follow(goal_offset=np.r_[w, 0])
+
+        traj = self.fwd_simulate(dmp)
+
+        reward = self.reward(traj)
+        
+        return None, reward
