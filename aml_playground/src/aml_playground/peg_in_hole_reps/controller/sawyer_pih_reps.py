@@ -63,7 +63,7 @@ class SawyerPegREPS():
 
         traj_model = TrajRolloutModel(w_dim=exp_params['w_dim'], 
                                       x_dim=exp_params['x_dim'], 
-                                      cost=self._env._reward, 
+                                      cost=self.reward, 
                                       context_model=context_model, 
                                       num_data_points=exp_params['num_samples_fwd_data'])
 
@@ -71,7 +71,7 @@ class SawyerPegREPS():
                                   num_policy_updates=exp_params['num_policy_updates'], 
                                   num_samples_per_update=exp_params['num_samples_per_update'], 
                                   num_old_datasets=exp_params['num_old_datasets'],  
-                                  env=self._env,
+                                  env=self,
                                   context_model=context_model, 
                                   traj_rollout_model=traj_model,
                                   policy=policy,
@@ -116,3 +116,32 @@ class SawyerPegREPS():
         new_dmp_traj = dmp.generate_trajectory(config=config)
 
         return new_dmp_traj['pos']
+
+    def fwd_simulate(self, dmp):
+        """
+        implement the dmp
+        """
+        return np.random.randn(220,3)
+        
+    def context(self):
+        """
+
+        """
+        context = np.random.randn(2)
+
+        return context
+
+
+    def reward(self, traj):
+
+        return self._env._simulation_reward(traj)
+
+    def execute_policy(self, w, s):
+
+        dmp = self.update_dmp_params(goal_offset=np.r_[w, 0])
+
+        traj = self.fwd_simulate(dmp)
+
+        reward = self.reward(traj)
+        
+        return None, reward

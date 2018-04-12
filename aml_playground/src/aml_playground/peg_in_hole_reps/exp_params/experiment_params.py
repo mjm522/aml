@@ -2,12 +2,12 @@ import os
 import numpy as np
 
 gpreps_params = {
-	'w_dim':3,
-	'initial_params': 4.0 * np.ones(3),
+	'w_dim':2,
+	'initial_params': 4.0 * np.ones(2),
 	'entropy_bound':2.0,
 	'context_dim':2,
-	'context_feature_dim':4,
-	'x_dim':2,
+	'context_feature_dim':6,
+	'x_dim':4, #input param dimension of GP
 	'policy_variance':0.03,
 	'random_state':np.random.RandomState(0),
 	'num_policy_updates':25,

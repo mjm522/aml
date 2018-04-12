@@ -36,4 +36,3 @@ class TrajRolloutModel(REPSFwdModel):
         mu_r, sigma_r = self.reward_model.predict(np.hstack([ s, w ]))
 
         return mu_r
-
