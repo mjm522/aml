@@ -22,8 +22,8 @@ np.random.seed(123)
 class GPREPSOpt():
 
     def __init__(self, entropy_bound, num_policy_updates, 
-                       num_samples_per_update, num_old_datasets, env, 
-                       num_context_features, context_model, traj_rollout_model,
+                       num_samples_per_update, num_old_datasets,
+                       env, context_model, traj_rollout_model,
                        policy, min_eta=1e-8, num_data_to_collect=20, num_fake_data=30):
 
         self._logger = aml_logging.get_logger(__name__)
@@ -42,8 +42,6 @@ class GPREPSOpt():
         self._num_old_datasets = num_old_datasets
         #to execute the policy
         self._env = env
-        #number of context features
-        self._context_dim = num_context_features
         #param dim
         self._w_dim = self._policy._w_dim
 

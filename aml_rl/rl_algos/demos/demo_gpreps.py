@@ -30,7 +30,7 @@ traj_model = TrajRolloutModel(w_dim=w_dim, x_dim=2, cost=env.reward,
 
 mycreps = GPREPSOpt(entropy_bound=2.0, num_policy_updates=25, 
                     num_samples_per_update=n_samples_per_update, num_old_datasets=1, env=env, 
-                    num_context_features=3, context_model=context_model, traj_rollout_model=traj_model,
+                    context_model=context_model, traj_rollout_model=traj_model,
                     policy=policy)
 
 
