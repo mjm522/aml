@@ -21,13 +21,15 @@ np.random.seed(123)
 class CREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 
-                       num_samples_per_update, num_old_datasets, env, num_context_features):
+                       num_samples_per_update, num_old_datasets, 
+                       env, policy, min_eta=1e-8):
+        
         #epsilon in the algorithm
         self._entropy_boud = entropy_bound
         #initial params
         self._w_init = initial_params
         #pi(w|s) in the algorithm
-        self._policy = LinGaussPolicy(w_dim=1, context_dim=3, variance=0.03, initial_params=self._w_init, random_state=env._random_state)
+        self._policy = policy
         #K in the algorithm
         self._num_policy_updates = num_policy_updates
         #number of samples to be used for each update (N)
@@ -36,12 +38,10 @@ class CREPSOpt():
         self._num_old_datasets = num_old_datasets
         #to execute the policy
         self._env = env
-        #number of context features
-        self._context_dim = num_context_features
         #param dim
-        self._w_dim = len(self._w_init)
+        self._w_dim = self._policy._w_dim
 
-        self._min_eta = 1e-8
+        self._min_eta = min_eta
 
         self._itr = 0
 
