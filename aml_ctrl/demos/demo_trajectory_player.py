@@ -12,8 +12,6 @@ from aml_ctrl.traj_player.traj_player import TrajPlayer
 
 Controller = JSVelocityController
 
-from aml_rl_envs.sawyer.sawyer_env import SawyerEnv
-
 import os
 import rospy
 import numpy as np
