@@ -1,4 +1,5 @@
 import os
+import copy
 import numpy as np
 from rl_algos.agents.gpreps import GPREPSOpt
 from aml_lfd.dmp.discrete_dmp import DiscreteDMP
@@ -14,13 +15,23 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 from rl_algos.forward_models.context_model import ContextModel
 from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
 
+from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG
+
 np.random.seed(123)
 
 class SawyerPegREPS():
 
     def __init__(self, joint_space, exp_params):
 
-        self._env = SawyerEnv()
+        eval_config = copy.deepcopy(SAWYER_ENV_CONFIG)
+        sim_config = copy.deepcopy(SAWYER_ENV_CONFIG)
+
+        sim_config['renders'] = False
+        eval_config['renders'] = True
+
+        self._eval_env = SawyerEnv(config=eval_config, demo2follow=self.update_dmp_params)
+
+        self._sim_env = SawyerEnv(config=sim_config, demo2follow=self.update_dmp_params)
 
         self._exp_params = exp_params
 
@@ -63,7 +74,7 @@ class SawyerPegREPS():
 
         traj_model = TrajRolloutModel(w_dim=exp_params['w_dim'], 
                                       x_dim=exp_params['x_dim'], 
-                                      cost=self.reward, 
+                                      cost=self._sim_env.reward, 
                                       context_model=context_model, 
                                       num_data_points=exp_params['num_samples_fwd_data'])
 
@@ -71,7 +82,7 @@ class SawyerPegREPS():
                                   num_policy_updates=exp_params['num_policy_updates'], 
                                   num_samples_per_update=exp_params['num_samples_per_update'], 
                                   num_old_datasets=exp_params['num_old_datasets'],  
-                                  env=self,
+                                  env=self._sim_env,
                                   context_model=context_model, 
                                   traj_rollout_model=traj_model,
                                   policy=policy,
@@ -117,65 +128,4 @@ class SawyerPegREPS():
 
         return new_dmp_traj['pos']
 
-    def fwd_simulate(self, dmp, joint_space = False):
-        """
-        implement the dmp
-        """
-        # return np.random.randn(220,3)
-        ee_traj = []
 
-
-        for k in range(dmp.shape[0]):
-
-            if joint_space:
-
-                cmd = dmp[k, :]
-
-            else:
-
-                cmd = self._env._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
-
-            self._env._sawyer.apply_action(cmd)
-
-            ee_pos, ee_ori = self._env._sawyer.get_ee_pose()
-            ee_traj.append(ee_pos)
-            
-            # import time
-            # time.sleep(0.01)
-            self._env.simple_step()
-            
-
-
-        return np.asarray(ee_traj)
-        
-    def context(self):
-        """
-        Context is the top face of the box.
-
-            Top face of box:
-                # x : (0.7, 0.7 + 0.15*0.55)
-                # y : (0.1, 0.1 - 0.15*1.90)
-                # z : (0.62, 0.62 + 0.15*2.40)
-        """
-
-        x = np.random.uniform(0.7, 0.7 + 0.15*0.55)
-        y = np.random.uniform(0.1, 0.1 - 0.15*1.90)
-
-        context = np.array([x,y])
-
-        return context
-
-
-    def reward(self, traj):
-
-        return self._env._simulation_reward(traj)
-
-    def execute_policy(self, w, s):
-
-        dmp = self.update_dmp_params(goal_offset=np.r_[w, 0])
-
-        traj = self.fwd_simulate(dmp)
-
-        reward = self.reward(traj)
-        
-        return None, reward
