@@ -1,6 +1,6 @@
 import numpy as np
 import pybullet as pb
-from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
+from aml_robot.bullet.bullet_visualizer import setup_bullet_visualizer
 
 class AMLRlRobot(object):
 
@@ -22,10 +22,9 @@ class AMLRlRobot(object):
 
         if 'call_renderer' in self._config.keys():
 
-            if self._config['call_renderer']:
-                
-                self._cid = setup_bullet_visualizer(self._renders)
+            self._renders = self._config['call_renderer']
 
+            self._cid = setup_bullet_visualizer(self._renders)
 
         self._robot_id = robot_id
 
