@@ -12,7 +12,7 @@ class Sawyer(AMLRlRobot):
 
         self._config = config
 
-        self._ee_index = 16
+        self._ee_index = 20#20#16
 
         self._gripper_index = 7
 

@@ -43,7 +43,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._box_id, [0.7, 0.1, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.62, 0.075, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
                         
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
 
@@ -267,9 +267,12 @@ class SawyerEnv(AMLRlEnv):
         return context
 
 
-    def execute_policy(self, w, s):
+    def execute_policy(self, w, s, show_demo=False):
 
-        dmp = self._demo2follow(goal_offset=np.r_[w, 0])
+        dmp = self._demo2follow() #goal_offset=np.r_[w, 0]
+
+        if show_demo:
+            plot_demo(dmp, start_idx=0, life_time=4, cid=self._cid)
 
         traj = self.fwd_simulate(dmp)
 
