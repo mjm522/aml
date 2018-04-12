@@ -8,7 +8,7 @@ from aml_rl_envs.aml_rl_robot import AMLRlRobot
 
 class Baxter(AMLRlRobot):
 
-    def __init__(self, config, call_renderer=False):
+    def __init__(self, config, cid, call_renderer=False):
 
         self._config = config
 
@@ -18,15 +18,15 @@ class Baxter(AMLRlRobot):
 
         config['call_renderer'] = call_renderer
 
-        AMLRlRobot.__init__(self, config)
+        AMLRlRobot.__init__(self, config, cid)
 
         self.reset()
  
     def reset(self):
 
-        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"baxter/baxter_with_gripper.urdf"), useFixedBase=True)
+        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"baxter/baxter_with_gripper.urdf"), useFixedBase=True, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._robot_id,[0.0,0.0,0.9],[0.,0.,0.,1.])
+        pb.resetBasePositionAndOrientation(self._robot_id,[0.0,0.0,0.9],[0.,0.,0.,1.], physicsClientId=self._cid)
         
         self._left_untuck = [-0.08, -1.0, -1.19, 1.94, 0.67, 1.03, -0.50, 0., 0.] #the last two are gripper
         
@@ -42,7 +42,7 @@ class Baxter(AMLRlRobot):
         
         for i in self._movable_jnts:
             
-            jnt_info = pb.getJointInfo(self._robot_id, i)
+            jnt_info = pb.getJointInfo(self._robot_id, i, physicsClientId=self._cid)
             
             qIndex = jnt_info[3]
             
@@ -67,9 +67,9 @@ class Baxter(AMLRlRobot):
         
         observation = []
         
-        ee_state = pb.getLinkState(self._robot_id, self._ee_index)
+        ee_state = pb.getLinkState(self._robot_id, self._ee_index, physicsClientId=self._cid)
         
-        ee_vel   = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1)
+        ee_vel   = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1, physicsClientId=self._cid)
 
         jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque = self.get_jnt_state()
         
@@ -95,11 +95,11 @@ class Baxter(AMLRlRobot):
         
         for k in range(len(self._movable_jnts)):
             
-            pb.resetJointState(self._robot_id, self._movable_jnts[k], joint_state[k])
+            pb.resetJointState(self._robot_id, self._movable_jnts[k], joint_state[k], physicsClientId=self._cid)
 
     def get_ee_pose(self):
 
-        link_state = pb.getLinkState(self._robot_id, self._ee_index)
+        link_state = pb.getLinkState(self._robot_id, self._ee_index, physicsClientId=self._cid)
         
         ee_pos = np.asarray(link_state[0]) 
         
@@ -109,7 +109,7 @@ class Baxter(AMLRlRobot):
 
     def get_ee_velocity(self):
 
-        link_state = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1)
+        link_state = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1, physicsClientId=self._cid)
 
         ee_vel = np.asarray(link_state[6]) 
         
@@ -131,7 +131,7 @@ class Baxter(AMLRlRobot):
 
         for jnt_idx in range(len(self._motor_indices)):
 
-            jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx])
+            jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx], physicsClientId=self._cid)
             
             jnt_pos.append(jnt_state[0])
             
