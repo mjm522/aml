@@ -9,7 +9,7 @@ from aml_rl_envs.aml_rl_robot import AMLRlRobot
 
 class Kuka(AMLRlRobot):
 
-    def __init__(self, config):
+    def __init__(self, cid, config):
         
         self._fingerA_force = 2 
         
@@ -29,7 +29,7 @@ class Kuka(AMLRlRobot):
         
         self._gripper_index = 7
 
-        AMLRlRobot.__init__(self, config)
+        AMLRlRobot.__init__(self, config, cid=cid)
 
         #lower limits for null space
         self._ll=[-.967,-2 ,-2.96,0.19,-2.96,-2.09,-3.05]
@@ -46,13 +46,13 @@ class Kuka(AMLRlRobot):
         
     def reset(self):
         
-        objects = pb.loadSDF(os.path.join(self._urdf_root_path,"kuka/kuka_with_gripper2.sdf"))
+        objects = pb.loadSDF(os.path.join(self._urdf_root_path,"kuka/kuka_with_gripper2.sdf"), physicsClientId=self._cid)
         
         self._robot_id = objects[0]
 
         pb.resetBasePositionAndOrientation(self._robot_id,
                                            [-0.100000,0.000000,0.070000],
-                                           [0.000000,0.000000,0.000000,1.000000])
+                                           [0.000000,0.000000,0.000000,1.000000], physicsClientId=self._cid)
         
         self._jnt_postns = [ 0.006418, 0.413184, -0.011401, 
                                 -1.589317, 0.005379, 1.137684,
@@ -63,7 +63,7 @@ class Kuka(AMLRlRobot):
         
         
         self._tray_id = pb.loadURDF(os.path.join(self._urdf_root_path,"tray/tray.urdf"), 
-                                    0.640000,0.075000, 0.050000,0.000000,0.000000,1.000000,0.000000)
+                                    0.640000,0.075000, 0.050000,0.000000,0.000000,1.000000,0.000000, physicsClientId=self._cid)
         
         self._ee_pos = [0.537,0.0,0.5]
         
@@ -79,7 +79,7 @@ class Kuka(AMLRlRobot):
         
         for i in range (self._num_jnts):
             
-            joint_info = pb.getJointInfo(self._robot_id,i)
+            joint_info = pb.getJointInfo(self._robot_id,i, physicsClientId=self._cid)
             
             q_index = joint_info[3]
             
@@ -107,7 +107,7 @@ class Kuka(AMLRlRobot):
         
         observation = []
 
-        state = pb.getLinkState(self._robot_id, self._gripper_index)
+        state = pb.getLinkState(self._robot_id, self._gripper_index, physicsClientId=self._cid)
 
         pos = state[0]
 
@@ -134,7 +134,7 @@ class Kuka(AMLRlRobot):
 
             fingerAngle = motor_commands[4]
             
-            state = pb.getLinkState(self._robot_id,self._ee_index)
+            state = pb.getLinkState(self._robot_id,self._ee_index, physicsClientId=self._cid)
             
             actual_ee_pos = state[0]
      
@@ -170,20 +170,22 @@ class Kuka(AMLRlRobot):
                 
                 if self._use_orientation:
                     
-                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,orn,self._ll,self._ul,self._jr,self._rp)
+                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,orn,self._ll,
+                                                              self._ul,self._jr,self._rp,physicsClientId=self._cid)
                 
                 else:
                     
-                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,lowerLimits=self._ll, upperLimits=self._ul, jointRanges=self._jr, restPoses=self._rp)
+                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,lowerLimits=self._ll, 
+                                                              upperLimits=self._ul, jointRanges=self._jr, restPoses=self._rp, physicsClientId=self._cid)
             else:
                 
                 if self._use_orientation:
                     
-                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,orn,jointDamping=self._jd)
+                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos,orn,jointDamping=self._jd, physicsClientId=self._cid)
                 
                 else:
                     
-                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos)
+                    jnt_poses = pb.calculateInverseKinematics(self._robot_id,self._ee_index,pos, physicsClientId=self._cid)
         
 
             if (self._use_simulation):
@@ -197,23 +199,24 @@ class Kuka(AMLRlRobot):
                                              targetVelocity=0, 
                                              force=self._max_force, 
                                              maxVelocity=self._max_velocity, 
-                                             positionGain=0.3,velocityGain=1)
+                                             positionGain=0.3,velocityGain=1,
+                                             physicsClientId=self._cid)
             else:
                 #reset the joint state (ignoring all dynamics, not recommended to use during simulation)
                 for i in range (self._num_jnts):
                     
-                    pb.resetJointState(self._robot_id,i,jnt_poses[i])
+                    pb.resetJointState(self._robot_id,i,jnt_poses[i], physicsClientId=self._cid)
             
             #fingers
-            pb.setJointMotorControl2(self._robot_id,7,pb.POSITION_CONTROL, targetPosition=self._ee_ori,force=self._max_force)
+            pb.setJointMotorControl2(self._robot_id,7,pb.POSITION_CONTROL, targetPosition=self._ee_ori,force=self._max_force, physicsClientId=self._cid)
             
-            pb.setJointMotorControl2(self._robot_id,8,pb.POSITION_CONTROL, targetPosition=-fingerAngle,force=self._fingerA_force)
+            pb.setJointMotorControl2(self._robot_id,8,pb.POSITION_CONTROL, targetPosition=-fingerAngle,force=self._fingerA_force, physicsClientId=self._cid)
             
-            pb.setJointMotorControl2(self._robot_id,11,pb.POSITION_CONTROL, targetPosition=fingerAngle,force=self._fingerB_force)
+            pb.setJointMotorControl2(self._robot_id,11,pb.POSITION_CONTROL, targetPosition=fingerAngle,force=self._fingerB_force, physicsClientId=self._cid)
             
-            pb.setJointMotorControl2(self._robot_id,10,pb.POSITION_CONTROL, targetPosition=0,force=self._finger_tip_force)
+            pb.setJointMotorControl2(self._robot_id,10,pb.POSITION_CONTROL, targetPosition=0,force=self._finger_tip_force, physicsClientId=self._cid)
             
-            pb.setJointMotorControl2(self._robot_id,13,pb.POSITION_CONTROL, targetPosition=0,force=self._finger_tip_force)
+            pb.setJointMotorControl2(self._robot_id,13,pb.POSITION_CONTROL, targetPosition=0,force=self._finger_tip_force, physicsClientId=self._cid)
             
             
         else:
@@ -222,4 +225,4 @@ class Kuka(AMLRlRobot):
                 
                 motor = self._motor_indices[action]
                 
-                pb.setJointMotorControl2(self._robot_id,motor,pb.POSITION_CONTROL,targetPosition=motor_commands[action],force=self._max_force)
+                pb.setJointMotorControl2(self._robot_id,motor,pb.POSITION_CONTROL,targetPosition=motor_commands[action],force=self._max_force, physicsClientId=self._cid)
