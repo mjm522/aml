@@ -4,7 +4,7 @@ from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 class AMLRlRobot(object):
 
-    def __init__(self, config, robot_id=None):
+    def __init__(self, config, cid, robot_id=None):
 
         self._config = config
 
@@ -18,11 +18,13 @@ class AMLRlRobot(object):
         
         self._ctrl_type = self._config['ctrl_type']
 
+        self._cid = cid
+
         if 'call_renderer' in self._config.keys():
 
             if self._config['call_renderer']:
                 
-                setup_bullet_visualizer()
+                self._cid = setup_bullet_visualizer(self._renders)
 
 
         self._robot_id = robot_id
@@ -33,14 +35,14 @@ class AMLRlRobot(object):
 
     def set_base_pose(self, pos, ori):
 
-        pb.resetBasePositionAndOrientation(self._robot_id, pos, ori)
+        pb.resetBasePositionAndOrientation(self._robot_id, pos, ori, physicsClientId=self._cid)
 
     def get_ee_state(self, ee_idx, as_tuple=True):
         """
         returns orientation in bullet format quaternion [x,y,z,w]
         """
 
-        link_state = pb.getLinkState(self._robot_id, ee_idx, computeLinkVelocity = 1)
+        link_state = pb.getLinkState(self._robot_id, ee_idx, computeLinkVelocity = 1, physicsClientId=self._cid)
 
         if not as_tuple:
             ee_pos = np.asarray(link_state[0])
@@ -57,7 +59,7 @@ class AMLRlRobot(object):
         
     def set_ctrl_mode(self, jnt_postns=None):
 
-        self._tot_num_jnts = pb.getNumJoints(self._robot_id)
+        self._tot_num_jnts = pb.getNumJoints(self._robot_id, physicsClientId=self._cid)
 
         self._jnt_indexs = self.get_movable_joints()
 
@@ -73,38 +75,38 @@ class AMLRlRobot(object):
         #disable the default position_control mode. 
         for k, jnt_index in enumerate(self._jnt_indexs):
             
-            pb.resetJointState(self._robot_id, jnt_index, self._jnt_postns[k])
+            pb.resetJointState(self._robot_id, jnt_index, self._jnt_postns[k], physicsClientId=self._cid)
 
             if self._ctrl_type == 'pos':
                 
-                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.POSITION_CONTROL, targetPosition=self._jnt_postns[k], force=self._max_force)
+                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.POSITION_CONTROL, targetPosition=self._jnt_postns[k], force=self._max_force, physicsClientId=self._cid)
             
             else:
                 
-                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL, targetPosition=self._jnt_postns[k], force=0.5)
+                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL, targetPosition=self._jnt_postns[k], force=0.5, physicsClientId=self._cid)
 
     
     def set_friction_properties(self, lf=1., sf=1., rf=1., r=0.7):
 
         for jnt_idx in self._jnt_indexs:
 
-            pb.changeDynamics(self._robot_id, jnt_idx,   lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r)
+            pb.changeDynamics(self._robot_id, jnt_idx,   lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
 
     def enable_force_torque_sensors(self, joint_idx = -2):
 
         for i in self._jnt_indexs:
 
-            pb.enableJointForceTorqueSensor(self._robot_id, i, 1)
+            pb.enableJointForceTorqueSensor(self._robot_id, i, 1, physicsClientId=self._cid)
 
 
     def get_movable_joints(self):
 
         movable_jnts = []
         
-        for i in range (pb.getNumJoints(self._robot_id)):
+        for i in range (pb.getNumJoints(self._robot_id, physicsClientId=self._cid)):
             
-            jnt_info = pb.getJointInfo(self._robot_id, i)
+            jnt_info = pb.getJointInfo(self._robot_id, i, physicsClientId=self._cid)
             
             qIndex = jnt_info[3]
             
@@ -119,21 +121,21 @@ class AMLRlRobot(object):
 
         if self._ctrl_type == 'torque':
 
-            pb.setJointMotorControl2(self._robot_id, motor, pb.TORQUE_CONTROL, force=cmd)
+            pb.setJointMotorControl2(self._robot_id, motor, pb.TORQUE_CONTROL, force=cmd, physicsClientId=self._cid)
             
         elif self._ctrl_type == 'pos':
             
             if Kp is None:
                 
-                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, force=self._max_force)
+                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, force=self._max_force, physicsClientId=self._cid)
             
             else:
                 
-                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp[motor], force=self._max_force)
+                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp[motor], force=self._max_force, physicsClientId=self._cid)
         
         elif self._ctrl_type == 'vel':
             
-            pb.setJointMotorControl2(self._robot_id, motor, pb.VELOCITY_CONTROL, targetVelocity=cmd, force=self._max_force)
+            pb.setJointMotorControl2(self._robot_id, motor, pb.VELOCITY_CONTROL, targetVelocity=cmd, force=self._max_force, physicsClientId=self._cid)
 
         else:
 
@@ -146,14 +148,16 @@ class AMLRlRobot(object):
 
             return pb.calculateInverseKinematics(self._robot_id, 
                                                 ee_idx, 
-                                                targetPosition=ee_pos)
+                                                targetPosition=ee_pos,
+                                                physicsClientId=self._cid)
         
         else:
             
             return pb.calculateInverseKinematics(self._robot_id, 
                                                 ee_idx, 
                                                 targetPosition=ee_pos, 
-                                                targetOrientation=ee_ori)
+                                                targetOrientation=ee_ori,
+                                                physicsClientId=self._cid)
 
 
     def get_inv_dyn(self, js_pos, js_vel, js_acc=None):
@@ -177,7 +181,8 @@ class AMLRlRobot(object):
         tau = pb.calculateInverseDynamics(bodyUniqueId=self._robot_id,
                                           objPositions=js_pos,
                                           objVelocities=js_vel,
-                                          objAccelerations=js_acc)
+                                          objAccelerations=js_acc,
+                                          physicsClientId=self._cid)
         
         return np.asarray(tau)
 
@@ -228,9 +233,9 @@ class AMLRlRobot(object):
 
         for k, idx in enumerate(self._jnt_indexs):
 
-            lower_lim[k] = pb.getJointInfo(self._robot_id, idx)[8]
+            lower_lim[k] = pb.getJointInfo(self._robot_id, idx, physicsClientId=self._cid)[8]
             
-            upper_lim[k] = pb.getJointInfo(self._robot_id, idx)[9]
+            upper_lim[k] = pb.getJointInfo(self._robot_id, idx, physicsClientId=self._cid)[9]
 
             mean_[k] = 0.5*( lower_lim[k] + upper_lim[k] )
 

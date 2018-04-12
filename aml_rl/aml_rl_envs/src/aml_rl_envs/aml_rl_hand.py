@@ -5,9 +5,9 @@ from aml_rl_envs.aml_rl_robot import AMLRlRobot
 
 class AMLRlHand(AMLRlRobot):
 
-    def __init__(self, config, num_fingers, finger_jnt_indices=None, robot_id=None):
+    def __init__(self, config, num_fingers, cid, finger_jnt_indices=None, robot_id=None):
 
-        AMLRlRobot.__init__(self, config, robot_id)
+        AMLRlRobot.__init__(self, config, cid, robot_id)
 
         self._config = config
 
@@ -25,20 +25,20 @@ class AMLRlHand(AMLRlRobot):
 
             for jnt_idx in self._finger_jnt_indices[k]:
                 
-                jnt_info = pb.getJointInfo(self._robot_id, jnt_idx)
+                jnt_info = pb.getJointInfo(self._robot_id, jnt_idx, physicsClientId=self._cid)
                 
                 q_index = jnt_info[2]
 
                 self._motor_names[k].append(str(jnt_info[1]))
                 
-        pb.setRealTimeSimulation(0)
+        pb.setRealTimeSimulation(0, physicsClientId=self._cid)
 
     #old name is set_joint_state
     def set_fin_joint_state(self, finger_idx, jnt_pos):
 
         for k, idx in enumerate(self._finger_jnt_indices[finger_idx]):
 
-            pb.resetJointState(self._robot_id, idx, jnt_pos[k])
+            pb.resetJointState(self._robot_id, idx, jnt_pos[k], physicsClientId=self._cid)
 
     
     def apply_action(self, finger_idx, motor_commands, Kp=None):
@@ -102,7 +102,7 @@ class AMLRlHand(AMLRlRobot):
 
         for k in range(self._num_fingers):
 
-            link_state = pb.getLinkState(self._robot_id, self._ee_indexs[k], computeLinkVelocity = 1)
+            link_state = pb.getLinkState(self._robot_id, self._ee_indexs[k], computeLinkVelocity = 1, physicsClientId=self._cid)
 
             if as_tuple:
                 
@@ -132,7 +132,7 @@ class AMLRlHand(AMLRlRobot):
 
             for jnt_idx in self._finger_jnt_indices[finger_idx]:
 
-                jnt_state = pb.getJointState(self._robot_id, jnt_idx)
+                jnt_state = pb.getJointState(self._robot_id, jnt_idx, physicsClientId=self._cid)
                 jnt_poss[finger_idx].append(jnt_state[0])
                 jnt_vels[finger_idx].append(jnt_state[1])
                 jnt_reaction_forces[finger_idx].append(jnt_state[2])
@@ -146,7 +146,7 @@ class AMLRlHand(AMLRlRobot):
 
         jnt_pos = self.convert_fin_jnt_poss_to_list(jnt_poss)
 
-        Mq = np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id, objPositions=jnt_pos))
+        Mq = np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id, objPositions=jnt_pos, physicsClientId=self._cid))
 
         #assuming equal finger joints
         active_joints = Mq.shape[1]/self._num_fingers
@@ -195,8 +195,8 @@ class AMLRlHand(AMLRlRobot):
                                                                 localPosition=[0.,0.,0.],
                                                                 objPositions=jnt_pos,
                                                                 objVelocities=np.zeros(len(jnt_pos)).tolist(),
-                                                                objAccelerations=np.zeros(len(jnt_pos)).tolist()
-                                                                )
+                                                                objAccelerations=np.zeros(len(jnt_pos)).tolist(),
+                                                                physicsClientId=self._cid)
             lin_jacs.append(np.asarray(linear_jacobian))
 
         return lin_jacs
@@ -214,8 +214,8 @@ class AMLRlHand(AMLRlRobot):
                                                                 localPosition=local_point,
                                                                 objPositions=jnt_pos,
                                                                 objVelocities=np.zeros(len(jnt_pos)).tolist(),
-                                                                objAccelerations=np.zeros(len(jnt_pos)).tolist()
-                                                                )
+                                                                objAccelerations=np.zeros(len(jnt_pos)).tolist(),
+                                                                physicsClientId=self._cid)
 
         Jee = np.asarray(linear_jacobian)
         
@@ -239,8 +239,8 @@ class AMLRlHand(AMLRlRobot):
                                                                 localPosition=[0.,0.,0.],
                                                                 objPositions=jnt_pos,
                                                                 objVelocities=np.zeros(self._num_joints).tolist(),
-                                                                objAccelerations=np.zeros(self._num_joints).tolist()
-                                                                )
+                                                                objAccelerations=np.zeros(self._num_joints).tolist(),
+                                                                physicsClientId=self._cid)
             if hand_jacobian is None:
                 
                 hand_jacobian = np.asarray(linear_jacobian)

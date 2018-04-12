@@ -83,26 +83,26 @@ class AMLRlEnv(gym.Env):
 
         self._terminated = 0
 
-        pb.resetSimulation()
+        pb.resetSimulation(physicsClientId=self._cid)
         
-        pb.setPhysicsEngineParameter(numSolverIterations=150)
+        pb.setPhysicsEngineParameter(numSolverIterations=150, physicsClientId=self._cid)
         
-        pb.setTimeStep(self._time_step)
+        pb.setTimeStep(self._time_step, physicsClientId=self._cid)
 
         if self._set_gravity:
 
-            pb.setGravity(0,0,-9.8)
+            pb.setGravity(0,0,-9.8, physicsClientId=self._cid)
 
         self.simple_step()
 
 
     def simple_step(self):
 
-        pb.stepSimulation()
+        pb.stepSimulation(physicsClientId=self._cid)
 
     def __del__(self):
         
-        pb.disconnect()
+        pb.disconnect(physicsClientId=self._cid)
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -123,7 +123,7 @@ class AMLRlEnv(gym.Env):
             
             return np.array([])
         
-        base_pos,orn = self._pb.getBasePositionAndOrientation(self._robot._robot_id)
+        base_pos,orn = self._pb.getBasePositionAndOrientation(self._robot._robot_id, physicsClientId=self._cid)
         
         view_matrix = self._pb.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=base_pos,
@@ -131,15 +131,16 @@ class AMLRlEnv(gym.Env):
             yaw=self._cam_yaw,
             pitch=self._cam_pitch,
             roll=0,
-            upAxisIndex=2)
+            upAxisIndex=2,
+            physicsClientId=self._cid)
         
         proj_matrix = self._pb.computeProjectionMatrixFOV(
             fov=60, aspect=float(self._config['render_wigth'])/self._config['render_height'],
-            nearVal=0.1, farVal=100.0)
+            nearVal=0.1, farVal=100.0, physicsClientId=self._cid)
         
         (_, _, px, _, _) = self._pb.getCameraImage(
             width=self._config['render_wigth'], height=self._config['render_height'], viewMatrix=view_matrix,
-            projectionMatrix=proj_matrix, renderer=self._pb.ER_BULLET_HARDWARE_OPENGL)
+            projectionMatrix=proj_matrix, renderer=self._pb.ER_BULLET_HARDWARE_OPENGL, physicsClientId=self._cid)
         
         rgb_array = np.array(px)
         
