@@ -3,7 +3,7 @@
     <link name="base_link">
         <visual>
             <geometry>
-                <cylinder length="0.05" radius="0.5"/>
+                <cylinder length="0.05" radius="0.8"/>
             </geometry>
             <material name="red">
                 <color rgba="0.8 0 0 0.6"/>
@@ -12,7 +12,7 @@
         </visual>
         <collision>
             <geometry>
-                <cylinder length="0.05" radius="0.5"/>
+                <cylinder length="0.05" radius="0.8"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0. 0 0"/>
         </collision>
@@ -91,18 +91,20 @@
     <link name="f1_eePoint">
         <visual>
             <geometry>
-                <sphere  radius="0.054"/>
+                <!--<sphere  radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
             <material name="grey">
                 <color rgba="0.5 0.5 0.5 1"/>
             </material>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="0.054"/>
+                <!--<sphere radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </collision>
         <inertial>
             <mass value="0.001"/>
@@ -179,18 +181,20 @@
     <link name="f2_eePoint">
         <visual>
             <geometry>
-                <sphere  radius="0.054"/>
+                <!--<sphere  radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
             <material name="grey">
                 <color rgba="0.5 0.5 0.5 1"/>
             </material>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="0.054"/>
+                <!--<sphere radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </collision>
         <inertial>
             <mass value="0.001"/>
@@ -267,18 +271,20 @@
     <link name="f3_eePoint">
         <visual>
             <geometry>
-                <sphere  radius="0.054"/>
+                <!--<sphere  radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
             <material name="grey">
                 <color rgba="0.5 0.5 0.5 1"/>
             </material>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="0.054"/>
+                <!--<sphere radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </collision>
         <inertial>
             <mass value="0.001"/>
@@ -355,18 +361,20 @@
     <link name="f4_eePoint">
         <visual>
             <geometry>
-                <sphere  radius="0.054"/>
+                <!--<sphere  radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
             <material name="grey">
                 <color rgba="0.5 0.5 0.5 1"/>
             </material>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="0.054"/>
+                <!--<sphere radius="0.054"/>-->
+                <capsule length="0.08" radius="0.05"/>
             </geometry>
-            <origin rpy="0 0 0" xyz="0 0 0.0"/>
+            <origin rpy="0 1.576, 0." xyz="0 0 0.0"/>
         </collision>
         <inertial>
             <mass value="0.001"/>
@@ -377,7 +385,7 @@
     <joint name="f1_joint1" type="revolute">
         <parent link="base_link"/>
         <child link="f1_link1"/>
-        <origin xyz="0.45 0 0." rpy="0 0 0" />
+        <origin xyz="0.75 0 0." rpy="0 0 0" />
         <axis xyz = "1 0 0" />
         <dynamics damping="0.0" friction="0.0"/>
         <limit effort="300" velocity="1.0" lower="-0.84819" upper="0.84819" />
@@ -386,19 +394,19 @@
     <joint name="f1_joint2" type="revolute">
         <parent link="f1_link1"/>
         <child link="f1_link2"/>
-        <origin xyz="0 0 0.2" rpy="0 0 0" />
+        <origin xyz="0. 0 0.2" rpy="0 0 0" />
         <axis xyz = "0 1 0" />
         <dynamics damping="0.0" friction="0.0"/>
-        <limit effort="300" velocity="1.0" lower="-1.21619" upper="1.21619" />
+        <limit effort="300" velocity="1.0" lower="-1.576" upper="1.576" />
     </joint>
 
     <joint name="f1_joint3" type="revolute">
         <parent link="f1_link2"/>
         <child link="f1_link3"/>
-        <origin xyz="0 0 0.5" rpy="0 0 0" />
+        <origin xyz="0. 0 0.5" rpy="0 0 0" />
         <axis xyz = "0 1 0" />
         <dynamics damping="0.0" friction="0.0"/>
-        <limit effort="300" velocity="1.0" lower="-1.97019" upper="2.200" />
+        <limit effort="300" velocity="1.0" lower="-2.97019" upper="2.900" />
     </joint>
 
     <joint name="f1_joint4" type="fixed">
@@ -410,7 +418,7 @@
     <joint name="f2_joint1" type="revolute">
         <parent link="base_link"/>
         <child link="f2_link1"/>
-        <origin xyz="0 0.45 0" rpy="0 0 1.5707963267948966" />
+        <origin xyz="0 0.75 0" rpy="0 0 1.5707963267948966" />
         <axis xyz = "1 0 0" />
         <dynamics damping="0.0" friction="0.0"/>
         <limit effort="300" velocity="1.0" lower="-0.84819" upper="0.84819" />
@@ -431,7 +439,7 @@
         <origin xyz="0 0 0.5" rpy="0 0 0" />
         <axis xyz = "0 1 0" />
         <dynamics damping="0.0" friction="0.0"/>
-        <limit effort="300" velocity="1.0" lower="-1.97019" upper="2.200" />
+        <limit effort="300" velocity="1.0" lower="-2.97019" upper="2.900" />
     </joint>
 
     <joint name="f2_joint4" type="fixed">
@@ -443,7 +451,7 @@
     <joint name="f3_joint1" type="revolute">
         <parent link="base_link"/>
         <child link="f3_link1"/>
-        <origin xyz="-0.45 0 0" rpy="0 0 3.14159" />
+        <origin xyz="-0.75 0 0" rpy="0 0 3.14159" />
         <axis xyz = "1 0 0" />
         <dynamics damping="0.0" friction="0.0"/>
         <limit effort="300" velocity="1.0" lower="-0.84819" upper="0.84819" />
@@ -464,7 +472,7 @@
         <origin xyz="0 0 0.5" rpy="0 0 0" />
         <axis xyz = "0 1 0" />
         <dynamics damping="0.0" friction="0.0"/>
-        <limit effort="300" velocity="1.0" lower="-1.97019" upper="2.200" />
+        <limit effort="300" velocity="1.0" lower="-2.97019" upper="2.900" />
     </joint>
 
     <joint name="f3_joint4" type="fixed">
@@ -476,7 +484,7 @@
     <joint name="f4_joint1" type="revolute">
         <parent link="base_link"/>
         <child link="f4_link1"/>
-        <origin xyz="0 -0.45 0" rpy="0 0 -1.5707963267948966" />
+        <origin xyz="0 -0.75 0" rpy="0 0 -1.5707963267948966" />
         <axis xyz = "1 0 0" />
         <dynamics damping="0.0" friction="0.0"/>
         <limit effort="300" velocity="1.0" lower="-0.84819" upper="0.84819" />
@@ -497,7 +505,7 @@
         <origin xyz="0 0 0.5" rpy="0 0 0" />
         <axis xyz = "0 1 0" />
         <dynamics damping="0.0" friction="0.0"/>
-        <limit effort="300" velocity="1.0" lower="-1.97019" upper="2.200" />
+        <limit effort="300" velocity="1.0" lower="-2.97019" upper="2.900" />
     </joint>
 
     <joint name="f4_joint4" type="fixed">
