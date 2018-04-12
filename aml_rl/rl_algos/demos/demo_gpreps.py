@@ -36,6 +36,8 @@ mycreps = GPREPSOpt(entropy_bound=2.0, num_policy_updates=25,
 
 for it in range(n_episodes):
 
+    print "Episode \t", it
+
     mycreps.run()
 
     policy = mycreps._policy
