@@ -185,19 +185,38 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def reward(self, traj, end_id = 200, scale = 1):
+    def reward(self, traj, end_id = 200, scale = [1,1]):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
 
-        reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+        def alignment_reward():
 
-        traj_end_vector = traj[-1, :] - traj[-end_id, :]
-        traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+            reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
 
-        cos_angle = np.dot(traj_end_vector, reference_vector)
+            traj_end_vector = traj[-1, :] - traj[-end_id, :]
+            traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
 
-        return abs(scale*cos_angle)
+            cos_angle = np.dot(traj_end_vector, reference_vector)
+
+            return abs(cos_angle)
+
+        def completion_reward():
+
+            # 0.6776011368  -0.1101703639   1.0655471412
+
+            required_z_val = 1.06554
+
+            # checking if the final position of the rolled-out trajectory reached the depth required for insertion
+            if abs(traj[-1, 2] - required_z_val) < 0.2:
+                reward = 10
+            else:
+                reward = -20
+
+            return reward
+
+
+        return scale[0]*alignment_reward() + scale[1]*completion_reward()
 
     def fwd_simulate(self, dmp, joint_space = False):
         """
