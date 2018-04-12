@@ -45,7 +45,7 @@ class AMLRlEnv(gym.Env):
         
         self.viewer = None
          
-        setup_bullet_visualizer(self._renders)
+        self._cid = setup_bullet_visualizer(self._renders)
 
         self._set_gravity = set_gravity
 
