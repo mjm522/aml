@@ -6,10 +6,6 @@ from collections import deque
 from aml_io.log_utils import aml_logging
 from scipy.optimize import fmin_l_bfgs_b
 from rl_algos.utils.utils import logsumexp
-from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
-from rl_algos.forward_models.context_model import ContextModel
-from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
-
 
 """
 
@@ -25,23 +21,23 @@ np.random.seed(123)
 
 class GPREPSOpt():
 
-    def __init__(self, entropy_bound, initial_params, num_policy_updates, 
-                       num_samples_per_update, num_old_datasets, env, num_context_features):
+    def __init__(self, entropy_bound, num_policy_updates, 
+                       num_samples_per_update, num_old_datasets, env, 
+                       num_context_features, context_model, traj_rollout_model,
+                       policy, min_eta=1e-8, num_data_to_collect=20, num_fake_data=30):
 
         self._logger = aml_logging.get_logger(__name__)
 
         #epsilon in the algorithm
         self._entropy_bound = entropy_bound
-        #initial params
-        self._w_init = initial_params
         #pi(w|s) in the algorithm
-        self._policy = LinGaussPolicy(w_dim=1, context_dim=3, variance=0.03, initial_params=self._w_init, random_state=env._random_state)
+        self._policy = policy
         #K in the algorithm
         self._num_policy_updates = num_policy_updates
         #number of samples to be used for each update (N)
         self._num_samples_per_update = num_samples_per_update
         #
-        self._num_data_to_collect = 20
+        self._num_data_to_collect = num_data_to_collect
         #H in the algorithm
         self._num_old_datasets = num_old_datasets
         #to execute the policy
@@ -49,22 +45,18 @@ class GPREPSOpt():
         #number of context features
         self._context_dim = num_context_features
         #param dim
-        self._w_dim = len(self._w_init)
+        self._w_dim = self._policy._w_dim
 
         #M in the paper
-        self._num_fake_data = 30
+        self._num_fake_data = num_fake_data
 
-        self._num_samples_fwd_data = 50
-
-        self._min_eta = 1e-8
+        self._min_eta = min_eta
 
         self._itr = 0
 
-        self._context_model = ContextModel(context_dim=1, 
-                                           num_data_points=self._num_samples_fwd_data)
+        self._context_model = context_model
 
-        self._traj_model = TrajRolloutModel(w_dim=self._w_dim, cost=self._env.reward, 
-                                            context_model=self._context_model, num_data_points=self._num_samples_fwd_data)
+        self._traj_model = traj_rollout_model
 
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 

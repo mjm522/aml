@@ -9,7 +9,7 @@ class LinGaussPolicy():
     our aim is to lean the distribution of w from samples collected
     """
 
-    def __init__(self, w_dim, context_dim, variance, 
+    def __init__(self, w_dim, context_feature_dim, variance, 
                  initial_params, bounds=None, covariance_scale=1.0, gamma=0.0, random_state=None):
 
         #initial guess of w
@@ -18,7 +18,7 @@ class LinGaussPolicy():
         #dimenstion of the w
         self._w_dim = w_dim
 
-        self._context_dim = context_dim
+        self._context_dim = context_feature_dim
 
         self._covariance_scale = covariance_scale
 
