@@ -40,17 +40,17 @@ class BaxterEnv(AMLRlEnv):
 
         self.setup_env()
 
-        pb.loadURDF(os.path.join(self._urdf_root_path,"plane.urdf"),[0,0,0])
+        pb.loadURDF(os.path.join(self._urdf_root_path,"plane.urdf"),[0,0,0], physicsClientId=self._cid)
 
-        self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5)
+        self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.7], [0, 0, -0.707, 0.707])
+        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.7], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._object = ManObject(urdf_root_path=self._config['urdf_root_path'], time_step=self._config['time_step'], 
+        self._object = ManObject(cid=self._cid, urdf_root_path=self._config['urdf_root_path'], time_step=self._config['time_step'], 
                                   pos=[0.9, 0.1, 1.4], ori=[0, 0, -0.707, 0.707], scale=0.55, 
                                   use_fixed_Base = True, obj_type='sphere')
                         
-        self._baxter = Baxter(config=BAXTER_CONFIG)
+        self._baxter = Baxter(config=BAXTER_CONFIG, cid=self._cid)
         
         if self._demo2follow is not None:
             #first joint position in the demo
@@ -71,7 +71,7 @@ class BaxterEnv(AMLRlEnv):
 
          self._observation = self._baxter.get_observation()
 
-         gripper_state  = pb.getLinkState(self._baxter._robot_id,self._baxter._gripper_index)
+         gripper_state  = pb.getLinkState(self._baxter._robot_id,self._baxter._gripper_index, physicsClientId=self._cid)
          
          gripper_pos = gripper_state[0]
          
@@ -141,7 +141,7 @@ class BaxterEnv(AMLRlEnv):
             
             self._baxter.apply_action(action)
             
-            pb.stepSimulation()
+            pb.stepSimulation(physicsClientId=self._cid)
             
             if self.termination():
                 
@@ -167,7 +167,7 @@ class BaxterEnv(AMLRlEnv):
 
     def termination(self):
 
-        state = pb.getLinkState(self._baxter._robot_id, self._baxter._ee_index)
+        state = pb.getLinkState(self._baxter._robot_id, self._baxter._ee_index, physicsClientId=self._cid)
         
         actualEndEffectorPos = state[0]
             
@@ -195,7 +195,7 @@ class BaxterEnv(AMLRlEnv):
 
         blockPos, blockOrn=self._object.get_curr_state(ori_type='quat', as_tuple=True)[:2]
         
-        closest_points     = pb.getClosestPoints(self._object._obj_id, self._baxter._robot_id, 1000, -1, self._baxter._ee_index)
+        closest_points     = pb.getClosestPoints(self._object._obj_id, self._baxter._robot_id, 1000, -1, self._baxter._ee_index, physicsClientId=self._cid)
 
         ee_pos, ee_ori = self._baxter.get_ee_pose()
         

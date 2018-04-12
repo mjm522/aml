@@ -35,11 +35,11 @@ class KukaEnv(AMLRlEnv):
 
     def _reset(self):
 
-        pb.loadURDF(os.path.join(self._urdf_root_path,"plane.urdf"),[0,0,-1])
+        pb.loadURDF(os.path.join(self._urdf_root_path,"plane.urdf"),[0,0,-1], physicsClientId=self._cid)
         
-        self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True)
+        self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0.5,0.0, 0.0], [0.0,0.0,0.0,1.0])
+        pb.resetBasePositionAndOrientation(self._table_id, [0.5,0.0, 0.0], [0.0,0.0,0.0,1.0], physicsClientId=self._cid)
         
         xpos = 0.55 +0.12*random.random()
         
@@ -49,9 +49,9 @@ class KukaEnv(AMLRlEnv):
         
         orn = pb.getQuaternionFromEuler([0,0,ang])
         
-        self._block_id =pb.loadURDF(os.path.join(self._urdf_root_path, "block.urdf"), xpos,ypos, 0.06,orn[0],orn[1],orn[2],orn[3])
+        self._block_id =pb.loadURDF(os.path.join(self._urdf_root_path, "block.urdf"), xpos,ypos, 0.06,orn[0],orn[1],orn[2],orn[3], physicsClientId=self._cid)
                         
-        self._kuka = Kuka(config=KUKA_CONFIG)
+        self._kuka = Kuka(cid=self._cid, config=KUKA_CONFIG)
         
         self.simple_step()
         
@@ -64,13 +64,13 @@ class KukaEnv(AMLRlEnv):
 
          self._observation = self._kuka.get_observation()
 
-         gripper_state  = pb.getLinkState(self._kuka._robot_id,self._kuka._gripper_index)
+         gripper_state  = pb.getLinkState(self._kuka._robot_id,self._kuka._gripper_index, physicsClientId=self._cid)
          
          gripper_pos = gripper_state[0]
          
          gripper_ori = gripper_state[1]
          
-         block_pos, block_ori = pb.getBasePositionAndOrientation(self._block_id)
+         block_pos, block_ori = pb.getBasePositionAndOrientation(self._block_id, physicsClientId=self._cid)
 
          inv_gripper_pos, inv_gripper_ori = pb.invertTransform(gripper_pos, gripper_ori)
          
@@ -125,7 +125,7 @@ class KukaEnv(AMLRlEnv):
             
             self._kuka.apply_action(action)
             
-            pb.stepSimulation()
+            pb.stepSimulation(physicsClientId=self._cid)
             
             if self.termination():
                 
@@ -163,15 +163,18 @@ class KukaEnv(AMLRlEnv):
                 yaw=self._cam_yaw,
                 pitch=self._cam_pitch,
                 roll=0,
-                upAxisIndex=2)
+                upAxisIndex=2,
+                physicsClientId=self._cid)
         
         proj_matrix = self._pb.computeProjectionMatrixFOV(
                 fov=60, aspect=float(RENDER_WIDTH)/RENDER_HEIGHT,
-                nearVal=0.1, farVal=100.0)
+                nearVal=0.1, farVal=100.0,
+                physicsClientId=self._cid)
         
         (_, _, px, _, _) = self._pb.getCameraImage(
                 width=RENDER_WIDTH, height=RENDER_HEIGHT, viewMatrix=view_matrix,
-                projectionMatrix=proj_matrix, renderer=self._pb.ER_BULLET_HARDWARE_OPENGL)
+                projectionMatrix=proj_matrix, renderer=self._pb.ER_BULLET_HARDWARE_OPENGL,
+                physicsClientId=self._cid)
         
         rgb_array = np.array(px)
         
@@ -182,7 +185,7 @@ class KukaEnv(AMLRlEnv):
 
     def termination(self):
         
-        state = pb.getLinkState(self._kuka._robot_id, self._kuka._ee_index)
+        state = pb.getLinkState(self._kuka._robot_id, self._kuka._ee_index, physicsClientId=self._cid)
         
         actual_ee_pos = state[0]
             
@@ -194,7 +197,7 @@ class KukaEnv(AMLRlEnv):
         
         max_dist = 0.005 
         
-        closest_points = pb.getClosestPoints(self._kuka._tray_id, self._kuka._robot_id, max_dist)
+        closest_points = pb.getClosestPoints(self._kuka._tray_id, self._kuka._robot_id, max_dist, physicsClientId=self._cid)
          
         if (len(closest_points)):
             
@@ -209,7 +212,7 @@ class KukaEnv(AMLRlEnv):
                 
                 self._kuka.apply_action(grasp_action)
                 
-                pb.stepSimulation()
+                pb.stepSimulation(physicsClientId=self._cid)
                 
                 finger_angle = finger_angle-(0.3/100.)
                 
@@ -223,15 +226,15 @@ class KukaEnv(AMLRlEnv):
                 
                 self._kuka.apply_action(grasp_action)
                 
-                pb.stepSimulation()
+                pb.stepSimulation(physicsClientId=self._cid)
                 
-                block_pos, block_ori =pb.getBasePositionAndOrientation(self._block_id)
+                block_pos, block_ori =pb.getBasePositionAndOrientation(self._block_id, physicsClientId=self._cid)
                 
                 if (block_pos[2] > 0.23):
 
                     break
                 
-                state = pb.getLinkState(self._kuka._robot_id,self._kuka._ee_index)
+                state = pb.getLinkState(self._kuka._robot_id,self._kuka._ee_index, physicsClientId=self._cid)
                 
                 actual_ee_pos = state[0]
                 
@@ -248,9 +251,9 @@ class KukaEnv(AMLRlEnv):
     def _reward(self):
         
         #rewards is height of target object
-        block_pos,block_ori=pb.getBasePositionAndOrientation(self._block_id)
+        block_pos,block_ori=pb.getBasePositionAndOrientation(self._block_id, physicsClientId=self._cid)
         
-        closest_points = pb.getClosestPoints(self._block_id,self._kuka._robot_id,1000, -1, self._kuka._ee_index) 
+        closest_points = pb.getClosestPoints(self._block_id,self._kuka._robot_id,1000, -1, self._kuka._ee_index, physicsClientId=self._cid) 
 
         reward = -1000
         

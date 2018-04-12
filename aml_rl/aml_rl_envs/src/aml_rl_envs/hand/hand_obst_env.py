@@ -26,7 +26,7 @@ class HandObstacleEnv(AMLRlEnv):
     def __init__(self, action_dim, demo2follow=None, 
                        action_high=None, action_low=None, 
                        randomize_box_ori=False, keep_obj_fixed = True, 
-                       config=HAND_OBJ_CONFIG):
+                       config=HAND_OBJ_CONFIG, hand_choice='pincer'):
 
         self._config = config
 
@@ -57,14 +57,14 @@ class HandObstacleEnv(AMLRlEnv):
 
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
-        self._reset(obj_base_fixed = keep_obj_fixed)
+        self._reset(obj_base_fixed = keep_obj_fixed, hand_choice=hand_choice)
 
         obs_dim = len(self.get_extended_observation())
 
         self.set_space_lims(obs_dim, action_dim, action_high, action_low)
 
 
-    def _reset(self, box_pos=[-0.7, 0, 0.8], obj_base_fixed = True): #1.3
+    def _reset(self, box_pos=[-0.7, 0, 0.8], obj_base_fixed = True, hand_choice='pincer'):
 
         self.setup_env()
 
@@ -78,23 +78,23 @@ class HandObstacleEnv(AMLRlEnv):
             
             box_ori = [0.,0.,0.,1]
 
-        self._world_id = pb.loadURDF(join(self._urdf_root_path,"plane.urdf"))
+        self._world_id = pb.loadURDF(join(self._urdf_root_path,"plane.urdf"), physicsClientId=self._cid)
         
-        self._table_id = pb.loadURDF(join(self._urdf_root_path, "table.urdf"), useFixedBase=True)
+        self._table_id = pb.loadURDF(join(self._urdf_root_path, "table.urdf"), useFixedBase=True, physicsClientId=self._cid)
         
-        self._obstacle_id  = pb.loadURDF(join(self._urdf_root_path, "topple_block.urdf"), useFixedBase=True)
+        self._obstacle_id  = pb.loadURDF(join(self._urdf_root_path, "topple_block.urdf"), useFixedBase=True, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._world_id, [0., 0., -0.5], [0.,0.,0.,1])
+        pb.resetBasePositionAndOrientation(self._world_id, [0., 0., -0.5], [0.,0.,0.,1], physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.66], [0.,0.,0.,1])
+        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.66], [0.,0.,0.,1], physicsClientId=self._cid)
 
         obs_pos=[0, 0, 0.72]
         
         obs_ori=[0.,0.,1.,0.] 
         
-        pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori)
+        pb.resetBasePositionAndOrientation(self._obstacle_id, obs_pos, obs_ori, physicsClientId=self._cid)
  
-        self._object = ManObject(pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base=obj_base_fixed, obj_type='cube')
+        self._object = ManObject(cid=self._cid, pos=box_pos, ori=box_ori, scale=scale, use_fixed_Base=obj_base_fixed, obj_type='cube')
         
         base_hand_pos  = [-0.7, 0., 2.1]
 
@@ -104,7 +104,7 @@ class HandObstacleEnv(AMLRlEnv):
 
         HAND_CONFIG.update(self._config)
 
-        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
+        self._hand = Hand(cid=self._cid, config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
 
         self._num_fingers = self._hand._num_fingers
 
@@ -125,9 +125,9 @@ class HandObstacleEnv(AMLRlEnv):
 
     def set_friction_properties(self):
 
-        pb.setPhysicsEngineParameter(restitutionVelocityThreshold=0.2)
+        pb.setPhysicsEngineParameter(restitutionVelocityThreshold=0.2, physicsClientId=self._cid)
 
-        pb.changeDynamics(self._table_id,-1,  lateralFriction=1, spinningFriction=1., rollingFriction=1., restitution=0.6)
+        pb.changeDynamics(self._table_id,-1,  lateralFriction=1, spinningFriction=1., rollingFriction=1., restitution=0.6, physicsClientId=self._cid)
 
         self._hand.set_friction_properties(lf=1., sf=1., rf=1., r=0.)
 
@@ -203,7 +203,8 @@ class HandObstacleEnv(AMLRlEnv):
 
         for fin_no in range(self._hand._num_fingers):
 
-            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], bodyB=self._object._obj_id, linkIndexB=0)
+            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], 
+                                               bodyB=self._object._obj_id, linkIndexB=0, physicsClientId=self._cid)
 
             #contact points on male
             cp_on_finger = []
@@ -235,7 +236,7 @@ class HandObstacleEnv(AMLRlEnv):
     def get_contact_points_object_obstacle(self):
         #only report contact points that involve block and obstacle, the table (environment contact) is neglected
 
-        contact_data = pb.getContactPoints(bodyA=self._object._obj_id, bodyB=self._obstacle_id)
+        contact_data = pb.getContactPoints(bodyA=self._object._obj_id, bodyB=self._obstacle_id, physicsClientId=self._cid)
 
         #contact points on male
         cp_on_block = []
@@ -265,7 +266,7 @@ class HandObstacleEnv(AMLRlEnv):
     def get_contact_points_object_table(self):
         #only report contact points that involve block and obstacle, the table (environment contact) is neglected
 
-        contact_data = pb.getContactPoints(bodyA=self._object._obj_id, bodyB=self._table_id)
+        contact_data = pb.getContactPoints(bodyA=self._object._obj_id, bodyB=self._table_id, physicsClientId=self._cid)
 
         #contact points on male
         cp_on_block = []
@@ -301,7 +302,8 @@ class HandObstacleEnv(AMLRlEnv):
 
         for fin_no in range(self._hand._num_fingers):
 
-            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], bodyB=self._object._obj_id, linkIndexB=0)
+            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], 
+                                               bodyB=self._object._obj_id, linkIndexB=0, physicsClientId=self._cid)
 
             #contact points on male
             cp_on_finger = []
@@ -524,7 +526,7 @@ class HandObstacleEnv(AMLRlEnv):
 
         self._hand.apply_action(action, Kp)
 
-        pb.stepSimulation()
+        pb.stepSimulation(physicsClientId=self._cid)
 
         done = self._termination()
 
@@ -596,7 +598,7 @@ if __name__ == '__main__':
 
         # env._hand.set_joint_state(finger_idx=0, jnt_pos=cmd)
 
-        pb.stepSimulation()
+        pb.stepSimulation(physicsClientId=env._cid)
 
         # cmd += np.array([0.0, 0.00, 0.001])
 

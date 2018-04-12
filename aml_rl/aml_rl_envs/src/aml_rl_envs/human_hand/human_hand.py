@@ -7,7 +7,7 @@ from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
 
 class HumanHand(AMLRlHand):
 
-    def __init__(self, config=AML_RL_ROBOT_CONFIG, scale=1., 
+    def __init__(self, cid, config=AML_RL_ROBOT_CONFIG, scale=1., 
                        hand_type='right', use_fixed_base=False, 
                        pos=(0.,0.,0.), ori=(0.,0.,0.,1.), j_pos=None, call_renderer=False):
 
@@ -29,7 +29,7 @@ class HumanHand(AMLRlHand):
 
         self._defualt_jnts = j_pos
 
-        AMLRlHand.__init__(self, config, num_fingers=5)
+        AMLRlHand.__init__(self, config, cid=cid, num_fingers=5)
 
         self.reset()
  
@@ -48,7 +48,7 @@ class HumanHand(AMLRlHand):
 
             raise Exception("Unknown hand type")
 
-        self._robot_id = pb.loadURDF(urdf_file, globalScaling=self._scale, useFixedBase=self._use_fixed_base)
+        self._robot_id = pb.loadURDF(urdf_file, globalScaling=self._scale, useFixedBase=self._use_fixed_base, physicsClientId=self._cid)
 
         self._finger_jnt_indices = [[1,2,3,4], #thumb finger joints
                                     [5,6,7,8,9], # index finger joints

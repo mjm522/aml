@@ -13,3 +13,5 @@ def setup_bullet_visualizer(render=True):
     else:
         
         pb.connect(pb.DIRECT)
+
+    return cid

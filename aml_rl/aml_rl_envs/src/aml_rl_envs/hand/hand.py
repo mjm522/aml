@@ -9,23 +9,23 @@ from aml_rl_envs.aml_rl_hand import AMLRlHand
 
 class Hand(AMLRlHand):
 
-    def __init__(self, config, pos = [1.75, 0., 2.75], ori = [0., 0., 0., 1], j_pos=[np.pi/3, 0.0, 0.0, 0.000], hand_choice = 'four_finger'):
+    def __init__(self, cid, config, pos = [1.75, 0., 2.75], ori = [0., 0., 0., 1], j_pos=[np.pi/3, 0.0, 0.0, 0.000], hand_choice = 'four_finger'):
 
         if hand_choice == 'pincer':
             
-            self._robot_id = pb.loadURDF(join(config['urdf_root_path'], "hand/pincer_arm.urdf"), useFixedBase=True, globalScaling=1)
+            self._robot_id = pb.loadURDF(join(config['urdf_root_path'], "hand/pincer_arm.urdf"), useFixedBase=True, globalScaling=1, physicsClientId=cid)
 
             self._num_fingers = 2    
         
         else:
             
-            self._robot_id = pb.loadURDF(join(config['urdf_root_path'], "hand/four_finger_hand.urdf"), useFixedBase=True, globalScaling=1)
+            self._robot_id = pb.loadURDF(join(config['urdf_root_path'], "hand/four_finger_hand.urdf"), useFixedBase=True, globalScaling=1, physicsClientId=cid)
 
             self._num_fingers = 4
         
         self._default_j_pos = j_pos
 
-        self._finger_radius = 0.05 # from urdf
+        self._finger_radius = 0.04 # from urdf
 
         if self._num_fingers == 2:
 
@@ -35,7 +35,8 @@ class Hand(AMLRlHand):
 
             self._finger_jnt_indices = [[0,1,2], [4,5,6], [8,9,10], [12,13,14]]
 
-        AMLRlHand.__init__(self, config, self._num_fingers, self._finger_jnt_indices, self._robot_id)
+        AMLRlHand.__init__(self, config=config, cid=cid, num_fingers=self._num_fingers, 
+                                finger_jnt_indices=self._finger_jnt_indices, robot_id=self._robot_id)
        
         self._ee_indexs = [3,7,11,15]
 
@@ -49,6 +50,8 @@ class Hand(AMLRlHand):
 
             self.set_fin_joint_state(k, self._default_j_pos)
 
+        # print self.get_jnt_state()[0]
+
         self.setup_hand()
         
         self._ee_pos, self._ee_ori, _, _  = self.get_ee_states()
@@ -60,7 +63,7 @@ class Hand(AMLRlHand):
 
     def get_action_dim(self):
         
-        return 6 #position x,y,z and roll/pitch/yaw euler angles of end effector
+        return 12 #position x,y,z and roll/pitch/yaw euler angles of end effector
 
     def get_obs_dim(self):
         
@@ -78,9 +81,9 @@ class Hand(AMLRlHand):
         
         for k in range(self._num_fingers):
         
-            observation.extend(jnt_poss[k])
+            observation.extend(ee_poss[k])
             
-            observation.extend(jnt_vels[k])
+            observation.extend(ee_vels[k])
 
         return observation
 
