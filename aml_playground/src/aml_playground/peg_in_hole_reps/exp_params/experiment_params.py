@@ -1,28 +1,28 @@
 import os
 import numpy as np
 
-#kpx kpy kpz
-sg ={
-'start':np.array([10., 10., 10.]),
-'goal':np.array([10.,10., 10.]),
-}
-
-state_constraints={
-'min':[10., 10., 10.],
-'max':[70., 70., 70.],
+gpreps_params = {
+	'w_dim':3,
+	'initial_params': 4.0 * np.ones(3),
+	'entropy_bound':2.0,
+	'context_dim':2,
+	'context_feature_dim':4,
+	'x_dim':2,
+	'policy_variance':0.03,
+	'random_state':np.random.RandomState(0),
+	'num_policy_updates':25,
+	'num_old_datasets':1,
+	'min_eta':1e-8, 
+	'num_data_to_collect':20, 
+	'num_fake_data':30,
+	'num_samples_per_update':30,
+	'num_samples_fwd_data':50,
 }
 
 
 experiment_1 = {
-	'timesteps':100,
-	'no_rollouts':100,
-	'h':10,
-	'gain':1e-1,
-	'max_iter':61,
-	'state_constraints':state_constraints,
-	'start_goal':sg,
-	'init_traj':None,
-	'cost_fn':None,
+	
+	'gpreps_params':gpreps_params,
 }
 
-ee_config = experiment_1
+exp_params = experiment_1

@@ -3,11 +3,13 @@ import time
 import numpy as np
 from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_playground.peg_in_hole_reps.controller.sawyer_pih_reps import SawyerPegREPS
+#get the experiment params
+from aml_playground.peg_in_hole_reps.exp_params.experiment_params import exp_params
 
 
 def main(joint_space=False):
 
-    ps = SawyerPegREPS(joint_space)
+    ps = SawyerPegREPS(joint_space, exp_params)
 
     traj = ps.update_dmp_params()[:750,:]
 
