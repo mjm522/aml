@@ -29,7 +29,7 @@ class HandObjEnv(AMLRlEnv):
     def __init__(self,  action_dim,  demo2follow=None, 
                         action_high=None, action_low=None, 
                         randomize_box_ori=True, keep_obj_fixed = True, 
-                        config=HAND_OBJ_CONFIG):
+                        config=HAND_OBJ_CONFIG, hand_choice='four_finger',set_gravity=True):
 
         self._goal_block_pos = np.array([0, 0, 0.]) #x,y,z
         
@@ -58,9 +58,9 @@ class HandObjEnv(AMLRlEnv):
 
         self._config = config
 
-        AMLRlEnv.__init__(self, config, set_gravity=True)
+        AMLRlEnv.__init__(self, config, set_gravity=set_gravity)
 
-        self._reset(obj_base_fixed = keep_obj_fixed)
+        self._reset(obj_base_fixed = keep_obj_fixed, hand_choice=hand_choice)
 
         obs_dim = len(self.get_extended_observation())
 
@@ -78,7 +78,7 @@ class HandObjEnv(AMLRlEnv):
         self._seed()
 
 
-    def _reset(self, box_pos=[0, 0, 1.4 ], obj_base_fixed = True):
+    def _reset(self, box_pos=[0, 0, 1.4 ], obj_base_fixed = True, hand_choice='four_finger'):
 
         self.setup_env()
 
@@ -92,15 +92,15 @@ class HandObjEnv(AMLRlEnv):
             
             box_ori = [0.,0.,0.,1]
 
-        self._world_id = pb.loadURDF(join(self._urdf_root_path,"plane.urdf"))
+        self._world_id = pb.loadURDF(join(self._urdf_root_path,"plane.urdf"), physicsClientId=self._cid)
         
-        self._table_id = pb.loadURDF(join(self._urdf_root_path, "table.urdf"), useFixedBase=True)
+        self._table_id = pb.loadURDF(join(self._urdf_root_path, "table.urdf"), useFixedBase=True, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._world_id, [0., 0., -0.5], [0.,0.,0.,1])
+        pb.resetBasePositionAndOrientation(self._world_id, [0., 0., -0.5], [0.,0.,0.,1], physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.5], [0.,0.,0.,1])
+        pb.resetBasePositionAndOrientation(self._table_id, [0., 0., 0.5], [0.,0.,0.,1], physicsClientId=self._cid)
 
-        self._object = ManObject(urdf_root_path=self._config['urdf_root_path'], time_step=self._config['time_step'], 
+        self._object = ManObject(cid=self._cid, urdf_root_path=self._config['urdf_root_path'], time_step=self._config['time_step'], 
                                   pos=box_pos, ori=box_ori, scale=scale, 
                                   use_fixed_Base = obj_base_fixed, obj_type='cyl')
         
@@ -108,9 +108,9 @@ class HandObjEnv(AMLRlEnv):
         
         base_hand_ori  = pb.getQuaternionFromEuler([0., 0., 0.])
 
-        hand_j_pos = [0.014906321431778925, 0.9418708340321089, -2.070697592866243, 0.0]#, 0.01464389158008051, 0.7442819989476841, -1.6298398854594098, 0.0]
+        hand_j_pos = [0.014906321431778925, 0.176, -1.900697592866243, 0.0]#, 0.01464389158008051, 0.7442819989476841, -1.6298398854594098, 0.0]
 
-        self._hand = Hand(config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice='pincer')
+        self._hand = Hand(cid=self._cid, config=HAND_CONFIG, pos=base_hand_pos, ori=base_hand_ori, j_pos=hand_j_pos, hand_choice=hand_choice) #
 
         self._num_fingers = self._hand._num_fingers
         
@@ -125,9 +125,9 @@ class HandObjEnv(AMLRlEnv):
 
     def set_friction_properties(self):
 
-        pb.setPhysicsEngineParameter(restitutionVelocityThreshold=0.2)
+        pb.setPhysicsEngineParameter(restitutionVelocityThreshold=0.2, physicsClientId=self._cid)
 
-        pb.changeDynamics(self._table_id,-1,  lateralFriction=1, spinningFriction=1., rollingFriction=1., restitution=0.6)
+        pb.changeDynamics(self._table_id,-1,  lateralFriction=1, spinningFriction=1., rollingFriction=1., restitution=0.6, physicsClientId=self._cid)
 
         self._hand.set_friction_properties(lf=1., sf=1., rf=1., r=0.)
 
@@ -218,7 +218,8 @@ class HandObjEnv(AMLRlEnv):
 
         for fin_no in range(self._hand._num_fingers):
 
-            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], bodyB=self._object._obj_id, linkIndexB=0)
+            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], 
+                                               bodyB=self._object._obj_id, linkIndexB=0, physicsClientId=self._cid)
 
             #contact points on male
             cp_on_finger = []
@@ -259,7 +260,8 @@ class HandObjEnv(AMLRlEnv):
 
         for fin_no in range(self._hand._num_fingers):
 
-            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], bodyB=self._object._obj_id, linkIndexB=0)
+            contact_data = pb.getContactPoints(bodyA=self._hand._robot_id, linkIndexA=self._hand._ee_indexs[fin_no], 
+                                               bodyB=self._object._obj_id, linkIndexB=0, physicsClientId=self._cid)
 
             #contact points on male
             cp_on_finger = []
