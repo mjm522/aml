@@ -27,6 +27,9 @@ class TrajRolloutModel(REPSFwdModel):
         S = np.asarray(self.context_model._data)
         W = np.asarray(self._w_data)
         R = np.asarray(self._reward_data)
+
+        if R.ndim == 1:
+            R = R[:,None]
     
         self.reward_model.fit(X=np.hstack([ S, W ]),  Y=R)
 

@@ -21,15 +21,17 @@ class ContextModel(REPSFwdModel):
     def fit(self, X=None, Y=None):
 
         S = np.asarray(self._data)
-        self._mean = np.mean(S)
-        self._std = np.std(S)
+
+        self._mean = np.mean(S, axis=0)
+        self._std  = np.std(S, axis=0)
+
 
     def sample(self):
 
-        if isinstance(self._mean, np.float):
+        # if isinstance(self._mean, np.float):
         
-            return np.asarray([np.random.normal(loc=self._mean, scale=self._std)])
+        #     return np.asarray([np.random.normal(loc=self._mean, scale=self._std)])
 
-        else:
-
-            return np.random.multivariate_normal(mean=self._mean, cov=np.outer(self._std, self._std))
+        # else:
+        
+        return np.random.multivariate_normal(mean=self._mean, cov=np.outer(self._std, self._std))
