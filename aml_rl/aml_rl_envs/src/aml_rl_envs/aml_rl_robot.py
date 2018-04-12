@@ -31,7 +31,7 @@ class AMLRlRobot(object):
 
     def simple_step(self):
         
-        pb.stepSimulation()
+        pb.stepSimulation(physicsClientId=self._cid)
 
     def set_base_pose(self, pos, ori):
 
