@@ -39,15 +39,15 @@ class SawyerEnv(AMLRlEnv):
 
         self.setup_env()
 
-        self._hole_id = pb.loadURDF(os.path.join(self._urdf_root_path,"square_hole.urdf"), useFixedBase=True, globalScaling=0.5)
+        self._hole_id = pb.loadURDF(os.path.join(self._urdf_root_path,"square_hole.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._hole_id, [0.5, 1,-0.5], [0, 0, -0.707, 0.707])
+        pb.resetBasePositionAndOrientation(self._hole_id, [0.5, 1,-0.5], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._box_id =pb.loadURDF(os.path.join(self._urdf_root_path,"cuboid.urdf"), useFixedBase=False, globalScaling = 0.55)
+        self._box_id =pb.loadURDF(os.path.join(self._urdf_root_path,"cuboid.urdf"), useFixedBase=False, globalScaling = 0.55, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._box_id, [0.5, 0,-0.35], [0, 0, -0.707, 0.707]) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.5, 0,-0.35], [0, 0, -0.707, 0.707], physicsClientId=self._cid) 
                         
-        self._sawyer = Sawyer(config=SAWYER_CONFIG)
+        self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
         
         if self._demo2follow is not None:
             #first joint position in the demo
@@ -68,13 +68,13 @@ class SawyerEnv(AMLRlEnv):
 
          self._observation = self._sawyer.get_observation()
 
-         gripper_state  = pb.getLinkState(self._sawyer._robot_id,self._sawyer._gripper_index)
+         gripper_state  = pb.getLinkState(self._sawyer._robot_id,self._sawyer._gripper_index, physicsClientId=self._cid)
          
          gripper_pos = gripper_state[0]
          
          gripper_ori = gripper_state[1]
          
-         block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id)
+         block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
          inv_gripper_pos, inv_gripper_ori = pb.invertTransform(gripper_pos, gripper_ori)
          
@@ -138,7 +138,7 @@ class SawyerEnv(AMLRlEnv):
             
             self._sawyer.apply_action(action)
             
-            pb.stepSimulation()
+            pb.stepSimulation(physicsClientId=self._cid)
             
             if self.termination():
                 
@@ -164,11 +164,11 @@ class SawyerEnv(AMLRlEnv):
 
     def termination(self):
 
-        state = pb.getLinkState(self._sawyer._robot_id, self._sawyer._ee_index)
+        state = pb.getLinkState(self._sawyer._robot_id, self._sawyer._ee_index, physicsClientId=self._cid)
         
         actualEndEffectorPos = state[0]
             
-        blockPos, blockOrn=pb.getBasePositionAndOrientation(self._box_id)
+        blockPos, blockOrn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
         if (self._terminated or self._env_step_counter>self._max_steps):
             
@@ -190,9 +190,9 @@ class SawyerEnv(AMLRlEnv):
 
         #rewards is height of target object
 
-        block_pos,block_ori=pb.getBasePositionAndOrientation(self._box_id)
+        block_pos,block_ori=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
         
-        closest_points     = pb.getClosestPoints(self._box_id, self._sawyer._robot_id, 1000, -1, self._sawyer._ee_index)
+        closest_points     = pb.getClosestPoints(self._box_id, self._sawyer._robot_id, 1000, -1, self._sawyer._ee_index, physicsClientId=self._cid)
 
         ee_pos, ee_ori = self._sawyer.get_ee_pose()
         

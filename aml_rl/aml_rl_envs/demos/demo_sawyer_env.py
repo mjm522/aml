@@ -9,11 +9,6 @@ def main():
     environment = SawyerEnv()
     
     motors_ids=[]
-    #motors_ids.append(environment._p.addUserDebugParameter("posX",0.4,0.75,0.537))
-    #motors_ids.append(environment._p.addUserDebugParameter("posY",-.22,.3,0.0))
-    #motors_ids.append(environment._p.addUserDebugParameter("posZ",0.1,1,0.2))
-    #motors_ids.append(environment._p.addUserDebugParameter("yaw",-3.14,3.14,0))
-    #motors_ids.append(environment._p.addUserDebugParameter("fingerAngle",0,0.3,.3))
     
     dv = 0.01 
     motors_ids.append(environment._pb.addUserDebugParameter("posX",-dv,dv,0))

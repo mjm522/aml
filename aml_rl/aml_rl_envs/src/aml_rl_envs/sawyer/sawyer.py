@@ -8,7 +8,7 @@ from aml_rl_envs.aml_rl_robot import AMLRlRobot
 
 class Sawyer(AMLRlRobot):
 
-    def __init__(self, config):
+    def __init__(self, config, cid):
 
         self._config = config
 
@@ -16,15 +16,15 @@ class Sawyer(AMLRlRobot):
 
         self._gripper_index = 7
 
-        AMLRlRobot.__init__(self, config)
+        AMLRlRobot.__init__(self, config, cid)
 
         self.reset()
  
     def reset(self):
 
-        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_peg.urdf"), useFixedBase=True)
+        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_peg.urdf"), useFixedBase=True, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000, 1.0000],[0.000000,0.000000,0.000000,1.000000])
+        pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000, 1.0000],[0.000000,0.000000,0.000000,1.000000], physicsClientId=self._cid)
         
         self._jnt_postns=[-5.26523437e-02, -1.18152539e+00, -2.35156250e-03,  2.05699707e+00, 3.74414063e-03,  6.67680664e-01,  3.31310840e+00]
         
@@ -36,7 +36,7 @@ class Sawyer(AMLRlRobot):
         
         for i in self._movable_jnts:
             
-            jnt_info = pb.getJointInfo(self._robot_id, i)
+            jnt_info = pb.getJointInfo(self._robot_id, i, physicsClientId=self._cid)
             
             qIndex = jnt_info[3]
             
@@ -94,11 +94,11 @@ class Sawyer(AMLRlRobot):
         
         for k in range(len(self._movable_jnts)):
             
-            pb.resetJointState(self._robot_id, self._movable_jnts[k], joint_state[k])
+            pb.resetJointState(self._robot_id, self._movable_jnts[k], joint_state[k], physicsClientId=self._cid)
 
     def get_ee_pose(self):
 
-        link_state = pb.getLinkState(self._robot_id, self._ee_index)
+        link_state = pb.getLinkState(self._robot_id, self._ee_index, physicsClientId=self._cid)
         
         ee_pos = np.asarray(link_state[0]) 
         
@@ -108,7 +108,7 @@ class Sawyer(AMLRlRobot):
 
     def get_ee_velocity(self):
 
-        link_state = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1)
+        link_state = pb.getLinkState(self._robot_id, self._ee_index, computeLinkVelocity = 1, physicsClientId=self._cid)
 
         ee_vel = np.asarray(link_state[6]) 
         
@@ -130,7 +130,7 @@ class Sawyer(AMLRlRobot):
 
         for jnt_idx in range(len(self._motor_indices)):
 
-            jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx])
+            jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx], physicsClientId=self._cid)
             
             jnt_pos.append(jnt_state[0])
             
