@@ -7,7 +7,7 @@ urdf_root_path = '/'.join(abspath(__file__).split('/')[:-1] ) + '/models/'
 AML_RL_ENV_CONFIG = {
 	'renders':True,
 	'ctrl_type':'pos',
-	'max_steps':1000,
+	'max_steps':5000,
 	'time_step':1./240.,
 	'urdf_root_path':urdf_root_path,
 	'cam_dist':1.3,
