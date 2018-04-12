@@ -69,7 +69,7 @@ class GPREPSOpt():
 
     def predict_reward(self, s, w):
 
-        new_mu = self._traj_model.predict(s=s, w=w[0])
+        new_mu = self._traj_model.predict(s=s, w=w)
 
         return None, new_mu
 
@@ -84,9 +84,8 @@ class GPREPSOpt():
 
         #get the context
         s_i = self.sample_context()
-
         #compute policy params for each context
-        w_i = self._policy.compute_w(context=s_i)
+        w_i = self._policy.compute_w(context=s_i, transform=True)
         #execute the policy in the environment
         tau_i, R_sw_i = self.predict_reward(s=s_i, w=w_i)
 
@@ -173,6 +172,8 @@ class GPREPSOpt():
 
         for k in range(num_trials):
 
+            self._logger.debug("Collect data itr:=\t%d"%(k))
+
             #get the context
             s_k = self._env.context()
             #compute policy params for each context
@@ -205,6 +206,8 @@ class GPREPSOpt():
         self.learn_fwd_model()
 
         for k in range(self._num_samples_per_update):
+
+            self._logger.debug("K:= \t %d"%(k,))
 
             self.artificial_data()
 
