@@ -117,17 +117,51 @@ class SawyerPegREPS():
 
         return new_dmp_traj['pos']
 
-    def fwd_simulate(self, dmp):
+    def fwd_simulate(self, dmp, joint_space = False):
         """
         implement the dmp
         """
-        return np.random.randn(220,3)
+        # return np.random.randn(220,3)
+        ee_traj = []
+
+
+        for k in range(dmp.shape[0]):
+
+            if joint_space:
+
+                cmd = dmp[k, :]
+
+            else:
+
+                cmd = self._env._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
+
+            self._env._sawyer.apply_action(cmd)
+
+            ee_pos, ee_ori = self._env._sawyer.get_ee_pose()
+            ee_traj.append(ee_pos)
+            
+            # import time
+            # time.sleep(0.01)
+            self._env.simple_step()
+            
+
+
+        return np.asarray(ee_traj)
         
     def context(self):
         """
+        Context is the top face of the box.
 
+            Top face of box:
+                # x : (0.7, 0.7 + 0.15*0.55)
+                # y : (0.1, 0.1 - 0.15*1.90)
+                # z : (0.62, 0.62 + 0.15*2.40)
         """
-        context = np.random.randn(2)
+
+        x = np.random.uniform(0.7, 0.7 + 0.15*0.55)
+        y = np.random.uniform(0.1, 0.1 - 0.15*1.90)
+
+        context = np.array([x,y])
 
         return context
 
