@@ -14,6 +14,7 @@ def main(joint_space=False):
 
     ps = SawyerPegREPS(joint_space, exp_params)
 
+
     for i in range(5):
 
         print "Episode \t", i
