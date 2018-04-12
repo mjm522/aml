@@ -7,6 +7,8 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 from rl_algos.forward_models.context_model import ContextModel
 from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
 
+np.random.seed(123)
+
 rewards = []
 random_state = np.random.RandomState(0)
 initial_params = 4.0 * np.ones(1)
@@ -16,7 +18,6 @@ n_episodes = 64
 w_dim = len(initial_params)
 num_samples_fwd_data = 50
 test_contexts = np.arange(-6, 6, 0.1)
-
 
 env = Env(x0=0., n_samples_per_update=n_samples_per_update, random_state=random_state)
 

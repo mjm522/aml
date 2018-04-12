@@ -25,7 +25,7 @@ mycreps = CREPSOpt(entropy_bound=2.0, initial_params=initial_params, num_policy_
 
 for it in range(n_episodes):
 
-	print "Episode \t", it
+    print "Episode \t", it
 
     mycreps.run()
 
