@@ -33,6 +33,8 @@ class SawyerEnv(AMLRlEnv):
 
         self.set_space_lims(obs_dim, 9, None, None, False)
 
+        self._goal_ori = np.asarray(pb.getEulerFromQuaternion((-0.52021453, -0.49319602,  0.47898476, 0.50666373)))
+
     def _reset(self):
 
         self.setup_env()
@@ -43,7 +45,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._box_id, [0.62, 0.075, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.65145, 0.015, 0.56], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
                         
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
 
@@ -192,31 +194,46 @@ class SawyerEnv(AMLRlEnv):
 
         def alignment_reward():
 
-            reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+            # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
 
-            traj_end_vector = traj[-1, :] - traj[-end_id, :]
-            traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+            ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
 
-            cos_angle = np.dot(traj_end_vector, reference_vector)
+            ori_diff_norm = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(ee_ori))-self._goal_ori)
 
-            return abs(cos_angle)
+            np.array([ [0.65145, 0.65145 + 0.15*0.55], 
+                       [0.015,   0.015 - 0.15*1.90] ] )
 
-        def completion_reward():
+            reward = -ori_diff_norm
 
-            # 0.6776011368  -0.1101703639   1.0655471412
+            if (0.65145 < ee_pos[0] < 0.65145 + 0.15*0.55) and (0.015 < ee_pos[1] < 0.015 - 0.15*1.90):
 
-            required_z_val = 1.06554
-
-            # checking if the final position of the rolled-out trajectory reached the depth required for insertion
-            if abs(traj[-1, 2] - required_z_val) < 0.2:
-                reward = 10
+                reward += 2.
             else:
-                reward = -20
+                reward -= 2.
 
-            return reward
+            # traj_end_vector = traj[-1, :] - traj[-end_id, :]
+            # traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+            # cos_angle = np.dot(traj_end_vector, reference_vector)
+
+            return reward 
 
 
-        return scale[0]*alignment_reward() + scale[1]*completion_reward()
+        # def completion_reward():
+
+        #     # 0.6776011368  -0.1101703639   1.0655471412
+
+        #     required_z_val = 1.06554
+
+        #     # checking if the final position of the rolled-out trajectory reached the depth required for insertion
+        #     if abs(traj[-1, 2] - required_z_val) < 0.2:
+        #         reward = 10
+        #     else:
+        #         reward = -20
+
+        #     return reward
+
+
+        return scale[0]*alignment_reward() #+ scale[1]*completion_reward()
 
     def fwd_simulate(self, dmp, joint_space = False):
         """
@@ -244,9 +261,12 @@ class SawyerEnv(AMLRlEnv):
             # import time
             # time.sleep(0.01)
             self.simple_step()
+
+        block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
+
+        # print "Block pos \t", np.asarray(block_pos)
+        # print "EE pos\t", np.asarray(ee_pos)
             
-
-
         return np.asarray(ee_traj)
         
     def context(self):
@@ -257,10 +277,17 @@ class SawyerEnv(AMLRlEnv):
                 # x : (0.7, 0.7 + 0.15*0.55)
                 # y : (0.1, 0.1 - 0.15*1.90)
                 # z : (0.62, 0.62 + 0.15*2.40)
+
+                 0.69274812 -0.13284674  0.9552463
+                 0.65145, 0.00966, 
+
+                 0.6927 - 0.5*0.15*0.55 = 0.65145
+                 -0.13284 + 0.5*0.15*1.9 = 0.00966
+                 0.65145, 0.015
         """
 
-        x = np.random.uniform(0.7, 0.7 + 0.15*0.55)
-        y = np.random.uniform(0.1, 0.1 - 0.15*1.90)
+        x = np.random.uniform(0.6700, 0.70000)#(0.65145, 0.65145 + 0.15*0.55)
+        y = np.random.uniform(0.1, -0.21)#(0.015, 0.015 - 0.15*1.90)
 
         context = np.array([x,y])
 
@@ -269,7 +296,7 @@ class SawyerEnv(AMLRlEnv):
 
     def execute_policy(self, w, s, show_demo=False):
 
-        dmp = self._demo2follow() #goal_offset=np.r_[w, 0]
+        dmp = self._demo2follow(goal_offset=np.r_[w, 0]) #
 
         if show_demo:
             plot_demo(dmp, start_idx=0, life_time=4, cid=self._cid)

@@ -62,12 +62,19 @@ class SawyerPegREPS():
         self.encode_dmps()
 
     def setup_gpreps(self, exp_params):
+
+        #w_bounds[:,0] = [x_lower, y_lower]
+        #w_bounds[:,1] = [x_upper, y_upper]
+        w_bounds = np.array([ [0.65145, 0.65145 + 0.15*0.55], 
+                              [0.015,   0.015 - 0.15*1.90] ] )
+
         
         policy = LinGaussPolicy(w_dim=exp_params['w_dim'], 
                                 context_feature_dim=exp_params['context_feature_dim'], 
                                 variance=exp_params['policy_variance'], 
                                 initial_params=exp_params['initial_params'], 
-                                random_state=exp_params['random_state'])
+                                random_state=exp_params['random_state'],
+                                bounds=w_bounds)
 
         context_model = ContextModel(context_dim=exp_params['context_dim'], 
                                     num_data_points=exp_params['num_samples_fwd_data'])
@@ -112,7 +119,7 @@ class SawyerPegREPS():
 
         config['y0'] = dmp._traj_data[0, 1:] + start_offset
         config['dy'] = np.zeros(self._dof)
-        config['goals'] = dmp._traj_data[-1, 1:] + goal_offset
+        config['goals'] =  goal_offset #dmp._traj_data[-1, 1:] +
         config['tau'] = 1./speed
         config['phase_start'] = phase_start
 
@@ -126,6 +133,10 @@ class SawyerPegREPS():
 
         new_dmp_traj = dmp.generate_trajectory(config=config)
 
-        return new_dmp_traj['pos']
+        # import matplotlib.pyplot as plt
+        # plt.plot(new_dmp_traj['pos'][:1000,0])
+        # plt.show()
+
+        return new_dmp_traj['pos'][:900, :]
 
 

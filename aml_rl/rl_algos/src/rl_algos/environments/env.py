@@ -28,5 +28,10 @@ class Env():
         return None, self.reward(w, s)
 
 
+    def _reset(self):
+
+        pass
+
+
 
 
