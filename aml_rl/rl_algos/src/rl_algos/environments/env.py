@@ -23,7 +23,7 @@ class Env():
 
         return -np.array([x_offset.dot(x_offset)])
 
-    def execute_policy(self, w, s):
+    def execute_policy(self, w, s, **kwargs):
         
         return None, self.reward(w, s)
 
