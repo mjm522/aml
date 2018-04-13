@@ -30,6 +30,7 @@ class AMLRlRobot(object):
 
         self._robot_id = robot_id
 
+        
     def simple_step(self):
         
         pb.stepSimulation(physicsClientId=self._cid)
@@ -86,6 +87,10 @@ class AMLRlRobot(object):
                 
                 pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL, targetPosition=self._jnt_postns[k], force=0.5, physicsClientId=self._cid)
 
+        if 'enable_force_torque_sensors' in self._config.keys() and self._config['enable_force_torque_sensors']:
+            self.enable_force_torque_sensors()
+
+
     
     def set_friction_properties(self, lf=1., sf=1., rf=1., r=0.7):
 
@@ -94,10 +99,14 @@ class AMLRlRobot(object):
             pb.changeDynamics(self._robot_id, jnt_idx,   lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
 
-    def enable_force_torque_sensors(self, joint_idx = -2):
+    def enable_force_torque_sensors(self, joint_idx = None):
 
-        for i in self._jnt_indexs:
+        if joint_idx is None:
+            indices = self._jnt_indexs
+        else:
+            indices = joint_idx
 
+        for i in indices:
             pb.enableJointForceTorqueSensor(self._robot_id, i, 1, physicsClientId=self._cid)
 
 
@@ -188,27 +197,42 @@ class AMLRlRobot(object):
         return np.asarray(tau)
 
 
-    def get_jnt_state(self):
+    def get_jnt_state(self, idx = None):
 
-        jnt_poss = []
-        jnt_vels = []
-        jnt_reaction_forces =  []
-        jnt_applied_torques  = []
+        if idx is None:
+            jnt_poss = []
+            jnt_vels = []
+            jnt_reaction_forces =  []
+            jnt_applied_torques  = []
 
-        for jnt_idx in self._jnt_indexs:
+            for jnt_idx in self._jnt_indexs:
 
-            jnt_state = pb.getJointState(self._robot_id, jnt_idx)
+                jnt_state = pb.getJointState(self._robot_id, jnt_idx)
+                
+                jnt_poss.append(jnt_state[0])
+                
+                jnt_vels.append(jnt_state[1])
+                
+                jnt_reaction_forces.append(jnt_state[2])
+                
+                jnt_applied_torques.append(jnt_state[3])
+
+
+            return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
+
+        else:
+
+            jnt_state = pb.getJointState(self._robot_id, idx)
+                
+            jnt_poss = jnt_state[0]
             
-            jnt_poss.append(jnt_state[0])
+            jnt_vels = jnt_state[1]
             
-            jnt_vels.append(jnt_state[1])
+            jnt_reaction_forces = jnt_state[2]
             
-            jnt_reaction_forces.append(jnt_state[2])
-            
-            jnt_applied_torques.append(jnt_state[3])
+            jnt_applied_torques = jnt_state[3]
 
-
-        return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
+            return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
 
     
     def apply_jnt_ctrl(self, cmd, Kp=None):

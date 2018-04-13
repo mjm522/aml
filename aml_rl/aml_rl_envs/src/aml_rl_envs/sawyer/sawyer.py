@@ -21,6 +21,8 @@ class Sawyer(AMLRlRobot):
         self._joint_tags = dict(zip(self.get_joint_names(), range(pb.getNumJoints(self._robot_id, physicsClientId=self._cid))))
 
         self._ee_index = self._joint_tags['right_poking_stick_tip_fixed']
+
+        self._ft_sensor_jnt = self._joint_tags['right_wrist']
  
     def reset(self):
 
@@ -84,6 +86,15 @@ class Sawyer(AMLRlRobot):
 
         return self.get_ee_state(self._ee_index, as_tuple)
 
+    def get_ee_wrench(self):
+        '''
+            End effector forces and torques
+        '''
+
+        jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = self.get_jnt_state(self._ft_sensor_jnt)
+
+        return jnt_reaction_forces[:3], jnt_reaction_forces[3:]
+
 
     def inv_kin(self, ee_pos, ee_ori=None):
 
@@ -118,31 +129,31 @@ class Sawyer(AMLRlRobot):
 
         return ee_vel, ee_omg 
 
-    def get_jnt_state(self):
+    # def get_jnt_state(self):
 
-        num_jnts = len(self._motor_indices)
+    #     num_jnts = len(self._motor_indices)
 
-        jnt_pos = []
+    #     jnt_pos = []
         
-        jnt_vel = []
+    #     jnt_vel = []
         
-        jnt_reaction_forces =  []
+    #     jnt_reaction_forces =  []
         
-        jnt_applied_torque  = []
+    #     jnt_applied_torque  = []
 
-        for jnt_idx in range(len(self._motor_indices)):
+    #     for jnt_idx in range(len(self._motor_indices)):
 
-            jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx], physicsClientId=self._cid)
+    #         jnt_state = pb.getJointState(self._robot_id, self._motor_indices[jnt_idx], physicsClientId=self._cid)
             
-            jnt_pos.append(jnt_state[0])
+    #         jnt_pos.append(jnt_state[0])
             
-            jnt_vel.append(jnt_state[1])
+    #         jnt_vel.append(jnt_state[1])
             
-            jnt_reaction_forces.append(jnt_state[2])
+    #         jnt_reaction_forces.append(jnt_state[2])
             
-            jnt_applied_torque.append(jnt_state[3])
+    #         jnt_applied_torque.append(jnt_state[3])
 
-        return jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque
+    #     return jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque
 
     def apply_action(self, motor_commands):
 

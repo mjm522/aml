@@ -51,9 +51,12 @@ class SawyerPegREPS():
         else:
             #in this file, the orientation is in [w,x,y,z] format
             #pos, ori, vel, omg is the sequence in which data is stored
-            path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states.csv'
-            self._demo_traj = load_csv_data(path_to_demo)[:, :3]
+            path_to_demo_1 = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states.csv'
+            path_to_demo_2 = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states_2.csv'
+            self._demo_traj = load_csv_data(path_to_demo_1)[:, :3]
+            self._demo_traj_2 = load_csv_data(path_to_demo_2)[:, :3]
             # self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
+            assert self._demo_traj.shape[1] == self._demo_traj_2.shape[1]
 
         self._dof = self._demo_traj.shape[1]
 
@@ -108,18 +111,35 @@ class SawyerPegREPS():
         self._man_dmp['obj'].load_demo_trajectory(self._demo_traj)
         self._man_dmp['obj'].train()
 
-    def update_dmp_params(self, phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
+
+        self._insertion_dmp = {}
+        self._insertion_dmp['config'] = discrete_dmp_config
+        self._insertion_dmp['obj'] = DiscreteDMP(config=discrete_dmp_config)
+
+        self._insertion_dmp['obj'].load_demo_trajectory(self._demo_traj_2)
+        self._insertion_dmp['obj'].train()
+
+    def update_dmp_params(self, dmp_type = 'reach_hole', phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
 
         if goal_offset is None: goal_offset = np.zeros(self._dof)
 
         if start_offset is None: start_offset = np.zeros(self._dof)
 
-        dmp    = self._man_dmp['obj']
-        config = self._man_dmp['config']
+
+        if dmp_type == 'reach_hole':    
+
+            dmp    = self._man_dmp['obj']
+            config = self._man_dmp['config']
+
+        elif dmp_type == 'insert':
+
+            dmp    = self._insertion_dmp['obj']
+            config = self._insertion_dmp['config']
+
 
         config['y0'] = dmp._traj_data[0, 1:] + start_offset
         config['dy'] = np.zeros(self._dof)
-        config['goals'] =  dmp._traj_data[-1, 1:] + goal_offset 
+        config['goals'] = dmp._traj_data[-1, 1:] + goal_offset #dmp._traj_data[-1, 1:] +
         config['tau'] = 1./speed
         config['phase_start'] = phase_start
 
@@ -137,7 +157,12 @@ class SawyerPegREPS():
         # plt.plot(new_dmp_traj['pos'][:1000,0])
         # plt.show()
 
-        return new_dmp_traj['pos'][:900, :]
+        if dmp_type == 'reach_hole':
+            return new_dmp_traj['pos'][:900, :]
+
+        elif dmp_type == 'insert':
+            return new_dmp_traj['pos']
+
 
     def trial_check(self, goal_offset, plot_color=[0,0,1]):
 
@@ -153,5 +178,3 @@ class SawyerPegREPS():
         hole = self._eval_env._hole_locs[hole_id]
 
         self.trial_check(goal_offset=hole, plot_color=colors[hole_id])
-
-

@@ -56,6 +56,8 @@ class SawyerEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._box_id, [0.65145, 0.015, 0.56], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
                         
+        SAWYER_CONFIG['enable_force_torque_sensors'] = True
+
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
 
         self.simple_step()
