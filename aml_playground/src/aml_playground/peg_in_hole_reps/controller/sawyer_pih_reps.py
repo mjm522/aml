@@ -35,17 +35,18 @@ class SawyerPegREPS():
 
         self._exp_params = exp_params
 
-        kwargs = {}
-        kwargs['limb_name'] = 'right' 
-
-        path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/right_sawyer_exp_peg_in_hole_01.pkl'
-
-        if not os.path.exists(path_to_demo):
-            raise Exception("Enter a valid demo path")
-        else:
-            kwargs['path_to_demo'] = path_to_demo
-
         if joint_space:
+
+            kwargs = {}
+            kwargs['limb_name'] = 'right' 
+
+            path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/right_sawyer_exp_peg_in_hole_01.pkl'
+
+            if not os.path.exists(path_to_demo):
+                raise Exception("Enter a valid demo path")
+            else:
+                kwargs['path_to_demo'] = path_to_demo
+
             self._gen_traj = JSTrajGenerator(load_from_demo=True, **kwargs)
             self._demo_traj = self._gen_traj.generate_traj()['pos_traj']
         else:
@@ -119,7 +120,7 @@ class SawyerPegREPS():
         self._insertion_dmp['obj'].load_demo_trajectory(self._demo_traj_2)
         self._insertion_dmp['obj'].train()
 
-    def update_dmp_params(self, dmp_type = 'reach_hole', phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
+    def update_dmp_params(self, dmp_type='reach_hole', phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
 
         if goal_offset is None: goal_offset = np.zeros(self._dof)
 
@@ -164,17 +165,23 @@ class SawyerPegREPS():
             return new_dmp_traj['pos']
 
 
-    def trial_check(self, goal_offset, plot_color=[0,0,1]):
+    def trial_check(self, dmp_type, goal_offset=None, start_offset=None, plot_color=[0,0,1]):
 
-        dmp = self.update_dmp_params(goal_offset=goal_offset)
+        dmp = self.update_dmp_params(dmp_type=dmp_type, goal_offset=goal_offset, start_offset=start_offset)
         plot_demo(dmp, start_idx=0, life_time=0, color=plot_color)
         ee_traj = self._eval_env.fwd_simulate(dmp, joint_space=False)
-        self._eval_env._sawyer.set_joint_state(self._eval_env._sawyer._jnt_postns)
+        
 
-    def goto_hole(self, hole_id=3):
+    def goto_hole(self, hole_id=2):
 
         colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
-        
         hole = self._eval_env._hole_locs[hole_id]
+        self.trial_check(dmp_type='reach_hole', goal_offset=hole, plot_color=colors[hole_id])
 
-        self.trial_check(goal_offset=hole, plot_color=colors[hole_id])
+    def insert_hole(self, hole_id=2):
+
+        colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
+        hole = self._eval_env._hole_locs[hole_id]
+        self.trial_check(dmp_type='insert', start_offset=hole, goal_offset=hole, plot_color=colors[hole_id])
+
+
