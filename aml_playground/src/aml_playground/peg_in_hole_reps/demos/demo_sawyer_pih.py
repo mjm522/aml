@@ -36,6 +36,10 @@ def main(joint_space=False):
 
     ps = SawyerPegREPS(joint_space, exp_params)
 
+    # for k in range(5):
+
+    #     ps.goto_hole(hole_id=k)
+
     # get_ee_traj(ps._sim_env, ps._demo_traj)
 
     plt.figure("Mean reward")

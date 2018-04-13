@@ -119,7 +119,7 @@ class SawyerPegREPS():
 
         config['y0'] = dmp._traj_data[0, 1:] + start_offset
         config['dy'] = np.zeros(self._dof)
-        config['goals'] =  goal_offset #dmp._traj_data[-1, 1:] +
+        config['goals'] =  dmp._traj_data[-1, 1:] + goal_offset 
         config['tau'] = 1./speed
         config['phase_start'] = phase_start
 
@@ -138,5 +138,20 @@ class SawyerPegREPS():
         # plt.show()
 
         return new_dmp_traj['pos'][:900, :]
+
+    def trial_check(self, goal_offset, plot_color=[0,0,1]):
+
+        dmp = self.update_dmp_params(goal_offset=goal_offset)
+        plot_demo(dmp, start_idx=0, life_time=0, color=plot_color)
+        ee_traj = self._eval_env.fwd_simulate(dmp, joint_space=False)
+        self._eval_env._sawyer.set_joint_state(self._eval_env._sawyer._jnt_postns)
+
+    def goto_hole(self, hole_id=3):
+
+        colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
+        
+        hole = self._eval_env._hole_locs[hole_id]
+
+        self.trial_check(goal_offset=hole, plot_color=colors[hole_id])
 
 
