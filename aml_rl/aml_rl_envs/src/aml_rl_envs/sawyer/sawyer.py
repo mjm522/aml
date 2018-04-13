@@ -12,13 +12,15 @@ class Sawyer(AMLRlRobot):
 
         self._config = config
 
-        self._ee_index = 20#20#16
-
         self._gripper_index = 7
 
         AMLRlRobot.__init__(self, config, cid)
 
         self.reset()
+
+        self._joint_tags = dict(zip(self.get_joint_names(), range(pb.getNumJoints(self._robot_id, physicsClientId=self._cid))))
+
+        self._ee_index = self._joint_tags['right_poking_stick_tip_fixed']
  
     def reset(self):
 

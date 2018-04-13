@@ -244,3 +244,34 @@ class AMLRlRobot(object):
                 
         return {'lower': lower_lim, 'upper':upper_lim, 'mean':mean_, 'range': range_}
 
+    def get_joint_names(self, joint_idx=None):
+        joint_names = []
+        joint_info = self.get_joint_info(joint_idx)
+
+        for joint in joint_info:
+            joint_names.append(joint['jointName'])
+        return joint_names
+
+    def get_joint_info(self, joint_idx=None):
+
+        attribute_list = ['jointIndex', 'jointName', 'jointType',
+                          'qIndex', 'uIndex', 'flags',
+                          'jointDamping', 'jointFriction', 'jointLowerLimit',
+                          'jointUpperLimit', 'jointMaxForce', 'jointMaxVelocity', 'linkName']
+
+        if joint_idx is None:
+            joint_indices = range(pb.getNumJoints(self._robot_id, physicsClientId=self._cid))
+
+        else:
+            if not isinstance(joint_idx, list):
+                joint_indices = [joint_idx]
+            else:
+                joint_indices = joint_idx
+
+        joint_details = []
+
+        for j_indx in joint_indices:
+            joint_details.append(dict(zip(attribute_list, pb.getJointInfo(self._robot_id, j_indx))))
+
+        return joint_details
+
