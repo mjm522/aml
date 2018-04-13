@@ -37,7 +37,7 @@ def main(joint_space=False):
 
     while True:
 
-        for k in range(5):
+        for k in range(2,3):
             ps.goto_hole(hole_id=k)
             ps.insert_hole(hole_id=k)
             ps._eval_env._sawyer.set_joint_state(ps._eval_env._sawyer._jnt_postns)

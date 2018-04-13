@@ -261,8 +261,8 @@ class SawyerEnv(AMLRlEnv):
                 cmd = dmp[k, :]
 
             else:
-
-                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
+                goal_ori = (-0.52021453, -0.49319602, 0.47898476, 0.50666373)
+                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist(), ee_ori=None)
 
             self._sawyer.apply_action(cmd)
 
