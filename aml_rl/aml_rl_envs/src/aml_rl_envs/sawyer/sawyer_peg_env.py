@@ -35,6 +35,15 @@ class SawyerEnv(AMLRlEnv):
 
         self._goal_ori = np.asarray(pb.getEulerFromQuaternion((-0.52021453, -0.49319602,  0.47898476, 0.50666373)))
 
+        #facing sawyer, from left side
+        hole1 = np.array([0., -0.725*0.15, 0.])
+        hole2 = np.array([0., -0.425*0.15, 0.])
+        hole3 = np.array([0., 0., 0.])
+        hole4 = np.array([0., 0.375*0.15, 0.])
+        hole5 = np.array([0., 0.775*0.15, 0.])
+
+        self._hole_locs = [hole1, hole2, hole3, hole4, hole5]
+
     def _reset(self):
 
         self.setup_env()
