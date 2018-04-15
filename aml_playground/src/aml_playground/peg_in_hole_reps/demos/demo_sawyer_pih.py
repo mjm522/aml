@@ -35,64 +35,42 @@ def main(joint_space=False):
 
     ps = SawyerPegREPS(joint_space, exp_params)
 
+    while True:
+
+        for k in range(2,3):
+            ps.goto_hole(hole_id=k)
+            ps.insert_hole(hole_id=k)
+            ps._eval_env._sawyer.set_joint_state(ps._eval_env._sawyer._jnt_postns)
+
+            raw_input("Press enter for next hole %d"%(k+2,))
+
     # get_ee_traj(ps._sim_env, ps._demo_traj)
 
     # plt.figure("Mean reward")
-    plt.figure("forces")
+    # plt.figure("forces")
     # plt.ion()
 
-    dmp = ps.update_dmp_params(dmp_type = 'reach_hole')
-
-    dmp2 = ps.update_dmp_params(dmp_type = 'insert')
 
     # plot_demo(dmp, start_idx=0, life_time=4)
 
 
-    forces1 = []
-    forces2 = []
-    forces3 = []
-    for k in range(dmp.shape[0]):
+    # forces1 = []
+    # forces2 = []
+    # forces3 = []
 
-        if joint_space:
 
-            cmd = dmp[k, :]
+    # _,_,f,_ = ps._eval_env._sawyer.get_jnt_state(16)
+    # print f#, t
 
-        else:
-
-            cmd = ps._eval_env._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
-
-        ps._eval_env._sawyer.apply_action(cmd)
-
-        time.sleep(0.01)
-        ps._eval_env.simple_step()
-
-    for k in range(dmp2.shape[0]):
-
-        if joint_space:
-
-            cmd = dmp2[k, :]
-
-        else:
-
-            cmd = ps._eval_env._sawyer.inv_kin(ee_pos=dmp2[k, :].tolist())
-
-        ps._eval_env._sawyer.apply_action(cmd)
-
-        # _,_,f,_ = ps._eval_env._sawyer.get_jnt_state(16)
-        # print f#, t
-
-        # forces1.append(f[0])
-        # forces2.append(f[1])
-        # forces3.append(f[2])
+    # forces1.append(f[0])
+    # forces2.append(f[1])
+    # forces3.append(f[2])
 
 
 
-        # ee_pos, ee_ori = ps._eval_env._sawyer.get_ee_pose()
-        # ee_traj.append(ee_pos)
-        
-        # import time
-        time.sleep(0.01)
-        ps._eval_env.simple_step()
+    # ee_pos, ee_ori = ps._eval_env._sawyer.get_ee_pose()
+    # ee_traj.append(ee_pos)
+    
 
     # for i in range(200):
     # plt.subplot(311)

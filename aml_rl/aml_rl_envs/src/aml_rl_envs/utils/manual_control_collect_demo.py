@@ -89,15 +89,13 @@ class ManualDemoCollect():
 
         self._file_name = self._demo_folder_path + '/block_js_ee_pos_data_dual_rotate_2'+'.csv'
 
-        #[-0.21051368124249195, -0.12633433487836554, -0.7156230615033555, 1.852675955788801, 1.6842031842541567, 0.21052783567465566, -0.5054749275337799, 0., 0., 0.])
-
         self.setup_manual_control(default_joint_state=self._robot._jnt_postns)
 
     def setup_manual_control(self, default_joint_state=None):
         """
         setup manula control sliders on the bullet window
         """
-        
+    
         self._jnt_ids=[]
         self._param_ids=[]
 
@@ -109,6 +107,7 @@ class ManualDemoCollect():
             # p.changeDynamics(self._robot_id,j,linearDamping=0, angularDamping=0)
             info = p.getJointInfo(self._robot_id, j)
             #print(info)
+            
             jointName = info[1]
             jointType = info[2]
             if (jointType==p.JOINT_PRISMATIC or jointType==p.JOINT_REVOLUTE):
@@ -146,10 +145,10 @@ class ManualDemoCollect():
 
                 # print "Demo end location saved: Start is now: \t", self._end
 
-            for i in range(len(self._param_ids)):
-                c = self._param_ids[i]
+            for i in range(len(self.param_ids)):
+                c = self.param_ids[i]
                 targetPos = p.readUserDebugParameter(c)
-                p.setJointMotorControl2(self._robot_id, self._jnt_ids[i], p.POSITION_CONTROL, targetPos, force=5*240.)
+                p.setJointMotorControl2(self._robot_id, self.joint_ids[i], p.POSITION_CONTROL, targetPos, force=5*240.)
 
 
     def collect_demo(self):
