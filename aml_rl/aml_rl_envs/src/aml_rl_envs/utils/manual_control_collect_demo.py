@@ -70,7 +70,7 @@ def get_desired_path(start, goal, only_pos):
 
 class ManualDemoCollect():
 
-    def __init__(self, manipulator, demo_path=os.environ["ROOT_DIR"]+'/data/new_data'):
+    def __init__(self, manipulator, demo_path=os.environ["AML_DATA"]+'/data/new_data'):
         """
         constructor of the class
         Args:
@@ -78,7 +78,7 @@ class ManualDemoCollect():
         """
 
         self._robot = manipulator
-        self._robot_id = manipulator.robotUid
+        self._robot_id = manipulator._robot_id
         self._start = None
         self._end = None
 
@@ -91,20 +91,20 @@ class ManualDemoCollect():
 
         #[-0.21051368124249195, -0.12633433487836554, -0.7156230615033555, 1.852675955788801, 1.6842031842541567, 0.21052783567465566, -0.5054749275337799, 0., 0., 0.])
 
-        self.setup_manual_control(default_joint_state=[-1.642, 1.221, -1.684, 0.])
+        self.setup_manual_control(default_joint_state=self._robot._jnt_postns)
 
     def setup_manual_control(self, default_joint_state=None):
         """
         setup manula control sliders on the bullet window
         """
         
-        self.jointIds=[]
-        self.paramIds=[]
+        self._jnt_ids=[]
+        self._param_ids=[]
 
         # gravId = p.addUserDebugParameter("gravity",-10,10,-10)
 
         jnt_idx = -1
-        for j in self._robot.movable_joints:
+        for j in self._robot._movable_jnts:
             jnt_idx += 1
             # p.changeDynamics(self._robot_id,j,linearDamping=0, angularDamping=0)
             info = p.getJointInfo(self._robot_id, j)
@@ -112,11 +112,11 @@ class ManualDemoCollect():
             jointName = info[1]
             jointType = info[2]
             if (jointType==p.JOINT_PRISMATIC or jointType==p.JOINT_REVOLUTE):
-                self.jointIds.append(j)
+                self._jnt_ids.append(j)
                 if default_joint_state is None:
-                    self.paramIds.append(p.addUserDebugParameter(jointName.decode("utf-8"),-4,4,0.))
+                    self._param_ids.append(p.addUserDebugParameter(jointName.decode("utf-8"),-4,4,0.))
                 else:
-                    self.paramIds.append(p.addUserDebugParameter(jointName.decode("utf-8"),-4,4, default_joint_state[jnt_idx]))
+                    self._param_ids.append(p.addUserDebugParameter(jointName.decode("utf-8"),-4,4, default_joint_state[jnt_idx]))
 
         p.setRealTimeSimulation(1)
 
@@ -146,10 +146,10 @@ class ManualDemoCollect():
 
                 # print "Demo end location saved: Start is now: \t", self._end
 
-            for i in range(len(self.paramIds)):
-                c = self.paramIds[i]
+            for i in range(len(self._param_ids)):
+                c = self._param_ids[i]
                 targetPos = p.readUserDebugParameter(c)
-                p.setJointMotorControl2(self._robot_id, self.jointIds[i], p.POSITION_CONTROL, targetPos, force=5*240.)
+                p.setJointMotorControl2(self._robot_id, self._jnt_ids[i], p.POSITION_CONTROL, targetPos, force=5*240.)
 
 
     def collect_demo(self):
