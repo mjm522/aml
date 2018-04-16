@@ -86,9 +86,6 @@ class BulletSawyerPisa(RobotInterface):
                                  0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
         self._ready = True
 
-    def _on_joint_states(self, msg):
-        print 'NOT IMPLEMENTED'
-
     def exec_position_cmd(self, cmd):
         self._bullet_robot.set_joint_positions(cmd, self._joints)
 
@@ -107,8 +104,44 @@ class BulletSawyerPisa(RobotInterface):
     def exec_torque_cmd(self, cmd):
         self._bullet_robot.set_joint_torques(cmd, self._joints)
 
-    def forward_kinematics(self, joint_angles=None):
-        print 'NOT IMPLEMENTED'
+    def forward_kinematics(self, joint_angles=None, ori_type='quat'):
+
+        if joint_angles is None:
+
+            argument = None
+
+        else:
+
+            argument = dict(zip(self.joint_names(), joint_angles))
+
+        # combine the names and joint angles to a dictionary, that only is accepted by kdl
+        pose = np.array(self._kinematics.forward_position_kinematics(argument))
+        position = pose[0:3][:, None]  # senting as  column vector
+
+        w = pose[6]
+        x = pose[3]
+        y = pose[4]
+        z = pose[5]  # quarternions
+
+        rotation = quaternion.quaternion(w, x, y, z)
+
+        # formula for converting quarternion to rotation matrix
+
+        if ori_type == 'mat':
+
+            # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
+            #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
+            #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
+
+            rotation = quaternion.as_rotation_matrix(rotation)
+
+        elif ori_type == 'eul':
+
+            rotation = quaternion.as_euler_angles(rotation)
+        elif ori_type == 'quat':
+            pass
+
+        return position, rotation
 
     def inverse_kinematics(self, position, orientation=None):
         return self._bullet_robot.inverse_kinematics(position, orientation)[self._joints]
