@@ -7,6 +7,7 @@ import numpy as np
 import pybullet as pb
 from gym import spaces
 from gym.utils import seeding
+from aml_io.log_utils import aml_logging
 from aml_rl_envs.aml_rl_env import AMLRlEnv
 from aml_rl_envs.sawyer.sawyer import Sawyer
 from aml_rl_envs.utils.collect_demo import plot_demo
@@ -18,6 +19,8 @@ class SawyerEnv(AMLRlEnv):
     def __init__(self, demo2follow=None, config=SAWYER_ENV_CONFIG):
 
         self._config = config
+
+        self._logger = aml_logging.get_logger(__name__)
 
         self._action_repeat = config['action_repeat']
 
@@ -52,9 +55,9 @@ class SawyerEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
+        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.11, physicsClientId=self._cid)
         #0.6876992
-        pb.resetBasePositionAndOrientation(self._box_id, [0.6876992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler([0., 0., 0.]), physicsClientId=self._cid) 
+        pb.resetBasePositionAndOrientation(self._box_id, [0.7076992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler([0., 0., -3.14/2]), physicsClientId=self._cid) 
                         
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
 
@@ -198,56 +201,56 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [0.003, 3]):
+    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [0.003, 3, 2, 0.25]):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
 
-        # def alignment_reward():
+        def alignment_reward():
 
-        #     # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+            # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
 
-        #     ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
+            ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
 
-        #     ori_diff_norm = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(ee_ori))-self._goal_ori)
+            block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
-        #     np.array([ [0.65145, 0.65145 + 0.15*0.55], 
-        #                [0.015,   0.015 - 0.15*1.90] ] )
+            block_ori = np.asarray(pb.getEulerFromQuaternion(block_orn))
+            ee_ori = np.asarray(pb.getEulerFromQuaternion(ee_ori)) - np.array([[-3.08578398,  0.11448067, -3.1304143+1.57 ]])
 
-        #     reward = -ori_diff_norm
+            if block_ori[2] > 3.14:
+                block_ori[2] = 3.14 - block_ori[2]
 
-        #     if (0.65145 < ee_pos[0] < 0.65145 + 0.15*0.55) and (0.015 < ee_pos[1] < 0.015 - 0.15*1.90):
+            print "block ori \t", block_ori
+            print "ee_ori \t", ee_ori
 
-        #         reward += 2.
-        #     else:
-        #         reward -= 2.
+            # raw_input()
 
-        #     # traj_end_vector = traj[-1, :] - traj[-end_id, :]
-        #     # traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
-        #     # cos_angle = np.dot(traj_end_vector, reference_vector)
+            ori_diff_norm = np.linalg.norm(ee_ori[:,2]-block_ori[2])
 
-        #     return reward 
+            reward = -ori_diff_norm
+
+            return reward 
 
 
         def penalise_wrong_contacts(traj_data):
 
             penalty = 0
 
-            contact_list = traj_data['contact_details']
+            # contact_list = traj_data['contact_details']
 
-            for i in range(len(contact_list)):
+            # for i in range(len(contact_list)):
 
-                if contact_list[i] is None:
-                    continue
+            #     if contact_list[i] is None:
+            #         continue
 
-                else:
+            #     else:
 
-                    for contact_num in range(len(contact_list[i])):
-                        # penalise for any contact that is not with base of the box (-1)
-                        if contact_list[i][contact_num]['obj_link'] != -1:
-                            penalty += 1
-                        else:
-                            penalty -= 1
+            #         for contact_num in range(len(contact_list[i])):
+            #             # penalise for any contact that is not with base of the box (-1)
+            #             if contact_list[i][contact_num]['obj_link'] != -1:
+            #                 penalty += 1
+            #             else:
+            #                 penalty -= 1
 
             return -penalty
 
@@ -268,8 +271,13 @@ class SawyerEnv(AMLRlEnv):
 
             return reward
 
+        def closeness_reward():
 
+            final_position = traj_reach['ee_traj'][-1]
 
+            block_pos,block_ori=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
+
+            return 1./(np.linalg.norm(final_position[:2] - np.array([block_pos[0],  block_pos[1]])))
 
         # def completion_reward():
 
@@ -285,16 +293,39 @@ class SawyerEnv(AMLRlEnv):
 
         #     return reward
 
+        penalty_wrong_contact = scale[0]*(penalise_wrong_contacts(traj_reach) + penalise_wrong_contacts(traj_insert) )
+        penalty_final_ee_pos = scale[1]*check_final_ee_pos()
+        penalty_alignment = scale[2]*alignment_reward()
+        penalty_closeness = scale[3]*closeness_reward()
 
-        return scale[0]*(penalise_wrong_contacts(traj_reach) + penalise_wrong_contacts(traj_insert) ) + scale[1]*check_final_ee_pos() #+ scale[1]*completion_reward()
+        self._logger.debug("*******************************************************************")
+        self._logger.debug("penalty_wrong_contact \t %f"%(penalty_wrong_contact,))
+        self._logger.debug("penalty_final_ee_pos \t %f"%(penalty_final_ee_pos,))
+        self._logger.debug("penalty_alignment \t %f"%(penalty_alignment,))
+        self._logger.debug("penalty_closeness \t %f"%(penalty_closeness,))
+        self._logger.debug("*******************************************************************")
 
-    def fwd_simulate(self, dmp, joint_space = False):
+        # raw_input()
+
+        tot_reward = penalty_wrong_contact+\
+                     penalty_final_ee_pos+\
+                     penalty_alignment +\
+                     penalty_closeness
+
+        return  tot_reward
+
+    def fwd_simulate(self, dmp, ee_ori=None, joint_space=False):
         """
         implement the dmp
         """
         ee_traj = []
 
         full_contacts_list = []
+
+        if ee_ori is None:
+            goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+        else:
+            goal_ori = pb.getQuaternionFromEuler(ee_ori)
 
         for k in range(dmp.shape[0]):
 
@@ -304,7 +335,10 @@ class SawyerEnv(AMLRlEnv):
 
             else:
                 # goal_ori = (-0.52021453, -0.49319602, 0.47898476, 0.50666373)
-                goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+                # goal_ori = 
+                # #in euler (3.1401728051502205, 0.027638219089217236, 3.0868671400979135)
+                # print pb.getEulerFromQuaternion(goal_ori)
+                # raw_input()
                 # print "Goal pos \t",dmp[k, :].tolist()
                 cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist(), ee_ori=goal_ori)
 
@@ -313,7 +347,6 @@ class SawyerEnv(AMLRlEnv):
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
-
 
             full_contacts_list.append(self.get_contact_details())
             
@@ -331,15 +364,27 @@ class SawyerEnv(AMLRlEnv):
         Context is the bottom base of the box.
         """
 
+        s = np.random.uniform(-0.1, 0.1)
+
+        box_ori = (0., 0., -3.14/2 + s)
+
+        pb.resetBasePositionAndOrientation(self._box_id, [0.7076992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler(box_ori), physicsClientId=self._cid)
+
         block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
-        return np.asarray(block_pos)
+        block_orn = pb.getEulerFromQuaternion(block_orn)
+
+        # return np.asarray(block_pos)
+        return np.array([block_orn[2]])
 
 
     def execute_policy(self, w, s, show_demo=False):
 
         reach_end_offset=w[:3]
         peg_insert_end = np.r_[w[:2], w[3]]
+        ee_ori_offset = np.array([0., 0., w[4]])
+
+        ee_ori = tuple(np.array([3.1401728051502205, 0.027638219089217236, 3.0868671400979135]) + ee_ori_offset)
 
         dmp_reach  = self._demo2follow(dmp_type='reach_hole', goal_offset=reach_end_offset)
         dmp_insert = self._demo2follow(dmp_type='insert', goal_offset=peg_insert_end, start_offset=reach_end_offset)
@@ -348,8 +393,8 @@ class SawyerEnv(AMLRlEnv):
             plot_demo(dmp_reach, start_idx=0, life_time=4, cid=self._cid)
             plot_demo(dmp_insert, start_idx=0, life_time=4, cid=self._cid)
 
-        traj_reach = self.fwd_simulate(dmp_reach)
-        traj_insert = self.fwd_simulate(dmp_insert)
+        traj_reach = self.fwd_simulate(dmp=dmp_reach, ee_ori=ee_ori)
+        traj_insert = self.fwd_simulate(dmp=dmp_insert, ee_ori=ee_ori)
 
         reward = self.reward(traj_reach, traj_insert)
         

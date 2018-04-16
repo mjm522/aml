@@ -4,7 +4,7 @@
     <color rgba="0 0 0 1"/>
   </material>
   <material name="darkgray">
-    <color rgba="0.2 0.2 0.2 0.4"/>
+    <color rgba="0.2 0.2 0.2 1"/>
   </material>
   <material name="enthocolor">
     <color rgba="0.7 0.7 0.7 0.4"/>
