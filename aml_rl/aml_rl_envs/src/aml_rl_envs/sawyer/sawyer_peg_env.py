@@ -203,30 +203,68 @@ class SawyerEnv(AMLRlEnv):
             Computing reward for the given (forward-simulated) trajectory
         '''
 
-        def alignment_reward():
+        # def alignment_reward():
 
-            # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+        #     # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
 
-            ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
+        #     ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
 
-            ori_diff_norm = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(ee_ori))-self._goal_ori)
+        #     ori_diff_norm = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(ee_ori))-self._goal_ori)
 
-            np.array([ [0.65145, 0.65145 + 0.15*0.55], 
-                       [0.015,   0.015 - 0.15*1.90] ] )
+        #     np.array([ [0.65145, 0.65145 + 0.15*0.55], 
+        #                [0.015,   0.015 - 0.15*1.90] ] )
 
-            reward = -ori_diff_norm
+        #     reward = -ori_diff_norm
 
-            if (0.65145 < ee_pos[0] < 0.65145 + 0.15*0.55) and (0.015 < ee_pos[1] < 0.015 - 0.15*1.90):
+        #     if (0.65145 < ee_pos[0] < 0.65145 + 0.15*0.55) and (0.015 < ee_pos[1] < 0.015 - 0.15*1.90):
 
-                reward += 2.
-            else:
-                reward -= 2.
+        #         reward += 2.
+        #     else:
+        #         reward -= 2.
 
-            # traj_end_vector = traj[-1, :] - traj[-end_id, :]
-            # traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
-            # cos_angle = np.dot(traj_end_vector, reference_vector)
+        #     # traj_end_vector = traj[-1, :] - traj[-end_id, :]
+        #     # traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+        #     # cos_angle = np.dot(traj_end_vector, reference_vector)
 
-            return reward 
+        #     return reward 
+
+
+        def penalise_wrong_contacts(traj_data):
+
+            penalty = 0
+
+            contact_list = traj_data['contact_details']
+
+            for i in range(len(contact_list)):
+
+                if contact_list[i] is None:
+                    continue
+
+                else:
+
+                    for contact_num in range(len(contact_list[i])):
+                        # penalise for any contact that is not with base of the box (-1)
+                        if contact_list[i][contact_num]['obj_link'] != -1:
+                            penalty += 1
+
+            return -penalty
+
+        def check_final_ee_pos():
+
+            reached_goal = False
+
+            final_contacts = traj_insert['contact_details'][-1]
+
+            for conts in range(len(final_contacts)):
+
+                if final_contacts[conts]['obj_link'] == -1:
+                    reached_goal = True
+
+            reward = 1 if reached_goal else -1
+
+            return reward
+
+
 
 
         # def completion_reward():
@@ -244,7 +282,7 @@ class SawyerEnv(AMLRlEnv):
         #     return reward
 
 
-        return scale[0]*alignment_reward() #+ scale[1]*completion_reward()
+        return scale[0]*(penalise_wrong_contacts(traj_reach) + penalise_wrong_contacts(traj_insert) ) + scale[1]*check_final_ee_pos() #+ scale[1]*completion_reward()
 
     def fwd_simulate(self, dmp, joint_space = False):
         """
@@ -252,6 +290,7 @@ class SawyerEnv(AMLRlEnv):
         """
         ee_traj = []
 
+        full_contacts_list = []
 
         for k in range(dmp.shape[0]):
 
@@ -270,6 +309,9 @@ class SawyerEnv(AMLRlEnv):
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
+
+
+            full_contacts_list.append(self.get_contact_details())
             
             # time.sleep(0.1)
             self.simple_step()
@@ -278,7 +320,7 @@ class SawyerEnv(AMLRlEnv):
         # print "Block pos \t", np.asarray(block_pos)
         # print "EE pos\t", np.asarray(ee_pos)
             
-        return np.asarray(ee_traj)
+        return { 'ee_traj':np.asarray(ee_traj), 'contact_details':full_contacts_list }
         
     def context(self):
         """
@@ -308,3 +350,30 @@ class SawyerEnv(AMLRlEnv):
         reward = self.reward(traj_reach, traj_insert)
         
         return None, reward
+
+
+    def get_contact_details(self):
+        '''
+            Get contact details of every contact when the peg is in contact with any part of the hole.
+        '''
+
+        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19, 
+                              bodyB=self._box_id, physicsClientId=self._cid)
+
+        if len(full_details) > 0:
+
+            contact_details = []
+
+            for contact_id in range(len(full_details)):
+
+                details = {}
+
+                details['obj_link'] = full_details[contact_id][4]
+                details['contact_pt'] = full_details[contact_id][6]
+                details['contact_force'] = full_details[contact_id][9]
+
+                contact_details.append(details)
+
+            return contact_details
+
+        return None
