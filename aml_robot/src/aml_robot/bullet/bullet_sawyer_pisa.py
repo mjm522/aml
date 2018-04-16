@@ -172,8 +172,8 @@ class BulletSawyerPisa(RobotInterface):
         state['position'] = joint_angles
         state['velocity'] = joint_velocities
         state['effort'] = joint_efforts
-        state['jacobian'] = None#self.jacobian(None)[:, 1:]
-        state['inertia'] = None#self.inertia(None)[1:, 1:]
+        state['jacobian'] = self.jacobian(None)#None#self.jacobian(None)[:, 1:]
+        state['inertia'] = self.inertia(None)#None#self.inertia(None)[1:, 1:]
 
         state['ee_point'], state['ee_ori'] = self.ee_pose()
 
