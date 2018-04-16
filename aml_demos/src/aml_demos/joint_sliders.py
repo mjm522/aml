@@ -22,6 +22,8 @@ import numpy as np
 import python_qt_binding.QtCore as qtc
 import python_qt_binding.QtGui as qtg
 
+import math
+
 # ROS imports
 import rospy
 
@@ -163,10 +165,18 @@ class SliderWindow(qtg.QWidget):
         vbox = qtg.QVBoxLayout()
         header_box = qtg.QHBoxLayout()
         header_box2 = qtg.QHBoxLayout()
-        sliders_box = qtg.QHBoxLayout()
+
         vbox.addLayout(header_box)
         vbox.addLayout(header_box2)
-        vbox.addLayout(sliders_box)
+
+        n_slider_boxes = int(math.ceil(self.arm.n_cmd()/7.0)) + 1
+        slider_boxes = []
+        for i in range(n_slider_boxes):
+            sliders_box = qtg.QHBoxLayout()
+            slider_boxes.append(sliders_box)
+            vbox.addLayout(sliders_box)
+
+
 
         control_options = [('dummy_controller',DummyController), ('js_position_control',JSPositionController2),('js_velocity_control',JSVelocityController),('js_torque_control',JSTorqueController)]
         self.controller_dict = {}
@@ -227,6 +237,8 @@ class SliderWindow(qtg.QWidget):
         self.num_joints = len(self.joint_names) # 7
         self.joint_sliders = []
         self.joint_slider_labels = []
+
+        slider_idx = -1
         for i, name in enumerate(self.joint_names):
 
             joint_limits = self.arm.joint_limits()
@@ -237,7 +249,8 @@ class SliderWindow(qtg.QWidget):
             try:
                 description = my_descriptions[name.split('_')[1]]
             except:
-                description = dict(zip(self.arm.joint_names(),self.arm.joint_names()))
+                description = "joint_%d"%(i,)
+                # description = dict(zip(self.arm.joint_names(),))
 
             name_label = qtg.QLabel('{}\n{}'.format(name, description))
             center(name_label)
@@ -254,20 +267,28 @@ class SliderWindow(qtg.QWidget):
 
             b = qtg.QHBoxLayout()
             b.addWidget(slider)
-            b.setAlignment(qtc.Qt.AlignHCenter)
+            b.setAlignment(qtc.Qt.AlignCenter)
             slider_vbox.addLayout(b)
 
             slider_vbox.addWidget(label)
-            sliders_box.addLayout(slider_vbox)
+
+
+            if i%7==0:
+                slider_idx+=1
+
+
+            slider_boxes[slider_idx].addLayout(slider_vbox)
+
+
         self.sync_sliders()
 
         timer = qtc.QTimer(self)
-        timer.setInterval(100) # ms
+        timer.setInterval(200) # ms
         timer.timeout.connect(self.sync_sliders)
         timer.start()
 
         self.setLayout(vbox)
-        self.setGeometry(100, 100, 400, 400)
+        self.setGeometry(100, 100, 400, 1024)
         self.setWindowTitle('Joint Sliders: {} arm'.format(arm_name))
         self.setWindowFlags(qtc.Qt.WindowStaysOnTopHint)
         self.show()
@@ -362,8 +383,8 @@ class SliderWindow(qtg.QWidget):
                 self.joint_slider_labels[i].setText('{:.3f}'.format(val))
 
 def main():
-    if len(sys.argv) < 3 or sys.argv[1] not in ['left', 'right'] or sys.argv[2] not in ['baxter', 'sawyer', 'sawyer_bullet']:
-        print('usage: ./joint_sliders.py (left|right) (baxter|sawyer)')
+    if len(sys.argv) < 3 or sys.argv[1] not in ['left', 'right'] or sys.argv[2] not in ['baxter', 'sawyer', 'sawyer_bullet', 'pisa_bullet','sawyer_pisa_bullet']:
+        print('usage: ./joint_sliders.py (left|right) (baxter|sawyer|sawyer_bullet|pisa_bullet|sawyer_pisa_bullet)')
         sys.exit(1)
 
     arm_name = sys.argv[1]
@@ -389,6 +410,10 @@ def main():
         from aml_robot.sawyer_robot import SawyerArm as ArmInterface
     elif arm_interface =="sawyer_bullet":
         from aml_robot.bullet.bullet_sawyer import BulletSawyerArm as ArmInterface
+    elif arm_interface =="pisa_bullet":
+        from aml_robot.bullet.bullet_pisa_hand import BulletPisaHand as ArmInterface
+    elif arm_interface =="sawyer_pisa_bullet":
+        from aml_robot.bullet.bullet_sawyer_pisa import BulletSawyerPisa as ArmInterface
 
 
     print "ARM INTERFACE",arm_interface

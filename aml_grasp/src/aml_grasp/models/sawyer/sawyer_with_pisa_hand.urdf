@@ -1396,6 +1396,7 @@
       </geometry>
     </collision>
   </link>
+  <!--
   <transmission name="soft_hand_thumb_abd_trans">
     <robotNamespace>soft_hand</robotNamespace>
     <type>transmission_interface/SimpleTransmission</type>
@@ -1726,6 +1727,7 @@
       <mechanicalReduction>1.0</mechanicalReduction>
     </actuator>
   </transmission>
+  -->
   <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
       <robotNamespace>soft_hand</robotNamespace>

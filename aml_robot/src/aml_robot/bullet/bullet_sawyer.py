@@ -10,7 +10,7 @@ import pybullet as pb
 
 from aml_math.quaternion_utils import compute_omg
 
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
+from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_robot.robot_interface import RobotInterface
 from aml_io.io_tools import get_file_path, get_aml_package_path
 from aml_robot.sawyer_kinematics import sawyer_kinematics
@@ -54,7 +54,7 @@ class BulletSawyerArm(RobotInterface):
 
         self._kinematics = sawyer_kinematics(self, description=sawyer_path)
 
-        self._bullet_robot = BulletRobot2(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
+        self._bullet_robot = BulletRobot(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
 
         self._limb = limb
 
@@ -84,10 +84,6 @@ class BulletSawyerArm(RobotInterface):
         self._ready = True
 
 
-
-    def _on_joint_states(self, msg):
-        print 'NOT IMPLEMENTED'
-
     def exec_position_cmd(self, cmd):
         self._bullet_robot.set_joint_positions(cmd, self._joints)
 
@@ -111,9 +107,44 @@ class BulletSawyerArm(RobotInterface):
 
 
 
-    def forward_kinematics(self, joint_angles=None):
+    def forward_kinematics(self, joint_angles=None, ori_type='quat'):
 
-        print 'NOT IMPLEMENTED'
+        if joint_angles is None:
+
+            argument = None
+
+        else:
+
+            argument = dict(zip(self.joint_names(), joint_angles))
+
+        # combine the names and joint angles to a dictionary, that only is accepted by kdl
+        pose = np.array(self._kinematics.forward_position_kinematics(argument))
+        position = pose[0:3][:, None]  # senting as  column vector
+
+        w = pose[6]
+        x = pose[3]
+        y = pose[4]
+        z = pose[5]  # quarternions
+
+        rotation = quaternion.quaternion(w, x, y, z)
+
+        # formula for converting quarternion to rotation matrix
+
+        if ori_type == 'mat':
+
+            # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
+            #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
+            #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
+
+            rotation = quaternion.as_rotation_matrix(rotation)
+
+        elif ori_type == 'eul':
+
+            rotation = quaternion.as_euler_angles(rotation)
+        elif ori_type == 'quat':
+            pass
+
+        return position, rotation
 
 
     def inverse_kinematics(self, position, orientation=None):
@@ -228,3 +259,4 @@ class BulletSawyerArm(RobotInterface):
     def set_arm_speed(self, speed):
 
         pass
+
