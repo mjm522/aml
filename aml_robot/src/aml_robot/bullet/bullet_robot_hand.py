@@ -123,6 +123,18 @@ class BulletRobotHand(BulletRobot2):
         return np.array(self._all_joints)
 
 
+    def set_jnt_state(self, jnt_state):
+
+
+        if len(jnt_state) < self.n_cmd():
+            raise Exception ("Incorrect number of joint state values given")
+
+        else:
+            for jnt_idx in self._all_joints:
+
+                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
+
+
 
 
 

@@ -302,13 +302,12 @@ class BulletRobot2(object):
 
     def set_jnt_state(self, jnt_state):
 
-        num_jnts = pb.getNumJoints(self._id)
 
-        if len(jnt_state) < num_jnts:
+        if len(jnt_state) < self.n_cmd():
             raise Exception ("Incorrect number of joint state values given")
 
         else:
-            for jnt_idx in range(num_jnts):
+            for jnt_idx in self._movable_joints:
 
                 pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
 
