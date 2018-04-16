@@ -198,7 +198,7 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [1,1]):
+    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [0.003, 3]):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
@@ -246,6 +246,8 @@ class SawyerEnv(AMLRlEnv):
                         # penalise for any contact that is not with base of the box (-1)
                         if contact_list[i][contact_num]['obj_link'] != -1:
                             penalty += 1
+                        else:
+                            penalty -= 1
 
             return -penalty
 
@@ -255,12 +257,14 @@ class SawyerEnv(AMLRlEnv):
 
             final_contacts = traj_insert['contact_details'][-1]
 
-            for conts in range(len(final_contacts)):
+            if final_contacts is not None:
 
-                if final_contacts[conts]['obj_link'] == -1:
-                    reached_goal = True
+                for conts in range(len(final_contacts)):
 
-            reward = 1 if reached_goal else -1
+                    if final_contacts[conts]['obj_link'] == -1:
+                        reached_goal = True
+
+            reward = 10 if reached_goal else -2
 
             return reward
 

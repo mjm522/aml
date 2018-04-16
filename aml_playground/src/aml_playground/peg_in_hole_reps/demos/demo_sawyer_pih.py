@@ -89,7 +89,7 @@ def main(joint_space=False):
     plt.figure("Mean reward")
     plt.ion()
 
-    for i in range(200):
+    for i in range(70):
 
         print "Episode \t", i
 
