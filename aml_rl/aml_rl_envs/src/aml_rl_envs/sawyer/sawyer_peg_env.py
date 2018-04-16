@@ -150,7 +150,7 @@ class SawyerEnv(AMLRlEnv):
         
         actualEndEffectorPos = state[0]
             
-        blockPos, blockOrn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
+        block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
         if (self._terminated or self._env_step_counter>self._max_steps):
             
@@ -158,7 +158,7 @@ class SawyerEnv(AMLRlEnv):
             
             return True
 
-        if np.linalg.norm(np.asarray(blockPos) - self._goal_box) < 0.2:
+        if np.linalg.norm(np.asarray(block_pos) - self._goal_box) < 0.2:
                 
             self._terminated = 1
             
@@ -198,7 +198,7 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def reward(self, traj, end_id = 200, scale = [1,1]):
+    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [1,1]):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
@@ -282,38 +282,29 @@ class SawyerEnv(AMLRlEnv):
         
     def context(self):
         """
-        Context is the top face of the box.
-
-            Top face of box:
-                # x : (0.7, 0.7 + 0.15*0.55)
-                # y : (0.1, 0.1 - 0.15*1.90)
-                # z : (0.62, 0.62 + 0.15*2.40)
-
-                 0.69274812 -0.13284674  0.9552463
-                 0.65145, 0.00966, 
-
-                 0.6927 - 0.5*0.15*0.55 = 0.65145
-                 -0.13284 + 0.5*0.15*1.9 = 0.00966
-                 0.65145, 0.015
+        Context is the bottom base of the box.
         """
 
-        x = np.random.uniform(0.6700, 0.70000)#(0.65145, 0.65145 + 0.15*0.55)
-        y = np.random.uniform(0.1, -0.21)#(0.015, 0.015 - 0.15*1.90)
+        block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
-        context = np.array([x,y])
-
-        return context
+        return np.asarray(block_pos)
 
 
     def execute_policy(self, w, s, show_demo=False):
 
-        dmp = self._demo2follow(goal_offset=np.r_[w, 0]) #
+        reach_end_offset=w[:3]
+        peg_insert_end = np.r_[w[:2], w[3]]
+
+        dmp_reach  = self._demo2follow(dmp_type='reach_hole', goal_offset=reach_end_offset)
+        dmp_insert = self._demo2follow(dmp_type='insert', goal_offset=peg_insert_end, start_offset=reach_end_offset)
 
         if show_demo:
-            plot_demo(dmp, start_idx=0, life_time=4, cid=self._cid)
+            plot_demo(dmp_reach, start_idx=0, life_time=4, cid=self._cid)
+            plot_demo(dmp_insert, start_idx=0, life_time=4, cid=self._cid)
 
-        traj = self.fwd_simulate(dmp)
+        traj_reach = self.fwd_simulate(dmp_reach)
+        traj_insert = self.fwd_simulate(dmp_insert)
 
-        reward = self.reward(traj)
+        reward = self.reward(traj_reach, traj_insert)
         
         return None, reward

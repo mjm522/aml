@@ -28,31 +28,18 @@ def get_ee_traj(env, js_traj):
     raw_input()
 
 
-def main(joint_space=False):
+# def main(joint_space=False):
 
-    rewards = []
-    params  = []
+#     rewards = []
+#     params  = []
 
-    ps = SawyerPegREPS(joint_space, exp_params)
+#     ps = SawyerPegREPS(joint_space, exp_params)
 
-    # ee_pos = (0.70772373, -0.13389146,  0.97989907)#(0.6927491146, -0.1328456399, 0.7499999999999744)
-    # goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
-    
-    # cmd = ps._eval_env._sawyer.inv_kin(ee_pos=ee_pos, ee_ori=goal_ori)
+    # while True:
 
-    # j_pos = np.array([-0.67076236, -0.43281162,  0.50212922,  1.27707396, -0.60422263,  0.84830778, 1.77191691])
-    # ps._eval_env._sawyer.set_joint_state(j_pos)
-    # ps._eval_env.simple_step()
-
-    # print j_pos-cmd
-
-    while True:
-        # ps._eval_env._sawyer.apply_action(j_pos)
-        # ps._eval_env.simple_step()
-
-        for k in range(2,3):
-            ps.goto_hole(hole_id=k)
-            ps.insert_hole(hole_id=k)
+        # for k in range(2,3):
+        #     ps.goto_hole(hole_id=k)
+        #     ps.insert_hole(hole_id=k)
 
         # goal_pos, goal_ori = ps._eval_env._sawyer.get_ee_pose()
         # print goal_pos
@@ -91,62 +78,44 @@ def main(joint_space=False):
     # ee_traj.append(ee_pos)
     
 
-    # for i in range(200):
-    # plt.subplot(311)
-    # plt.plot(forces1)
 
-    # plt.subplot(312)
-    # plt.plot(forces2)
+def main(joint_space=False):
 
-    # plt.subplot(313)
-    # plt.plot(forces3)
+    rewards = []
+    params  = []
 
-    #     # plt.pause(0.00001)
-    # plt.show()
+    ps = SawyerPegREPS(joint_space, exp_params)
 
-# def main(joint_space=False):
+    plt.figure("Mean reward")
+    plt.ion()
 
-#     rewards = []
-#     params  = []
+    for i in range(200):
 
-#     ps = SawyerPegREPS(joint_space, exp_params)
+        print "Episode \t", i
 
-#     # for k in range(5):
+        s = ps._eval_env.context()
 
-#     #     ps.goto_hole(hole_id=k)
+        policy = ps._gpreps.run()
 
-#     # get_ee_traj(ps._sim_env, ps._demo_traj)
+        w = policy.compute_w(s, transform=True, explore=False)
 
-#     plt.figure("Mean reward")
-#     plt.ion()
+        _, mean_reward = ps._eval_env.execute_policy(w, s, show_demo=False)
 
-#     for i in range(200):
+        print "Parameter found*****************************************: \t", w
+        print "mean_reward \t", mean_reward
 
-#         print "Episode \t", i
+        rewards.append(mean_reward)
+        params.append(np.hstack([w,s,mean_reward]))
 
-#         s = ps._eval_env.context()
+        ps._eval_env._reset()
 
-#         policy = ps._gpreps.run()
+        plt.plot(rewards)
+        plt.pause(0.00001)
+        plt.draw()
 
-#         w = policy.compute_w(s, transform=True, explore=False)
-
-#         _, mean_reward = ps._eval_env.execute_policy(w, s, show_demo=False)
-
-#         print "Parameter found*****************************************: \t", w
-#         print "mean_reward \t", mean_reward
-
-#         rewards.append(mean_reward)
-#         params.append(np.hstack([w,s,mean_reward]))
-
-#         ps._eval_env._reset()
-
-#         plt.plot(rewards)
-#         plt.pause(0.00001)
-#         plt.draw()
-
-#     file_name = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/params.csv'
-#     save_csv_data(file_name, np.asarray(params))
-#     raw_input("Press any key to exit")
+    file_name = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/params.csv'
+    save_csv_data(file_name, np.asarray(params))
+    raw_input("Press any key to exit")
 
       
 if __name__=="__main__":

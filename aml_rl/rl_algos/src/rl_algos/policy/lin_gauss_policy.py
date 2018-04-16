@@ -91,7 +91,6 @@ class LinGaussPolicy():
 
         if transform:
             context_feature = self.transform_context(context)
-
         else:
             context_feature = context
 
@@ -101,10 +100,10 @@ class LinGaussPolicy():
         else:
             w = self._w.dot(context_feature)
 
-        w = self.scale_w(w)    
+        w = self.scale_w(w)
 
         if self._bounds is not None:
-            np.clip(w, self._bounds[:, 0], self._bounds[:, 1], out=w)
+            np.clip(w, self._bounds[0, :], self._bounds[1, :], out=w)
 
         return w
 
