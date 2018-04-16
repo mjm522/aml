@@ -300,16 +300,11 @@ class BulletRobot(object):
         return np.array(joint_angles), np.array(joint_velocities), np.array(joint_reaction_forces), np.array(
             joint_efforts)
 
-    def set_jnt_state(self, jnt_state):
+    def set_joint_angles(self, joint_angles, joint_indices):
 
+        for i, jnt_idx in enumerate(joint_indices):
 
-        if len(jnt_state) < self.n_cmd():
-            raise Exception ("Incorrect number of joint state values given")
-
-        else:
-            for jnt_idx in self._movable_joints:
-
-                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
+            pb.resetJointState(self._id, jnt_idx, joint_angles[i])
 
     def get_movable_joints(self):
 
