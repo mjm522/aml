@@ -38,7 +38,7 @@ class SawyerEnv(AMLRlEnv):
         #facing sawyer, from left side
         hole1 = np.array([0., -0.725*0.15, 0.])
         hole2 = np.array([0., -0.425*0.15, 0.])
-        hole3 = np.array([0., 0., 0.])
+        hole3 = np.array([0., 0., 0.0])
         hole4 = np.array([0., 0.375*0.15, 0.])
         hole5 = np.array([0., 0.775*0.15, 0.])
 
@@ -52,9 +52,9 @@ class SawyerEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
-        
-        pb.resetBasePositionAndOrientation(self._box_id, [0.65145, 0.015, 0.56], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
+        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
+        #0.6876992
+        pb.resetBasePositionAndOrientation(self._box_id, [0.6876992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler([0., 0., 0.]), physicsClientId=self._cid) 
                         
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
 
@@ -250,7 +250,6 @@ class SawyerEnv(AMLRlEnv):
         """
         implement the dmp
         """
-        # return np.random.randn(220,3)
         ee_traj = []
 
 
@@ -261,20 +260,21 @@ class SawyerEnv(AMLRlEnv):
                 cmd = dmp[k, :]
 
             else:
-                goal_ori = (-0.52021453, -0.49319602, 0.47898476, 0.50666373)
-                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist(), ee_ori=None)
+                # goal_ori = (-0.52021453, -0.49319602, 0.47898476, 0.50666373)
+                goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+                # print "Goal pos \t",dmp[k, :].tolist()
+                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist(), ee_ori=goal_ori)
 
             self._sawyer.apply_action(cmd)
 
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
+
             ee_traj.append(ee_pos)
             
-            # import time
-            # time.sleep(0.01)
+            # time.sleep(0.1)
             self.simple_step()
 
-        block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
-
+        # block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
         # print "Block pos \t", np.asarray(block_pos)
         # print "EE pos\t", np.asarray(ee_pos)
             

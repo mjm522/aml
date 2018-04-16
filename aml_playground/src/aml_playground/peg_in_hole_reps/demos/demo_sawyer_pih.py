@@ -35,14 +35,33 @@ def main(joint_space=False):
 
     ps = SawyerPegREPS(joint_space, exp_params)
 
+    # ee_pos = (0.70772373, -0.13389146,  0.97989907)#(0.6927491146, -0.1328456399, 0.7499999999999744)
+    # goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+    
+    # cmd = ps._eval_env._sawyer.inv_kin(ee_pos=ee_pos, ee_ori=goal_ori)
+
+    # j_pos = np.array([-0.67076236, -0.43281162,  0.50212922,  1.27707396, -0.60422263,  0.84830778, 1.77191691])
+    # ps._eval_env._sawyer.set_joint_state(j_pos)
+    # ps._eval_env.simple_step()
+
+    # print j_pos-cmd
+
     while True:
+        # ps._eval_env._sawyer.apply_action(j_pos)
+        # ps._eval_env.simple_step()
 
         for k in range(2,3):
             ps.goto_hole(hole_id=k)
             ps.insert_hole(hole_id=k)
-            ps._eval_env._sawyer.set_joint_state(ps._eval_env._sawyer._jnt_postns)
 
-            raw_input("Press enter for next hole %d"%(k+2,))
+        # goal_pos, goal_ori = ps._eval_env._sawyer.get_ee_pose()
+        # print goal_pos
+
+        #     print ps._eval_env._sawyer.get_joint_state()[0]
+
+        #     # ps._eval_env._sawyer.set_joint_state(ps._eval_env._sawyer._jnt_postns)
+
+        #     raw_input("Press enter for next hole %d"%(k+2,))
 
     # get_ee_traj(ps._sim_env, ps._demo_traj)
 

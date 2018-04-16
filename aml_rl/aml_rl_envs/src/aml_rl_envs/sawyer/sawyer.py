@@ -20,7 +20,7 @@ class Sawyer(AMLRlRobot):
 
         self._joint_tags = dict(zip(self.get_joint_names(), range(pb.getNumJoints(self._robot_id, physicsClientId=self._cid))))
 
-        self._ee_index = self._joint_tags['right_poking_stick_tip_fixed']
+        self._ee_index = 16#self._joint_tags['right_poking_stick_tip_fixed']
 
         self._ft_sensor_jnt = self._joint_tags['right_wrist']
  

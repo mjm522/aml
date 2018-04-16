@@ -168,7 +168,7 @@ class SawyerPegREPS():
     def trial_check(self, dmp_type, goal_offset=None, start_offset=None, plot_color=[0,0,1]):
 
         dmp = self.update_dmp_params(dmp_type=dmp_type, goal_offset=goal_offset, start_offset=start_offset)
-        plot_demo(dmp, start_idx=0, life_time=0, color=plot_color)
+        # plot_demo(dmp, start_idx=0, life_time=0, color=plot_color)
         ee_traj = self._eval_env.fwd_simulate(dmp, joint_space=False)
         
 
@@ -182,6 +182,6 @@ class SawyerPegREPS():
 
         colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
         hole = self._eval_env._hole_locs[hole_id]
-        self.trial_check(dmp_type='insert', start_offset=hole, goal_offset=hole, plot_color=colors[hole_id])
+        self.trial_check(dmp_type='insert', start_offset=hole, goal_offset=np.array([hole[0],hole[1], 0.03]), plot_color=colors[hole_id])
 
 

@@ -1,13 +1,22 @@
 <robot name="square_hole">
 
+ <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="darkgray">
+    <color rgba="0.2 0.2 0.2 0.4"/>
+  </material>
+  <material name="enthocolor">
+    <color rgba="0.7 0.7 0.7 0.4"/>
+  </material>
+
+
   <link name="base">
     <visual>
       <geometry>
         <box size="0.18 0.22 0.1"/>
       </geometry>
-      <material name="brown">
-        <color rgba="0.6 0.251 0.137 1"/>
-      </material>
+      <material name="black"/>
     </visual>
     <collision>
       <geometry>
@@ -32,9 +41,7 @@
         <box size="0.18 0.22 0.8"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.35"/>
-      <material name="brown">
-        <color rgba="0.6 0.251 0.137 1"/>
-      </material>
+      <material name="enthocolor"/>
     </visual>
     <collision>
       <geometry>
@@ -60,9 +67,7 @@
         <box size="0.18 0.22 0.8"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.35"/>
-      <material name="brown">
-        <color rgba="0.6 0.251 0.137 1"/>
-      </material>
+      <material name="darkgray"/>
     </visual>
     <collision>
       <geometry>
@@ -88,13 +93,11 @@
         <box size="0.18 0.66 0.8"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.35"/>
-      <material name="brown">
-        <color rgba="0.6 0.251 0.137 1"/>
-      </material>
+      <material name="darkgray"/>
     </visual>
     <collision>
       <geometry>
-        <box size="0.0.18 0.66 0.8"/>
+        <box size="0.18 0.66 0.8"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.35"/>
     </collision>
@@ -116,9 +119,7 @@
         <box size="0.18 0.66 0.8"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.35"/>
-      <material name="brown">
-        <color rgba="0.6 0.251 0.137 1"/>
-      </material>
+      <material name="enthocolor"/>
     </visual>
     <collision>
       <geometry>
