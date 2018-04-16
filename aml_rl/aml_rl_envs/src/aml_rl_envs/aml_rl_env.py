@@ -3,7 +3,7 @@ import numpy as np
 import pybullet as pb
 from gym import spaces
 from gym.utils import seeding
-from aml_rl_envs.bullet_visualizer import setup_bullet_visualizer
+from aml_robot.bullet.bullet_visualizer import setup_bullet_visualizer
 
 
 class AMLRlEnv(gym.Env):

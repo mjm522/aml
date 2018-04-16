@@ -24,7 +24,7 @@
 				<mesh filename="peg_hole.STL" scale="0.01 0.01 0.01"/>
       </geometry>
        <material name="grey">
-        <color rgba="0.5 0.5 0.5 1"/>
+        <color rgba="0.5 0.5 0.5 0.2"/>
       </material>
     </visual>
     <collision>

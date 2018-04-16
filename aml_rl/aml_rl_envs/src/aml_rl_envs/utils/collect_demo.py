@@ -22,7 +22,7 @@ def get_demo(demo_path):
 
     return demo_data
 
-def plot_demo(trajectory, color=[0,0,1], start_idx=8, life_time=0.):
+def plot_demo(trajectory, color=[0,0,1], start_idx=8, life_time=0., cid=None):
     """
     this funciton is to load trajectory into the bullet viewer.
     the state is a list of 6 values, only the x,y,z values are taken
@@ -38,17 +38,20 @@ def plot_demo(trajectory, color=[0,0,1], start_idx=8, life_time=0.):
 
         draw_trajectory(point_1=trajectory[k, start_idx:start_idx+3], 
                         point_2=trajectory[k+1, start_idx:start_idx+3], 
-                        colour=color, line_width=5.5, life_time=life_time)
+                        colour=color, line_width=5.5, life_time=life_time, cid=cid)
 
 
-def draw_trajectory(point_1, point_2, colour=[0,1,0], line_width=4.5, life_time=0.):
+def draw_trajectory(point_1, point_2, colour=[0,1,0], line_width=4.5, life_time=0., cid=None):
     """
     This function adds colour line between points point_1 and point_2 in the bullet
     Args:
     point_1: starting point => [x,y,z]
     point_2: ending_point => [x,y,z]
     """
-    pb.addUserDebugLine(point_1, point_2, lifeTime=life_time, lineColorRGB=colour, lineWidth=line_width)
+    if cid is None:
+        pb.addUserDebugLine(point_1, point_2, lifeTime=life_time, lineColorRGB=colour, lineWidth=line_width)
+    else:
+        pb.addUserDebugLine(point_1, point_2, lifeTime=life_time, lineColorRGB=colour, lineWidth=line_width, physicsClientId=cid)
 
 
 class CollectDemo():

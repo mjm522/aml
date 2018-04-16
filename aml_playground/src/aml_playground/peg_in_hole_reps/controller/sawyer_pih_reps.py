@@ -35,25 +35,29 @@ class SawyerPegREPS():
 
         self._exp_params = exp_params
 
-        kwargs = {}
-        kwargs['limb_name'] = 'right' 
-
-        path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/right_sawyer_exp_peg_in_hole_01.pkl'
-
-        if not os.path.exists(path_to_demo):
-            raise Exception("Enter a valid demo path")
-        else:
-            kwargs['path_to_demo'] = path_to_demo
-
         if joint_space:
+
+            kwargs = {}
+            kwargs['limb_name'] = 'right' 
+
+            path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/right_sawyer_exp_peg_in_hole_01.pkl'
+
+            if not os.path.exists(path_to_demo):
+                raise Exception("Enter a valid demo path")
+            else:
+                kwargs['path_to_demo'] = path_to_demo
+
             self._gen_traj = JSTrajGenerator(load_from_demo=True, **kwargs)
             self._demo_traj = self._gen_traj.generate_traj()['pos_traj']
         else:
             #in this file, the orientation is in [w,x,y,z] format
             #pos, ori, vel, omg is the sequence in which data is stored
-            path_to_demo = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states.csv'
-            self._demo_traj = load_csv_data(path_to_demo)[:, :3]
+            path_to_demo_1 = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states.csv'
+            path_to_demo_2 = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/sawyer_bullet_ee_states_2.csv'
+            self._demo_traj = load_csv_data(path_to_demo_1)[:, :3]
+            self._demo_traj_2 = load_csv_data(path_to_demo_2)[:, :3]
             # self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
+            assert self._demo_traj.shape[1] == self._demo_traj_2.shape[1]
 
         self._dof = self._demo_traj.shape[1]
 
@@ -62,12 +66,19 @@ class SawyerPegREPS():
         self.encode_dmps()
 
     def setup_gpreps(self, exp_params):
+
+        #w_bounds[:,0] = [x_lower, y_lower, z0_lower, z1_lower]
+        #w_bounds[:,1] = [x_upper, y_upper, z0_upper, z1_upper]
+        w_bounds = np.array([ [-0.013, -0.015, 0., 0.], 
+                              [0.013,   0.015, 0., 0.05] ] )
+
         
         policy = LinGaussPolicy(w_dim=exp_params['w_dim'], 
                                 context_feature_dim=exp_params['context_feature_dim'], 
                                 variance=exp_params['policy_variance'], 
                                 initial_params=exp_params['initial_params'], 
-                                random_state=exp_params['random_state'])
+                                random_state=exp_params['random_state'],
+                                bounds=w_bounds)
 
         context_model = ContextModel(context_dim=exp_params['context_dim'], 
                                     num_data_points=exp_params['num_samples_fwd_data'])
@@ -101,18 +112,35 @@ class SawyerPegREPS():
         self._man_dmp['obj'].load_demo_trajectory(self._demo_traj)
         self._man_dmp['obj'].train()
 
-    def update_dmp_params(self, phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
+
+        self._insertion_dmp = {}
+        self._insertion_dmp['config'] = discrete_dmp_config
+        self._insertion_dmp['obj'] = DiscreteDMP(config=discrete_dmp_config)
+
+        self._insertion_dmp['obj'].load_demo_trajectory(self._demo_traj_2)
+        self._insertion_dmp['obj'].train()
+
+    def update_dmp_params(self, dmp_type='reach_hole', phase_start=1., speed=1., goal_offset=None, start_offset=None, external_force=None):
 
         if goal_offset is None: goal_offset = np.zeros(self._dof)
 
         if start_offset is None: start_offset = np.zeros(self._dof)
 
-        dmp    = self._man_dmp['obj']
-        config = self._man_dmp['config']
+
+        if dmp_type == 'reach_hole':    
+
+            dmp    = self._man_dmp['obj']
+            config = self._man_dmp['config']
+
+        elif dmp_type == 'insert':
+
+            dmp    = self._insertion_dmp['obj']
+            config = self._insertion_dmp['config']
+
 
         config['y0'] = dmp._traj_data[0, 1:] + start_offset
         config['dy'] = np.zeros(self._dof)
-        config['goals'] = dmp._traj_data[-1, 1:] + goal_offset
+        config['goals'] = dmp._traj_data[-1, 1:] + goal_offset #dmp._traj_data[-1, 1:] +
         config['tau'] = 1./speed
         config['phase_start'] = phase_start
 
@@ -126,6 +154,34 @@ class SawyerPegREPS():
 
         new_dmp_traj = dmp.generate_trajectory(config=config)
 
-        return new_dmp_traj['pos']
+        # import matplotlib.pyplot as plt
+        # plt.plot(new_dmp_traj['pos'][:1000,0])
+        # plt.show()
+
+        if dmp_type == 'reach_hole':
+            return new_dmp_traj['pos'][:900, :]
+
+        elif dmp_type == 'insert':
+            return new_dmp_traj['pos']
+
+
+    def trial_check(self, dmp_type, goal_offset=None, start_offset=None, plot_color=[0,0,1]):
+
+        dmp = self.update_dmp_params(dmp_type=dmp_type, goal_offset=goal_offset, start_offset=start_offset)
+        # plot_demo(dmp, start_idx=0, life_time=0, color=plot_color)
+        ee_traj = self._eval_env.fwd_simulate(dmp, joint_space=False)
+        
+
+    def goto_hole(self, hole_id=2):
+
+        colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
+        hole = self._eval_env._hole_locs[hole_id]
+        self.trial_check(dmp_type='reach_hole', goal_offset=hole, plot_color=colors[hole_id])
+
+    def insert_hole(self, hole_id=2):
+
+        colors = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1]]
+        hole = self._eval_env._hole_locs[hole_id]
+        self.trial_check(dmp_type='insert', start_offset=hole, goal_offset=np.array([hole[0],hole[1], 0.03]), plot_color=colors[hole_id])
 
 

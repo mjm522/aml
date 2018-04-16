@@ -55,6 +55,7 @@ class LinGaussPolicy():
         #sigma of the policy param w
         self._sigma = np.eye(self._w_dim) * self._covariance_scale
 
+
     def fit(self, S, B, weights):
         
         #array of contexts
@@ -90,7 +91,6 @@ class LinGaussPolicy():
 
         if transform:
             context_feature = self.transform_context(context)
-
         else:
             context_feature = context
 
@@ -100,15 +100,10 @@ class LinGaussPolicy():
         else:
             w = self._w.dot(context_feature)
 
-        return self.scale_w(w)
-
-    def bound_w(self, context, explore=False):
-
-        w = self.compute_w(context, explore)
         w = self.scale_w(w)
-        
+
         if self._bounds is not None:
-            np.clip(w, self._bounds[:, 0], self._bounds[:, 1], out=w)
+            np.clip(w, self._bounds[0, :], self._bounds[1, :], out=w)
 
         return w
 

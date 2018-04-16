@@ -33,6 +33,17 @@ class SawyerEnv(AMLRlEnv):
 
         self.set_space_lims(obs_dim, 9, None, None, False)
 
+        self._goal_ori = np.asarray(pb.getEulerFromQuaternion((-0.52021453, -0.49319602,  0.47898476, 0.50666373)))
+
+        #facing sawyer, from left side
+        hole1 = np.array([0., -0.725*0.15, 0.])
+        hole2 = np.array([0., -0.425*0.15, 0.])
+        hole3 = np.array([0., 0., 0.0])
+        hole4 = np.array([0., 0.375*0.15, 0.])
+        hole5 = np.array([0., 0.775*0.15, 0.])
+
+        self._hole_locs = [hole1, hole2, hole3, hole4, hole5]
+
     def _reset(self):
 
         self.setup_env()
@@ -41,10 +52,12 @@ class SawyerEnv(AMLRlEnv):
         
         pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
-        
-        pb.resetBasePositionAndOrientation(self._box_id, [0.7, 0.1, .62], pb.getQuaternionFromEuler([1.57, 0., 1.57]), physicsClientId=self._cid) 
+        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.15, physicsClientId=self._cid)
+        #0.6876992
+        pb.resetBasePositionAndOrientation(self._box_id, [0.6876992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler([0., 0., 0.]), physicsClientId=self._cid) 
                         
+        SAWYER_CONFIG['enable_force_torque_sensors'] = True
+
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
 
         self.simple_step()
@@ -137,7 +150,7 @@ class SawyerEnv(AMLRlEnv):
         
         actualEndEffectorPos = state[0]
             
-        blockPos, blockOrn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
+        block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
         if (self._terminated or self._env_step_counter>self._max_steps):
             
@@ -145,7 +158,7 @@ class SawyerEnv(AMLRlEnv):
             
             return True
 
-        if np.linalg.norm(np.asarray(blockPos) - self._goal_box) < 0.2:
+        if np.linalg.norm(np.asarray(block_pos) - self._goal_box) < 0.2:
                 
             self._terminated = 1
             
@@ -185,46 +198,103 @@ class SawyerEnv(AMLRlEnv):
 
         return reward
 
-    def reward(self, traj, end_id = 200, scale = [1,1]):
+    def reward(self, traj_reach, traj_insert, end_id = 200, scale = [0.003, 3]):
         '''
             Computing reward for the given (forward-simulated) trajectory
         '''
 
-        def alignment_reward():
+        # def alignment_reward():
 
-            reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
+        #     # reference_vector = np.array([0,0,1]) # z-axis (direction of hole)
 
-            traj_end_vector = traj[-1, :] - traj[-end_id, :]
-            traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+        #     ee_pos, ee_ori,_,_ = self._sawyer.ee_state()
 
-            cos_angle = np.dot(traj_end_vector, reference_vector)
+        #     ori_diff_norm = np.linalg.norm(np.asarray(pb.getEulerFromQuaternion(ee_ori))-self._goal_ori)
 
-            return abs(cos_angle)
+        #     np.array([ [0.65145, 0.65145 + 0.15*0.55], 
+        #                [0.015,   0.015 - 0.15*1.90] ] )
 
-        def completion_reward():
+        #     reward = -ori_diff_norm
 
-            # 0.6776011368  -0.1101703639   1.0655471412
+        #     if (0.65145 < ee_pos[0] < 0.65145 + 0.15*0.55) and (0.015 < ee_pos[1] < 0.015 - 0.15*1.90):
 
-            required_z_val = 1.06554
+        #         reward += 2.
+        #     else:
+        #         reward -= 2.
 
-            # checking if the final position of the rolled-out trajectory reached the depth required for insertion
-            if abs(traj[-1, 2] - required_z_val) < 0.2:
-                reward = 10
-            else:
-                reward = -20
+        #     # traj_end_vector = traj[-1, :] - traj[-end_id, :]
+        #     # traj_end_vector = traj_end_vector/np.linalg.norm(traj_end_vector)
+        #     # cos_angle = np.dot(traj_end_vector, reference_vector)
+
+        #     return reward 
+
+
+        def penalise_wrong_contacts(traj_data):
+
+            penalty = 0
+
+            contact_list = traj_data['contact_details']
+
+            for i in range(len(contact_list)):
+
+                if contact_list[i] is None:
+                    continue
+
+                else:
+
+                    for contact_num in range(len(contact_list[i])):
+                        # penalise for any contact that is not with base of the box (-1)
+                        if contact_list[i][contact_num]['obj_link'] != -1:
+                            penalty += 1
+                        else:
+                            penalty -= 1
+
+            return -penalty
+
+        def check_final_ee_pos():
+
+            reached_goal = False
+
+            final_contacts = traj_insert['contact_details'][-1]
+
+            if final_contacts is not None:
+
+                for conts in range(len(final_contacts)):
+
+                    if final_contacts[conts]['obj_link'] == -1:
+                        reached_goal = True
+
+            reward = 10 if reached_goal else -2
 
             return reward
 
 
-        return scale[0]*alignment_reward() + scale[1]*completion_reward()
+
+
+        # def completion_reward():
+
+        #     # 0.6776011368  -0.1101703639   1.0655471412
+
+        #     required_z_val = 1.06554
+
+        #     # checking if the final position of the rolled-out trajectory reached the depth required for insertion
+        #     if abs(traj[-1, 2] - required_z_val) < 0.2:
+        #         reward = 10
+        #     else:
+        #         reward = -20
+
+        #     return reward
+
+
+        return scale[0]*(penalise_wrong_contacts(traj_reach) + penalise_wrong_contacts(traj_insert) ) + scale[1]*check_final_ee_pos() #+ scale[1]*completion_reward()
 
     def fwd_simulate(self, dmp, joint_space = False):
         """
         implement the dmp
         """
-        # return np.random.randn(220,3)
         ee_traj = []
 
+        full_contacts_list = []
 
         for k in range(dmp.shape[0]):
 
@@ -233,46 +303,81 @@ class SawyerEnv(AMLRlEnv):
                 cmd = dmp[k, :]
 
             else:
-
-                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist())
+                # goal_ori = (-0.52021453, -0.49319602, 0.47898476, 0.50666373)
+                goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+                # print "Goal pos \t",dmp[k, :].tolist()
+                cmd = self._sawyer.inv_kin(ee_pos=dmp[k, :].tolist(), ee_ori=goal_ori)
 
             self._sawyer.apply_action(cmd)
 
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
+
             ee_traj.append(ee_pos)
+
+
+            full_contacts_list.append(self.get_contact_details())
             
-            # import time
-            # time.sleep(0.01)
+            # time.sleep(0.1)
             self.simple_step()
+
+        # block_pos, block_ori = pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
+        # print "Block pos \t", np.asarray(block_pos)
+        # print "EE pos\t", np.asarray(ee_pos)
             
-
-
-        return np.asarray(ee_traj)
+        return { 'ee_traj':np.asarray(ee_traj), 'contact_details':full_contacts_list }
         
     def context(self):
         """
-        Context is the top face of the box.
-
-            Top face of box:
-                # x : (0.7, 0.7 + 0.15*0.55)
-                # y : (0.1, 0.1 - 0.15*1.90)
-                # z : (0.62, 0.62 + 0.15*2.40)
+        Context is the bottom base of the box.
         """
 
-        x = np.random.uniform(0.7, 0.7 + 0.15*0.55)
-        y = np.random.uniform(0.1, 0.1 - 0.15*1.90)
+        block_pos, block_orn=pb.getBasePositionAndOrientation(self._box_id, physicsClientId=self._cid)
 
-        context = np.array([x,y])
-
-        return context
+        return np.asarray(block_pos)
 
 
-    def execute_policy(self, w, s):
+    def execute_policy(self, w, s, show_demo=False):
 
-        dmp = self._demo2follow(goal_offset=np.r_[w, 0])
+        reach_end_offset=w[:3]
+        peg_insert_end = np.r_[w[:2], w[3]]
 
-        traj = self.fwd_simulate(dmp)
+        dmp_reach  = self._demo2follow(dmp_type='reach_hole', goal_offset=reach_end_offset)
+        dmp_insert = self._demo2follow(dmp_type='insert', goal_offset=peg_insert_end, start_offset=reach_end_offset)
 
-        reward = self.reward(traj)
+        if show_demo:
+            plot_demo(dmp_reach, start_idx=0, life_time=4, cid=self._cid)
+            plot_demo(dmp_insert, start_idx=0, life_time=4, cid=self._cid)
+
+        traj_reach = self.fwd_simulate(dmp_reach)
+        traj_insert = self.fwd_simulate(dmp_insert)
+
+        reward = self.reward(traj_reach, traj_insert)
         
         return None, reward
+
+
+    def get_contact_details(self):
+        '''
+            Get contact details of every contact when the peg is in contact with any part of the hole.
+        '''
+
+        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19, 
+                              bodyB=self._box_id, physicsClientId=self._cid)
+
+        if len(full_details) > 0:
+
+            contact_details = []
+
+            for contact_id in range(len(full_details)):
+
+                details = {}
+
+                details['obj_link'] = full_details[contact_id][4]
+                details['contact_pt'] = full_details[contact_id][6]
+                details['contact_force'] = full_details[contact_id][9]
+
+                contact_details.append(details)
+
+            return contact_details
+
+        return None

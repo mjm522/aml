@@ -179,7 +179,7 @@ class GPREPSOpt():
             #compute policy params for each context
             w_k = self._policy.compute_w(s_k)
             #execute the policy in the environment
-            tau_k, R_sw_k = self._env.execute_policy(w_k, s_k)
+            tau_k, R_sw_k = self._env.execute_policy(w_k, s_k, show_demo=False)
 
             self._context_model.add_data(datum=s_k)
 
@@ -190,6 +190,8 @@ class GPREPSOpt():
                 self._context_obs_history.append(self._policy.transform_context(s_k))
                 self._policy_w_history.append(w_k)
                 self._rewards_history.append(R_sw_k)
+
+            self._env._reset()
     
         if num_trials == 20:
 

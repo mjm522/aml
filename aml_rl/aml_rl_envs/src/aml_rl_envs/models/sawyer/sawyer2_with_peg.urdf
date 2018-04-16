@@ -405,72 +405,73 @@
 
  <link name="right_soft_hand_adapter">
     <visual>
-      <origin rpy="1.5707 0. 0" xyz="-0.05 0.04 0."/>
+      <origin rpy="1.5707 0. 3.14" xyz="0. 0. 0."/>
       <geometry>
         <mesh filename="meshes/peg_description/pisa_hand_adapter.STL" scale="0.001 0.001 0.001" />
       </geometry>
     </visual>
+    <collision>
+      <origin rpy="1.5707 0. 3.14" xyz="0. 0. 0."/>
+      <geometry>
+        <mesh filename="meshes/peg_description/pisa_hand_adapter.STL" scale="0.001 0.001 0.001" />
+      </geometry>
+    </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+      <origin rpy="0 0 0" xyz="-0.05 0.04 0."/>
       <mass value="0.0001"/>
       <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
     </inertial>
   </link>
 
   <joint name="right_gripper_soft_hand_adapter" type="fixed">
-    <origin rpy="0 0. 0" xyz="0 0 0.0"/>
+    <origin rpy="0 0. 0" xyz="0.07 -0.04 -0.01"/>
     <parent link="right_hand"/>
     <child link="right_soft_hand_adapter"/>
   </joint>
 
   <link name="right_poking_stick">
     <visual>
-      <origin rpy="1.5707 0. 0" xyz="-0.015 0.011 0.0"/>
+      <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <geometry>
-        <mesh filename="meshes/peg_description/poking_stick.STL" scale="0.001 0.001 0.001" />
+        <mesh filename="meshes/peg_description/peg_rect1620.STL" scale="0.001 0.001 0.001" />
       </geometry>
     </visual>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+      <origin rpy="0 0 0" xyz="-0.015 0.011 0.0"/>
       <mass value="0.0001"/>
       <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
     </inertial>
     <collision>
-      <origin rpy="1.5707 0. 0" xyz="-0.015 0.011 0.0"/>
+      <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <geometry>
-        <mesh filename="meshes/peg_description/poking_stick.STL" scale="0.001 0.001 0.001" />
+        <mesh filename="meshes/peg_description/peg_rect1620.STL" scale="0.001 0.001 0.001" />
       </geometry>
     </collision>
   </link>
 
   <joint name="right_poking_stick_fixed" type="fixed">
-    <origin rpy="0 0. 0" xyz="0 0 0.0"/>
+    <!-- <origin rpy="0 0. 0" xyz="-0.05 0.05 0.03"/>  for the cylinder peg--> 
+    <origin rpy="0 0. 0" xyz="-0.04 0.04 0.03"/>
     <parent link="right_soft_hand_adapter"/>
     <child link="right_poking_stick"/>
   </joint>
 
   <link name="right_poking_stick_tip">
     <visual>
-      <origin rpy="1.5707 0. 0" xyz="-0.015 0.011 0."/>
+      <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <geometry>
-        <box size="0.001 .001 .001"/>
+        <sphere radius="0.01"/>
       </geometry>
     </visual>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+      <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <mass value="0.0001"/>
       <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
     </inertial>
-    <collision>
-      <origin rpy="1.5707 0. 0" xyz="-0.015 0.011 0."/>
-      <geometry>
-        <box size="0.001 .001 .001"/>
-      </geometry>
-    </collision>
   </link>
 
   <joint name="right_poking_stick_tip_fixed" type="fixed">
-    <origin rpy="0 0. 0" xyz="0 0 0."/>
+    <origin rpy="0 0. 0" xyz="0.0 -0.0 0.177"/>
     <parent link="right_poking_stick"/>
     <child link="right_poking_stick_tip"/>
   </joint>
