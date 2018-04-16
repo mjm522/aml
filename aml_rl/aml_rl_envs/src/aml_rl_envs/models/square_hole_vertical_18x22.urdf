@@ -1,0 +1,166 @@
+<robot name="square_hole">
+
+  <link name="base">
+    <visual>
+      <geometry>
+        <box size="0.18 0.22 0.1"/>
+      </geometry>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.18 0.22 0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side1">
+    <visual>
+      <geometry>
+        <box size="0.18 0.22 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.18 0.22 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side2">
+    <visual>
+      <geometry>
+        <box size="0.18 0.22 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.18 0.22 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side3">
+    <visual>
+      <geometry>
+        <box size="0.18 0.66 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.0.18 0.66 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <link name="side4">
+    <visual>
+      <geometry>
+        <box size="0.18 0.66 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+      <material name="brown">
+        <color rgba="0.6 0.251 0.137 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.18 0.66 0.8"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.35"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
+    <contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+
+  <joint name="base_to_right" type="fixed">
+    <parent link="base"/>
+    <child link="side1"/>
+    <origin xyz="0 0.22 0"/>
+  </joint>
+
+  <joint name="base_to_left" type="fixed">
+    <parent link="base"/>
+    <child link="side2"/>
+    <origin xyz="0 -0.22 0"/>
+  </joint>
+
+  <joint name="base_to_side3" type="fixed">
+    <parent link="base"/>
+    <child link="side3"/>
+    <origin xyz="-0.18 0 0"/>
+  </joint>
+
+  <joint name="base_to_side4" type="fixed">
+    <parent link="base"/>
+    <child link="side4"/>
+    <origin xyz="0.18 0 0"/>
+  </joint>
+
+
+</robot>
