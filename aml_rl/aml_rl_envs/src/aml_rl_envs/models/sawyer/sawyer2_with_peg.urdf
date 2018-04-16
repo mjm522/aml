@@ -433,7 +433,7 @@
     <visual>
       <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <geometry>
-        <mesh filename="meshes/peg_description/poking_stick.STL" scale="0.001 0.001 0.001" />
+        <mesh filename="meshes/peg_description/peg_rect1620.STL" scale="0.001 0.001 0.001" />
       </geometry>
     </visual>
     <inertial>
@@ -444,13 +444,14 @@
     <collision>
       <origin rpy="1.5707 0. 0" xyz="0. 0. 0."/>
       <geometry>
-        <mesh filename="meshes/peg_description/poking_stick.STL" scale="0.001 0.001 0.001" />
+        <mesh filename="meshes/peg_description/peg_rect1620.STL" scale="0.001 0.001 0.001" />
       </geometry>
     </collision>
   </link>
 
   <joint name="right_poking_stick_fixed" type="fixed">
-    <origin rpy="0 0. 0" xyz="-0.05 0.05 0.03"/>
+    <!-- <origin rpy="0 0. 0" xyz="-0.05 0.05 0.03"/>  for the cylinder peg--> 
+    <origin rpy="0 0. 0" xyz="-0.04 0.04 0.03"/>
     <parent link="right_soft_hand_adapter"/>
     <child link="right_poking_stick"/>
   </joint>
@@ -470,7 +471,7 @@
   </link>
 
   <joint name="right_poking_stick_tip_fixed" type="fixed">
-    <origin rpy="0 0. 0" xyz="0.01 -0.01 0.18"/>
+    <origin rpy="0 0. 0" xyz="0.0 -0.0 0.177"/>
     <parent link="right_poking_stick"/>
     <child link="right_poking_stick_tip"/>
   </joint>
