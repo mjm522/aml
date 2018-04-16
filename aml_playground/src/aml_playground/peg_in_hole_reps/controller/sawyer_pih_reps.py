@@ -26,8 +26,8 @@ class SawyerPegREPS():
         eval_config = copy.deepcopy(SAWYER_ENV_CONFIG)
         sim_config = copy.deepcopy(SAWYER_ENV_CONFIG)
 
-        sim_config['renders'] = False
-        eval_config['renders'] = True
+        sim_config['renders']  = False
+        eval_config['renders'] = True #True
 
         self._eval_env = SawyerEnv(config=eval_config, demo2follow=self.update_dmp_params)
 
@@ -67,18 +67,15 @@ class SawyerPegREPS():
 
     def setup_gpreps(self, exp_params):
 
-        #w_bounds[:,0] = [x_lower, y_lower, z0_lower, z1_lower]
-        #w_bounds[:,1] = [x_upper, y_upper, z0_upper, z1_upper]
-        w_bounds = np.array([ [-0.013, -0.015, 0., 0.], 
-                              [0.013,   0.015, 0., 0.05] ] )
+        #w_bounds[:,0] = [x_lower, y_lower, z0_lower, z1_lower, theta_lower]
+        #w_bounds[:,1] = [x_upper, y_upper, z0_upper, z1_upper, theta_upper]
 
-        
         policy = LinGaussPolicy(w_dim=exp_params['w_dim'], 
                                 context_feature_dim=exp_params['context_feature_dim'], 
                                 variance=exp_params['policy_variance'], 
                                 initial_params=exp_params['initial_params'], 
                                 random_state=exp_params['random_state'],
-                                bounds=w_bounds)
+                                bounds=exp_params['w_bounds'])
 
         context_model = ContextModel(context_dim=exp_params['context_dim'], 
                                     num_data_points=exp_params['num_samples_fwd_data'])
