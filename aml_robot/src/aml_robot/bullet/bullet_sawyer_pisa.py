@@ -36,36 +36,54 @@ class BulletSawyerPisa(RobotInterface):
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
         sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)
+        table_path = get_file_path("table.urdf", models_path)
+        mug_path = get_file_path("mug.urdf", models_path)
+        plane_path = get_file_path("plane.urdf", models_path)
         robot_id = pb.loadURDF(sawyer_path, useFixedBase=True)
+        self._table_id = pb.loadURDF(table_path, useFixedBase=True, globalScaling=0.5)
+        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707])
 
+        self._mug_id = pb.loadURDF(mug_path,  globalScaling=0.001)
+        pb.resetBasePositionAndOrientation(self._mug_id, [0.65, 0., 0.665], [-0.707, 0.0, 0.0, 0.707])
 
+        self._plane_id = pb.loadURDF(plane_path, useFixedBase=True)
+        pb.resetBasePositionAndOrientation(self._mug_id, [0.65, 0., 0.665], [-0.707, 0.0, 0.0, 0.707])
 
         self._bullet_robot = BulletRobot2(robot_id=robot_id, config = config_hand_world)
         self._bullet_robot_hand = BulletRobotHand(robot_id=robot_id, config = config_hand_world)  # hardcoded from the sawyer urdf
 
+
+        self._bullet_robot.configure_default_pos([-0.100000, 0.000000, 1.0000], [0.000000, 0.000000, 0.000000, 1.000000])
+
         self.name = limb
         self._limb = limb
 
+        self._joint_names = ['right_j%s' % (s,) for s in range(0, 7)]
+        self._joint_names += self._bullet_robot_hand.joint_names()
+
         self._kinematics = sawyer_kinematics(self, description=sawyer_path)
 
-        self._joint_names = self._bullet_robot.joint_names()
-
         # all_joint_dict = self._bullet_robot.get_joint_dict()
-        self._joints = self._bullet_robot.get_all_joints()
+        # self._joints = self._bullet_robot.get_all_joints()
 
-
+        all_joint_dict = self._bullet_robot.get_joint_dict()
+        self._joints = [all_joint_dict[joint_name] for joint_name in self._joint_names]
 
         self._nq = len(self._joint_names)
         self._nu = len(self._joint_names)
 
-        lower_limits = self._bullet_robot.get_joint_limits()['lower']#[self._joints]
-        upper_limits = self._bullet_robot.get_joint_limits()['upper']#[self._joints]
+        lower_limits = self._bullet_robot.get_joint_limits()['lower'][self._joints]
+        upper_limits = self._bullet_robot.get_joint_limits()['upper'][self._joints]
 
         self._jnt_limits = [{'lower': x[0], 'upper': x[1]} for x in zip(lower_limits,upper_limits)]
 
-        self._tuck = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        self._untuck = self._tuck
+        # self._tuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
+        #                        0., 0., 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., 0.])
+        self._tuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
+                               1.5707889560579844, 0.786210883026469, 0.7880146387387372, 0.0004999999996493284, 0.4795928796782728, 0.6948884694870044, 0.7828197973076467, 0.00033187601344706225, 0.7839629628325961, 0.7854953738051564, 0.785411633485201, -0.05623798776832702, 0.7827861068048277, 0.7834708238660533, 0.7741387171672663, 0.10818102126910266, 0.7794819174352743, 0.7875821720282794, 0.7788698724995202])
 
+        self._untuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
+                                 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
         self._ready = True
 
     def _on_joint_states(self, msg):
@@ -93,7 +111,7 @@ class BulletSawyerPisa(RobotInterface):
         print 'NOT IMPLEMENTED'
 
     def inverse_kinematics(self, position, orientation=None):
-        return self._bullet_robot.inverse_kinematics(position, orientation)#[self._joints]
+        return self._bullet_robot.inverse_kinematics(position, orientation)[self._joints]
 
     def ee_pose(self):
         return self._bullet_robot.ee_pose()
@@ -102,12 +120,10 @@ class BulletSawyerPisa(RobotInterface):
         pass
 
     def untuck(self):
-        pass
-        # self.exec_position_cmd(self._tuck)
+        self.exec_position_cmd(self._untuck)
 
     def tuck(self):
-        pass
-        # self.exec_position_cmd(self._tuck)
+        self.exec_position_cmd(self._tuck)
 
     def _update_state(self):
         pass
@@ -117,11 +133,32 @@ class BulletSawyerPisa(RobotInterface):
 
     def jacobian(self, joint_angles=None):
 
-        return None
-        # return self._bullet_robot.jacobian(joint_angles)
+        # jacobian = self._bullet_robot.jacobian(joint_angles)
+        #
+        # return np.delete(jacobian, 1, 1)
+
+        if joint_angles is None:
+
+            argument = dict(zip(self.joint_names(), self.angles()))
+
+        else:
+
+            argument = dict(zip(self.joint_names(), joint_angles))
+        # combine the names and joint angles to a dictionary, that only is accepted by kdl
+        jacobian = np.array(self._kinematics.jacobian(argument))
+
+        # print jacobian
+
+        return jacobian
 
     def inertia(self, joint_angles=None):
-        return self._bullet_robot.inertia(joint_angles)
+
+        if joint_angles is None:
+            argument = dict(zip(self.joint_names(), self.angles()))
+        else:
+            argument = dict(zip(self.joint_names(), joint_angles))
+
+        return np.array(self._kinematics.inertia(argument))
 
     def q_mean(self):
         return self._bullet_robot.q_mean()
@@ -143,18 +180,16 @@ class BulletSawyerPisa(RobotInterface):
         state['ee_vel'], state['ee_omg'] = self.ee_velocity()
 
         # state['gripper_state'] = self.gripper_state()
-
-
         return state
 
     def angles(self):
-        return self._bullet_robot.angles()#[self._joints]
+        return self._bullet_robot.angles()[self._joints]
 
     def joint_velocities(self):
-        return self._bullet_robot.joint_velocities()#[self._joints]
+        return self._bullet_robot.joint_velocities()[self._joints]
 
     def joint_efforts(self):
-        return self._bullet_robot.joint_efforts()#[self._joints]
+        return self._bullet_robot.joint_efforts()[self._joints]
 
     def ee_velocity(self, numerical=False):
         return self._bullet_robot.ee_velocity(numerical)
@@ -166,7 +201,7 @@ class BulletSawyerPisa(RobotInterface):
         return self._nq
 
     def joint_names(self):
-        return self._bullet_robot.joint_names()
+        return self._joint_names
 
     def joint_limits(self):
         return self._jnt_limits

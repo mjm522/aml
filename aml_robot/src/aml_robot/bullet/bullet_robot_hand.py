@@ -114,7 +114,7 @@ class BulletRobotHand(BulletRobot2):
 
 
 
-    def joint_names(self, finger_name):
+    def joint_names(self, finger_name = None):
         return self._joint_name_map.get(finger_name, self._all_joint_names)
 
 
