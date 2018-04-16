@@ -67,10 +67,10 @@ class SawyerPegREPS():
 
     def setup_gpreps(self, exp_params):
 
-        #w_bounds[:,0] = [x_lower, y_lower]
-        #w_bounds[:,1] = [x_upper, y_upper]
-        w_bounds = np.array([ [0.65145, 0.65145 + 0.15*0.55], 
-                              [0.015,   0.015 - 0.15*1.90] ] )
+        #w_bounds[:,0] = [x_lower, y_lower, z0_lower, z1_lower]
+        #w_bounds[:,1] = [x_upper, y_upper, z0_upper, z1_upper]
+        w_bounds = np.array([ [-0.013, -0.015, 0., 0.], 
+                              [0.013,   0.015, 0., 0.05] ] )
 
         
         policy = LinGaussPolicy(w_dim=exp_params['w_dim'], 

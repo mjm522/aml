@@ -108,8 +108,8 @@ def main(joint_space=False):
         params.append(np.hstack([w,s,mean_reward]))
 
         ps._eval_env._reset()
-
-        plt.plot(rewards)
+        plt.clf()
+        plt.plot(rewards, 'b')
         plt.pause(0.00001)
         plt.draw()
 
