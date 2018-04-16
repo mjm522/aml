@@ -1,387 +1,131 @@
+import sys
 import numpy as np
 import quaternion
-
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
-
 import pybullet as pb
+from aml_robot.bullet.bullet_robot2 import BulletRobot2
+# from utils import parse_state
+# from glove_interface.config import default_glove_config as g_config
+
+import atexit
+
+
+def to_bullet_quat(q, flip_z=False):
+    return [q.x, q.y, q.z, q.w]
+    # if flip_z:
+    #     return [q.x, q.y, -q.z, q.w]#np.flip(quaternion.as_float_array(q),0)
+    # else:
+
+
+def from_bullet_to_np_quat(array):
+    return quaternion.quaternion(array[3], array[0], array[1], array[2])
+
+
+def make_np_quat(array):
+    return quaternion.quaternion(array[0], array[1], array[2], array[3])
 
 
 class BulletRobotHand(BulletRobot2):
-    def __init__(self, robot_id, ee_link_idx=16, ee_link_name="right_hand"):
+    def __init__(self, robot_id, config):
 
-        """
-        :param config: configuration for this robot
-        """
+        BulletRobot2.__init__(self, robot_id, config)
 
-        BulletRobot2.__init__(self, robot_id = robot_id, ee_link_idx=16, ee_link_name=ee_link_name)
+        self._config = config
 
+        # self._ori_offset = quaternion.from_euler_angles(*config['orientation_offset'])
 
+        # self._pos = np.array([0.0, 0., 0.])
+        # self._ori_quat = np.quaternion(1, 0, 0, 0)
+        # self._start_pos = np.array([0.0, 0., 0.])
+        # self._start_ori = quaternion.from_euler_angles(0, 1.570796327, 3.141592654)
+        #
+        # self.configure_default_pos(np.array([0.0, 0., 0.]), to_bullet_quat(self._ori_offset * self._ori_quat))
 
-        # self._config = config
-        # description_path = config['description_path']
-        # extension = description_path.split('.')[-1]
-        # if extension == "urdf":
-        #     self._id = pb.loadURDF(config['description_path'])
-        # elif extension == "xml":
-        #     self._id = pb.loadMJCF(config['description_path'])[0]
+        self._thumb_joints = [self.get_joint_by_name(jm) for jm in self._config['thumb_joints']]
 
-        self._all_joints = range(pb.getNumJoints(self._id))
+        self._index_joints = [self.get_joint_by_name(jm) for jm in self._config['index_joints']]
 
-        self._movable_joints = self.get_movable_joints()
+        self._middle_joints = [self.get_joint_by_name(jm) for jm in self._config['middle_joints']]
 
-        self._nq = len(self._all_joints)
+        self._ring_joints = [self.get_joint_by_name(jm) for jm in self._config['ring_joints']]
 
-        self._nu = len(self._movable_joints)
+        self._little_joints = [self.get_joint_by_name(jm) for jm in self._config['little_joints']]
 
-        joint_information = self.get_joint_info()
+        self._joint_map = {"thumb": self._thumb_joints,
+                           "index": self._index_joints,
+                           "middle": self._middle_joints,
+                           "ring": self._ring_joints,
+                           "little": self._little_joints}
 
-        self._all_joint_names = [info['jointName'] for info in joint_information]
+        self._joint_name_map = {"thumb": self._config['thumb_joints'],
+                               "index": self._config['index_joints'],
+                               "middle": self._config['middle_joints'],
+                               "ring": self._config['ring_joints'],
+                               "little": self._config['little_joints']}
+
+        self._all_joint_names = []
+        for finger_name in self._config["finger_order"]:
+            self._all_joint_names += self._joint_name_map[finger_name]
+
+        self._all_joints = []
+        for finger_name in self._config["finger_order"]:
+            self._all_joints += self._joint_map[finger_name]
 
         self._all_joint_dict = dict(zip(self._all_joint_names, self._all_joints))
 
-        self._ee_link_name = ee_link_name  # config['ee_link_name']
+        self._nfingers = len(self._config["finger_order"])
+        # Hack for the right hand
+        # self._all_joints.reverse()
 
-        self._ee_link_idx = ee_link_idx  # config['ee_link_idx'] # saywer ee idx: 16
+        # self._joint_state = np.zeros(len(self._joints))
+
+        self._nq = len(self._all_joints)
+        self._nu = len(self._all_joints)
 
         self._joint_limits = self.get_joint_limits()
 
-    def state(self):
-        """
+        self.add_static_debug_visual_elements()
 
-        :return: returns dictionary containing current state of the robot
-        """
+        pb.getCameraImage(640, 480, renderer=pb.ER_BULLET_HARDWARE_OPENGL)
+        atexit.register(self.on_shutdown)
 
-        joint_angles = self.angles()
-        joint_velocities = self.joint_velocities()
-        joint_efforts = self.joint_efforts()
+    def add_static_debug_visual_elements(self):
 
-        state = {}
-        state['position'] = joint_angles
-        state['velocity'] = joint_velocities
-        state['effort'] = joint_efforts
-        state['jacobian'] = self.jacobian(None)
-        state['inertia'] = self.inertia(None)
+        for jn in self._all_joints:
+            pb.addUserDebugLine([0, 0, 0], [0, 0.0, 0.05], [1, 0, 0], parentObjectUniqueId=self._id,
+                                parentLinkIndex=jn, lineWidth=0.05, lifeTime=0)
+            pb.addUserDebugText("jnt_%d" % jn, [0, 0, -0.025], textColorRGB=[1, 0, 0], textSize=1.0,
+                                parentObjectUniqueId=self._id, parentLinkIndex=jn)
+    #
+    # def get_joint_limits(self, joints):
+    #
+    #     joint_lims = [self.get_joint_limits(joint_idx) for joint_idx in joints]
+    #     return dict(zip(joints, joint_lims))
+    #
 
-        state['ee_point'], state['ee_ori'] = self.ee_pose()
 
-        state['ee_vel'], state['ee_omg'] = self.ee_velocity()
 
-        # state['gripper_state'] = self.gripper_state()
+    def on_shutdown(self):
 
-    def jacobian(self, joint_angles=None):
-        """
+        pb.removeAllUserDebugItems()
 
-        :param joint_angles: 
-        Optional parameter. If different than None, then returned jacobian will be evaluated at given joint_angles.
-        Otherwise the returned jacobian will be evaluated at current robot joint angles
+        pb.resetSimulation()
 
-        :return: 
-        Jacobian evaluated at current joint angles or optionally at joint_angles
+        pb.disconnect()
 
-        """
 
-        if joint_angles is None:
-            joint_angles = self.angles()
 
-        linear_jacobian, angular_jacobian = pb.calculateJacobian(bodyUniqueId=self._id,
-                                                                 linkIndex=self._ee_link_idx,
-                                                                 localPosition=[0.0, 0.0, 0.0],
-                                                                 objPositions=joint_angles.tolist(),
-                                                                 objVelocities=np.zeros(self.n_joints()).tolist(),
-                                                                 objAccelerations=np.zeros(self.n_joints()).tolist()
-                                                                 )
+    def joint_names(self, finger_name):
+        return self._joint_name_map.get(finger_name, self._all_joint_names)
 
-        jacobian = np.vstack([np.array(linear_jacobian), np.array(angular_jacobian)])
 
-        return jacobian
+    def get_all_joints(self):
 
-    def ee_pose(self):
-        """
+        return np.array(self._all_joints)
 
-        :return: end-effector pose of this robot in the format (position,orientation)
-        Note: orientation is a quaternion following Hamilton convention, i.e. (w, x, y, z)
-        """
-        return self.get_link_pose(link_id=self._ee_link_idx)
 
-    def ee_velocity(self, numerical=False):
-        """
 
-        :param numerical: flag indicating if end-effector velocity should be computed numerically or not.
-        :return: end-effector velocity, which includes linear and angular velocities, i.e. (v,omega)
-        """
 
-        return self.get_link_velocity(link_id=self._ee_link_idx)
 
-    def inertia(self, joint_angles=None):
-        """
 
-        :param joint_angles: optional parameter, if not None, then returned inertia is evaluated at given joint_angles.
-        Otherwise, returned inertia tensor is evaluated at current joint angles.
-        :return: Joint space inertia tensor
-        """
 
-        if joint_angles is None:
-            joint_angles = self.angles()
 
-        inertia_tensor = np.array(pb.calculateMassMatrix(self._id, joint_angles.tolist()))
-
-        return inertia_tensor
-
-    def inverse_kinematics(self, position, orientation=None):
-        """
-
-        :param position: target position
-        :param orientation: target orientation in quaternion format (w, x, y , z)
-        :return: joint positions that take the end effector to the desired target position and/or orientation
-        """
-
-        solution = None
-        if orientation is None:
-
-            solution = pb.calculateInverseKinematics(self._id,
-                                                     self._ee_link_idx,
-                                                     targetPosition=position)
-        else:
-
-            orientation = [orientation[1], orientation[2], orientation[3], orientation[0]]
-            solution = pb.calculateInverseKinematics(self._id,
-                                                     self._ee_link_idx,
-                                                     targetPosition=position,
-                                                     targetOrientation=orientation)
-
-        return np.array(solution), solution is None
-
-    def q_mean(self):
-        return self._joint_limits['mean']
-
-    def joint_names(self):
-        """
-
-        :return: joint names for this robot
-        """
-        return self._all_joint_names
-
-    def joint_ids(self):
-
-        return self._all_joints
-
-    def angles(self):
-
-        """
-
-        :return: current joint angles
-        """
-        return self.get_joint_state()[0]
-
-    def joint_velocities(self):
-
-        """
-
-
-        :return: current joint velocities
-        """
-        return self.get_joint_state()[1]
-
-    def joint_efforts(self):
-        """
-
-
-        :return: current joint efforts
-        """
-        return self.get_joint_state()[3]
-
-    def n_joints(self):
-        """
-
-        :return: number of joint this robot has
-        """
-        return self._nq
-
-    def n_cmd(self):
-        """
-
-
-        :return: number of controllable degrees of freedom that this robot has
-        """
-        return self._nu
-
-    def set_joint_velocities(self, cmd, joints=None):
-
-        if joints is None:
-            joints = self._movable_joints
-
-        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.VELOCITY_CONTROL, targetVelocities=cmd)
-
-    def set_joint_torques(self, cmd, joints=None):
-
-        if joints is None:
-            joints = self._movable_joints
-
-        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.TORQUE_CONTROL, forces=cmd)
-
-    def set_joint_positions_delta(self, cmd, joints=None, forces=None):
-
-        if joints is None:
-            joints = self._movable_joints
-
-        if forces is None:
-            forces = np.ones(len(joints)) * 1.5
-
-        pb.setJointMotorControlArray(self._id, joints,
-                                     controlMode=pb.POSITION_CONTROL,
-                                     targetVelocities=cmd,
-                                     forces=forces)
-
-    def set_joint_positions(self, cmd, joints=None, forces=None):
-
-        vels = [0.0005 for n in range(len(cmd))]
-        pb.setJointMotorControlArray(self._id, joints, controlMode=pb.POSITION_CONTROL,
-                                     targetPositions=cmd, targetVelocities=vels)
-
-    def get_joint_info(self):
-        attribute_list = ['jointIndex', 'jointName', 'jointType',
-                          'qIndex', 'uIndex', 'flags',
-                          'jointDamping', 'jointFriction', 'jointLowerLimit',
-                          'jointUpperLimit', 'jointMaxForce', 'jointMaxVelocity', 'linkName']
-
-        joint_information = []
-        for idx in self._all_joints:
-            info = pb.getJointInfo(self._id, idx)
-            joint_information.append(dict(zip(attribute_list, info)))
-
-        return joint_information
-
-    def get_link_pose(self, link_id=-3):
-
-        if link_id == -3:
-            self._ee_link_idx
-
-        # if link_id not in self._joint_idx:
-        #     raise Exception("Invalid Link ID")
-
-        link_state = pb.getLinkState(self._id, link_id)
-        pos = np.asarray(link_state[0])
-        ori = np.quaternion(link_state[1][3], link_state[1][0], link_state[1][1],
-                            link_state[1][2])  # hamilton convention
-
-        return pos, ori
-
-    def get_link_velocity(self, link_id=-3):
-
-        if link_id == -3:
-            self._ee_link_idx
-
-        # if link_id not in self._joint_idx:
-        #     raise Exception("Invalid Link ID")
-
-        link_state = pb.getLinkState(self._id, link_id, computeLinkVelocity=1)
-
-        lin_vel = np.asarray(link_state[6])
-        ang_vel = np.asarray(link_state[7])
-
-        return lin_vel, ang_vel
-
-    def get_joint_state(self):
-
-        joint_angles = []
-        joint_velocities = []
-        joint_reaction_forces = []
-        joint_efforts = []
-
-        for idx in self._all_joints:
-            joint_state = pb.getJointState(self._id, idx)
-
-            joint_angles.append(joint_state[0])
-
-            joint_velocities.append(joint_state[1])
-
-            joint_reaction_forces.append(joint_state[2])
-
-            joint_efforts.append(joint_state[3])
-
-        return np.array(joint_angles), np.array(joint_velocities), np.array(joint_reaction_forces), np.array(
-            joint_efforts)
-
-    def get_movable_joints(self):
-
-        movable_joints = []
-        for i in self._all_joints:
-            joint_info = pb.getJointInfo(self._id, i)
-            q_index = joint_info[3]
-            joint_name = joint_info[1]
-            if q_index > -1:
-                movable_joints.append(i)
-
-        return np.array(movable_joints)
-
-    def get_joint_dict(self):
-
-        return self._all_joint_dict
-
-    def get_joint_limits(self):
-
-        lower_lim = np.zeros(self.n_joints())
-
-        upper_lim = np.zeros(self.n_joints())
-
-        mean_ = np.zeros(self.n_joints())
-
-        range_ = np.zeros(self.n_joints())
-
-        for k, idx in enumerate(self._all_joints):
-            lower_lim[k] = pb.getJointInfo(self._id, idx)[8]
-
-            upper_lim[k] = pb.getJointInfo(self._id, idx)[9]
-
-            mean_[k] = 0.5 * (lower_lim[k] + upper_lim[k])
-
-            range_[k] = (upper_lim[k] - lower_lim[k])
-
-        return {'lower': lower_lim, 'upper': upper_lim, 'mean': mean_, 'range': range_}
-
-    def get_joint_by_name(self, joint_name):
-        if joint_name in self._all_joint_dict:
-            return self._all_joint_dict[joint_name]
-        else:
-            raise Exception("Joint name does not exist!")
-
-    def set_default_pos_ori(self):
-
-        self.set_pos_ori(self._default_pos, self._default_ori)
-
-    def set_pos_ori(self, pos, ori):
-
-        pb.resetBasePositionAndOrientation(self._id, pos, ori)
-
-    def set_ctrl_mode(self, ctrl_type='pos'):
-
-        angles = self.angles()
-
-        # disable the default position_control mode.
-        for k, jnt_index in enumerate(self._movable_joints):
-
-            pb.resetJointState(self._id, jnt_index, angles[k])
-
-            if ctrl_type == 'pos':
-
-                pb.setJointMotorControl2(self._id, jnt_index, pb.POSITION_CONTROL,
-                                         targetPosition=angles[k], force=10)
-
-            else:
-
-                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL,
-                                         targetPosition=angles[k], force=0.5)
-
-                # def get_image(self):
-                #
-                #     _, _, self._view_matrix, _, _, _, _, _, _, _, _, _ = pb.getDebugVisualizerCamera()
-                #     (w, h, rgb_pixels, depth_pixels, _) = pb.getCameraImage(self._config['cam']['image_width'],
-                #                                                             self._config['cam']['image_height'],
-                #                                                             self._view_matrix, self._projection_matrix, [0, 1, 0],
-                #                                                             renderer=pb.ER_BULLET_HARDWARE_OPENG)
-                #
-                #     # rgba to rgb
-                #     rgb_image = rgb_pixels[:, :, 0:3]
-                #     depth_image = depth_pixels
-                #
-                #     return rgb_image, depth_image

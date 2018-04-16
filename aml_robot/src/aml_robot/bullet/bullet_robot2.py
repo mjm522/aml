@@ -324,6 +324,10 @@ class BulletRobot2(object):
 
         return np.array(movable_joints)
 
+    def get_all_joints(self):
+
+        return np.array(self._all_joints)
+
     def get_joint_dict(self):
 
         return self._all_joint_dict
@@ -404,3 +408,5 @@ class BulletRobot2(object):
     #     depth_image = depth_pixels
     #
     #     return rgb_image, depth_image
+
+

@@ -11,14 +11,12 @@ import pybullet as pb
 from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot_hand import BulletRobotHand
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
 from aml_robot.robot_interface import RobotInterface
 from aml_io.io_tools import get_file_path, get_aml_package_path
 
-from aml_robot.sawyer_kinematics import sawyer_kinematics
 from aml_robot.bullet.config import config_hand_world
 
-class BulletSawyerPisa(RobotInterface):
+class BulletPisaHand(RobotInterface):
 
     def __init__(self, limb="right", on_state_callback=None):
         self._ready = False
@@ -35,20 +33,14 @@ class BulletSawyerPisa(RobotInterface):
         pb.setTimeStep(0.01)
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)
+        sawyer_path = get_file_path('pisa_hand_right.urdf', models_path)
         robot_id = pb.loadURDF(sawyer_path, useFixedBase=True)
 
+        self._bullet_robot = BulletRobotHand(robot_id=robot_id, config = config_hand_world)  # hardcoded from the sawyer urdf
 
-
-        self._bullet_robot = BulletRobot2(robot_id=robot_id, config = config_hand_world)
-        self._bullet_robot_hand = BulletRobotHand(robot_id=robot_id, config = config_hand_world)  # hardcoded from the sawyer urdf
-
-        self.name = limb
         self._limb = limb
 
-        self._kinematics = sawyer_kinematics(self, description=sawyer_path)
-
-        self._joint_names = self._bullet_robot.joint_names()
+        self._joint_names = self._bullet_robot.joint_names(None)
 
         # all_joint_dict = self._bullet_robot.get_joint_dict()
         self._joints = self._bullet_robot.get_all_joints()
@@ -166,7 +158,7 @@ class BulletSawyerPisa(RobotInterface):
         return self._nq
 
     def joint_names(self):
-        return self._bullet_robot.joint_names()
+        return self._bullet_robot.joint_names(None)
 
     def joint_limits(self):
         return self._jnt_limits
