@@ -10,7 +10,7 @@ import pybullet as pb
 
 from aml_math.quaternion_utils import compute_omg
 
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
+from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_robot.robot_interface import RobotInterface
 from aml_io.io_tools import get_file_path, get_aml_package_path
 from aml_robot.sawyer_kinematics import sawyer_kinematics
@@ -54,7 +54,7 @@ class BulletSawyerArm(RobotInterface):
 
         self._kinematics = sawyer_kinematics(self, description=sawyer_path)
 
-        self._bullet_robot = BulletRobot2(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
+        self._bullet_robot = BulletRobot(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
 
         self._limb = limb
 

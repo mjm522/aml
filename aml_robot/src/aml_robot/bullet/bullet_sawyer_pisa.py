@@ -11,7 +11,7 @@ import pybullet as pb
 from aml_math.quaternion_utils import compute_omg
 
 from aml_robot.bullet.bullet_robot_hand import BulletRobotHand
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
+from aml_robot.bullet.bullet_robot import BulletRobot
 from aml_robot.robot_interface import RobotInterface
 from aml_io.io_tools import get_file_path, get_aml_package_path
 
@@ -49,7 +49,7 @@ class BulletSawyerPisa(RobotInterface):
         self._plane_id = pb.loadURDF(plane_path, useFixedBase=True)
         pb.resetBasePositionAndOrientation(self._mug_id, [0.65, 0., 0.665], [-0.707, 0.0, 0.0, 0.707])
 
-        self._bullet_robot = BulletRobot2(robot_id=robot_id, config = config_hand_world)
+        self._bullet_robot = BulletRobot(robot_id=robot_id, config = config_hand_world)
         self._bullet_robot_hand = BulletRobotHand(robot_id=robot_id, config = config_hand_world)  # hardcoded from the sawyer urdf
 
 

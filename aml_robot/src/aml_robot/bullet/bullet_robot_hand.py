@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import quaternion
 import pybullet as pb
-from aml_robot.bullet.bullet_robot2 import BulletRobot2
+from aml_robot.bullet.bullet_robot import BulletRobot
 # from utils import parse_state
 # from glove_interface.config import default_glove_config as g_config
 
@@ -24,10 +24,10 @@ def make_np_quat(array):
     return quaternion.quaternion(array[0], array[1], array[2], array[3])
 
 
-class BulletRobotHand(BulletRobot2):
+class BulletRobotHand(BulletRobot):
     def __init__(self, robot_id, config):
 
-        BulletRobot2.__init__(self, robot_id, config)
+        BulletRobot.__init__(self, robot_id, config)
 
         self._config = config
 
