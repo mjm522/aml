@@ -77,3 +77,11 @@ class BulletSawyerPisa2(BulletSawyerArm):
     def set_joint_angles(self, joint_angles):
 
         self._bullet_robot.set_joint_angles(joint_angles, self._joints)
+
+    #
+    # def state(self):
+    #
+    #     data = self._bullet_robot_hand.triangle_mesh()
+    #     print data[-5]
+    #
+    #     return BulletSawyerArm.state(self)
