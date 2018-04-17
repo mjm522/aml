@@ -21,7 +21,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-	 	     <box size="30 30 0.01"/>
+        <mesh filename="9_Mug/9_a_Ceramic_mugs/conic_with_open_handle.stl" scale="1 1 1"/>
       </geometry>
     </collision>
   </link>
