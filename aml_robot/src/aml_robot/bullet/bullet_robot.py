@@ -401,11 +401,11 @@ class BulletRobot(object):
             if ctrl_type == 'pos':
 
                 pb.setJointMotorControl2(self._id, jnt_index, pb.POSITION_CONTROL,
-                                         targetPosition=angles[k], force=10)
+                                         targetPosition=angles[k], force=100)
 
             else:
 
-                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL,
+                pb.setJointMotorControl2(self._id, jnt_index, pb.VELOCITY_CONTROL,
                                          targetPosition=angles[k], force=0.5)
 
     def triangle_mesh(self):
