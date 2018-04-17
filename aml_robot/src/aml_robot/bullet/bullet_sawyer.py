@@ -45,7 +45,7 @@ class BulletSawyerArm(RobotInterface):
         #     self._id = pb.loadMJCF(config['description_path'])[0]
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        self._sawyer_path = get_file_path('sawyer_with_pisa_hand.urdf', models_path)#_with_pisa_hand
+        self._sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)#_with_pisa_hand
         robot_id = pb.loadURDF(self._sawyer_path, useFixedBase=True)
 
         self.name = limb
