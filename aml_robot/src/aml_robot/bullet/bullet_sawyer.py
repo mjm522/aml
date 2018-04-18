@@ -45,14 +45,14 @@ class BulletSawyerArm(RobotInterface):
         #     self._id = pb.loadMJCF(config['description_path'])[0]
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        sawyer_path = get_file_path('sawyer.urdf', models_path)#_with_pisa_hand
-        robot_id = pb.loadURDF(sawyer_path, useFixedBase=True)
+        self._sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)#_with_pisa_hand
+        robot_id = pb.loadURDF(self._sawyer_path, useFixedBase=True)
 
         self.name = limb
 
         self._joint_names = ['right_j%s' % (s,) for s in range(0, 7)]
 
-        self._kinematics = sawyer_kinematics(self, description=sawyer_path)
+        self._kinematics = sawyer_kinematics(self, description=self._sawyer_path)
 
         self._bullet_robot = BulletRobot(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
 

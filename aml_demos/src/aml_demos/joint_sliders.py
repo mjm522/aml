@@ -28,6 +28,7 @@ import math
 import rospy
 
 from aml_ctrl.controllers.js_controllers.js_torque_controller import JSTorqueController
+from aml_ctrl.controllers.js_controllers.js_torque_controller2 import JSTorqueController2
 from aml_ctrl.controllers.js_controllers.js_postn_controller2 import JSPositionController2
 from aml_ctrl.controllers.js_controllers.js_velocity_controller import JSVelocityController
 
@@ -178,7 +179,11 @@ class SliderWindow(qtg.QWidget):
 
 
 
-        control_options = [('dummy_controller',DummyController), ('js_position_control',JSPositionController2),('js_velocity_control',JSVelocityController),('js_torque_control',JSTorqueController)]
+        control_options = [('dummy_controller',DummyController),
+                           ('js_position_control',JSPositionController2),
+                           ('js_velocity_control',JSVelocityController),
+                           ('js_torque_control',JSTorqueController),
+                           ('js_torque_control2', JSTorqueController2)]
         self.controller_dict = {}
 
         combo_box = qtg.QComboBox()
@@ -413,7 +418,7 @@ def main():
     elif arm_interface =="pisa_bullet":
         from aml_robot.bullet.bullet_pisa_hand import BulletPisaHand as ArmInterface
     elif arm_interface =="sawyer_pisa_bullet":
-        from aml_robot.bullet.bullet_sawyer_pisa import BulletSawyerPisa as ArmInterface
+        from aml_robot.bullet.bullet_sawyer_pisa2 import BulletSawyerPisa2 as ArmInterface
 
 
     print "ARM INTERFACE",arm_interface

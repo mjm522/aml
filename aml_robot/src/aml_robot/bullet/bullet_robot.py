@@ -264,6 +264,25 @@ class BulletRobot(object):
 
         return pos, ori
 
+    def get_link_pose_inertial(self, link_id=-3):
+
+        # If you implement your own rendering, you need to transform the local visual transform to world space,
+        # making use of the center of mass world transform and the (inverse) localInertialFrame.
+        # You can access the localInertialFrame using the getLinkState API.
+
+        if link_id == -3:
+            self._ee_link_idx
+
+        # if link_id not in self._joint_idx:
+        #     raise Exception("Invalid Link ID")
+
+        link_state = pb.getLinkState(self._id, link_id)
+        pos = np.asarray(link_state[0])
+        ori = np.quaternion(link_state[1][3], link_state[1][0], link_state[1][1],
+                            link_state[1][2])  # hamilton convention
+
+        return pos, ori
+
     def get_link_velocity(self, link_id=-3):
 
         if link_id == -3:
@@ -300,16 +319,11 @@ class BulletRobot(object):
         return np.array(joint_angles), np.array(joint_velocities), np.array(joint_reaction_forces), np.array(
             joint_efforts)
 
-    def set_jnt_state(self, jnt_state):
+    def set_joint_angles(self, joint_angles, joint_indices):
 
+        for i, jnt_idx in enumerate(joint_indices):
 
-        if len(jnt_state) < self.n_cmd():
-            raise Exception ("Incorrect number of joint state values given")
-
-        else:
-            for jnt_idx in self._movable_joints:
-
-                pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
+            pb.resetJointState(self._id, jnt_idx, joint_angles[i])
 
     def get_movable_joints(self):
 
@@ -387,12 +401,48 @@ class BulletRobot(object):
             if ctrl_type == 'pos':
 
                 pb.setJointMotorControl2(self._id, jnt_index, pb.POSITION_CONTROL,
-                                         targetPosition=angles[k], force=10)
+                                         targetPosition=angles[k], force=100)
 
             else:
 
-                pb.setJointMotorControl2(self._robot_id, jnt_index, pb.VELOCITY_CONTROL,
+                pb.setJointMotorControl2(self._id, jnt_index, pb.VELOCITY_CONTROL,
                                          targetPosition=angles[k], force=0.5)
+
+    def triangle_mesh(self):
+
+        visual_shape_data = pb.getVisualShapeData(self._id)
+
+        triangle_mesh = [None]*len(visual_shape_data)
+
+        for i, data in enumerate(visual_shape_data):
+            link_index = data[1]
+            geometry_type = data[2]
+            dimensions = data[3]
+            mesh_asset_file = data[4]
+            local_pos = data[5]
+            local_ori = data[6]
+            colour = data[7]
+
+            link_state = pb.getLinkState(self._id, link_index)
+            pos = link_state[0]
+            ori = link_state[1]
+            loc_inertial_pos = link_state[2]
+            loc_inertial_ori = link_state[3]
+
+            inv_loc_inertial_pos, inv_loc_inertial_ori = pb.invertTransform(loc_inertial_pos,
+                                                                            loc_inertial_ori)
+            tp, to = pb.multiplyTransforms(inv_loc_inertial_pos,
+                                           inv_loc_inertial_ori,
+                                           pos,ori)
+
+            global_pos, global_ori = pb.multiplyTransforms(tp,to,local_pos,local_ori)
+
+
+            triangle_mesh[i] = (np.asarray(global_pos),)
+
+
+        return triangle_mesh
+
 
     # def get_image(self):
     #
