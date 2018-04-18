@@ -141,7 +141,7 @@ class AMLRlRobot(object):
             
             else:
                 
-                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp[motor], force=self._max_force, physicsClientId=self._cid)
+                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp, force=self._max_force, physicsClientId=self._cid)
         
         elif self._ctrl_type == 'vel':
             
@@ -298,4 +298,7 @@ class AMLRlRobot(object):
             joint_details.append(dict(zip(attribute_list, pb.getJointInfo(self._robot_id, j_indx))))
 
         return joint_details
+
+
+
 
