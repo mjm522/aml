@@ -23,7 +23,7 @@ class BulletRobot(object):
         # elif extension == "xml":
         #     self._id = pb.loadMJCF(config['description_path'])[0]
 
-        self._all_joints = range(pb.getNumJoints(self._id))
+        self._all_joints = np.array(range(pb.getNumJoints(self._id)))
 
         self._movable_joints = self.get_movable_joints()
 
@@ -337,9 +337,10 @@ class BulletRobot(object):
 
         return np.array(movable_joints)
 
+
     def get_all_joints(self):
 
-        return np.array(self._all_joints)
+        return self._all_joints
 
     def get_joint_dict(self):
 

@@ -24,6 +24,9 @@ class BulletSawyerPisa2(BulletSawyerArm):
 
         BulletSawyerArm.__init__(self,limb,on_state_callback)
 
+
+        self._config = config_hand_world
+
         self._ready = False
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
@@ -40,7 +43,7 @@ class BulletSawyerPisa2(BulletSawyerArm):
 
         self._plane_id = pb.loadURDF(plane_path, useFixedBase=True)
 
-        self._bullet_robot_hand = BulletRobotHand(robot_id=self._bullet_robot._id, config = config_hand_world)  # hardcoded from the sawyer urdf
+        self._bullet_robot_hand = BulletRobotHand(robot_id=self._bullet_robot._id, config = self._config)  # hardcoded from the sawyer urdf
 
 
         self._bullet_robot.configure_default_pos([-0.100000, 0.000000, 1.0000], [0.000000, 0.000000, 0.000000, 1.000000])
@@ -79,7 +82,7 @@ class BulletSawyerPisa2(BulletSawyerArm):
              0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
 
 
-        self._bullet_robot.set_ctrl_mode('torque')
+        # self._bullet_robot.set_ctrl_mode('torque')
 
 
     def set_joint_angles(self, joint_angles):
@@ -99,3 +102,42 @@ class BulletSawyerPisa2(BulletSawyerArm):
     #     print data[-5]
     #
     #     return BulletSawyerArm.state(self)
+
+    def exec_position_cmd(self, cmd):
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(cmd[-1:])
+
+    def exec_position_cmd_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(self.angles()[-1:] + cmd[-1:])
+
+    def move_to_joint_position(self, cmd):
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(cmd[-1:])
+
+    def move_to_joint_pos_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(self.angles()[-1:] + cmd[-1:])
+
+
+    def exec_velocity_cmd(self, cmd):
+
+        self._bullet_robot.set_joint_velocities(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_velocities(cmd[-1:])
+
+    def exec_torque_cmd(self, cmd):
+
+        self._bullet_robot.set_joint_torques(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_torques(cmd[-1:])

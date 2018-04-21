@@ -3,7 +3,7 @@ import numpy as np
 
 class RobotBulletInterface():
 
-    def __init__(self, robot_interface, bullet_interface, rate=500):
+    def __init__(self, robot_interface, bullet_interface, rate=900):
 
         self._real_robot = robot_interface
 
@@ -95,9 +95,9 @@ class RobotBulletInterface():
 
             goal_js_pos, goal_js_vel = self.compute_cmd()
 
-            self._bullet_robot.apply_jnt_ctrl(cmd=goal_js_pos)
+            self._bullet_robot.exec_position_cmd(goal_js_pos)#(cmd=goal_js_pos)
 
-            self._bullet_robot.simple_step()
+            # self._bullet_robot.simple_step()
             
             rate.sleep()
 

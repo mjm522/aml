@@ -30,7 +30,7 @@ class BulletSawyerPisa(RobotInterface):
 
         pb.resetSimulation()
 
-        pb.setGravity(0.0, 0.0 ,0.0)
+        pb.setGravity(0.0, 0.0, -9.8)
         pb.setRealTimeSimulation(1)
         pb.setTimeStep(0.01)
 
@@ -84,6 +84,7 @@ class BulletSawyerPisa(RobotInterface):
 
         self._untuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
                                  0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+
         self._ready = True
 
     def exec_position_cmd(self, cmd):
