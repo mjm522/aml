@@ -9,16 +9,22 @@ class MinJerkInterp():
         self.tau = tau
         self.timesteps = np.arange(0, 2*self.tau, self.dt)
         self.min_jerk_traj = {}
+        self._quat_interp = False
 
-    def configure(self, start_pos, start_qt, goal_pos, goal_qt):
+    def configure(self, start_pos, goal_pos, start_qt=None, goal_qt=None):
         self.start_pos = copy.deepcopy(start_pos)
         self.goal_pos  = copy.deepcopy(goal_pos)
-        if isinstance(start_qt, np.quaternion):
-            start_qt = quaternion.as_float_array(start_qt)
-        if isinstance(goal_qt, np.quaternion):
-            goal_qt = quaternion.as_float_array(goal_qt)
-        self.start_qt  = copy.deepcopy(start_qt)
-        self.goal_qt   = copy.deepcopy(goal_qt)
+
+        if (start_qt is not None) or (goal_qt is not None):
+            
+            self._quat_interp = True
+
+            if isinstance(start_qt, np.quaternion):
+                start_qt = quaternion.as_float_array(start_qt)
+            if isinstance(goal_qt, np.quaternion):
+                goal_qt = quaternion.as_float_array(goal_qt)
+            self.start_qt  = copy.deepcopy(start_qt)
+            self.goal_qt   = copy.deepcopy(goal_qt)
 
     def min_jerk_step(self, x, xd, xdd, goal, tau):
         # function [x,xd,xdd] = min_jerk_step(x,xd,xdd,goal,tau, dt) computes
@@ -139,7 +145,10 @@ class MinJerkInterp():
 
     def get_interpolated_trajectory(self):
 
-        final_q, final_w, final_al  = self.min_jerk_step_qt()
+        if self._quat_interp:
+            final_q, final_w, final_al  = self.min_jerk_step_qt()
+        else:
+            final_q = final_w = final_al = None
 
         final_p, final_v, final_a   = self.min_jerk_step_pos()
     
@@ -148,7 +157,7 @@ class MinJerkInterp():
         #velocity trajectory
         self.min_jerk_traj['vel_traj'] = final_v
         #acceleration trajectory
-        self.min_jerk_traj['acc_traj'] = final_al
+        self.min_jerk_traj['acc_traj'] = final_a
 
 
         #orientation trajectory
@@ -156,7 +165,7 @@ class MinJerkInterp():
         #angular velocity trajector
         self.min_jerk_traj['omg_traj'] = final_w
         #angular acceleration trajectory
-        self.min_jerk_traj['ang_traj'] = final_a
+        self.min_jerk_traj['ang_traj'] = final_al
 
         return self.min_jerk_traj
 
@@ -173,18 +182,19 @@ class MinJerkInterp():
         # plt.plot(min_jerk_traj['ori_traj'][:,2]) 
         # plt.plot(min_jerk_traj['ori_traj'][:,3])
         # 
-        plt.subplot(312)
-        plt.title('omega')
-        plt.plot(min_jerk_traj['omg_traj'][:,0]) 
-        plt.plot(min_jerk_traj['omg_traj'][:,1]) 
-        plt.plot(min_jerk_traj['omg_traj'][:,2]) 
-        # 
-    
-        plt.subplot(313)
-        plt.title('alpha')
-        plt.plot(min_jerk_traj['ang_traj'][:,0]) 
-        plt.plot(min_jerk_traj['ang_traj'][:,1]) 
-        plt.plot(min_jerk_traj['ang_traj'][:,2])
+        if self._quat_interp: 
+            plt.subplot(312)
+            plt.title('omega')
+            plt.plot(min_jerk_traj['omg_traj'][:,0]) 
+            plt.plot(min_jerk_traj['omg_traj'][:,1]) 
+            plt.plot(min_jerk_traj['omg_traj'][:,2]) 
+            # 
+        
+            plt.subplot(313)
+            plt.title('alpha')
+            plt.plot(min_jerk_traj['ang_traj'][:,0]) 
+            plt.plot(min_jerk_traj['ang_traj'][:,1]) 
+            plt.plot(min_jerk_traj['ang_traj'][:,2])
 
         plt.figure(2)
         plt.subplot(311)
