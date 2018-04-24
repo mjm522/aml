@@ -176,20 +176,20 @@ class MinJerkInterp():
         plt.figure(1)
         plt.subplot(311)
         #for plotting this return orientation interpolation as a numpy array
-        # plt.title('orientation')
-        # plt.plot(min_jerk_traj['ori_traj'][:,0]) 
-        # plt.plot(min_jerk_traj['ori_traj'][:,1]) 
-        # plt.plot(min_jerk_traj['ori_traj'][:,2]) 
-        # plt.plot(min_jerk_traj['ori_traj'][:,3])
-        # 
-        if self._quat_interp: 
+        if self._quat_interp:
+
+            # plt.title('orientation')
+            # plt.plot(min_jerk_traj['ori_traj'][:,0]) 
+            # plt.plot(min_jerk_traj['ori_traj'][:,1]) 
+            # plt.plot(min_jerk_traj['ori_traj'][:,2]) 
+            # plt.plot(min_jerk_traj['ori_traj'][:,3])
+
             plt.subplot(312)
             plt.title('omega')
             plt.plot(min_jerk_traj['omg_traj'][:,0]) 
             plt.plot(min_jerk_traj['omg_traj'][:,1]) 
             plt.plot(min_jerk_traj['omg_traj'][:,2]) 
-            # 
-        
+            
             plt.subplot(313)
             plt.title('alpha')
             plt.plot(min_jerk_traj['ang_traj'][:,0]) 
