@@ -33,6 +33,7 @@ class pisaiit_kinematics(object):
         self._num_jnts = len(self._joint_names)
 
 
+
         self._links = self._limb_interface.links()
         self._base_link = self._links['base_link']
 
@@ -42,7 +43,7 @@ class pisaiit_kinematics(object):
 
         self._chains = [self._kdl_tree.getChain(self._base_link, tip_link) for tip_link in self._tip_links]
         self._num_chains = len(self._chains)
-
+        self._chain_num_joints = [chain.getNrOfJoints() for chain in self._chains]
 
         # KDL Solvers
         self._fk_p_kdl = [PyKDL.ChainFkSolverPos_recursive(chain) for chain in self._chains]
@@ -146,7 +147,7 @@ class pisaiit_kinematics(object):
             return None
 
     def jacobian(self, joint_values=None, finger_idx=0):
-        jacobian = PyKDL.Jacobian(self._num_jnts)
+        jacobian = PyKDL.Jacobian(self._chain_num_joints[finger_idx])
         self._jac_kdl[finger_idx].JntToJac(self.joints_to_kdl('positions', joint_values), jacobian)
         return self.kdl_to_mat(jacobian)
 

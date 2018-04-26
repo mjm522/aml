@@ -170,21 +170,6 @@
     <!-- <origin xyz="0.022500000 -0.003300000 0.0" rpy="0.42662757656587236 0.0 0.18131960430075023" /> -->
     <origin rpy="0.42662757656587236 0.0 0.0" xyz="0.022500000 -0.003300000 0.0"/>
     <parent link="soft_hand_thumb_knuckle_link"/>
-    <child link="soft_hand_thumb_fake_link1"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_thumb_fake_link1">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_thumb_inner_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_thumb_fake_link1"/>
     <child link="soft_hand_thumb_proximal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -212,26 +197,12 @@
   <joint name="soft_hand_thumb_outer_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0.0"/>
     <parent link="soft_hand_thumb_proximal_link"/>
-    <child link="soft_hand_thumb_fake_link3"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_thumb_fake_link3">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_thumb_outer_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_thumb_fake_link3"/>
     <child link="soft_hand_thumb_distal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
     <dynamics damping="0.0" friction="0.0"/>
   </joint>
+
   <link name="soft_hand_thumb_distal_link">
     <inertial>
       <origin xyz="0.009849094 5.6e-07 0.000820286"/>
@@ -281,21 +252,6 @@
   <joint name="soft_hand_index_inner_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_index_knuckle_link"/>
-    <child link="soft_hand_index_fake_link1"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_index_fake_link1">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_index_inner_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_index_fake_link1"/>
     <child link="soft_hand_index_proximal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -323,21 +279,6 @@
   <joint name="soft_hand_index_middle_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_index_proximal_link"/>
-    <child link="soft_hand_index_fake_link2"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_index_fake_link2">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_index_middle_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_index_fake_link2"/>
     <child link="soft_hand_index_middle_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -365,26 +306,12 @@
   <joint name="soft_hand_index_outer_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_index_middle_link"/>
-    <child link="soft_hand_index_fake_link3"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_index_fake_link3">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_index_outer_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_index_fake_link3"/>
     <child link="soft_hand_index_distal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
     <dynamics damping="0.0" friction="0.0"/>
   </joint>
+
   <link name="soft_hand_index_distal_link">
     <inertial>
       <origin xyz="0.009849094 5.6e-07 0.000820286"/>
@@ -434,21 +361,6 @@
   <joint name="soft_hand_middle_inner_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_middle_knuckle_link"/>
-    <child link="soft_hand_middle_fake_link1"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_middle_fake_link1">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_middle_inner_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_middle_fake_link1"/>
     <child link="soft_hand_middle_proximal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -476,21 +388,6 @@
   <joint name="soft_hand_middle_middle_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_middle_proximal_link"/>
-    <child link="soft_hand_middle_fake_link2"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_middle_fake_link2">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_middle_middle_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_middle_fake_link2"/>
     <child link="soft_hand_middle_middle_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -518,21 +415,6 @@
   <joint name="soft_hand_middle_outer_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_middle_middle_link"/>
-    <child link="soft_hand_middle_fake_link3"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_middle_fake_link3">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_middle_outer_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_middle_fake_link3"/>
     <child link="soft_hand_middle_distal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -587,21 +469,6 @@
   <joint name="soft_hand_ring_inner_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_ring_knuckle_link"/>
-    <child link="soft_hand_ring_fake_link1"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_ring_fake_link1">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_ring_inner_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_ring_fake_link1"/>
     <child link="soft_hand_ring_proximal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -629,21 +496,6 @@
   <joint name="soft_hand_ring_middle_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_ring_proximal_link"/>
-    <child link="soft_hand_ring_fake_link2"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_ring_fake_link2">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_ring_middle_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_ring_fake_link2"/>
     <child link="soft_hand_ring_middle_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -671,21 +523,6 @@
   <joint name="soft_hand_ring_outer_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_ring_middle_link"/>
-    <child link="soft_hand_ring_fake_link3"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_ring_fake_link3">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_ring_outer_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_ring_fake_link3"/>
     <child link="soft_hand_ring_distal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -740,21 +577,6 @@
   <joint name="soft_hand_little_inner_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_little_knuckle_link"/>
-    <child link="soft_hand_little_fake_link1"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_little_fake_link1">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_little_inner_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_little_fake_link1"/>
     <child link="soft_hand_little_proximal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -782,21 +604,6 @@
   <joint name="soft_hand_little_middle_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_little_proximal_link"/>
-    <child link="soft_hand_little_fake_link2"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_little_fake_link2">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_little_middle_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_little_fake_link2"/>
     <child link="soft_hand_little_middle_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -824,21 +631,6 @@
   <joint name="soft_hand_little_outer_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.009 0 0"/>
     <parent link="soft_hand_little_middle_link"/>
-    <child link="soft_hand_little_fake_link3"/>
-    <axis xyz="0 -1 0"/>
-    <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
-    <dynamics damping="0.0" friction="0.0"/>
-  </joint>
-  <link name="soft_hand_little_fake_link3">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-    </inertial>
-  </link>
-  <joint name="soft_hand_little_outer_joint_mimic" type="revolute">
-    <origin rpy="0 0 0" xyz="0.013 0 0"/>
-    <parent link="soft_hand_little_fake_link3"/>
     <child link="soft_hand_little_distal_link"/>
     <axis xyz="0 -1 0"/>
     <limit effort="100" lower="0.0" upper="0.785398163397" velocity="100"/>
@@ -862,7 +654,6 @@
       </geometry>
     </collision>
   </link>
-
 
 </robot>
 

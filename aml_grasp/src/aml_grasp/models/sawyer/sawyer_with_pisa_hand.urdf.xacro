@@ -508,7 +508,7 @@
 
   <xacro:include filename="$(find soft_hand_description)/model/soft_hand.urdf.xacro"/>
   <xacro:soft_hand name="soft_hand" parent="right_hand" 
-                 withAdaptiveTransmission="true" useMimicTag="true" left="false">
+                 withAdaptiveTransmission="false" useMimicTag="false" left="false">
   <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:soft_hand>
 
