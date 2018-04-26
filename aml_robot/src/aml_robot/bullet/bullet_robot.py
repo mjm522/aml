@@ -402,7 +402,7 @@ class BulletRobot(object):
             if ctrl_type == 'pos':
 
                 pb.setJointMotorControl2(self._id, jnt_index, pb.POSITION_CONTROL,
-                                         targetPosition=angles[k], force=100)
+                                         targetPosition=angles[k], force=500)
 
             else:
 

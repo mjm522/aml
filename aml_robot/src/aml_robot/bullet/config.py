@@ -54,7 +54,7 @@ config_pisa_hand_right = {
 }
 
 config_pisa_hand_right_noabd = {
-	'use_synergy': False,
+	'use_synergy': True,
 	'map_synergy': True, # whether or not we want to map synergy joint commands to the other coupled joints (used only if use_synergy is true)
 	'synergy_joints': ['soft_hand_synergy_joint'],
 	'thumb_joints': [ 'soft_hand_thumb_%s_joint'%(jm,) for jm in ['abd','inner','outer']],
