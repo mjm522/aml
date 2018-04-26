@@ -30,7 +30,7 @@
 
     This is by no means correct, but a sanity check to make sure the moment of inertia are the right order of magnitudes, so the model behaves somewhat physically realistically.
     -->
-  <link name="hand"/>
+  <link name="right_hand"/>
   <!-- PACMAN VERION ALREADY INCLUDES THE COUPLER, CLAMP AND BASE -->
   <joint name="hand_soft_hand_kuka_coupler_joint" type="fixed">
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
