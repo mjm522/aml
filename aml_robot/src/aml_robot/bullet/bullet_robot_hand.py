@@ -50,25 +50,52 @@ class BulletRobotHand(BulletRobot):
 
         self._little_joints = [self.get_joint_by_name(jm) for jm in self._config['little_joints']]
 
+        self._synergy_joints = [self.get_joint_by_name(jm) for jm in self._config['synergy_joints']]
+
         self._joint_map = {"thumb": self._thumb_joints,
                            "index": self._index_joints,
                            "middle": self._middle_joints,
                            "ring": self._ring_joints,
-                           "little": self._little_joints}
+                           "little": self._little_joints,
+                           "synergy": self._synergy_joints}
 
         self._joint_name_map = {"thumb": self._config['thumb_joints'],
                                "index": self._config['index_joints'],
                                "middle": self._config['middle_joints'],
                                "ring": self._config['ring_joints'],
-                               "little": self._config['little_joints']}
+                               "little": self._config['little_joints'],
+                               "synergy": self._config['synergy_joints']}
+
+        # if self._config['use_synergy']:
+        #     self._joint_name_map = {}
+        #     self._joint_name_map['synergy_joints'] = self._config['synergy_joints']
+        #     self._all_joint_names = self._joint_name_map['synergy_joints']
 
         self._all_joint_names = []
         for finger_name in self._config["finger_order"]:
             self._all_joint_names += self._joint_name_map[finger_name]
 
+        if self._config['use_synergy']:
+
+            self._joint_names = self._config['synergy_joints']
+        else:
+            self._joint_names = self._all_joint_names
+
+        if self._config['use_synergy'] and not self._config['map_synergy']:
+            self._all_joint_names = self._joint_names
+
+
         self._all_joints = []
         for finger_name in self._config["finger_order"]:
             self._all_joints += self._joint_map[finger_name]
+        self._all_joints = np.array(self._all_joints)
+
+        self._controllable_joints = self._all_joints
+
+        if self._config['use_synergy'] and not self._config['map_synergy']:
+            self._controllable_joints = self._synergy_joints
+
+
 
         self._all_joint_dict = dict(zip(self._all_joint_names, self._all_joints))
 
@@ -79,7 +106,8 @@ class BulletRobotHand(BulletRobot):
         # self._joint_state = np.zeros(len(self._joints))
 
         self._nq = len(self._all_joints)
-        self._nu = len(self._all_joints)
+        self._nu = len(self._all_joint_names)
+
 
         self._joint_limits = self.get_joint_limits()
 
@@ -115,27 +143,74 @@ class BulletRobotHand(BulletRobot):
 
 
     def joint_names(self, finger_name = None):
-        return self._joint_name_map.get(finger_name, self._all_joint_names)
+
+        if self._config['use_synergy']:
+            joint_names = self._joint_names
+        else:
+            joint_names = self._all_joint_names
+
+        return self._joint_name_map.get(finger_name, joint_names)
 
 
     def get_all_joints(self):
 
-        return np.array(self._all_joints)
+        return self._all_joints
 
 
     def set_jnt_state(self, jnt_state):
 
 
-        if len(jnt_state) < self.n_cmd():
+        if len(jnt_state) < self.n_joints():
             raise Exception ("Incorrect number of joint state values given")
 
         else:
-            for jnt_idx in self._all_joints:
+            for jnt_idx in self.get_all_joints():
 
                 pb.resetJointState(self._id, jnt_idx, jnt_state[jnt_idx])
 
 
+    def set_joint_velocities(self, cmd, joints=None):
 
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            hand_cmd = cmd[-1]
+
+            cmd = [hand_cmd]*self.n_joints()
+
+        BulletRobot.set_joint_velocities(self, cmd, self.get_controllable_joints())
+
+    def set_joint_torques(self, cmd, joints=None):
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            hand_cmd = cmd[-1]
+
+            cmd = [hand_cmd]*self.n_joints()
+
+        BulletRobot.set_joint_torques(self, cmd, self.get_controllable_joints())
+
+    def set_joint_positions_delta(self, cmd, joints=None, forces=None):
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            hand_cmd = cmd[-1]
+
+            cmd = [hand_cmd]*self.n_joints()
+
+        BulletRobot.set_joint_positions_delta(self, cmd, self.get_controllable_joints())
+
+    def set_joint_positions(self, cmd, joints=None, forces=None):
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            hand_cmd = cmd[-1]
+
+            cmd = [hand_cmd]*self.n_joints()
+
+        BulletRobot.set_joint_positions(self, cmd, self.get_controllable_joints())
+
+
+
+
+    def get_controllable_joints(self):
+
+        return self._controllable_joints
 
 
 

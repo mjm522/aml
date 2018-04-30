@@ -8,7 +8,7 @@ from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 class RobotBulletInterface():
 
-    def __init__(self, robot_interface, bullet_interface, rate=500):
+    def __init__(self, robot_interface, bullet_interface, rate=900):
 
         self._real_robot = robot_interface
 
@@ -174,6 +174,12 @@ class RobotBulletInterface():
             self.calibration()
 
         while not rospy.is_shutdown():
+
+            self._bullet_robot.exec_position_cmd(goal_js_pos)#(cmd=goal_js_pos)
+
+            # self._bullet_robot.simple_step()
+            
+            rate.sleep()
 
             self.mirror_real_robot()
 

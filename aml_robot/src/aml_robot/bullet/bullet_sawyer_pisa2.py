@@ -24,6 +24,9 @@ class BulletSawyerPisa2(BulletSawyerArm):
 
         BulletSawyerArm.__init__(self,limb,on_state_callback)
 
+
+        self._config = config_hand_world
+
         self._ready = False
 
         models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
@@ -40,7 +43,7 @@ class BulletSawyerPisa2(BulletSawyerArm):
 
         self._plane_id = pb.loadURDF(plane_path, useFixedBase=True)
 
-        self._bullet_robot_hand = BulletRobotHand(robot_id=self._bullet_robot._id, config = config_hand_world)  # hardcoded from the sawyer urdf
+        self._bullet_robot_hand = BulletRobotHand(robot_id=self._bullet_robot._id, config = self._config)  # hardcoded from the sawyer urdf
 
 
         self._bullet_robot.configure_default_pos([-0.100000, 0.000000, 1.0000], [0.000000, 0.000000, 0.000000, 1.000000])
@@ -65,21 +68,41 @@ class BulletSawyerPisa2(BulletSawyerArm):
 
         # self._tuck = np.array([-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
         #                        0., 0., 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., 0.])
+
+        # old joints including abduction joints
+        # np.array(
+        #     [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01, 3.32346747e+00,
+        #      1.5707889560579844, 0.786210883026469, 0.7880146387387372, 
+        #      0.0004999999996493284, 0.4795928796782728, 0.6948884694870044, 0.7828197973076467, 
+        #      0.00033187601344706225, 0.7839629628325961, 0.7854953738051564, 0.785411633485201, 
+        #      -0.05623798776832702, 0.7827861068048277, 0.7834708238660533, 0.7741387171672663,
+        #      0.10818102126910266, 0.7794819174352743, 0.7875821720282794, 0.7788698724995202])
+
+
+
+
         self._tuck = np.array(
-            [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,
-             3.32346747e+00,
-             1.5707889560579844, 0.786210883026469, 0.7880146387387372, 0.0004999999996493284, 0.4795928796782728,
-             0.6948884694870044, 0.7828197973076467, 0.00033187601344706225, 0.7839629628325961, 0.7854953738051564,
-             0.785411633485201, -0.05623798776832702, 0.7827861068048277, 0.7834708238660533, 0.7741387171672663,
-             0.10818102126910266, 0.7794819174352743, 0.7875821720282794, 0.7788698724995202])
+            [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01, 3.32346747e+00,
+             1.5707889560579844, 0.786210883026469, 0.7880146387387372, 
+             0.4795928796782728, 0.6948884694870044, 0.7828197973076467, 
+             0.7839629628325961, 0.7854953738051564, 0.785411633485201, 
+             0.7827861068048277, 0.7834708238660533, 0.7741387171672663,
+             0.7794819174352743, 0.7875821720282794, 0.7788698724995202])
 
         self._untuck = np.array(
-            [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,
-             3.32346747e+00,
-             0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+            [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01, 3.32346747e+00,
+             0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
 
+        if self._config['use_synergy']:
+            self._tuck = np.array(
+                [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
+                 0.9])
 
-        self._bullet_robot.set_ctrl_mode('torque')
+            self._untuck = np.array(
+                [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,3.32346747e+00,
+                 0.0])
+
+        self._bullet_robot.set_ctrl_mode('pos')
 
 
     def set_joint_angles(self, joint_angles):
@@ -99,3 +122,42 @@ class BulletSawyerPisa2(BulletSawyerArm):
     #     print data[-5]
     #
     #     return BulletSawyerArm.state(self)
+
+    def exec_position_cmd(self, cmd):
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(cmd[-1:])
+
+    def exec_position_cmd_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(self.angles()[-1:] + cmd[-1:])
+
+    def move_to_joint_position(self, cmd):
+        self._bullet_robot.set_joint_positions(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(cmd[-1:])
+
+    def move_to_joint_pos_delta(self, cmd):
+        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_positions(self.angles()[-1:] + cmd[-1:])
+
+
+    def exec_velocity_cmd(self, cmd):
+
+        self._bullet_robot.set_joint_velocities(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_velocities(cmd[-1:])
+
+    def exec_torque_cmd(self, cmd):
+
+        self._bullet_robot.set_joint_torques(cmd, self._joints)
+
+        if self._config['use_synergy'] and self._config['map_synergy']:
+            self._bullet_robot_hand.set_joint_torques(cmd[-1:])

@@ -34,7 +34,7 @@ import rospy
 
 import baxter_interface
 
-from baxter_kdl.kdl_parser import kdl_tree_from_urdf_model
+from aml_robot.utilities.kdl_parser import kdl_tree_from_urdf_model
 from urdf_parser_py.urdf import URDF
 
 

@@ -6,17 +6,20 @@ import rospy
 from std_msgs.msg import Float32
 
 import numpy as np
+import quaternion
 
 # AML additional imports
 from aml_robot.robot_interface import RobotInterface
 from aml_io.log_utils import aml_logging
+from aml_robot.pisaiit.config import pisaiit_config
 
 
 import threading
 
 
 class PisaIITHand(RobotInterface):
-    def __init__(self, robot_name, on_state_callback=None):
+
+    def __init__(self, robot_name = "right_hand", on_state_callback=None):
         """
         Class constructor
         Args: 
@@ -26,7 +29,7 @@ class PisaIITHand(RobotInterface):
         none, store the trajectories
         """
 
-        self._logger = aml_logging.get_logger(__name__)
+        self._logger = aml_logging.get_logger(__name__,'critical')
 
         self._ready = False
 
@@ -52,19 +55,9 @@ class PisaIITHand(RobotInterface):
                 now                 = rospy.Time.now()
                 self._state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
 
-                # joint_angles        = self.angles()
-                # joint_velocities    = self.joint_velocities()
-                # joint_efforts       = self.joint_efforts()
-
-                # joint_names         = self.joint_names()
-
-                # def to_list(ls):
-                #     return [ls[n] for n in joint_names]
-
-
-                # state['position']        = joint_angles
-                # state['velocity']        = np.array(to_list(joint_velocities))
-                # state['effort']          = np.array(to_list(joint_efforts))
+                self._state['position']        = self.angles()
+                self._state['velocity']        = self.joint_velocities()
+                self._state['effort']          = self.joint_efforts()
                 # state['jacobian']        = self.get_jacobian_from_joints(None)
                 # state['inertia']         = self.get_inertia(None)
                 # state['rgb_image']       = self._camera._curr_rgb_image
@@ -87,6 +80,26 @@ class PisaIITHand(RobotInterface):
                 self._on_state_callback(self._state)
 
     def _configure(self, limb, on_state_callback):
+
+
+        self.name = limb
+
+
+        self._config = pisaiit_config
+
+        self._links = self._config['links']
+
+        self._joint_name_map = {"thumb": self._config['thumb_joints'],
+                               "index": self._config['index_joints'],
+                               "middle": self._config['middle_joints'],
+                               "ring": self._config['ring_joints'],
+                               "little": self._config['little_joints'],
+                               "synergy": self._config['synergy_joints']}
+
+        self._all_joint_names = []
+        for finger_name in self._config["finger_order"]:
+            self._all_joint_names += self._joint_name_map[finger_name]
+
         self._state = None
 
         if on_state_callback:
@@ -96,8 +109,8 @@ class PisaIITHand(RobotInterface):
 
         self._pos_cmd_pub = rospy.Publisher('/soft_hand_pos_cmd', Float32, queue_size=10)
         self._sh_current_status = rospy.Subscriber('/soft_hand_read_current', Float32, callback=self._on_current_status, queue_size=10)
-        self._nq = 1
-        self._nu = 1
+        self._nq = len(self._all_joint_names)
+        self._nu = len(self._joint_name_map['synergy'])
 
         self._jnt_limits = [{'lower': 0.0, 'upper': 1.0}]
         self._q_mean = np.array([0.5 * (limit['lower'] + limit['upper']) for limit in self._jnt_limits])
@@ -137,6 +150,21 @@ class PisaIITHand(RobotInterface):
     def angles(self):
         self._logger.warning("angles not implemented")
 
+        return np.zeros(self.n_joints())
+
+    def joint_velocities(self):
+        self._logger.warning("joint_velocities not implemented")
+
+        return np.zeros(self.n_joints())
+
+    def joint_efforts(self):
+        self._logger.warning("joint_efforts not implemented")
+
+        return np.zeros(self.n_joints())
+
+    def ee_velocity(self, numerical=False):
+        self._logger.warning("ee_velocity not implemented")
+
     def q_mean(self):
         return self._q_mean
 
@@ -146,8 +174,44 @@ class PisaIITHand(RobotInterface):
     def cartesian_velocity(self, joint_velocities=None):
         self._logger.warning("cartesian_velocity not implemented")
 
-    def forward_kinematics(self, joint_angles=None):
-        self._logger.warning("forward_kinematics not implemented")
+    def forward_kinematics(self, joint_angles=None, ori_type='quat'):
+
+        if joint_angles is None:
+
+            argument = None
+
+        else:
+
+            argument = dict(zip(self.joint_names(), joint_angles))
+
+        # combine the names and joint angles to a dictionary, that only is accepted by kdl
+        pose = np.array(self._kinematics.forward_position_kinematics(argument))
+        position = pose[0:3][:, None]  # senting as  column vector
+
+        w = pose[6]
+        x = pose[3]
+        y = pose[4]
+        z = pose[5]  # quarternions
+
+        rotation = quaternion.quaternion(w, x, y, z)
+
+        # formula for converting quarternion to rotation matrix
+
+        if ori_type == 'mat':
+
+            # rotation = np.array([[1.-2.*(y**2+z**2),    2.*(x*y-z*w),           2.*(x*z+y*w)],\
+            #                      [2.*(x*y+z*w),         1.-2.*(x**2+z**2),      2.*(y*z-x*w)],\
+            #                      [2.*(x*z-y*w),         2.*(y*z+x*w),           1.-2.*(x**2+y**2)]])
+
+            rotation = quaternion.as_rotation_matrix(rotation)
+
+        elif ori_type == 'eul':
+
+            rotation = quaternion.as_euler_angles(rotation)
+        elif ori_type == 'quat':
+            pass
+
+        return position, rotation
 
     def inverse_kinematics(self, position, orientation=None):
         self._logger.warning("inverse_kinematics not implemented")
@@ -158,11 +222,6 @@ class PisaIITHand(RobotInterface):
     def n_joints(self):
         return self._nq
 
-    def joint_efforts(self):
-        self._logger.warning("joint_efforts not implemented")
-
-    def ee_velocity(self, numerical=False):
-        self._logger.warning("ee_velocity not implemented")
 
     def tuck(self):
         self._logger.warning("tuck not implemented")
@@ -170,11 +229,14 @@ class PisaIITHand(RobotInterface):
     def untuck(self):
         self._logger.warning("untuck not implemented")
 
-    def joint_velocities(self):
-        self._logger.warning("joint_velocities not implemented")
-
     def joint_names(self):
-        return ['synergy_joint']
+        return self._all_joint_names
+
+    def links(self):
+        return self._links
+
+    def joint_limits(self):
+        return self._jnt_limits
 
     def jacobian(self, joint_angles=None):
         self._logger.warning("jacobian not implemented")

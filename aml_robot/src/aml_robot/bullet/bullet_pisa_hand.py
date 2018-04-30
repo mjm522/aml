@@ -36,19 +36,23 @@ class BulletPisaHand(RobotInterface):
         sawyer_path = get_file_path('pisa_hand_right.urdf', models_path)
         robot_id = pb.loadURDF(sawyer_path, useFixedBase=True)
 
+        self._config = config_hand_world
         self._bullet_robot = BulletRobotHand(robot_id=robot_id, config = config_hand_world)  # hardcoded from the sawyer urdf
 
         self._limb = limb
 
-        self._joint_names = self._bullet_robot.joint_names(None)
+        if self._config['use_synergy']:
+
+            self._joint_names = self._config['synergy_joints']
+        else:
+            self._joint_names = self._bullet_robot.joint_names(None)
 
         # all_joint_dict = self._bullet_robot.get_joint_dict()
-        self._joints = self._bullet_robot.get_all_joints()
+        # self._joints = self._bullet_robot.get_all_joints()
 
 
-
-        self._nq = len(self._joint_names)
-        self._nu = len(self._joint_names)
+        self._nq = self._bullet_robot.n_joints()
+        self._nu = self._bullet_robot.n_cmd()
 
         lower_limits = self._bullet_robot.get_joint_limits()['lower']#[self._joints]
         upper_limits = self._bullet_robot.get_joint_limits()['upper']#[self._joints]
@@ -64,22 +68,22 @@ class BulletPisaHand(RobotInterface):
         print 'NOT IMPLEMENTED'
 
     def exec_position_cmd(self, cmd):
-        self._bullet_robot.set_joint_positions(cmd, self._joints)
+        self._bullet_robot.set_joint_positions(cmd)
 
     def exec_position_cmd_delta(self, cmd):
-        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+        self._bullet_robot.set_joint_positions(self.angles() + cmd)
 
     def move_to_joint_position(self, cmd):
-        self._bullet_robot.set_joint_positions(cmd, self._joints)
+        self._bullet_robot.set_joint_positions(cmd)
 
     def move_to_joint_pos_delta(self, cmd):
-        self._bullet_robot.set_joint_positions(self.angles() + cmd, self._joints)
+        self._bullet_robot.set_joint_positions(self.angles() + cmd)
 
     def exec_velocity_cmd(self, cmd):
-        self._bullet_robot.set_joint_velocities(cmd, self._joints)
+        self._bullet_robot.set_joint_velocities(cmd)
 
     def exec_torque_cmd(self, cmd):
-        self._bullet_robot.set_joint_torques(cmd, self._joints)
+        self._bullet_robot.set_joint_torques(cmd)
 
     def forward_kinematics(self, joint_angles=None):
         print 'NOT IMPLEMENTED'
@@ -158,7 +162,7 @@ class BulletPisaHand(RobotInterface):
         return self._nq
 
     def joint_names(self):
-        return self._bullet_robot.joint_names(None)
+        return self._joint_names
 
     def joint_limits(self):
         return self._jnt_limits
