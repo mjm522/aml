@@ -1,5 +1,10 @@
+import os
 import rospy
 import numpy as np
+import pybullet as pb
+from aml_io.log_utils import aml_logging
+from aml_io.io_tools import get_file_path, get_aml_package_path
+from aml_ctrl.traj_generator.js_traj_generator import JSTrajGenerator
 
 class RobotBulletInterface():
 
@@ -20,6 +25,10 @@ class RobotBulletInterface():
         self._rate = rate
 
         self._scale_from_home = False
+
+        self._calibrated = False
+
+        self._logger = aml_logging.get_logger(__name__)
 
 
     def master_js_scale(self):
@@ -83,6 +92,75 @@ class RobotBulletInterface():
         return cmd, np.zeros(self._num_slave_jnts)
 
 
+    def calibration(self, num_samples=1):
+
+        # models_path = get_aml_package_path('aml_lfd/data')
+  
+        # kwargs = {'path_to_demo':get_file_path('sawyer_bullet_interface_calib.pkl', models_path),
+        #           'limb_name':self._real_robot._limb}
+
+        # gen_traj  = JSTrajGenerator(load_from_demo=True, **kwargs)
+
+        # calib_traj = gen_traj.generate_traj()['pos_traj']
+
+        # num_samples = calib_traj.shape[0]
+
+        real_robot_ee_pos = np.zeros([num_samples, 3])
+        #in euler
+        real_robot_ee_ori = np.zeros([num_samples, 3])
+
+        bullet_robot_ee_pos = np.zeros([num_samples, 3])
+        #in euler
+        bullet_robot_ee_ori = np.zeros([num_samples, 3])
+
+        for i in range(num_samples):
+
+            # self._real_robot.move_to_joint_position(calib_traj[i,:])
+
+            # self.mirror_real_robot()
+
+            real_robot_state   = self._real_robot.state()
+
+            bullet_robot_state = self._bullet_robot.state()
+
+            real_robot_ori = real_robot_state['ee_ori']
+            bullet_robot_ori = bullet_robot_state['ee_ori']
+            
+            real_robot_ori   = np.asarray(pb.getEulerFromQuaternion((real_robot_ori.x, real_robot_ori.y, real_robot_ori.z, real_robot_ori.w)))
+            bullet_robot_ori = np.asarray(pb.getEulerFromQuaternion((bullet_robot_ori.x, bullet_robot_ori.y, bullet_robot_ori.z, bullet_robot_ori.w)))
+
+            real_robot_ee_pos[i,:] = real_robot_state['ee_point']
+
+            real_robot_ee_ori[i,:] = real_robot_ori
+
+            bullet_robot_ee_pos[i,:] = bullet_robot_state['ee_point']
+            
+            bullet_robot_ee_ori[i,:] = bullet_robot_ori
+
+        calib_pos = np.mean(real_robot_ee_pos-bullet_robot_ee_pos, axis=0)
+
+        calib_ori = np.mean(real_robot_ee_ori-bullet_robot_ee_ori, axis=0)
+
+        base_ori = pb.getQuaternionFromEuler(calib_ori)
+
+        self._logger.info("\nCalib pos \t {}".format(calib_pos))
+        self._logger.info("\nCalib ori \t {}".format(base_ori))
+
+        pb.resetSimulation(physicsClientId=self._bullet_robot._cid)
+
+        self._bullet_robot.reset(base_pos=calib_pos.tolist(), base_ori=base_ori)
+
+        self._calibrated = True
+
+    def mirror_real_robot(self):
+
+        goal_js_pos, goal_js_vel = self.compute_cmd()
+
+        self._bullet_robot.apply_jnt_ctrl(cmd=goal_js_pos)
+
+        self._bullet_robot.simple_step()
+
+
     def run(self):
         """
         ctrlr function,
@@ -91,14 +169,12 @@ class RobotBulletInterface():
 
         rate = rospy.timer.Rate(self._rate)
 
+        if not self._calibrated:
+
+            self.calibration()
+
         while not rospy.is_shutdown():
 
-            goal_js_pos, goal_js_vel = self.compute_cmd()
+            self.mirror_real_robot()
 
-            self._bullet_robot.apply_jnt_ctrl(cmd=goal_js_pos)
-
-            self._bullet_robot.simple_step()
-            
             rate.sleep()
-
-
