@@ -65,7 +65,7 @@ def main():
     # test_nlinks(hand_kinematics)
     # test_njoints(hand_kinematics)
     #
-    # test_print_kdl_chain(hand_kinematics)
+    test_print_kdl_chain(hand_kinematics)
 
 
 
