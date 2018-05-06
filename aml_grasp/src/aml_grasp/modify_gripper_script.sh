@@ -1,1 +1,1 @@
-rosrun aml_grasp send_urdf_gripper.py -f /home/ermanoarruda/Projects/catkin_workspaces/baxter_ws/src/aml/aml_grasp/src/aml_grasp/models/pisa_iit_hand/pisa_hand_right.urdf
+rosrun aml_grasp send_urdf_gripper.py -f /home/ermanoarruda/Projects/catkin_workspaces/baxter_ws/src/aml/aml_grasp/src/aml_grasp/models/pisa_iit_hand/pisa_hand_right_nomass.urdf
