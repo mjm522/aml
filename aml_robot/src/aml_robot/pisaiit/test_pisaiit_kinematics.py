@@ -9,6 +9,47 @@ import numpy as np
 import rospy
 
 
+
+def test_njoints(hand_kinematics):
+
+    print "Test n joints"
+    for i in range(hand_kinematics.n_chains()):
+
+        print hand_kinematics.n_joints(i)
+
+def test_nlinks(hand_kinematics):
+
+    print "Test n links"
+    for i in range(hand_kinematics.n_chains()):
+
+        print hand_kinematics.n_links(i)
+
+def test_print_kdl_chain(hand_kinematics):
+
+    for i in range(hand_kinematics.n_chains()):
+
+        hand_kinematics.print_kdl_chain(i)
+
+def test_jacobian(hand_kinematics):
+    print "N chains: ", hand_kinematics.n_chains()
+    for i in range(hand_kinematics.n_chains()):
+        jacobian = hand_kinematics.jacobian(np.random.randn(hand_kinematics.n_joints(i)), finger_idx=i)
+
+        print "Finger %d"%(i,), np.linalg.det(np.dot(jacobian.T,jacobian))
+
+
+def test_forward_kinematics(hand_kinematics):
+
+
+    for i in range(hand_kinematics.n_chains()):
+        link_poses = hand_kinematics.forward_position_kinematics(np.random.randn(hand_kinematics.n_joints(i)), finger_idx=i)
+
+        for j in range(len(link_poses)):
+            print "Chain %d pose %d"%(i,j), link_poses[j]
+
+        print "-------------------"
+
+
 def main():
     rospy.init_node('pisa_iit_soft_hand_test', anonymous=True)
 
@@ -20,22 +61,12 @@ def main():
 
     hand_kinematics.print_robot_description()
 
-    for i in range(hand_kinematics._num_chains):
+    test_forward_kinematics(hand_kinematics)
+    # test_nlinks(hand_kinematics)
+    # test_njoints(hand_kinematics)
+    #
+    # test_print_kdl_chain(hand_kinematics)
 
-        hand_kinematics.print_kdl_chain(i)
-
-    finger_idx = 1
-    num_joints = 7#hand_kinematics._chains[finger_idx].getNrOfJoints()
-    jacobian = PyKDL.Jacobian(num_joints)
-
-    for i in range(1):
-        kdl_array = PyKDL.JntArray(num_joints)
-        angles = np.random.randn(num_joints)
-        for idx in range(angles.shape[0]):
-            kdl_array[idx] = angles[idx]
-        hand_kinematics._jac_kdl[finger_idx].JntToJac(kdl_array, jacobian)
-
-        print hand_kinematics.kdl_to_mat(jacobian)
 
 
 

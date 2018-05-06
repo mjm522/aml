@@ -252,7 +252,7 @@ if __name__=="__main__":
 
         for arm in [r_limb, l_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
-            arm.set_sampling_rate(sampling_rate=500) # Arm should report its state as fast as possible.
+            arm.set_sampling_rate(sampling_rate=200) # Arm should report its state as fast as possible.
             # arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
     elif args.arm_interface == "sawyer":
 
@@ -262,7 +262,7 @@ if __name__=="__main__":
 
         for arm in [r_limb]:
             arm.set_arm_speed(max(min(args.arm_speed,max_speed),min_speed)) # WARNING: max 0.2 rad/s for safety reasons
-            arm.set_sampling_rate(sampling_rate=900) # Arm should report its state as fast as possible.
+            arm.set_sampling_rate(sampling_rate=200) # Arm should report its state as fast as possible.
             # arm.set_gripper_speed(max(min(args.gripper_speed,0.20),0.01))
     elif args.arm_interface == "sawyer_bullet":
 

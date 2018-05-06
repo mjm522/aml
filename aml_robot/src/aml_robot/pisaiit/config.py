@@ -3,15 +3,20 @@
 pisaiit_config = {
     'synergy_joints': ['soft_hand_synergy_joint'],
     'thumb_joints': ['soft_hand_thumb_%s_joint' % (jm,) for jm in ['abd', 'inner', 'outer']],
-    'index_joints': ['soft_hand_index_%s_joint' % (jm,) for jm in ['inner', 'middle', 'outer']],
-    'middle_joints': ['soft_hand_middle_%s_joint' % (jm,) for jm in ['inner', 'middle', 'outer']],
-    'ring_joints': ['soft_hand_ring_%s_joint' % (jm,) for jm in ['inner', 'middle', 'outer']],
-    'little_joints': ['soft_hand_little_%s_joint' % (jm,) for jm in ['inner', 'middle', 'outer']],
+    'index_joints': ['soft_hand_index_%s_joint' % (jm,) for jm in ['abd','inner', 'middle', 'outer']],
+    'middle_joints': ['soft_hand_middle_%s_joint' % (jm,) for jm in ['abd', 'inner', 'middle', 'outer']],
+    'ring_joints': ['soft_hand_ring_%s_joint' % (jm,) for jm in ['abd', 'inner', 'middle', 'outer']],
+    'little_joints': ['soft_hand_little_%s_joint' % (jm,) for jm in ['abd', 'inner', 'middle', 'outer']],
     "finger_order": ["thumb", "index", "middle", "ring", "little"],
 
 
 }
 
+# * soft_hand_kuka_coupler_bottom
+# * soft_hand_kuka_coupler
+# * soft_hand_clamp
+# * soft_hand_softhand_base
+# * soft_hand_palm_link
 links = {'base_link': 'right_hand',
         'palm_links': ['soft_hand_kuka_coupler_bottom',
                         'soft_hand_kuka_coupler',

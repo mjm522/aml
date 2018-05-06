@@ -67,9 +67,15 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         if self._gripper is not None:
             self._jnt_limits.append({'lower': self._gripper.MIN_POSITION, 'upper': self._gripper.MAX_POSITION})
 
-        self._tuck = np.array(
-            [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,
-             3.32346747e+00, 2.07798000e-02])
+        if self._gripper is not None:
+            self._tuck = np.array(
+                [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,
+                 3.32346747e+00, 2.07798000e-02]) 
+        else:
+            self._tuck = np.array(
+                [-3.31223050e-04, -1.18001699e+00, -8.22146399e-05, 2.17995802e+00, -2.70787321e-03, 5.69996851e-01,
+                 3.32346747e+00]) #2.07798000e-02
+
         self._untuck = self._tuck
 
         if limb == 'left':
