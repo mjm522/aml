@@ -102,7 +102,7 @@ class JointStatePublisher():
         self._pisaiit_hand = PisaIITHand()
 
         self._models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        self._hand_path = get_file_path('pisa_hand_right.urdf', self._models_path)
+        self._hand_path = get_file_path('pisa_hand_right_nomass.urdf', self._models_path)
         self._hand_kinematics = pisaiit_kinematics(self._pisaiit_hand, self._hand_path)
 
         self._gi = ReachInterface(config=default_reach_config)
@@ -113,16 +113,14 @@ class JointStatePublisher():
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
-
         self._dim = np.array([5,7,7,7,7])
         self._n_joints = np.sum(self._dim)
         self._joint_names = ["hand_joint%d" % (joint,) for joint in range(self._n_joints)]
 
-
         self._finger_ids = []
         init = 0
         for d in self._dim:
-            self._finger_ids.append(range(init,init+d))
+            self._finger_ids.append(range(init, init+d))
             init += d
 
         self._all_angles = np.zeros(self._n_joints)
@@ -150,7 +148,7 @@ class JointStatePublisher():
 
 
         translation = (t.transform.translation.x,t.transform.translation.y,t.transform.translation.z)
-        quaternion = (t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z,t.transform.rotation.w)
+        quaternion = (t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w)
 
         return translation, quaternion, t.header.stamp
 
