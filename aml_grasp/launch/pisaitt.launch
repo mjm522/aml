@@ -1,0 +1,12 @@
+<launch>
+    <arg name="model" default="$(find aml_grasp)/src/aml_grasp/models/pisa_iit_hand/pisa_hand_right.urdf"/>
+
+    <param name="pisaiit_robot_description" command="rosrun xacro xacro $(arg model)"/>
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="pisaiit_st_pub" >
+      <remap from="robot_description" to="pisaiit_robot_description" />
+      <remap from="joint_states" to="pisaiit/joint_states" />
+    </node>
+
+
+
+</launch>
