@@ -8,7 +8,7 @@ import rospy
 from std_msgs.msg import (
     UInt16,
 )
-
+import copy
 # Auxiliary imports
 import numpy as np
 import quaternion
@@ -16,7 +16,7 @@ import quaternion
 # Intera SDK imports
 import intera_interface
 from intera_interface import CHECK_VERSION
-from intera_core_msgs.msg import SEAJointState
+from intera_core_msgs.msg import SEAJointState, EndpointStates
 
 # AML Robot specific imports
 from aml_robot.sawyer_kinematics import sawyer_kinematics
@@ -24,6 +24,7 @@ from aml_robot.sawyer_ik import IKSawyer
 
 # AML additional imports
 
+from aml_perception import ft_sensor
 from aml_perception import camera_sensor
 from aml_math.quaternion_utils import compute_omg  # for computing orientation error
 from aml_visual_tools.load_aml_logo import load_aml_logo
@@ -100,9 +101,6 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             self._lights = None
             self._lights = intera_interface.Lights()
             self._cuff.register_callback(self._light_action, '{0}_cuff'.format(self._limb))
-
-
-
 
         except Exception as e:
             self._logger.warning(e)
@@ -205,6 +203,9 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         self._gravity_comp = rospy.Subscriber('robot/limb/' + limb + '/gravity_compensation_torques',
                                               SEAJointState, self._gravity_comp_callback)
+
+        self._tip_states = rospy.Subscriber('robot/limb/' + limb + '/tip_states',
+                                              EndpointStates, self._tip_states_callback)
         # gravity + feed forward torques
         self._h = [0. for _ in range(self._nq)]
 
@@ -214,8 +215,11 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         self._camera = camera_sensor.CameraSensor()
 
+        self._ft = ft_sensor.FTSensor()
+
         self._gripper = None
         self._cuff = None
+        self._tip_state = {}
 
         self._configure_cuff()
         self._configure_gripper()
@@ -235,6 +239,29 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         # print "difference velocity \n", np.array(msg.commanded_velocity) - np.array(msg.actual_velocity)
         # print "difference position \n", np.array(msg.commanded_position) - np.array(msg.actual_position)
 
+    def _tip_states_callback(self, msg):
+        tip_state = {}
+        
+        time = msg.header.stamp
+        pos = msg.states[0].pose.position
+        ori = msg.states[0].pose.orientation
+        l_vel = msg.states[0].twist.linear
+        a_vel = msg.states[0].twist.angular
+        force = msg.states[0].wrench.force
+        torque = msg.states[0].wrench.torque
+
+        tip_state['time'] = {'secs':time.secs, 'nsecs':time.nsecs}
+        tip_state['position'] = np.asarray([pos.x, pos.y, pos.z])
+        tip_state['orientation'] = np.asarray([ori.w, ori.x, ori.y, ori.z])
+        tip_state['linear_vel'] = np.asarray([l_vel.x, l_vel.y, l_vel.z])
+        tip_state['angular_vel'] = np.asarray([a_vel.x, a_vel.y, a_vel.z])
+        tip_state['force'] = np.asarray([force.x, force.y, force.z])
+        tip_state['torque'] = np.asarray([torque.x, torque.y, torque.z])
+        tip_state['valid'] = msg.states[0].valid
+
+        self._tip_state = tip_state
+        
+
     def _update_state(self):
 
         now = rospy.Time.now()
@@ -242,6 +269,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         joint_angles = self.angles()
         joint_velocities = self.velocities()
         joint_efforts = self.joint_efforts()
+        tip_state = self.tip_state()
 
         joint_names = self.joint_names()
 
@@ -257,9 +285,9 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         state['rgb_image'] = self._camera._curr_rgb_image
         state['depth_image'] = self._camera._curr_depth_image
         state['gravity_comp'] = np.array(self._h)
-
+        state['tip_state'] = tip_state
+        state['ft_reading'] = self._ft.ft_reading()
         state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
-
         try:
             state['ee_point'], state['ee_ori'] = self.ee_pose()
         except:
@@ -320,6 +348,9 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
     def state(self):
         return self._state
+
+    def tip_state(self):
+        return self._tip_state
 
     def gripper_state(self):
         gripper_state = {}
