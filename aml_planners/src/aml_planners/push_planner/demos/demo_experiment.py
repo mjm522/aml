@@ -6,7 +6,8 @@ from time import gmtime, strftime
 from mpl_toolkits.mplot3d import Axes3D
 
 from aml_io.io_tools import save_data, load_data
-from aml_opt.mppi_controller.mppi_controller import MPPIController
+# from aml_opt.mppi_controller.mppi_controller import MPPIController
+from aml_opt.mppi_controller.mppi_controller_new import MPPIController
 
 from aml_planners.push_planner.dynamics.box2d_dynamics import Box2DDynamics
 from aml_planners.push_planner.dynamics.learnt_dynamics import LearnedDynamics
