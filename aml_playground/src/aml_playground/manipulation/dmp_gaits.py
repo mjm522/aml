@@ -1,3 +1,4 @@
+generate_trajectoryimport os
 import time
 import copy
 import numpy as np
@@ -9,6 +10,7 @@ from aml_lfd.dmp.config import discrete_dmp_config
 from aml_rl_envs.hand.hand_obj_env import HandObjEnv
 from aml_playground.manipulation.config import HAND_OBJ_CONFIG
 from aml_rl_envs.utils.collect_demo import plot_demo, get_demo
+from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 
 np.random.seed(123)
 discrete_dmp_config['dof'] = 3
@@ -40,7 +42,18 @@ class DMPGaits():
         self.encode_dmps()
 
 
-    def get_primitives(self, offset = 0.3):
+    def convert_obj_frame(self, primitive):
+
+        primitive_obj_frame = np.zeros_like(primitive)
+
+        for k in range(primitive.shape[0]):
+
+            primitive_obj_frame[k, :] = self._env.transfer_point_from_world_to_obj(primitive[k,:])[0]
+
+        return primitive_obj_frame
+
+
+    def get_primitives(self, offset = 0.3, in_obj_frame=False):
 
         def rotz(ang):
             return np.array([ [np.cos(ang), -np.sin(ang), 0.], [np.sin(ang), np.cos(ang), 0.], [0., 0., 1.] ])
@@ -87,7 +100,13 @@ class DMPGaits():
                 primitive_base[k, :] = savgol_filter(np.hstack([np.linspace(end_points[j][k], mid_points[j][k], 15), 
                                                                 np.linspace(mid_points[j][k], start_points[j][k], 15)]), 29, 2)
 
-            p_bases.append(primitive_base.T)
+            if in_obj_frame:
+
+                p_bases.append(self.convert_obj_frame(primitive_base.T))
+
+            else:
+
+                p_bases.append(primitive_base.T)
 
             # print "finger \t", j
             # print "start \n", primitive_base[:,0]
@@ -102,7 +121,13 @@ class DMPGaits():
 
         self._dmp_list = []
 
-        primitive_list = self.get_primitives()
+        primitive_list = self.get_primitives(in_obj_frame=False)
+
+        # tmp = np.hstack([primitive_list[0], primitive_list[1], primitive_list[2], primitive_list[3]])
+
+        # save_csv_data(os.environ['AML_DATA'] + '/aml_playground/manipulation/dmp/primitive_gait_obj_frame.csv', tmp)
+
+        # print dfa
 
         for k in range(self._num_fingers):
 
@@ -165,7 +190,7 @@ def main():
 
                 if dg._env._ctrl_type == 'pos':
                     
-                    cmd = dg._env._hand.inv_kin(j, dmp_primitive[k, 1:].tolist())
+                    cmd = dg._env._hand.inv_kin(j, dmp_primitive[k, :].tolist())
 
                     ee_poss, ee_oris, ee_vels, ee_omgs = dg._env._hand.get_ee_states(as_tuple=True)
                     jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = dg._env._hand.get_jnt_states()

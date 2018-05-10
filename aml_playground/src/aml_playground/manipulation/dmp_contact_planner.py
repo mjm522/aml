@@ -1,10 +1,11 @@
+import os
+import copy
 import numpy as np
-import pybullet as p
 from dmp_gaits import DMPGaits
 from dmp_manipulation import DMPManptln
 from aml_rl_envs.hand.hand_obj_env import HandObjEnv
 from aml_playground.manipulation.config import HAND_OBJ_CONFIG
-
+from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 
 class DMPConPlan():
 
@@ -18,6 +19,13 @@ class DMPConPlan():
         
         self._maniptn =  DMPManptln(env=self._env)
 
+        self._policy = []
+
+
+    def collect_data(self, cmd):
+
+        self._policy.append(copy.deepcopy(cmd))
+
 
     def run(self):
 
@@ -25,9 +33,13 @@ class DMPConPlan():
 
         gain = 10.
 
-        while True:
+        done = False
+
+        while not done:
 
             for k in range(man_primitive.shape[0]):
+
+                joint_cmd = np.array([])
 
                 for j in range(self._env._num_fingers): #dg._num_fingers
                     
@@ -40,12 +52,19 @@ class DMPConPlan():
                         continue
 
                     self._env._hand.apply_action(j, cmd)
+
+                    joint_cmd = np.r_[joint_cmd, cmd]
+
+                self.collect_data(joint_cmd)
                     
                 self._env.simple_step()
 
             for m in range(self._env._num_fingers):
 
                 gait_primitive  = self._gaiter.update_dmp_params(finger_idx=m)
+
+                joint_cmd = np.asarray(self._env._hand.get_jnt_state()[0])
+
                 for n in range(gait_primitive.shape[0]):
 
                     if self._env._ctrl_type == 'pos':
@@ -57,8 +76,16 @@ class DMPConPlan():
                         continue
 
                     self._env._hand.apply_action(m, cmd)
+
+                    joint_cmd[3*m:3*m+3]=np.asarray(cmd)
+
+                    self.collect_data(joint_cmd)
                 
                     self._env.simple_step()
+
+            done = True
+
+        save_csv_data(os.environ['AML_DATA'] + '/aml_playground/manipulation/dmp/policy.csv', self._policy)
 
 
 dcp = DMPConPlan()
