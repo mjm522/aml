@@ -20,7 +20,7 @@ Ddemos_list   = [data['states'][k][:,1] for k in range(100)]
 d_promp = DiscretePROMP(data=demos_list)
 d_promp.train()
 
-def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=None, label=''):
+def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=None, label='', title=None):
 
     """
     Expects mean = [Nx1] and Sigma [NxN]
@@ -34,6 +34,9 @@ def plot_mean_and_sigma(mean, sigma, interval=3, color_mean=None, color_shading=
     plt.fill_between(range(mean.shape[0]), lower_bound, upper_bound, color=color_shading, alpha=.5)
     # plot the mean on top
     plt.plot(mean, color_mean, label=label)
+    plt.title(title)
+    plt.xlabel("time(s)")
+    plt.ylabel("distance(m)")
 
     ########################to remove duplicate label handles########################
     handles, labels = plt.gca().get_legend_handles_labels()
@@ -66,10 +69,10 @@ def demo_generate_traj(additional_viapoint=False):
         #add a via point
         d_promp.add_viapoint(0.3, 2.25)
         d_promp.add_viapoint(0.6, 2.25)
-
-    traj_data_1 = d_promp.generate_trajectory(phase_speed=0.8,  randomness=1e-1)
+    
+    traj_data_1 = d_promp.generate_trajectory(phase_speed=1.,  randomness=1e-1)
     traj_data_2 = d_promp.generate_trajectory(phase_speed=1.,   randomness=1e-1)
-    traj_data_3 = d_promp.generate_trajectory(phase_speed=1.33, randomness=1e-1)
+    traj_data_3 = d_promp.generate_trajectory(phase_speed=1., randomness=1e-1)
 
 
     for traj, traj_vel in zip(demos_list, Ddemos_list):
@@ -91,7 +94,7 @@ def demo_generate_traj(additional_viapoint=False):
 
     plot_mean_and_sigma(mean=traj_data_1['mu_traj'].squeeze(), sigma=traj_data_1['sigma_traj'], color_mean='r', color_shading='r', label='speed=0.8')
     plot_mean_and_sigma(mean=traj_data_2['mu_traj'].squeeze(), sigma=traj_data_2['sigma_traj'], color_mean='g', color_shading='g', label='speed=1.')
-    plot_mean_and_sigma(mean=traj_data_3['mu_traj'].squeeze(), sigma=traj_data_3['sigma_traj'], color_mean='b', color_shading='b', label='speed=1.33')
+    plot_mean_and_sigma(mean=traj_data_3['mu_traj'].squeeze(), sigma=traj_data_3['sigma_traj'], color_mean='b', color_shading='b', label='speed=1.33', title="ProMP-Temporal Scaling Pos")
 
     if additional_viapoint:
         """
@@ -111,7 +114,7 @@ def demo_generate_traj(additional_viapoint=False):
 
     plot_mean_and_sigma(mean=traj_data_1['mu_Dtraj'].squeeze(), sigma=traj_data_1['sigma_Dtraj'], color_mean='r', color_shading='r', label='speed=0.8')
     plot_mean_and_sigma(mean=traj_data_2['mu_Dtraj'].squeeze(), sigma=traj_data_2['sigma_Dtraj'], color_mean='g', color_shading='g', label='speed=1.')
-    plot_mean_and_sigma(mean=traj_data_3['mu_Dtraj'].squeeze(), sigma=traj_data_3['sigma_Dtraj'], color_mean='b', color_shading='b', label='speed=1.33')
+    plot_mean_and_sigma(mean=traj_data_3['mu_Dtraj'].squeeze(), sigma=traj_data_3['sigma_Dtraj'], color_mean='b', color_shading='b', label='speed=1.33', title="ProMP-Temporal Scaling Vel")
 
 
 def compute_ctrl_cmds(traj_data, color='k', label='', original_actions=None):
@@ -128,7 +131,7 @@ def compute_ctrl_cmds(traj_data, color='k', label='', original_actions=None):
 
     ctrl_cmds_mean, ctrl_cmds_sigma = promp_ctl.compute_ctrl_traj(state_list=state_list)
 
-    plot_mean_and_sigma(mean=ctrl_cmds_mean[:, 0], sigma=np.diag(ctrl_cmds_sigma[:, 0, 0]), color_mean=color, color_shading=color, label=label)
+    plot_mean_and_sigma(mean=ctrl_cmds_mean[:, 0], sigma=np.diag(ctrl_cmds_sigma[:, 0, 0]), color_mean=color, color_shading=color, label=label, title="ProMP-Temporal Scaling Control")
 
     if original_actions is not None:
 
