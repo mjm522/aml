@@ -32,8 +32,39 @@
     -->
   <!--<link name="right_hand"/>-->
   <!-- PACMAN VERION ALREADY INCLUDES THE COUPLER, CLAMP AND BASE -->
+
+
+<!--<link name="right_soft_hand_adapter">-->
+    <!--<visual>-->
+      <!--<origin rpy="1.5707 0. 3.14" xyz="0. 0. 0."/>-->
+      <!--<geometry>-->
+        <!--<mesh filename="package://soft_hand_description/meshes/peg_description/pisa_hand_adapter.STL" scale="0.001 0.001 0.001" />-->
+      <!--</geometry>-->
+    <!--</visual>-->
+    <!--<collision>-->
+      <!--<origin rpy="1.5707 0. 3.14" xyz="0. 0. 0."/>-->
+      <!--<geometry>-->
+        <!--<mesh filename="package://soft_hand_description/meshes/peg_description/pisa_hand_adapter.STL" scale="0.001 0.001 0.001" />-->
+      <!--</geometry>-->
+    <!--</collision>-->
+    <!--<inertial>-->
+      <!--<origin rpy="0 0 0" xyz="-0.05 0.04 0."/>-->
+      <!--<mass value="0.0001"/>-->
+      <!--<inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>-->
+    <!--</inertial>-->
+  <!--</link>-->
+
+  <!--<joint name="right_gripper_soft_hand_adapter" type="fixed">-->
+    <!--<origin rpy="0 0. 0" xyz="0.05 -0.04 -0.01"/>-->
+    <!--<parent link="right_hand"/>-->
+    <!--<child link="right_soft_hand_adapter"/>-->
+  <!--</joint>-->
+
+
+
+
   <joint name="hand_soft_hand_kuka_coupler_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+    <origin rpy="0 0 -1.570796327" xyz="0.007 0.0 0.0035"/>
     <parent link="right_hand"/>
     <child link="soft_hand_kuka_coupler_bottom"/>
   </joint>

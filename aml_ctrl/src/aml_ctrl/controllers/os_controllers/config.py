@@ -64,13 +64,13 @@ OS_POSTN_CNTLR_REAL_BAXTER = {
 
 OS_POSTN_CNTLR_REAL_SAWYER = {
     'rate': 200,
-    'kp_p': 10.0, #gains for position
-    'kd_p': np.sqrt(0.0),
-    'kp_o': 8.0, #gains for orientation
-    'kd_o': np.sqrt(0.0), #gains for orientation
+    'kp_p': 8.0, #gains for position
+    'kd_p': np.sqrt(0.001),
+    'kp_o': 6.0, #gains for orientation
+    'kd_o': np.sqrt(0.001), #gains for orientation
     'alpha': 0.0,
-    'null_kp': 4.0*0,
-    'null_kd': 2.5*0,
+    'null_kp': 0.5,
+    'null_kd': 0.05,
     'use_orientation_ctrl': True,
     'linear_error_thr': 0.025, # error of 2 cm
     'angular_error_thr': 0.025, # allowing angular errors of 0.3 radians

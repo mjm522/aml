@@ -39,12 +39,18 @@ class pisaiit_kinematics(object):
 
         self._finger_links = self._links['finger_links']
         self._tip_links = [self._links[finger_link][-1] for finger_link in self._finger_links]
+        self._all_links = []
+        for finger_link in self._finger_links:
+            self._all_links += self._links[finger_link]
+
+        # self._n_links = [len(self._links[finger_link]) for finger_link in self._finger_links]
+
         self._tip_frame = PyKDL.Frame()
 
         self._chains = [self._kdl_tree.getChain(self._base_link, tip_link) for tip_link in self._tip_links]
         self._num_chains = len(self._chains)
         self._chain_num_joints = [chain.getNrOfJoints() for chain in self._chains]
-
+        self._n_links = [chain.getNrOfSegments() for chain in self._chains]
         # KDL Solvers
         self._fk_p_kdl = [PyKDL.ChainFkSolverPos_recursive(chain) for chain in self._chains]
         self._fk_v_kdl = [PyKDL.ChainFkSolverVel_recursive(chain) for chain in self._chains]
@@ -71,12 +77,14 @@ class pisaiit_kinematics(object):
 
     def print_kdl_chain(self, chain_idx):
         chain = self._chains[chain_idx]
+        print "KDL Chain: %d"% chain_idx
         print "KDL joints: %d" % chain.getNrOfJoints()
+        print "KDL segments: %d" % chain.getNrOfSegments()
         for idx in xrange(chain.getNrOfSegments()):
             print '* ' + chain.getSegment(idx).getName()
 
-    def joints_to_kdl(self, type, values=None):
-        kdl_array = PyKDL.JntArray(self._num_jnts)
+    def joints_to_kdl(self, type, values=None, finger_idx = 0):
+        kdl_array = PyKDL.JntArray(self._chain_num_joints[finger_idx])
 
         if values is None:
             if type == 'positions':
@@ -102,19 +110,24 @@ class pisaiit_kinematics(object):
         return mat
 
     def forward_position_kinematics(self, joint_values=None, finger_idx=0):
-        end_frame = PyKDL.Frame()
-        self._fk_p_kdl[finger_idx].JntToCart(self.joints_to_kdl('positions', joint_values),
-                                 end_frame)
-        pos = end_frame.p
-        rot = PyKDL.Rotation(end_frame.M)
-        rot = rot.GetQuaternion()
-        return np.array([pos[0], pos[1], pos[2],
-                         rot[0], rot[1], rot[2], rot[3]])
 
-    def forward_velocity_kinematics(self, joint_velocities=None, finger_idx=0):
+        link_poses = []
+        for link_idx in range(self.n_links(finger_idx)):
+            end_frame = PyKDL.Frame()
+            self._fk_p_kdl[finger_idx].JntToCart(self.joints_to_kdl('positions', joint_values, finger_idx),
+                                     end_frame, link_idx)
+            pos = end_frame.p
+            rot = PyKDL.Rotation(end_frame.M)
+            rot = rot.GetQuaternion()
+
+            link_poses.append(np.array([pos[0], pos[1], pos[2],
+                         rot[0], rot[1], rot[2], rot[3]]))
+        return link_poses
+
+    def forward_velocity_kinematics(self, joint_velocities=None, finger_idx=0, link_idx=0):
         end_frame = PyKDL.FrameVel()
-        self._fk_v_kdl[finger_idx].JntToCart(self.joints_to_kdl('velocities', joint_velocities),
-                                 end_frame)
+        self._fk_v_kdl[finger_idx].JntToCart(self.joints_to_kdl('velocities', joint_velocities,finger_idx),
+                                 end_frame, link_idx)
         return end_frame.GetTwist()
 
     def inverse_kinematics(self, position, orientation=None, seed=None, finger_idx=0):
@@ -148,7 +161,7 @@ class pisaiit_kinematics(object):
 
     def jacobian(self, joint_values=None, finger_idx=0):
         jacobian = PyKDL.Jacobian(self._chain_num_joints[finger_idx])
-        self._jac_kdl[finger_idx].JntToJac(self.joints_to_kdl('positions', joint_values), jacobian)
+        self._jac_kdl[finger_idx].JntToJac(self.joints_to_kdl('positions', joint_values, finger_idx), jacobian)
         return self.kdl_to_mat(jacobian)
 
     def jacobian_transpose(self, joint_values=None, finger_idx=0):
@@ -166,3 +179,23 @@ class pisaiit_kinematics(object):
         js_inertia = self.inertia(joint_values,finger_idx)
         jacobian = self.jacobian(joint_values,finger_idx)
         return np.linalg.inv(jacobian * np.linalg.inv(js_inertia) * jacobian.T)
+
+
+    def n_joints(self, finger_idx = 0):
+        return self._chain_num_joints[finger_idx]
+
+    def n_chains(self):
+        return self._num_chains
+
+    def n_links(self, finger_idx = 0):
+
+        return self._n_links[finger_idx]
+
+    def base_link(self):
+        return self._base_link
+
+    def link_name(self, finger_idx, link_idx):
+
+        chain = self._chains[finger_idx]
+        
+        return chain.getSegment(link_idx).getName()

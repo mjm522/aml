@@ -39,9 +39,9 @@ class PisaIITHand(RobotInterface):
         self._ready = True  # Hand is ready to be used
 
         self._lock = threading.Lock()
-        self._state_update_thread = threading.Thread(target=self._update_state)
-        self._state_update_thread.setDaemon(True)
-        self._state_update_thread.start()
+        # self._state_update_thread = threading.Thread(target=self._update_state)
+        # self._state_update_thread.setDaemon(True)
+        # self._state_update_thread.start()
 
 
 
