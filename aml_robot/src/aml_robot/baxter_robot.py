@@ -14,6 +14,13 @@ import quaternion
 
 # Baxter SDK imports
 import baxter_interface
+from baxter_interface import (
+    DigitalIO,
+    Gripper,
+    Navigator,
+    CHECK_VERSION,
+)
+
 from baxter_core_msgs.msg import SEAJointState, EndpointState
 from baxter_interface import CHECK_VERSION
 
@@ -28,6 +35,96 @@ from aml_robot.robot_interface import RobotInterface
 from aml_io.log_utils import aml_logging
 
 from aml_visual_tools.load_aml_logo import load_aml_logo
+
+
+
+
+class BaxterGripper(object):
+    """
+    Connects wrist button presses to gripper open/close commands.
+
+    Uses the DigitalIO Signal feature to make callbacks to connected
+    action functions when the button values change.
+    """
+
+    def __init__(self, arm, reversed = True, lights=True):
+        """
+        @type arm: str
+        @param arm: arm of gripper to control {left, right}
+        @type lights: bool
+        @param lights: if lights should activate on cuff grasp
+        """
+        self._arm = arm
+        # inputs
+        self._close_io = DigitalIO('%s_upper_button' % (arm,))  # 'dash' btn
+        self._open_io = DigitalIO('%s_lower_button' % (arm,))   # 'circle' btn
+        self._light_io = DigitalIO('%s_lower_cuff' % (arm,))    # cuff squeeze
+        # outputs
+        reverse_map = None
+        if reversed:
+            rmap = {'right' : 'left',
+                           'left' : 'right'}
+
+            reverse_map = lambda x : rmap[x]
+        else:
+            reverse_map = lambda x : x
+
+        self._gripper = Gripper('%s' % (reverse_map(arm),), CHECK_VERSION)
+        self._nav = Navigator('%s' % (reverse_map(arm),))
+
+        # connect callback fns to signals
+        if self._gripper.type() != 'custom':
+            if not (self._gripper.calibrated() or
+                    self._gripper.calibrate() == True):
+                rospy.logwarn("%s (%s) calibration failed.",
+                              self._gripper.name.capitalize(),
+                              self._gripper.type())
+        else:
+            msg = (("%s (%s) not capable of gripper commands."
+                   " Running cuff-light connection only.") %
+                   (self._gripper.name.capitalize(), self._gripper.type()))
+            rospy.logwarn(msg)
+
+        self._gripper.on_type_changed.connect(self._check_calibration)
+        self._open_io.state_changed.connect(self._open_action)
+        self._close_io.state_changed.connect(self._close_action)
+
+        if lights:
+            self._light_io.state_changed.connect(self._light_action)
+
+        rospy.loginfo("%s Cuff Control initialized...",
+                      self._gripper.name.capitalize())
+
+    def _open_action(self, value):
+        if value and self._is_grippable():
+            rospy.logdebug("gripper open triggered")
+            self._gripper.open()
+
+    def _close_action(self, value):
+        if value and self._is_grippable():
+            rospy.logdebug("gripper close triggered")
+            self._gripper.close()
+
+    def _light_action(self, value):
+        if value:
+            rospy.logdebug("cuff grasp triggered")
+        else:
+            rospy.logdebug("cuff release triggered")
+        self._nav.inner_led = value
+        self._nav.outer_led = value
+
+    def _check_calibration(self, value):
+        if self._gripper.calibrated():
+            return True
+        elif value == 'electric':
+            rospy.loginfo("calibrating %s...",
+                          self._gripper.name.capitalize())
+            return (self._gripper.calibrate() == True)
+        else:
+            return False
+
+    def _is_grippable(self):
+        return (self._gripper.calibrated() and self._gripper.ready())
 
 
 class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
@@ -45,6 +142,8 @@ class BaxterArm(baxter_interface.limb.Limb, RobotInterface):
         self._ready = True
 
         self._limb = limb
+
+        self._gripper = BaxterGripper(self._limb)
 
         if limb == 'left':
             # secondary goal for the manipulator
