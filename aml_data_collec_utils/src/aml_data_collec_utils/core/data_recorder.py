@@ -65,9 +65,8 @@ class DataRecorder(object):
 
     def record_once(self, task_action, terminal = False):
 
-        robot_state = copy.deepcopy(self._robot._state)
+        robot_state = copy.deepcopy(self._robot.state())
 
-        print robot_state['position']
         task_state = self._task.get_effect()
 
         if not self.check_sample(robot_state['timestamp']):
