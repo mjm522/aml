@@ -1,8 +1,10 @@
 import os
 import numpy as np
+import quaternion as q
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from aml_io.io_tools import load_data
+from aml_playground.peg_in_hole_reps.utilities.draw_frame import draw_frame
 
 demo_data_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/sawyer/demo_data/'
 
@@ -39,6 +41,58 @@ def lpf(data):
     return y
 
 
+def transform_forces(force_list, pos_list, ori_list):
+
+    trans_force_list = []
+
+    for j in range(len(force_list)):
+
+        trans_force_l= []
+        force_l = force_list[j]
+        pos_l = pos_list[j]
+        ori_l = ori_list[j]
+
+        for k in range(len(pos_l)-1):
+            point_1 = pos_l[k]
+            point_2 = pos_l[k+1]
+            ori = ori_l[k]
+
+            rot_sensor_frame = q.as_rotation_matrix(q.quaternion(ori[0], ori[1], ori[2], ori[3]))
+
+            x_axis  = point_2-point_1
+            x_axis[x_axis < 1e-5] = 0.
+            if np.linalg.norm(x_axis) < 1e-5:
+                x_axis = np.array([0.,0.,0])
+            else:
+                x_axis  /= np.linalg.norm(x_axis)
+            z_axis  = np.array([0.,0.,1.])
+            y_axis  = np.cross(z_axis, x_axis)
+
+            rot_contact_frame_T  = np.vstack([x_axis, y_axis, z_axis])
+
+            trans_force_l.append(np.dot(rot_contact_frame_T, np.dot(rot_sensor_frame, force_l[k,:])))
+            # trans_force_l.append(np.dot(rot_contact_frame_T, force_l[k,:]))
+
+        trans_force_list.append(np.asarray(trans_force_l))
+
+    return trans_force_list
+
+
+
+
+def plot_3D(force_list, pos_list, ori_list):
+    
+    fig = plt.figure(figsize=(15,15))
+    ax = fig.add_subplot(111, projection='3d')
+
+    for k in range(len(pos_list)):
+
+        if k%30==0:
+            draw_frame(pos=pos_list[k], ori=ori_list[k], axes=ax, l=0.15)
+
+    plt.show()
+
+
 def visualise_data(file_='right2left'): #right2left left2right
 
     file_list = replay_data_files
@@ -47,7 +101,7 @@ def visualise_data(file_='right2left'): #right2left left2right
     #contacts_data_left2right_changing_angles
     # file = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/contacts_data_'+file_+'_changing_angles.pkl'
 
-    pos_list, ori_list, lin_vels_list, ang_vels_list, f_list, t_list, pos_list = [],[],[],[],[]
+    pos_list, ori_list, lin_vels_list, ang_vels_list, f_list, t_list, pos_list = [],[],[],[],[],[],[]
 
     for data_file in file_list:
 
@@ -91,9 +145,9 @@ def visualise_data(file_='right2left'): #right2left left2right
         #     t_reading = np.array([ float(ft_reading[5]), float(ft_reading[7]), float(ft_reading[9])])
         #     f_list.append(f_reading)
         #     t_list.append(t_reading)
+        # pos_list.append([data[i]['tip_state']['position'] for i in range(len(data))])
 
-        pos_list.append([data[i]['tip_state']['position'] for i in range(len(data))])
-
+    trans_force_list = transform_forces(f_list, pos_list, ori_list)
 
     # print data[0].get_contents()
     # print "done"
@@ -114,6 +168,7 @@ def visualise_data(file_='right2left'): #right2left left2right
 
         print k+1, file_list[k]
 
+        tr_forces_list = trans_force_list[k]
         forces_list  = np.asarray(f_list[k]) #ee_wrenches[:,:3]
         torques_list = np.asarray(t_list[k]) #ee_wrenches[:,3:]
         pos = np.asarray(pos_list[k]) #ee_wrenches[:,3:]
@@ -121,6 +176,7 @@ def visualise_data(file_='right2left'): #right2left left2right
         a_vel = np.asarray(ang_vels_list[k])
         # forces_list_local  = ee_wrenches_local[:,:3]
         # torques_list_local = ee_wrenches_local[:,3:]
+        print tr_forces_list
 
         l_idx = 0
         g_idx = 0
@@ -132,10 +188,10 @@ def visualise_data(file_='right2left'): #right2left left2right
 
         subplot_idx = 320   
         # color = col[k]
-        plt.figure("force - torque", figsize=(15, 15))
+        plt.figure("force - trans-force", figsize=(15, 15))
         plt.title(file_)
         # plt.clf()
-        names = ['Fx', 'Tx', 'Fy', 'Ty', 'Fz', 'Tz']
+        names = ['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz']
         for j in range(6):
             
             subplot_idx += 1
@@ -143,9 +199,9 @@ def visualise_data(file_='right2left'): #right2left left2right
             ax.set_title(names[j])
             plt.xlabel("num data")
             if j%2 == 1:
-                ax.plot(lpf(torques_list[:,l_idx]), label=file_)
+                ax.plot(lpf(tr_forces_list[:,l_idx]), label=file_)
                 l_idx += 1
-                plt.ylabel("Nm")
+                plt.ylabel("N")
                 # if j == 1:
                 #     plt.legend(replay_data_files)
             else:
@@ -157,41 +213,41 @@ def visualise_data(file_='right2left'): #right2left left2right
         plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
                   ncol=3, fancybox=True, shadow=True)
 
-        plt.savefig(file_name_force)
-        l_idx = 0
-        g_idx = 0
+        # plt.savefig(file_name_force)
+        # l_idx = 0
+        # g_idx = 0
 
-        names = ['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz']
-        subplot_idx = 320 
-        plt.figure("l_vel - a_vel", figsize=(15, 15))
-        # plt.clf()
-        for j in range(6):
-            subplot_idx += 1
-            ax = plt.subplot(subplot_idx)
-            ax.set_title(names[j])
-            plt.xlabel("num data")
-            if j%2 == 1:
-                ax.plot(lpf(a_vel[:,l_idx]), label=file_)
-                l_idx += 1
-                plt.ylabel("rad/s")
-                # if j == 1:
-                #     plt.legend(replay_data_files)
-            else:
-                plt.plot(lpf(l_vel[:,g_idx]), label=file_)
-                g_idx += 1
-                plt.ylabel("m/s")
-            ax.set_xlim(0, 700)
-            ax.set_ylim(-1.0, 1.0)
+        # names = ['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz']
+        # subplot_idx = 320 
+        # plt.figure("l_vel - a_vel", figsize=(15, 15))
+        # # plt.clf()
+        # for j in range(6):
+        #     subplot_idx += 1
+        #     ax = plt.subplot(subplot_idx)
+        #     ax.set_title(names[j])
+        #     plt.xlabel("num data")
+        #     if j%2 == 1:
+        #         ax.plot(lpf(a_vel[:,l_idx]), label=file_)
+        #         l_idx += 1
+        #         plt.ylabel("rad/s")
+        #         # if j == 1:
+        #         #     plt.legend(replay_data_files)
+        #     else:
+        #         plt.plot(lpf(l_vel[:,g_idx]), label=file_)
+        #         g_idx += 1
+        #         plt.ylabel("m/s")
+        #     ax.set_xlim(0, 700)
+        #     ax.set_ylim(-1.0, 1.0)
 
-        plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
-                  ncol=3, fancybox=True, shadow=True)
+        # plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
+        #           ncol=3, fancybox=True, shadow=True)
 
-        plt.savefig(file_name_traj)
+        # plt.savefig(file_name_traj)
 
         # plt.close(title)
         plt.draw()
         plt.pause(0.00001)
-        # raw_input()
+        raw_input()
         # if k == 'q':
             # break
 
