@@ -17,17 +17,15 @@ def train_dmp(trajectory):
 
     return dmp
 
-def test_dmp(dmp):
 
+def update_dmp_params(dmp, start_offset, goal_offset, speed):
+    
     discrete_dmp_config['dof'] = dmp._dof
 
     test_config = discrete_dmp_config
     test_config['dt'] = 0.001
 
     # play with the parameters
-    start_offset = np.zeros(dmp._dof)
-    goal_offset = np.zeros(dmp._dof)
-    speed = 0.5
     external_force = np.array([0.,0.,0.,0.])
     alpha_phaseStop = 20.
 
@@ -45,33 +43,80 @@ def test_dmp(dmp):
 
     gen_traj = dmp.generate_trajectory(config=test_config)
 
-    # tmp = dmp.generate_trajectory_old(test_config)
+    return gen_traj
 
-    time_stamps = gen_traj['time_stamps']
-    test_traj   = gen_traj['pos']
+
+def test_dmp(dmp):
+
+    start_offset1 = np.zeros(dmp._dof)
+    goal_offset1 = np.zeros(dmp._dof)
+
+    gen_traj_speed1 = update_dmp_params(dmp, np.zeros(dmp._dof), np.zeros(dmp._dof), 1.5)
+    gen_traj_speed2 = update_dmp_params(dmp, np.zeros(dmp._dof), np.zeros(dmp._dof), 1.)
+    gen_traj_speed3 = update_dmp_params(dmp, np.zeros(dmp._dof), np.zeros(dmp._dof), 0.5)
+
+    gen_traj_spatial1 = update_dmp_params(dmp, np.zeros(dmp._dof), np.array([1.,1.]), 1.)
+    gen_traj_spatial2 = update_dmp_params(dmp, np.zeros(dmp._dof), np.zeros(dmp._dof), 1.)
+    gen_traj_spatial3 = update_dmp_params(dmp, np.zeros(dmp._dof), np.array([-1.,-1.]), 1.)
 
     #in 2D only maximum only two dimensions can be plotted
 
     if dmp._dof > 2:
         print "Warning: Only 2 dimensions can be plotted"
 
-    plt.figure("dmp-pos x vs y")
+    plt.figure("dmp-pos x vs y - tempoal")
     plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')
-    plt.plot(test_traj[:,0], test_traj[:,1], 'r--')
+    plt.plot(gen_traj_speed1['pos'][:,0], gen_traj_speed1['pos'][:,1], 'r--')
+    plt.plot(gen_traj_speed2['pos'][:,0], gen_traj_speed2['pos'][:,1], 'g--')
+    plt.plot(gen_traj_speed3['pos'][:,0], gen_traj_speed3['pos'][:,1], 'b--')
+    plt.title("DMP-Demo Traj - Temporal Scale")
+    plt.xlabel("distance X (m)")
+    plt.ylabel("distance Y (m)")
 
-    # plt.figure("OLD dmp-pos x vs y")
-    # plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')
-    # plt.plot(tmp['pos'][:,0], tmp['pos'][:,1], 'r--')
+    plt.figure("dmp-pos x vs y - spatial")
+    plt.plot(dmp._traj_data[:,1], dmp._traj_data[:,2], 'b-')
+    plt.plot(gen_traj_spatial1['pos'][:,0], gen_traj_spatial1['pos'][:,1], 'r--')
+    plt.plot(gen_traj_spatial2['pos'][:,0], gen_traj_spatial2['pos'][:,1], 'g--')
+    plt.plot(gen_traj_spatial3['pos'][:,0], gen_traj_spatial3['pos'][:,1], 'b--')
+    plt.title("DMP-Demo Traj - Spatial Scale")
+    plt.xlabel("distance X (m)")
+    plt.ylabel("distance Y (m)")
 
-    plt.figure("dmp-pos vs time")
+    plt.figure("dmp-pos vs time - spatial")
+    labels= ['x+1; tau=1', 'y+1; tau=1']
     for k in range(dmp._dof):
+        plt.plot(gen_traj_spatial1['time_stamps'], gen_traj_spatial1['pos'][:,k], label=labels[k])
 
-        plt.plot(time_stamps, test_traj[:,k])
+    labels= ['x+0; tau=1', 'y+0; tau=1']
+    for k in range(dmp._dof):
+        plt.plot(gen_traj_spatial2['time_stamps'], gen_traj_spatial2['pos'][:,k], label=labels[k])
 
-    # plt.figure("OLD dmp-pos vs time")
-    # for k in range(dmp._dof):
+    labels= ['x-1; tau=1', 'y-1; tau=1']
+    for k in range(dmp._dof):
+        plt.plot(gen_traj_spatial3['time_stamps'], gen_traj_spatial3['pos'][:,k], label=labels[k])
 
-    #     plt.plot(time_stamps, tmp['pos'][:,k])
+    plt.xlabel("time (s)")
+    plt.ylabel("distance (m)")
+    plt.title("DMP- X and Y Traj - Spatial")
+    plt.legend()
+
+    plt.figure("dmp-pos vs time - temporal")
+    labels= ['x+0; tau=1.5', 'y+0+0; tau=1.5']
+    for k in range(dmp._dof):
+        plt.plot(gen_traj_speed1['time_stamps'], gen_traj_speed1['pos'][:,k], label=labels[k])
+
+    labels= ['x+0; tau=1.', 'y+0; tau=1.']
+    for k in range(dmp._dof):
+        plt.plot(gen_traj_speed2['time_stamps'], gen_traj_speed2['pos'][:,k], label=labels[k])
+
+    labels= ['x+0; tau=0.5', 'y+0; tau=0.5']
+    for k in range(dmp._dof):
+        plt.plot(gen_traj_speed3['time_stamps'], gen_traj_speed3['pos'][:,k], label=labels[k])
+
+    plt.xlabel("time (s)")
+    plt.ylabel("distance (m)")
+    plt.title("DMP- X and Y Traj - Temporal")
+    plt.legend()
 
     plt.show()
 
