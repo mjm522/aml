@@ -1,9 +1,12 @@
 import os
+import copy
+import pandas
 import numpy as np
 import quaternion as q
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from aml_io.io_tools import load_data
+from scipy.interpolate import interp1d
 from aml_playground.peg_in_hole_reps.utilities.draw_frame import draw_frame
 
 demo_data_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/sawyer/demo_data/'
@@ -71,12 +74,51 @@ def transform_forces(force_list, pos_list, ori_list):
             rot_contact_frame_T  = np.vstack([x_axis, y_axis, z_axis])
 
             trans_force_l.append(np.dot(rot_contact_frame_T, np.dot(rot_sensor_frame, force_l[k,:])))
-            # trans_force_l.append(np.dot(rot_contact_frame_T, force_l[k,:]))
-
+     
         trans_force_list.append(np.asarray(trans_force_l))
 
     return trans_force_list
 
+
+def plot_(right_data,
+          left_data,
+          f_title="None",
+          p_title='None',
+          names=['dummyx', 'dummyx', 'dummyy', 'dummyy', 'dummyz', 'dummyz'],
+          do_clf=False,
+          ylabels=['none', 'none']):
+    
+    num_plots = len(names)
+    subplot_idx = (num_plots/2)*100 + (num_plots/4)*10 
+    l_idx, g_idx = 0, 0  
+    fig = plt.figure(f_title, figsize=(15, 15))
+    plt.title(p_title)
+    
+    if do_clf:
+        plt.clf()
+    
+    for j in range(num_plots):
+        
+        subplot_idx += 1
+        ax = plt.subplot(subplot_idx)
+        ax.set_title(names[j])
+        plt.xlabel("num data")
+        if j%2 == 1:
+            ax.plot(lpf(right_data[:,l_idx]), label=p_title)
+            l_idx += 1
+            plt.ylabel(ylabels[0])
+            # if j == 1:
+            #     plt.legend(replay_data_files)
+        else:
+            plt.plot(lpf(left_data[:,g_idx]), label=p_title)
+            g_idx += 1
+            plt.ylabel(ylabels[1])
+        ax.set_xlim(0, 700)
+        ax.set_ylim(-3.0, 3.0)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
+              ncol=3, fancybox=True, shadow=True)
+
+    return fig
 
 
 
@@ -91,6 +133,32 @@ def plot_3D(force_list, pos_list, ori_list):
             draw_frame(pos=pos_list[k], ori=ori_list[k], axes=ax, l=0.15)
 
     plt.show()
+
+
+def resample_data(force_list, pos_list, ori_list, num_resamples=500):
+
+    resampled_data_list = []
+
+    for j in range(len(pos_list)):
+
+        total_data = np.hstack([force_list[j], pos_list[j], ori_list[j]])
+        num_samples, num_dim = total_data.shape
+        resampled_data = np.zeros([num_resamples, num_dim])
+        #some of them has less number of data
+        #but how to upsample then?
+    
+        for k in range(num_dim):
+            osample  = np.arange(0.,  1., 1./num_samples)[:num_samples]
+            nsample  = np.arange(0.,  1., 1./num_resamples)
+            resampled_data[:,k] = interp1d(osample, total_data[:,k], kind='cubic', fill_value='extrapolate')(nsample)
+
+        #re-normalize quaternions
+        for i in range(num_resamples):
+            resampled_data[i,:-4] /= np.linalg.norm(resampled_data[i,:-4])
+
+        resampled_data_list.append(copy.deepcopy(resampled_data))
+
+    return resampled_data_list
 
 
 def visualise_data(file_='right2left'): #right2left left2right
@@ -148,6 +216,7 @@ def visualise_data(file_='right2left'): #right2left left2right
         # pos_list.append([data[i]['tip_state']['position'] for i in range(len(data))])
 
     trans_force_list = transform_forces(f_list, pos_list, ori_list)
+    resampled_data_list = resample_data(f_list, pos_list, ori_list)
 
     # print data[0].get_contents()
     # print "done"
@@ -162,94 +231,57 @@ def visualise_data(file_='right2left'): #right2left left2right
 
     for k in range(len(file_list)):
 
-        # ee_traj  = i['ee_traj']
-        # ee_wrenches = i['ee_wrenches']
-        # ee_wrenches_local = i['ee_wrenches_local']  
-
         print k+1, file_list[k]
-
-        tr_forces_list = trans_force_list[k]
-        forces_list  = np.asarray(f_list[k]) #ee_wrenches[:,:3]
-        torques_list = np.asarray(t_list[k]) #ee_wrenches[:,3:]
-        pos = np.asarray(pos_list[k]) #ee_wrenches[:,3:]
-        l_vel = np.asarray(lin_vels_list[k])
-        a_vel = np.asarray(ang_vels_list[k])
-        # forces_list_local  = ee_wrenches_local[:,:3]
-        # torques_list_local = ee_wrenches_local[:,3:]
-        print tr_forces_list
-
-        l_idx = 0
-        g_idx = 0
 
         file_ = str(('_'.join(file_list[k].split('_')[3:])).split('.')[0])
 
         file_name_force = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/' + file_+ '_images_force_' + str(k)+ '.png'
         file_name_traj = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/' + file_ +'_images_traj_' + str(k)+ '.png'
 
-        subplot_idx = 320   
-        # color = col[k]
-        plt.figure("force - trans-force", figsize=(15, 15))
-        plt.title(file_)
-        # plt.clf()
-        names = ['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz']
-        for j in range(6):
-            
-            subplot_idx += 1
-            ax = plt.subplot(subplot_idx)
-            ax.set_title(names[j])
-            plt.xlabel("num data")
-            if j%2 == 1:
-                ax.plot(lpf(tr_forces_list[:,l_idx]), label=file_)
-                l_idx += 1
-                plt.ylabel("N")
-                # if j == 1:
-                #     plt.legend(replay_data_files)
-            else:
-                plt.plot(lpf(forces_list[:,g_idx]), label=file_)
-                g_idx += 1
-                plt.ylabel("N")
-            ax.set_xlim(0, 700)
-            ax.set_ylim(-3.0, 3.0)
-        plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
-                  ncol=3, fancybox=True, shadow=True)
+        # fig_force = plot_(right_data=trans_force_list[k],
+        #   left_data=np.asarray(f_list[k]),
+        #   f_title="force - trans-force",
+        #   p_title=file_,
+        #   names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+        #   do_clf=False,
+        #   ylabels=['N', 'N'])
 
-        # plt.savefig(file_name_force)
-        # l_idx = 0
-        # g_idx = 0
+        # fig_vel = plot_(right_data=np.asarray(ang_vels_list[k]),
+        #   left_data=np.asarray(lin_vels_list[k]),
+        #   f_title="lin-vel <=> ang-vel",
+        #   p_title=file_,
+        #   names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+        #   do_clf=False,
+        #   ylabels=['rad/s', 'm/s'])
 
-        # names = ['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz']
-        # subplot_idx = 320 
-        # plt.figure("l_vel - a_vel", figsize=(15, 15))
-        # # plt.clf()
-        # for j in range(6):
-        #     subplot_idx += 1
-        #     ax = plt.subplot(subplot_idx)
-        #     ax.set_title(names[j])
-        #     plt.xlabel("num data")
-        #     if j%2 == 1:
-        #         ax.plot(lpf(a_vel[:,l_idx]), label=file_)
-        #         l_idx += 1
-        #         plt.ylabel("rad/s")
-        #         # if j == 1:
-        #         #     plt.legend(replay_data_files)
-        #     else:
-        #         plt.plot(lpf(l_vel[:,g_idx]), label=file_)
-        #         g_idx += 1
-        #         plt.ylabel("m/s")
-        #     ax.set_xlim(0, 700)
-        #     ax.set_ylim(-1.0, 1.0)
+        # fig_force_re = plot_(right_data=resampled_data[:,:3],
+        #                   left_data=np.asarray(f_list[k]),
+        #                   f_title="sample - resamples - force",
+        #                   p_title=file_,
+        #                   names=['Sfx', 'RSfx', 'Sfy', 'RSfy', 'Sfz', 'RSfz'],
+        #                   do_clf=False,
+        #                   ylabels=['N', 'N'])
 
-        # plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
-        #           ncol=3, fancybox=True, shadow=True)
+        # fig_pos_re = plot_(right_data=resampled_data_list[k][:,3:6],
+        #                   left_data=np.asarray(pos_list[k]),
+        #                   f_title="sample - resamples - pos",
+        #                   p_title=file_,
+        #                   names=['Sx', 'RSx', 'Sy', 'RSy', 'Sz', 'RSz'],
+        #                   do_clf=False,
+        #                   ylabels=['m', 'm'])
+
+        fig_ori_re = plot_(right_data=resampled_data_list[k][:,6:],
+                  left_data=np.asarray(ori_list[k]),
+                  f_title="sample - resamples - ori",
+                  p_title=file_,
+                  names=['Sx', 'RSx', 'Sy', 'RSy', 'Sz', 'RSz', 'Sw', 'RSw'],
+                  do_clf=False,
+                  ylabels=['none', 'none'])
 
         # plt.savefig(file_name_traj)
-
-        # plt.close(title)
         plt.draw()
         plt.pause(0.00001)
         raw_input()
-        # if k == 'q':
-            # break
 
 
 if __name__ == '__main__':
