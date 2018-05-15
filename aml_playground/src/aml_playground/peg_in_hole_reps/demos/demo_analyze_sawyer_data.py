@@ -95,7 +95,7 @@ def plot_(right_data,
     elif num_plots == 6:
         subplot_idx = 320
 
-    l_idx, g_idx = 0, 0  
+    l_idx, r_idx = 0, 0  
     fig = plt.figure(f_title, figsize=(15, 15))
     plt.title(p_title)
     
@@ -108,17 +108,15 @@ def plot_(right_data,
         ax = plt.subplot(subplot_idx)
         ax.set_title(names[j])
         plt.xlabel("num data")
-        if j%2 == 1:
-            ax.plot(lpf(right_data[:,l_idx]), label=p_title)
+        if j%2 == 0:
+            ax.plot(lpf(left_data[:,l_idx]), label=p_title)
             l_idx += 1
             plt.ylabel(ylabels[0])
-            # if j == 1:
-            #     plt.legend(replay_data_files)
-        else:
-            plt.plot(lpf(left_data[:,g_idx]), label=p_title)
-            g_idx += 1
+        elif j%2 == 1:
+            plt.plot(lpf(right_data[:,r_idx]), label=p_title)
+            r_idx += 1
             plt.ylabel(ylabels[1])
-        ax.set_xlim(0, 700)
+        ax.set_xlim(0, max(left_data.shape[0], right_data.shape[0]))
         ax.set_ylim(-3.0, 3.0)
     plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.15),
               ncol=3, fancybox=True, shadow=True)
@@ -218,12 +216,12 @@ def visualise_data(file_='right2left'): #right2left left2right
         #     print ft_reading
         #     f_reading = np.array([ float(ft_reading[0]), float(ft_reading[2]), float(ft_reading[4]) ])
         #     t_reading = np.array([ float(ft_reading[5]), float(ft_reading[7]), float(ft_reading[9])])
-        #     f_list.append(f_reading)
+        #     f_list.append(f_re           ading)
         #     t_list.append(t_reading)
         # pos_list.append([data[i]['tip_state']['position'] for i in range(len(data))])
 
     trans_force_list_before_resample = transform_forces(f_list, pos_list, ori_list)
-    resampled_force_list, resampled_pos_list,  resampled_ori_list = resample_data(f_list, pos_list, ori_list)
+    resampled_force_list, resampled_pos_list,  resampled_ori_list = resample_data(f_list, pos_list, ori_list, num_resamples=1000)
     trans_force_list_after_resample = transform_forces(resampled_force_list, resampled_pos_list,  resampled_ori_list)
 
     # print data[0].get_contents()
@@ -255,10 +253,10 @@ def visualise_data(file_='right2left'): #right2left left2right
         #   ylabels=['N', 'N'])
 
         fig_force = plot_(right_data=trans_force_list_after_resample[k],
-          left_data=np.asarray(f_list[k]),
+          left_data=np.asarray(trans_force_list_before_resample[k]),
           f_title="force - trans-force",
           p_title=file_,
-          names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+          names=['tranFx', 'R-tranFx', 'tranFy', 'R-tranFy', 'tranFz', 'R-tranFz'],
           do_clf=False,
           ylabels=['N', 'N'])
 
@@ -266,15 +264,15 @@ def visualise_data(file_='right2left'): #right2left left2right
         #   left_data=np.asarray(lin_vels_list[k]),
         #   f_title="lin-vel <=> ang-vel",
         #   p_title=file_,
-        #   names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+        #   names=['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz'],
         #   do_clf=False,
-        #   ylabels=['rad/s', 'm/s'])
+        #   ylabels=['m/s', 'rad/s'])
 
         # fig_force_re = plot_(right_data=resampled_force_list[k],
         #                   left_data=np.asarray(f_list[k]),
         #                   f_title="sample - resamples - force",
         #                   p_title=file_,
-        #                   names=['Sfx', 'RSfx', 'Sfy', 'RSfy', 'Sfz', 'RSfz'],
+        #                   names=['fx', 'R-fx', 'fy', 'R-fy', 'fz', 'R-fz'],
         #                   do_clf=False,
         #                   ylabels=['N', 'N'])
 
@@ -282,7 +280,7 @@ def visualise_data(file_='right2left'): #right2left left2right
         #                   left_data=np.asarray(pos_list[k]),
         #                   f_title="sample - resamples - pos",
         #                   p_title=file_,
-        #                   names=['Sx', 'RSx', 'Sy', 'RSy', 'Sz', 'RSz'],
+        #                   names=['x', 'R-x', 'y', 'R-y', 'z', 'R-z'],
         #                   do_clf=False,
         #                   ylabels=['m', 'm'])
 
@@ -290,7 +288,7 @@ def visualise_data(file_='right2left'): #right2left left2right
         #           left_data=np.asarray(ori_list[k]),
         #           f_title="sample - resamples - ori",
         #           p_title=file_,
-        #           names=['Sx', 'RSx', 'Sy', 'RSy', 'Sz', 'RSz', 'Sw', 'RSw'],
+        #           names=['x', 'R-x', 'y', 'R-y', 'z', 'R-z', 'w', 'R-w'],
         #           do_clf=False,
         #           ylabels=['none', 'none'])
 
