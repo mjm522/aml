@@ -47,7 +47,7 @@ class BaxterGripper(object):
     action functions when the button values change.
     """
 
-    def __init__(self, arm, reversed = True, lights=True):
+    def __init__(self, arm, reversed = False, lights=True):
         """
         @type arm: str
         @param arm: arm of gripper to control {left, right}

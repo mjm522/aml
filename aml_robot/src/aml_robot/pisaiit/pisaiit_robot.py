@@ -97,8 +97,9 @@ class PisaIITHand(RobotInterface):
                                "synergy": self._config['synergy_joints']}
 
         self._all_joint_names = []
-        for finger_name in self._config["finger_order"]:
-            self._all_joint_names += self._joint_name_map[finger_name]
+        self._all_joint_names = self._config["all_joint_names"]
+        # for finger_name in self._config["finger_order"]:
+        #     self._all_joint_names += self._joint_name_map[finger_name]
 
         self._state = None
 

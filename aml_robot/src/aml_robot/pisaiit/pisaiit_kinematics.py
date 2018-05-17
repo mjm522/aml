@@ -33,7 +33,6 @@ class pisaiit_kinematics(object):
         self._num_jnts = len(self._joint_names)
 
 
-
         self._links = self._limb_interface.links()
         self._base_link = self._links['base_link']
 
@@ -137,7 +136,7 @@ class pisaiit_kinematics(object):
             rot = rot.Quaternion(orientation[1],
                                  orientation[2], orientation[3], orientation[0])
         # Populate seed with current angles if not provided
-        seed_array = PyKDL.JntArray(self._num_jnts)
+        seed_array = PyKDL.JntArray(self.n_joints(finger_idx))
         if seed != None:
             seed_array.resize(len(seed))
             for idx, jnt in enumerate(seed):
@@ -151,7 +150,7 @@ class pisaiit_kinematics(object):
         else:
             goal_pose = PyKDL.Frame(pos)
 
-        result_angles = PyKDL.JntArray(self._num_jnts)
+        result_angles = PyKDL.JntArray(self.n_joints(finger_idx))
 
         if self._ik_p_kdl[finger_idx].CartToJnt(seed_array, goal_pose, result_angles) >= 0:
             result = np.array(list(result_angles))
@@ -171,7 +170,7 @@ class pisaiit_kinematics(object):
         return np.linalg.pinv(self.jacobian(joint_values,finger_idx))
 
     def inertia(self, joint_values=None, finger_idx=0):
-        inertia = PyKDL.JntSpaceInertiaMatrix(self._num_jnts)
+        inertia = PyKDL.JntSpaceInertiaMatrix(self.n_joints(finger_idx))
         self._dyn_kdl[finger_idx].JntToMass(self.joints_to_kdl('positions', joint_values), inertia)
         return self.kdl_to_mat(inertia)
 
@@ -199,3 +198,6 @@ class pisaiit_kinematics(object):
         chain = self._chains[finger_idx]
         
         return chain.getSegment(link_idx).getName()
+
+    def joint_names(self):
+        return self._joint_names

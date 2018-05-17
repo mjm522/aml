@@ -8,5 +8,9 @@
     </node>
 
 
+    <node pkg="aml_grasp" type="pisa_joint_state_publisher.py" name="pisa_joint_state_publisher" output="screen">
+    </node>
+
+
 
 </launch>
