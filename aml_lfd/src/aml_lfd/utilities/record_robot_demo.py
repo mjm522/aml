@@ -33,6 +33,8 @@ class RecordRobotDemo():
         self._robot = robot_interface
         #this will be rate at which data will be read from the arm
         self._sampling_rate = sampling_rate
+
+        # self._robot.untuck()
         
         self._robot.set_sampling_rate(sampling_rate=self._sampling_rate)
 
@@ -119,7 +121,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-l', '--limb_name', type=str,     default='left', help='limb index-(left/right)')
 
-    parser.add_argument('-i', '--arm_interface', type=str, default=False,  help='arm_interface (sawyer/baxter)')
+    parser.add_argument('-i', '--arm_interface', type=str, default='baxter',  help='arm_interface (sawyer/baxter)')
 
     parser.add_argument('-d', '--demo_name', type=str, help='demo name-(give a name for demo collected)')
     

@@ -14,12 +14,12 @@ from aml_planners.push_planner.exp_params.experiment_params import experiment_co
 from aml_planners.push_planner.costs.cost_imp import CostImp
 from aml_planners.push_planner.utilities.utils import sigmoid
 
-from aml_perception.camera_sensor import CameraSensor
+# from aml_perception.camera_sensor import CameraSensor
 
 import tf, rospy
 plt.ion()
 
-camera_sensor = CameraSensor()
+# camera_sensor = CameraSensor()
 
 # world = BaxterPushWorld(transform=False)
 # while not rospy.is_shutdown():

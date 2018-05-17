@@ -18,7 +18,7 @@ import numpy as np
 import argparse
 
 
-def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None, timeout = 1.0, rate = 100, reverse_traj = False):
+def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None, timeout = 1.0, rate = 100, reverse_traj = False, collect_data=False):
     '''
     the JSTrajGenerator expects either a demo index or a direct path to the demo
     do not pass both of them together. This could be fixed when we have multiple demos to be played out
@@ -60,7 +60,8 @@ def main(robot_interface, load_from_demo=False, demo_idx=None, path_to_demo=None
             print traj[key].shape
             traj[key] = np.flipud(traj[key]) 
 
-    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, trajectory=traj, timeout=timeout, rate=rate)
+    traj_player = TrajPlayer(robot_interface=robot_interface, controller=JSPositionController, 
+                             trajectory=traj, timeout=timeout, rate=rate,collect_data=collect_data)
 
     traj_player.player()
 
@@ -90,6 +91,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--arm_interface', type=str, default='baxter', help='arm interface, e.g. baxter/sawyer')
 
     parser.add_argument('-b', '--backward_playback', action='store_true', help='Play trajectory backwards.')
+
+    parser.add_argument('-c', '--collect_data', action='store_true', help='Play a trajectory and record the data.')
 
     args = parser.parse_args(rospy.myargv()[1:])
 
@@ -132,6 +135,6 @@ if __name__ == '__main__':
 
         print "Playing trajectory idx (%d): %s"%(args.idx_trajectory, traj_list[args.idx_trajectory])
         path_to_demo = base_path + traj_list[args.idx_trajectory]
-        main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo, timeout = args.timeout, rate = args.rate, reverse_traj = args.backward_playback)
+        main(robot_interface=arm, load_from_demo=True, demo_idx=demo_idx, path_to_demo=path_to_demo, timeout = args.timeout, rate = args.rate, reverse_traj = args.backward_playback, collect_data=args.collect_data)
 
 

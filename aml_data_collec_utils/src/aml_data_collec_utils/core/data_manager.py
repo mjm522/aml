@@ -10,14 +10,15 @@ from aml_data_collec_utils.core.sample import Sample
 import os
 
 import numpy as np
-import pickle
 
+from aml_io.log_utils import aml_logging
 
 class DataManager(object):
 
     def __init__(self, append_to_last_file=True, data_folder_path=None, data_name_prefix=None, num_samples_per_file=1000):
 
-        
+        self._logger = aml_logging.get_logger(__name__)
+
         self._last_sample_idx = 0 
 
         #this could be set from a hyper param file
@@ -28,6 +29,9 @@ class DataManager(object):
         else:
             
             self._data_folder_path = data_folder_path
+
+        if not os.path.exists(self._data_folder_path):
+            os.makedirs(self._data_folder_path)
 
         #maximum number of samples that is allowed per file
         self._num_samples_per_file = num_samples_per_file
@@ -119,6 +123,8 @@ class DataManager(object):
 
         data_file = self._data_folder_path + self._data_name_prefix + ('_%02d.pkl' % self._data_idx)
 
+        self._logger.info("Writing the data file: %s"%(data_file))
+
         save_data(self._data, data_file)
 
         self.create_new_data()
@@ -130,7 +136,7 @@ class DataManager(object):
 
         if not os.access(data_file, os.R_OK):
                 
-            aml_logging.info("Cannot read file at '%s'" % (data_file))
+            self._logger.error("Cannot read file at '%s'"%(data_file))
 
             return None
 
@@ -142,7 +148,7 @@ class DataManager(object):
 
                 self._data = data
             except Exception as e:
-                print "Unable to load data, file corrupted, creating new data file"
+                self._logger.error("Unable to load data, file corrupted, creating new data file")
                 os.remove(data_file)
                 self._data_idx -= 1
                 self.create_new_data()
@@ -160,7 +166,7 @@ class DataManager(object):
             
         if len(self._data) >= self._num_samples_per_file:
 
-            print "Saving the data file ..."
+            self._logger.info("Saving the data file ...")
 
             self.write_data()
 
@@ -169,7 +175,7 @@ class DataManager(object):
 
         else:
 
-            print "New sample added with size ", sample.size
+            self._logger.info("New sample added with size %d"%(sample.size,))
         
             self._data.append(sample)
 
@@ -304,7 +310,7 @@ class DataManager(object):
         for data_file_idx in data_file_range:
             self._data = self.read_data(data_file_idx)
             if self._data is None:
-                print "WARNING: Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,)
+                self._logger.warning( "Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,))
                 continue
             data +=  self.pack_data(keys=keys, sub_keys=sub_keys, ids=ids, sample_points=sample_points)
     
@@ -328,7 +334,7 @@ class DataManager(object):
         for data_file_idx in data_file_range:
             self._data = self.read_data(data_file_idx)
             if self._data is None:
-                print "WARNING: Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,)
+                self._logger.warning( "Data file with index %d is missing (the read operation returned None), so skipping it"%(data_file_idx,))
                 continue
             data_x +=  self.pack_data_x(keys=x_keys, sub_keys=x_sub_keys, ids=ids, just_before=before_after)
             data_y +=  self.pack_data_y(keys=y_keys, sub_keys=y_sub_keys, ids=ids, just_after=before_after)

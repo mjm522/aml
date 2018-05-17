@@ -18,7 +18,7 @@ class Sample(object):
 
     def __init__(self):
 
-        self._contents                = []
+        self._contents = []
 
         self._is_valid = True
 

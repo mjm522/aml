@@ -58,6 +58,8 @@ class AMLRlRobot(object):
             ee_omg = link_state[3]
 
         return ee_pos, ee_ori, ee_vel, ee_omg
+
+
         
     def set_ctrl_mode(self, jnt_postns=None):
 
@@ -104,7 +106,7 @@ class AMLRlRobot(object):
         if joint_idx is None:
             indices = self._jnt_indexs
         else:
-            indices = joint_idx
+            indices = [joint_idx]
 
         for i in indices:
             pb.enableJointForceTorqueSensor(self._robot_id, i, 1, physicsClientId=self._cid)
@@ -119,7 +121,7 @@ class AMLRlRobot(object):
             jnt_info = pb.getJointInfo(self._robot_id, i, physicsClientId=self._cid)
             
             qIndex = jnt_info[3]
-            
+
             if qIndex > -1 and jnt_info[1] != "head_pan":
                 
                 movable_jnts.append(i)
@@ -127,7 +129,7 @@ class AMLRlRobot(object):
         return movable_jnts
 
 
-    def apply_ctrl(self, motor, cmd, Kp=None):
+    def apply_ctrl(self, motor, cmd, Kp=None, Kd=None):
 
         if self._ctrl_type == 'torque':
 
@@ -140,8 +142,11 @@ class AMLRlRobot(object):
                 pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, force=self._max_force, physicsClientId=self._cid)
             
             else:
-                
-                pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp[motor], force=self._max_force, physicsClientId=self._cid)
+
+                if Kd is None:
+                    pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp, force=self._max_force, physicsClientId=self._cid)
+                else:
+                    pb.setJointMotorControl2(self._robot_id, motor, pb.POSITION_CONTROL, targetPosition=cmd, positionGain=Kp, velocityGain=Kd, force=self._max_force, physicsClientId=self._cid)
         
         elif self._ctrl_type == 'vel':
             
@@ -207,7 +212,7 @@ class AMLRlRobot(object):
 
             for jnt_idx in self._jnt_indexs:
 
-                jnt_state = pb.getJointState(self._robot_id, jnt_idx)
+                jnt_state = pb.getJointState(self._robot_id, jnt_idx, physicsClientId=self._cid)
                 
                 jnt_poss.append(jnt_state[0])
                 
@@ -222,7 +227,7 @@ class AMLRlRobot(object):
 
         else:
 
-            jnt_state = pb.getJointState(self._robot_id, idx)
+            jnt_state = pb.getJointState(self._robot_id, idx, physicsClientId=self._cid)
                 
             jnt_poss = jnt_state[0]
             
@@ -235,7 +240,7 @@ class AMLRlRobot(object):
             return jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques
 
     
-    def apply_jnt_ctrl(self, cmd, Kp=None):
+    def apply_jnt_ctrl(self, cmd, Kp=None, Kd=None):
 
         assert len(self._jnt_indexs) == len(cmd)
 
@@ -298,4 +303,19 @@ class AMLRlRobot(object):
             joint_details.append(dict(zip(attribute_list, pb.getJointInfo(self._robot_id, j_indx))))
 
         return joint_details
+
+    def get_mass_matrix(self, jnt_pos=None):
+
+        if jnt_pos is None:
+            jnt_pos = self.get_jnt_state()[0]
+
+        return np.asarray(pb.calculateMassMatrix(bodyUniqueId=self._robot_id,
+                                                 objPositions=jnt_pos,
+                                                 physicsClientId=self._cid))
+
+
+
+
+
+
 

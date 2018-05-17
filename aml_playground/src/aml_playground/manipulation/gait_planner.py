@@ -111,7 +111,7 @@ class GaitPlanner():
 
         curr_ee_pos = self._env.get_hand_ee_state()['pos'][finger_idx]
 
-        obj_pos = self._env.get_obj_curr_state(ori_as_euler=False)[0]
+        obj_pos = self._env.get_obj_curr_state(ori_type='quat')[0]
 
         out_point_1 = (curr_ee_pos - obj_pos)
 
@@ -146,7 +146,7 @@ class GaitPlanner():
 
             cmd = self._env._hand.inv_kin(finger_idx, primitive_base[k, :].tolist())
 
-            self._env._hand.applyAction(finger_idx, cmd)#, Kp=np.array([1., 0.1, 0.1]))
+            self._env._hand.apply_action(finger_idx, cmd)#, Kp=np.array([1., 0.1, 0.1]))
 
             self._env.simple_step()
 
@@ -156,7 +156,7 @@ class GaitPlanner():
 
             cmd = np.asarray(self._env._hand.get_jnt_states()[0][finger_idx][:3]) + np.array([0, -0.001, 0.])
 
-            self._env._hand.applyAction(finger_idx, cmd)#, Kp=np.array([1., 0.1, 0.1]))
+            self._env._hand.apply_action(finger_idx, cmd)#, Kp=np.array([1., 0.1, 0.1]))
             self._env.simple_step()
 
             

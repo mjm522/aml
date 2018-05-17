@@ -174,12 +174,12 @@
       </geometry>
     </collision>
   </link>
-  <joint name="head_pan" type="revolute">
+  <joint name="head_pan" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0.2965"/>
     <parent link="right_l0"/>
     <child link="head"/>
     <axis xyz="0 0 1"/>
-    <limit effort="8" lower="-5.1477" upper="0.9559" velocity="1.8"/>
+    <!-- <limit effort="8" lower="-5.1477" upper="0.9559" velocity="1.8"/> -->
   </joint>
   <link name="right_torso_itb">
     <inertial>

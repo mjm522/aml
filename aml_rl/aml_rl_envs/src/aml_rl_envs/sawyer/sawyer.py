@@ -5,6 +5,7 @@ import math
 import numpy as np
 import pybullet as pb
 from aml_rl_envs.aml_rl_robot import AMLRlRobot
+from aml_robot.sawyer_kinematics import sawyer_kinematics
 
 class Sawyer(AMLRlRobot):
 
@@ -13,6 +14,8 @@ class Sawyer(AMLRlRobot):
         self._config = config
 
         self._gripper_index = 7
+
+        self.name = 'right'
 
         AMLRlRobot.__init__(self, config, cid)
 
@@ -26,7 +29,9 @@ class Sawyer(AMLRlRobot):
  
     def reset(self):
 
-        self._robot_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_peg.urdf"), useFixedBase=True, physicsClientId=self._cid)
+        sawyer_path = os.path.join(self._config['urdf_root_path'],"sawyer/sawyer2_with_peg.urdf")
+
+        self._robot_id = pb.loadURDF(sawyer_path, useFixedBase=True, physicsClientId=self._cid)
 
         pb.resetBasePositionAndOrientation(self._robot_id,[-0.100000,0.000000, 1.0000],[0.000000,0.000000,0.000000,1.000000], physicsClientId=self._cid)
         
@@ -49,6 +54,8 @@ class Sawyer(AMLRlRobot):
                 self._motor_names.append(str(jnt_info[1]))
                 
                 self._motor_indices.append(i)
+
+        self._kinematics = sawyer_kinematics(self, description=os.path.join(self._config['urdf_root_path'],"sawyer/sawyer.urdf"))
 
         self.set_ctrl_mode(jnt_postns=self._jnt_postns)
 
@@ -88,13 +95,13 @@ class Sawyer(AMLRlRobot):
 
     def get_ee_wrench(self):
         '''
-            End effector forces and torques
+            End effector forces and torques.
+            Returns [fx, fy, fz, tx, ty, tz]
         '''
 
-        jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = self.get_jnt_state(self._ft_sensor_jnt)
+        _, _, jnt_reaction_forces, _ = self.get_jnt_state(self._ft_sensor_jnt)
 
-        return jnt_reaction_forces[:3], jnt_reaction_forces[3:]
-
+        return jnt_reaction_forces
 
     def inv_kin(self, ee_pos, ee_ori=None):
 
@@ -155,10 +162,38 @@ class Sawyer(AMLRlRobot):
 
     #     return jnt_pos, jnt_vel, jnt_reaction_forces, jnt_applied_torque
 
-    def apply_action(self, motor_commands):
+    def apply_action(self, motor_commands, Kp=None):
 
         for action in range (len(motor_commands)):
 
             motor = self._motor_indices[action]
 
-            self.apply_ctrl(motor, motor_commands[action])
+            if Kp is None:
+                self.apply_ctrl(motor, motor_commands[action])
+            else:
+                self.apply_ctrl(motor, motor_commands[action], Kp[action])
+
+
+    def joint_names(self):
+
+        return ['right_j%s' % (s,) for s in range(0, 7)]
+
+    def jacobian(self, joint_angles=None):
+
+        # jacobian = self._bullet_robot.jacobian(joint_angles)
+        #
+        # return np.delete(jacobian, 1, 1)
+
+        if joint_angles is None:
+
+            argument = dict(zip(self.joint_names(), self.get_jnt_state()[0]))
+
+        else:
+
+            argument = dict(zip(self.joint_names(), joint_angles))
+        # combine the names and joint angles to a dictionary, that only is accepted by kdl
+        jacobian = np.array(self._kinematics.jacobian(argument))
+
+        # print jacobian
+
+        return jacobian

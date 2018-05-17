@@ -35,47 +35,55 @@ def get_ee_traj(env, js_traj):
 
 #     ps = SawyerPegREPS(joint_space, exp_params)
 
-    # while True:
+#     # j_pos = [-0.04216211,-0.33363672,-0.53082617,1.40670703,0.7603125,0.7803291,4.04997461]
 
-        # for k in range(2,3):
-        #     ps.goto_hole(hole_id=k)
-        #     ps.insert_hole(hole_id=k)
+#     # ps._eval_env._sawyer.set_joint_state(j_pos)
 
-        # goal_pos, goal_ori = ps._eval_env._sawyer.get_ee_pose()
-        # print goal_pos
+#     # k =0
 
-        #     print ps._eval_env._sawyer.get_joint_state()[0]
+#     while True:
 
-        #     # ps._eval_env._sawyer.set_joint_state(ps._eval_env._sawyer._jnt_postns)
+#         ps._eval_env.simple_step()
 
-        #     raw_input("Press enter for next hole %d"%(k+2,))
+#         # for k in range(2,3):
+#         #     ps.goto_hole(hole_id=k)
+#         #     ps.insert_hole(hole_id=k)
 
-    # get_ee_traj(ps._sim_env, ps._demo_traj)
+#         goal_pos, goal_ori = ps._eval_env._sawyer.get_ee_pose()
+#         print goal_pos
 
-    # plt.figure("Mean reward")
-    # plt.figure("forces")
-    # plt.ion()
+#         # print ps._eval_env._sawyer.get_joint_state()[0]
 
+#         # ps._eval_env._sawyer.set_joint_state(j_pos)#ps._eval_env._sawyer._jnt_postns)
 
-    # plot_demo(dmp, start_idx=0, life_time=4)
+#         # raw_input("Press enter for next hole %d"%(k+2,))
 
+#     get_ee_traj(ps._sim_env, ps._demo_traj)
 
-    # forces1 = []
-    # forces2 = []
-    # forces3 = []
-
-
-    # _,_,f,_ = ps._eval_env._sawyer.get_jnt_state(16)
-    # print f#, t
-
-    # forces1.append(f[0])
-    # forces2.append(f[1])
-    # forces3.append(f[2])
+#     plt.figure("Mean reward")
+#     plt.figure("forces")
+#     plt.ion()
 
 
+#     plot_demo(dmp, start_idx=0, life_time=4)
 
-    # ee_pos, ee_ori = ps._eval_env._sawyer.get_ee_pose()
-    # ee_traj.append(ee_pos)
+
+#     forces1 = []
+#     forces2 = []
+#     forces3 = []
+
+
+#     _,_,f,_ = ps._eval_env._sawyer.get_jnt_state(16)
+#     print f#, t
+
+#     forces1.append(f[0])
+#     forces2.append(f[1])
+#     forces3.append(f[2])
+
+
+
+#     ee_pos, ee_ori = ps._eval_env._sawyer.get_ee_pose()
+#     ee_traj.append(ee_pos)
     
 
 
