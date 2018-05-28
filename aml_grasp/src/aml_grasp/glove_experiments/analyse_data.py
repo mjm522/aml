@@ -42,51 +42,113 @@ def multiply_transforms(t1, q1, t2, q2):
 
 if __name__ == '__main__':
 
-    data = load_data(sys.argv[1])
+    if len(sys.argv) > 1:
+        data_list = [sys.argv[1]]
+    else:
+        data_list = ["thumb_experiment1.pkl",
+                     "index_experiment1.pkl",
+                     "middle_experiment1.pkl",
+                     "ring_experiment1.pkl",
+                     "little_experiment1.pkl"]
+
+    list_pos_error = []
+    list_rot_error = []
+    list_avg_pos_error = []
+    list_avg_rot_error = []
+    list_norm_pos_error = []
+    list_norm_rot_error = []
+    for data_file in data_list:
+
+        data = load_data(data_file)
+
+        print "Measurement size: ", len(data['Measurement'])
+        print "GroundTruth size: ", len(data['GroundTruth'])
+
+        # print data['GroundTruth']
+        # print data['Measurement']
 
 
-    print "Measurement size: ", len(data['Measurement'])
-    print "GroundTruth size: ", len(data['GroundTruth'])
+        average_pos_error = []
+        average_rot_error = []
+        count = 0
+        nan_count = 0
+        correction_t, correction_q = (0,0,0), (0,0,0,1)
+        for i in range(len(data['Measurement'])):
 
-    # print data['GroundTruth']
-    # print data['Measurement']
+            if i == 0 and not np.any(np.isnan(data['GroundTruth'][i][:3])):
+                t1 = data['Measurement'][i][:3]
+                q1 = data['Measurement'][i][3:]
+
+                t2 = data['GroundTruth'][i][:3]
+                q2 = data['GroundTruth'][i][3:]
+
+                invt2, invq2 = inverse_transform(t2,q2)
+
+                correction_t, correction_q = multiply_transforms(t1,q1,invt2,invq2)
+
+            if not (np.any(np.isnan(data['Measurement'][i][:3])) or np.any(np.isnan(data['GroundTruth'][i][:3]))):
+
+                t = data['GroundTruth'][i][:3]
+                q = data['GroundTruth'][i][3:]
+
+                t2, q2 = inverse_transform(data['Measurement'][i][:3],data['Measurement'][i][3:])
 
 
-    average_pos_error = []
-    count = 0
-    nan_count = 0
-    correction_t, correction_q = (0,0,0), (0,0,0,1)
-    for i in range(len(data['Measurement'])):
+                tc, qc = multiply_transforms(correction_t,correction_q, t, q)
+                transform = np.hstack([tc,qc])
 
-        if i == 0 and not np.any(np.isnan(data['GroundTruth'][i][:3])):
-            t1 = data['Measurement'][i][:3]
-            q1 = data['Measurement'][i][3:]
+                terr, qerr = multiply_transforms(t2,q2, tc, qc)
+                average_pos_error.append(terr)
+                average_rot_error.append(qerr[:3])
+                count += 1
+            else:
+                nan_count += 1
+                print "Index %d is nan"%(i,), data['Measurement'][i][:3], " or ", data['GroundTruth'][i][:3]
 
-            t2 = data['GroundTruth'][i][:3]
-            q2 = data['GroundTruth'][i][3:]
+        print "Number of NaNs: ", nan_count
 
-            invt2, invq2 = inverse_transform(t2,q2)
+        def diag(avg_error, name = "Positional"):
 
-            correction_t, correction_q = multiply_transforms(t1,q1,invt2,invq2)
+            print "Average %s Error: "%(name,), np.average(avg_error)
+            print "Average %s Error Norm: "%(name,), np.linalg.norm(np.abs(avg_error))
 
-        if not (np.any(np.isnan(data['Measurement'][i][:3])) or np.any(np.isnan(data['GroundTruth'][i][:3]))):
 
-            t = data['GroundTruth'][i][:3]
-            q = data['GroundTruth'][i][3:]
+        diag(average_pos_error)
+        diag(average_rot_error,"Orientation")
 
-            tc, qc = multiply_transforms(correction_t,correction_q, t, q)
-            transform = np.hstack([tc,qc])
+        plt.figure()
+        plt.plot(average_pos_error)
 
-            average_pos_error.append(data['Measurement'][i][:3] - transform[:3])
-            count += 1
-        else:
-            nan_count += 1
-            print "Index %d is nan"%(i,), data['Measurement'][i][:3], " or ", data['GroundTruth'][i][:3]
-    print "Number of NaNs: ", nan_count
-    print "Average Positional Error: ", np.average(average_pos_error)
-    print "Average Positional Error Norm: ", np.linalg.norm(np.average(average_pos_error))
+        plt.figure()
+
+        plt.plot(average_rot_error)
+        plt.show(False)
+
+        list_pos_error.append(average_pos_error)
+        list_rot_error.append(average_rot_error)
+        list_avg_pos_error.append(np.average(np.abs(average_pos_error)))
+        list_avg_rot_error.append(np.average(np.abs(average_rot_error)))
+        list_norm_pos_error.append(np.linalg.norm(np.abs(average_pos_error)))
+        list_norm_rot_error.append(np.linalg.norm(np.abs(average_rot_error)))
+
 
     plt.figure()
-    plt.plot(average_pos_error)
+    x = range(len(list_avg_pos_error))
+    plt.bar(x,list_avg_pos_error)
+    plt.title("Average position error per finger")
+
+    plt.figure()
+    plt.bar(x, list_avg_rot_error)
+    plt.title("Average rotation error per finger")
+
+    plt.figure()
+    x = range(len(list_norm_pos_error))
+    plt.bar(x,list_norm_pos_error)
+    plt.title("Norm L2 position error per finger")
+
+    plt.figure()
+    plt.bar(x, list_norm_rot_error)
+    plt.title("Norm L2 rotation error per finger")
+
     plt.show()
 
