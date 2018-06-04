@@ -223,6 +223,11 @@ def rot2quat2(R):
 
     return q.reshape(3,1)
 
+def rot2quat3(R):
+
+    return rot2quat(R)[1:4].reshape(3,1)
+
+
 
 def skew(v):
     """

@@ -129,12 +129,21 @@ include_directories(
 ## Declare a C++ executable
 add_executable(aml_marker_odometry_node src/MarkerOdometryNode.cpp src/aruco_ros_utils.cpp)
 
+add_executable(aml_camera_pose_estimator src/CameraPoseEstimator.cpp src/aruco_ros_utils.cpp)
+
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(aml_marker_odometry_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_dependencies(aml_camera_pose_estimator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(aml_marker_odometry_node
+   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(aml_camera_pose_estimator
    ${catkin_LIBRARIES}
 )
 

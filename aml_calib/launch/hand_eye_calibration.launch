@@ -1,0 +1,13 @@
+<launch>
+
+	<!--<include file="$(find openni2_launch)/launch/openni2.launch"/>-->
+    <include file="$(find aml_calib)/launch/camera_pose_estimator.launch"/>
+    <node pkg="aml_calib" type="hand_eye_calibrator.py" name="hand_eye_calibrator" output="screen">
+    </node>
+
+</launch>
+
+
+
+
+
