@@ -322,7 +322,7 @@ public:
 
             std::stringstream ss;
             ss << "box";
-            if (openni_rgb_markers[i].id != box_marker_id) // compatibility with old single marker tracker
+            if (openni_rgb_markers[i].id != box_marker_id && openni_rgb_markers[i].id != hand_marker_id) // compatibility with old single marker tracker
               ss << openni_rgb_markers[i].id;
             //keep in mind that this is called only if the marker on the box
             // is visible
