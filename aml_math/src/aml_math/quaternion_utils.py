@@ -130,4 +130,154 @@ def quat_slerp(q1, q2, t):
 
 def compute_omg(q1, q2):
     
-    return 2.*compute_log( quat_mult( quat_convert(q1), quat_conj( quat_convert(q2) ) ) )     
+    return 2.*compute_log( quat_mult( quat_convert(q1), quat_conj( quat_convert(q2) ) ) )
+
+
+def rot2quat(R):
+
+    Qxx, Qyx, Qzx, Qxy, Qyy, Qzy, Qxz, Qyz, Qzz = R[:3,:3].flat
+    # Fill only lower half of symmetric matrix
+    K = np.array([
+        [Qxx - Qyy - Qzz, 0,               0,               0              ],
+        [Qyx + Qxy,       Qyy - Qxx - Qzz, 0,               0              ],
+        [Qzx + Qxz,       Qzy + Qyz,       Qzz - Qxx - Qyy, 0              ],
+        [Qyz - Qzy,       Qzx - Qxz,       Qxy - Qyx,       Qxx + Qyy + Qzz]]
+        ) / 3.0
+    # Use Hermitian eigenvectors, values for speed
+    vals, vecs = np.linalg.eigh(K)
+    # Select largest eigenvector, reorder to w,x,y,z quaternion
+    q = vecs[[3, 0, 1, 2], np.argmax(vals)]
+    # Prefer quaternion with positive w
+    # (q * -1 corresponds to same rotation as q)
+    if q[0] < 0:
+        q *= -1
+    return q
+
+def quat2rot(q):
+    p = np.dot(q.T, q)
+
+    if (p > 1):
+        print 'Warning: quat2rot: quaternion greater than 1'
+
+    w = np.sqrt(1 - p)  # % w = np.cos(theta / 2)
+
+    R = np.eye(4)
+
+    R[:3, :3] = 2 * np.dot(q, q.T) + 2 * w * skew(q) + np.eye(3) - 2 * diag([p, p, p])
+
+    return R
+
+
+def rot2quat2(R):
+    """
+    
+    :param R: 
+    :return: sin(theta/2) * v
+    """
+    tc = np.trace(R[:3, :3])
+
+    q = np.zeros((3,1))
+    if tc > 0:
+        s = 2 * np.sqrt(1 + tc)
+        w4 = 0.25 * s  # s = 4 * qw
+
+        q = np.array([
+            (R[2][1] - R[1][2]) / s,
+            (R[0][2] - R[2][0]) / s,
+            (R[1][0] - R[0][1]) / s])
+
+    elif R[0, 0] > R[1, 1] and R[0, 0] > R[2, 2]:
+
+        s = np.sqrt(1.0 + R[0, 0] - R[1, 1] - R[2, 2]) * 2  # s = 4 * qx
+        w4 = (R[2, 1] - R[1, 2]) / s
+        qx = 0.25 * s
+        qy = (R[0, 1] + R[1, 0]) / s
+        qz = (R[0, 2] + R[2, 0]) / s
+
+        q = np.array([
+            qx,
+            qy,
+            qz])
+    elif R[1, 1] > R[2, 2]:
+        s = np.sqrt(1.0 + R[1, 1] - R[0, 0] - R[2, 2]) * 2  # S = 4 * qy
+        qw = (R[0, 2] - R[2, 0]) / s
+        qx = (R[0, 1] + R[1, 0]) / s
+        qy = 0.25 * s
+        qz = (R[1, 2] + R[2, 1]) / s
+
+        q = np.array([
+            qx,
+            qy,
+            qz])
+    else:
+        s = np.sqrt(1.0 + R[2, 2] - R[0, 0] - R[1, 1]) * 2  # // S = 4 * qz
+        qw = (R[1, 0] - R[0, 1]) / s
+        qx = (R[0, 2] + R[2, 0]) / s
+        qy = (R[1, 2] + R[2, 1]) / s
+        qz = 0.25 * s
+
+        q = np.array([
+            qx,
+            qy,
+            qz])
+
+    return q.reshape(3,1)
+
+
+def skew(v):
+    """
+    
+    :param V: 
+    :return: skew symmetric matrix from 3d vector v
+    """
+    S = np.array([[0, -v[2], v[1]],
+                  [v[2], 0, -v[0]],
+                  [-v[1], v[0], 0]])
+
+    return S
+
+def diag(v):
+    """
+    
+    :param v: 
+    :return: diagonal elements of matrix v
+    """
+    d = np.eye(len(v))
+
+    for i in range(len(v)):
+        d[i][i] = v[i]
+
+    return d
+
+def transl(t):
+    """
+    
+    :param t: 
+    :return: 4x4 homogeneous transform representing translation
+    """
+    translation = np.eye(4)
+
+    translation[:3, 3] = t.reshape(3)
+
+    return translation
+
+def posediff(A,B):
+
+    t1 = A[:,3]
+    t2 = B[:,3]
+
+    dT = t2 - t1
+
+    q1 = rot2quat2(A)
+    q2 = rot2quat2(B)
+
+    rotAngle1 = 2 * np.math.asin(np.linalg.norm(q1))		#% rotation angle around the axis
+    q1 = q1/np.linalg.norm(q1)
+
+    rotAngle2 = 2 * np.math.asin(np.linalg.norm(q2))
+    q2 = q2/np.linalg.norm(q1)
+
+    dAxisAngle = np.math.asin(np.linalg.norm(np.cross(q1.T,q2.T)))
+    dRotAngle = rotAngle2 - rotAngle1
+
+    return dT, dAxisAngle, dRotAngle
