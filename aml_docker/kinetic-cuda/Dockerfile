@@ -42,18 +42,18 @@ RUN rosdep init \
 # install ros packages
 ENV ROS_DISTRO kinetic
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-ros-core=1.3.1-0* \
+    ros-kinetic-ros-core=1.3.2-0* \
 && rm -rf /var/lib/apt/lists/*
 
 
 # install ros packages
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-ros-base=1.3.1-0* \
+    ros-kinetic-ros-base=1.3.2-0* \
 && rm -rf /var/lib/apt/lists/*
 
 # install ros desktop full packages
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-desktop-full=1.3.1-0* \
+    ros-kinetic-desktop-full=1.3.2-0* \
     && rm -rf /var/lib/apt/lists/*
 
 
