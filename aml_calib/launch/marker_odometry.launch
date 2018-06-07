@@ -25,15 +25,15 @@
 
     
     <node pkg="aml_calib" type="aml_marker_odometry_node" name="aml_marker_odometry" output="screen">
-        <remap from="/left_hand_camera_info" to="/cameras/left_hand_camera/camera_info" /> <!-- "/stereo/$(arg eye)/camera_info -->
-        <remap from="/left_hand_image" to="/cameras/left_hand_camera/image"/>   <!--"/stereo/$(arg eye)/image_rect_color"-->
+        <remap from="/left_hand_camera_info" to="/io/internal_camera/right_hand_camera/camera_info"/>   <!-- "/stereo/$(arg eye)/camera_info, /cameras/left_hand_camera/camera_info -->
+        <remap from="/left_hand_image" to="/io/internal_camera/right_hand_camera/image_rect"/>     <!--"/stereo/$(arg eye)/image_rect_color", "/cameras/left_hand_camera/image"-->
         
         <remap from="/openni_rgb_camera_info" to="/camera/rgb/camera_info" />
         <remap from="/openni_rgb_rect_image" to="/camera/rgb/image_rect_color"/>
 
         <param name="hand_camera_info_topic" value="/left_hand_camera_info"/>
         <param name="hand_image_topic" value="/left_hand_image"/>
-        <param name="hand_frame" value="left_hand_camera"/>
+        <param name="hand_frame" value="right_hand_camera"/> <!-- left_hand_camera -->
 
         <param name="image_is_rectified" value="True"/>
         <param name="hand_marker_size"        value="$(arg hand_markerSize)"/>

@@ -90,11 +90,11 @@ class JointStatePublisher():
     def __init__(self):
         rospy.init_node('pisa_joint_state_publisher', anonymous=True)
         
-        rate = rospy.get_param('~rate', 500)
+        rate = rospy.get_param('~rate', 50)
         r = rospy.Rate(rate)
                                                                 
         # Start publisher
-        self.joint_states_pub = rospy.Publisher('/pisaiit/joint_states', JointState,queue_size=1)
+        self.joint_states_pub = rospy.Publisher('/pisaiit/joint_states', JointState, queue_size=1)
        
         rospy.loginfo("Starting Pisa Joint State Publisher at " + str(rate) + "Hz")
 
@@ -102,7 +102,8 @@ class JointStatePublisher():
         self._pisaiit_hand = PisaIITHand()
 
         self._models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        self._hand_path = get_file_path('pisa_hand_right_nomass.urdf', self._models_path)
+        self._hand_path = get_file_path('pisa_hand_right.urdf', self._models_path)
+        # get_file_path('pisa_hand_right_nomass2.urdf', self._models_path)
         self._hand_kinematics = pisaiit_kinematics(self._pisaiit_hand, self._hand_path)
 
         self._gi = ReachInterface(config=default_reach_config)
@@ -115,7 +116,7 @@ class JointStatePublisher():
 
         self._dim = np.array([5,7,7,7,7])
         self._n_joints = np.sum(self._dim)
-        self._joint_names = ["hand_joint%d" % (joint,) for joint in range(self._n_joints)]
+        self._joint_names = self._hand_kinematics.joint_names()
 
         self._finger_ids = []
         init = 0
@@ -133,13 +134,14 @@ class JointStatePublisher():
 
     def get_transform(self, frame_name, base_frame):
 
-        # return (0,0,0), (0,0,0,1), rospy.Time.now()
+        if frame_name == base_frame:
+            return (0,0,0), (0,0,0,1), rospy.Time.now()
 
         # t = (0,0,0)
         # q = (0,0,0,1)
         t = None
         try:
-            t = self._tf_buffer.lookup_transform(frame_name, base_frame, rospy.Time(), rospy.Duration(5.0))
+            t = self._tf_buffer.lookup_transform(frame_name, base_frame, rospy.Time(0), rospy.Duration(5.0))
 
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             rospy.logerr("Transform could not be queried.")
@@ -163,7 +165,7 @@ class JointStatePublisher():
 
     def multiply_transforms(self,t1,q1,t2,q2):
 
-        transform_mat1 = self.to_transform_matrix(t1,q1)
+        transform_mat1 = self.to_transform_matrix(t1, q1)
         transform_mat2 = self.to_transform_matrix(t2, q2)
 
         transform_mat3 = np.dot(transform_mat1, transform_mat2)
@@ -208,32 +210,67 @@ class JointStatePublisher():
 
 
         # compute forward kinematics with current angles
-        poses = []
+        # poses = []
+        #
+        # for i in range(5):
+        #     finger_angles = self._all_angles[self._finger_ids[i]]
+        #     finger_link_names = link_dict[link_dict['finger_links'][i]]
+        #     finger_link_poses = self._hand_kinematics.forward_position_kinematics(finger_angles, i)
+        #     # print finger_link_names
+        #     poses.append(dict(zip(finger_link_names, finger_link_poses)))
+        #
 
-        for i in range(5):
-            finger_angles = self._all_angles[self._finger_ids[i]]
-            finger_link_names = link_dict[link_dict['finger_links'][i]]
-            finger_link_poses = self._hand_kinematics.forward_position_kinematics(finger_angles, i)
-            # print finger_link_names
-            poses.append(dict(zip(finger_link_names, finger_link_poses)))
 
-
-
-
-        right_hand_t, right_hand_q, stamp = self.get_transform('base','right_hand')
-        # print right_hand_t, right_hand_q, stamp
-        now = stamp
-        for pose in poses:
-            for k, p in pose.items():
-                p_out, q_out = self.multiply_transforms(right_hand_t, right_hand_q,
-                                                            tuple(p[:3]), tuple(p[3:]))
-                self._br.sendTransform(p_out,
-                                       q_out,
-                                       now,
-                                       k,"base")
-
-        msg.header.stamp = now
+        msg.header.stamp = rospy.Time.now()
         self.joint_states_pub.publish(msg)
+
+
+        right_hand_t, right_hand_q, stamp = self.get_transform('base', 'right_hand') # with real robot
+        self._br.sendTransform(right_hand_t,
+                               right_hand_q,
+                               msg.header.stamp,
+                               'right_hand_base','base')  # base for real robot
+        # poses = []
+        # for i in range(5):
+        #     finger_link_names = link_dict[link_dict['finger_links'][i]]
+        #     for link_name in finger_link_names:
+        #         link_t, link_q, link_stamp = self.get_transform('right_hand', link_name)
+        #         p_out, q_out = self.multiply_transforms(right_hand_t, right_hand_q,
+        #                                                 link_t, link_q)
+        #         self._br.sendTransform(p_out,
+        #                                q_out,
+        #                                rospy.Time.now(),
+        #                                link_name,"base") # base for real robot
+
+
+
+
+
+        # right_hand_t, right_hand_q, stamp = self.get_transform('right_hand','right_hand')
+        # print right_hand_t, right_hand_q, stamp
+        # now = stamp
+        published_thumb = False
+        count = 0
+        # for i in range(len(poses)):
+        #     pose = poses[i]
+        #     count = 0
+        #     for k, p in pose.items():
+        #         p_out, q_out = self.multiply_transforms(right_hand_t, right_hand_q,
+        #                                                 tuple(p[:3]), tuple(p[3:]))
+        #         # if k == 'soft_hand_thumb_knuckle_link':
+        #         #     print p_out, q_out
+        #         #     print right_hand_t, right_hand_q
+        #         #     raw_input("wait here")
+        #         # #
+        #         #
+        #         # count += 1
+        #         # if count >= 4:
+        #         # self._br.sendTransform(p_out,
+        #         #                        q_out,
+        #         #                        now,
+        #         #                        k,"right_hand") # base for real robot
+
+
         
         
 if __name__ == '__main__':

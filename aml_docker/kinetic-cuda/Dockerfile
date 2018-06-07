@@ -42,18 +42,18 @@ RUN rosdep init \
 # install ros packages
 ENV ROS_DISTRO kinetic
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-ros-core=1.3.1-0* \
+    ros-kinetic-ros-core=1.3.2-0* \
 && rm -rf /var/lib/apt/lists/*
 
 
 # install ros packages
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-ros-base=1.3.1-0* \
+    ros-kinetic-ros-base=1.3.2-0* \
 && rm -rf /var/lib/apt/lists/*
 
 # install ros desktop full packages
 RUN apt-get update && apt-get install -y \
-    ros-kinetic-desktop-full=1.3.1-0* \
+    ros-kinetic-desktop-full=1.3.2-0* \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -84,7 +84,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
  
 
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip==9.0.3 && \
     pip install protobuf && \
     pip install pandas
 
@@ -97,7 +97,7 @@ RUN pip install --upgrade pip && \
 
 
 #six PySide
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip==9.0.3 && \
     pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl

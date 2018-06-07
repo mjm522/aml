@@ -1,0 +1,1 @@
+socat udp4-listen:5000,reuseaddr,fork PIPE:/tmp/pipi
