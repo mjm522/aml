@@ -1,8 +1,8 @@
 <launch>
 
-    <arg name="demo_folder" default="sawyer_exp_test"/>
-    <arg name="arm_interface" default="baxter"/>
-    <arg name="limb_name" default="left"/>
+    <arg name="demo_folder" default="sawyer_exp_imp_learn"/>
+    <arg name="arm_interface" default="sawyer"/>
+    <arg name="limb_name" default="right"/>
 
     <node pkg="aml_lfd" type="record_robot_demo.py" 
           name="demo_store_demonstration" 

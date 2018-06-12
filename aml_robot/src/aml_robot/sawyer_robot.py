@@ -15,7 +15,8 @@ import quaternion
 
 # Intera SDK imports
 import intera_interface
-from intera_interface import CHECK_VERSION
+# from intera_interface import CHECK_VERSION
+CHECK_VERSION = False
 from intera_core_msgs.msg import SEAJointState, EndpointStates
 
 # AML Robot specific imports
@@ -98,6 +99,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         self._has_cuff = True
 
+
         try:
 
             self._cuff_state = None
@@ -109,6 +111,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             self._cuff.register_callback(self._light_action, '{0}_cuff'.format(self._limb))
 
         except Exception as e:
+            print e
             self._logger.warning(e)
             self._has_cuff = False
 
@@ -221,7 +224,12 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         self._camera = camera_sensor.CameraSensor()
 
-        self._ft = ft_sensor.FTSensor()
+        self._ft = None
+        try:
+
+            self._ft = ft_sensor.FTSensor()
+        except:
+            pass
 
         self._gripper = None
         self._cuff = None
@@ -292,7 +300,13 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         state['depth_image'] = self._camera._curr_depth_image
         state['gravity_comp'] = np.array(self._h)
         state['tip_state'] = tip_state
-        state['ft_reading'] = self._ft.ft_reading()
+
+        try:
+            state['ft_reading'] = self._ft.ft_reading()
+
+        except:
+            pass
+
         state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
         try:
             state['ee_point'], state['ee_ori'] = self.ee_pose()

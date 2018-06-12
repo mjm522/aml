@@ -20,22 +20,23 @@ from aml_robot.bullet.config import SAWYER_BULLET_CONFIG
 
 class BulletSawyerArm(RobotInterface):
 
-    def __init__(self, limb="right", on_state_callback=None):
+    def __init__(self, limb="right", on_state_callback=None, sawyer_path=None, phys_id=None, kinematics=None):
 
         self._ready = False
 
-        self._phys_id = pb.connect(pb.SHARED_MEMORY)
+        if phys_id is None:
+            self._phys_id = pb.connect(pb.SHARED_MEMORY)
 
-    
-        if (self._phys_id<0):
-            self._phys_id = pb.connect(pb.UDP,"127.0.0.1")
+            if (self._phys_id<0):
+                self._phys_id = pb.connect(pb.UDP,"127.0.0.1")
+        else:  
+            self._phys_id = phys_id
 
         pb.resetSimulation()
 
         pb.setGravity(0.0, 0.0 ,0.0)
         pb.setRealTimeSimulation(1)
         pb.setTimeStep(0.01)
-
 
         # description_path = config['description_path']
         # extension = description_path.split('.')[-1]
@@ -44,20 +45,27 @@ class BulletSawyerArm(RobotInterface):
         # elif extension == "xml":
         #     self._id = pb.loadMJCF(config['description_path'])[0]
 
-        models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
-        self._sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)#_with_pisa_hand
+        if sawyer_path is None:
+            models_path = get_aml_package_path('aml_grasp/src/aml_grasp/models')
+            self._sawyer_path = get_file_path('sawyer2_with_pisa_hand.urdf', models_path)#_with_pisa_hand
+        else:
+            self._sawyer_path = sawyer_path
+
         robot_id = pb.loadURDF(self._sawyer_path, useFixedBase=True)
 
         self.name = limb
 
         self._joint_names = ['right_j%s' % (s,) for s in range(0, 7)]
 
-        self._kinematics = sawyer_kinematics(self, description=self._sawyer_path)
+        #this needs to be fixed
+        if kinematics is None:
+            self._kinematics = sawyer_kinematics(self, description=self._sawyer_path)
+        else:
+            self._kinematics = sawyer_kinematics(self, description=kinematics) 
 
         self._bullet_robot = BulletRobot(robot_id=robot_id, config = SAWYER_BULLET_CONFIG)  # hardcoded from the sawyer urdf
 
         self._limb = limb
-
 
         all_joint_dict = self._bullet_robot.get_joint_dict()
         self._joints = [all_joint_dict[joint_name] for joint_name in self._joint_names]
@@ -82,6 +90,10 @@ class BulletSawyerArm(RobotInterface):
         self._untuck = self._tuck
 
         self._ready = True
+
+
+    def step(self):
+        pb.stepSimulation()
 
 
     def exec_position_cmd(self, cmd):
