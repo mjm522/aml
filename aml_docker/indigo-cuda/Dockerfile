@@ -40,18 +40,18 @@ RUN rosdep init \
 # install ros core packages
 ENV ROS_DISTRO indigo
 RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-core=1.1.5-0* \
+    ros-indigo-ros-core=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 
 # install ros base packages
  RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-base=1.1.5-0* \
+    ros-indigo-ros-base=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 # install ros desktop full packages
 RUN apt-get update && apt-get install -y \
-    ros-indigo-desktop-full=1.1.5-0* \
+    ros-indigo-desktop-full=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 # installs avahi for local network discovery (required for using the real robot)
