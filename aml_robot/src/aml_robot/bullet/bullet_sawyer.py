@@ -24,13 +24,13 @@ class BulletSawyerArm(RobotInterface):
 
         self._ready = False
 
-        if phys_id is None:
-            self._phys_id = pb.connect(pb.SHARED_MEMORY)
+        # if phys_id is None:
+        #     self._phys_id = pb.connect(pb.SHARED_MEMORY)
 
-            if (self._phys_id<0):
-                self._phys_id = pb.connect(pb.UDP,"127.0.0.1")
-        else:  
-            self._phys_id = phys_id
+        #     if (self._phys_id<0):
+        #         self._phys_id = pb.connect(pb.UDP,"127.0.0.1")
+        # else:  
+        self._phys_id = phys_id
 
         pb.resetSimulation()
 
@@ -160,7 +160,8 @@ class BulletSawyerArm(RobotInterface):
 
 
     def inverse_kinematics(self, position, orientation=None):
-        return self._bullet_robot.inverse_kinematics(position, orientation)[self._joints]
+        return self._bullet_robot.inverse_kinematics(position, orientation)[0]
+        # return self._bullet_robot.inverse_kinematics(position, orientation)[self._joints]
 
 
     def ee_pose(self):

@@ -164,7 +164,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="head_pan" type="revolute">
+  <joint name="head_pan" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0.2965"/>
     <parent link="right_l0"/>
     <child link="head"/>
