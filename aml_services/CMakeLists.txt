@@ -23,7 +23,7 @@ catkin_python_setup()
 
 add_service_files(
   DIRECTORY srv 
-  FILES PredictState.srv PredictAction.srv SendPisaHandCmd.srv ReadPisaHandCurr.srv BoxState.srv PushAction.srv PCLUtility.srv
+  FILES PredictState.srv PredictAction.srv SendPisaHandCmd.srv ReadPisaHandCurr.srv BoxState.srv PushAction.srv #PCLUtility.srv
 )
 
 # include_directories(include)
@@ -35,7 +35,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
-  aml_perception
+#  aml_perception
   aml_services
 )
 

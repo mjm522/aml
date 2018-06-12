@@ -15,7 +15,7 @@ cd ../../..
 
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
-  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control'
+  BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control;pcl_server;test_clnt;aml_perception'
 elif [ "$ROS_DISTRO" == "kinetic" ]; then
   BLACK_LISTED_PKGS_ARG='-DCATKIN_BLACKLIST_PACKAGES=gazebo_ros_soft_hand;soft_hand_ros_control;aml_sawyer_simulator;aml_sawyer_sim_controllers;aml_sawyer_gazebo;aml_sawyer_sim_hardware;aml_sawyer_sim_kinematics;aml_sawyer_gazebo;aml_sawyer_sim_examples'
   #;baxter_simulator;baxter_sim_hardware;baxter_sim_controllers;baxter_gazebo;baxter_sim_io
