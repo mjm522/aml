@@ -95,7 +95,7 @@ RUN rm -rf /tmp/pybox2d*
 
 #six PySide
 RUN pip install --upgrade pip && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib==1.5.3 Pillow scipy && \
+    pip install numpy numpy-quaternion pygame decorator ipython jupyter==1.0.0 matplotlib==1.5.3 Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
