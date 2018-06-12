@@ -40,7 +40,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         self._logger = aml_logging.get_logger(__name__)
 
         # Load aml_logo
-        load_aml_logo("/robot/head_display")
+        # load_aml_logo("/robot/head_display")
 
         # these values are from the baxter urdf file
         self._jnt_limits = [{'lower': -1.70167993878, 'upper': 1.70167993878},
