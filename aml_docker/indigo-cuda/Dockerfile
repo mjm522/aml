@@ -60,6 +60,12 @@ RUN apt-get update && apt-get install -y \
 
 #ADD avahi-configs/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
+RUN wget https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz && \
+    tar xfz Python-2.7.9.tgz && \
+    cd Python-2.7.9/ && \
+    ./configure --prefix /usr/local/lib/python2.7.9 && \
+    make && \
+    make install
 
 
 # setup entrypoint, need entrypoint.sh in the same folder with Dockerfile
@@ -82,7 +88,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-    pip install --upgrade python && \
     pip install protobuf && \
     pip install pandas
 
