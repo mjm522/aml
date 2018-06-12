@@ -56,7 +56,7 @@ RUN apt-get update && apt-get install -y \
 
 # installs avahi for local network discovery (required for using the real robot)
 RUN apt-get update && apt-get install -y \
-    avahi-daemon avahi-utils
+    avahi-daemon avahi-utils wget
 
 #ADD avahi-configs/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
