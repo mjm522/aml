@@ -102,11 +102,11 @@ RUN rm -rf /tmp/pybox2d*
 #six PySide
 RUN pip install --upgrade pip && \
     pip install --upgrade certifi && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter==1.0.0 matplotlib==1.5.3 Pillow scipy && \
+    pip install numpy numpy-quaternion pygame matplotlib==1.5.3 Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
-
+# removing python notebook temporally: decorator ipython jupyter==1.0.0 
 # Install pybullet
 #RUN pip install pybullet==1.8.3
 
