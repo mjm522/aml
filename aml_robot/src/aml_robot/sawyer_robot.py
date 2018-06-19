@@ -305,7 +305,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
             state['ft_reading'] = self._ft.ft_reading()
  
         except:
-            pass
+            state['ft_reading'] = None
 
         state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
         try:
