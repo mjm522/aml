@@ -122,11 +122,10 @@ class SawyerVarImpREPS():
         def sigmoid(x):
             return 1 / (1 + np.exp(-x))
 
-        data = sawyer_data['sawyer_data']
-        true_traj = traj['traj']
-        ee_data_traj = traj['other_ee_data']
-        force_traj = traj['ee_wrenches'][:,:3]
-        torques_traj = traj['ee_wrenches'][:,3:]
+        desired_traj = sawyer_data['des_traj']
+        true_traj = sawyer_data['ee_traj']
+        force_traj = sawyer_data['ee_wrenches'][:,:3]
+        torques_traj = sawyer_data['ee_wrenches'][:,3:]
 
         num_data = len(desired_traj)
 
@@ -164,7 +163,8 @@ class SawyerVarImpREPS():
         implement the dmp
         """
         traj = traj_data['pos_traj']
-        sawyer_data = []
+        ee_traj = []
+        ee_wrenches = []
 
         if ee_ori is None:
             goal_ori = self._sawyer.state()['ee_ori']
@@ -207,6 +207,7 @@ class SawyerVarImpREPS():
                 pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.)
 
             else:
+
                 self._ctrlr.set_goal(goal_pos=traj[k, :], 
                            goal_ori=goal_ori, 
                            goal_vel=np.zeros(3), 
@@ -215,12 +216,22 @@ class SawyerVarImpREPS():
 
                 pos_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
-            k += 1 
+            k += 1
+
+            state = self._sawyer.state()
+            ee_traj.append(copy.deepcopy(state['ee_point']))
+            ft_reading = copy.deepcopy(state['ft_reading'])
+
+            if ft_reading is None:
+                self._logger.warning("FT Reading is None, check the whether the sensor is running!")
+                ee_wrenches.append(np.zeros(6))
+            else:
+                ee_wrenches.append(ft_reading)
 
             if self._joint_space:
                 timed_out = self._total_timeout is not None and rospy.get_time()-start > self._total_timeout
             else:
-                timed_out = False #self._total_timeout is not None and rospy.get_time()-start > self._total_timeout
+                timed_out = False
 
             finished = bool(k >= self._time_steps or timed_out)
 
@@ -228,10 +239,11 @@ class SawyerVarImpREPS():
 
             self._rate.sleep()
 
-            sawyer_data.append(self._sawyer.state())
+        print np.asarray(ee_wrenches).shape
 
-        return { 'traj':traj,
-                 'sawyer_data':sawyer_data }
+        return { 'des_traj':traj,
+                 'ee_traj':np.asarray(ee_traj),
+                 'ee_wrenches':np.asarray(ee_wrenches)}
         
     def context(self):
         """
@@ -256,7 +268,7 @@ class SawyerVarImpREPS():
 
         traj2follow = self.fwd_rollout(traj_data=self._demo_traj, Kp=Kp, Kd=Kd)
      
-        reward = 0#self.reward(traj2follow) #+ 4*np.linalg.norm(js_Kp)
+        reward = self.reward(traj2follow) #+ 4*np.linalg.norm(os_Kp)
         
         return traj2follow, reward
 
@@ -265,8 +277,9 @@ def main():
     from aml_playground.peg_in_hole_reps.exp_params.experiment_var_imp_params import exp_params
     rospy.init_node('sawyer_var_imp')
     svi = SawyerVarImpREPS(False, exp_params)
-    svi.execute_policy(w=np.array([1.,1.,1.,0.,0.,0.]))
+    _, reward = svi.execute_policy(w=np.array([1.,1.,1.,0.,0.,0.]))
     svi._ctrlr.set_active(False)
+    svi._logger.debug("Reward on the trial run is %f"%(reward,))
 
 
 #test code
