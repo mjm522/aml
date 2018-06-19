@@ -38,9 +38,7 @@ class SawyerVarImpREPS():
 
         self._sawyer = SawyerArm('right')
 
-        self._sawyer.move_to_joint_position([0.58546387,  0.4992666, 
-                                            -1.54154004,  2.02193262,  
-                                             2.00224219,  1.73852734, 4.50088965])
+        self._reset()
 
         self._exp_params = exp_params
 
@@ -113,6 +111,13 @@ class SawyerVarImpREPS():
 
         if Kd is not None:
             self._ctrlr._kd_p = Kd
+
+
+    def _reset(self):
+
+        self._sawyer.move_to_joint_position([0.58546387,  0.4992666, 
+                                            -1.54154004,  2.02193262,  
+                                             2.00224219,  1.73852734, 4.50088965])
 
 
     def reward(self, sawyer_data):
@@ -248,16 +253,13 @@ class SawyerVarImpREPS():
         """
         Context is the bottom base of the box.
         """
-
         s = np.random.uniform(-0.1, 0.1)
 
         lf = 0.5 + s 
 
-        self._reset(lf=lf)     
-
         return np.array([s])
 
-    def execute_policy(self, w=None):
+    def execute_policy(self, w=None, s_k=None, show_demo=None):
 
         if w is not None:
             Kp = np.ones(3)*8.0 + w[:3]
