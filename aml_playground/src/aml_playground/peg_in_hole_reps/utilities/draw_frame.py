@@ -23,12 +23,14 @@ def draw_frame(pos, ori, axes, l=1.):
 
     #draw a frame at the point pos, which is oriented at ori
     #the function draws a frame where each axis has a length of l
-    #axes is a handle to a 3d plot axis e.g.: ax = fig.add_subplot(111, projection='3d')
+    #axes is a handle to a 3d plot axis e.g.: ax = fig.add_subplot(111, projection='3d'
 
-    if len(ori) == 3:
+    if len(ori.flatten()) == 3:
         rot = q.as_rotation_matrix(q.from_euler_angles(ori[0],ori[1],ori[2]))
-    elif len(ori) == 4:
+    elif len(ori.flatten()) == 4:
         rot = q.as_rotation_matrix(q.quaternion(ori[0], ori[1], ori[2], ori[3]))
+    elif len(ori.flatten()) == 9:
+        rot = ori
 
     colrs = ['r', 'g', 'b']
 
