@@ -40,26 +40,32 @@ RUN rosdep init \
 # install ros core packages
 ENV ROS_DISTRO indigo
 RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-core=1.1.5-0* \
+    ros-indigo-ros-core=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 
 # install ros base packages
  RUN apt-get update && apt-get install -y \
-    ros-indigo-ros-base=1.1.5-0* \
+    ros-indigo-ros-base=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 # install ros desktop full packages
 RUN apt-get update && apt-get install -y \
-    ros-indigo-desktop-full=1.1.5-0* \
+    ros-indigo-desktop-full=1.1.6-0* \
     && rm -rf /var/lib/apt/lists/*
 
 # installs avahi for local network discovery (required for using the real robot)
 RUN apt-get update && apt-get install -y \
-    avahi-daemon avahi-utils
+    avahi-daemon avahi-utils wget
 
 #ADD avahi-configs/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
+RUN wget https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz && \
+    tar xfz Python-2.7.9.tgz && \
+    cd Python-2.7.9/ && \
+    ./configure --prefix /usr/local/lib/python2.7.9 && \
+    make && \
+    make install
 
 
 # setup entrypoint, need entrypoint.sh in the same folder with Dockerfile
@@ -95,11 +101,12 @@ RUN rm -rf /tmp/pybox2d*
 
 #six PySide
 RUN pip install --upgrade pip && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy && \
+    pip install --upgrade certifi && \
+    pip install numpy numpy-quaternion pygame matplotlib==1.5.3 Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
-
+# removing python notebook temporally: decorator ipython jupyter==1.0.0 
 # Install pybullet
 #RUN pip install pybullet==1.8.3
 
