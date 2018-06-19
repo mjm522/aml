@@ -27,6 +27,7 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 from rl_algos.forward_models.context_model import ContextModel
 from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
 
+from aml_playground.peg_in_hole_reps.utilities.utils import convert_list_str_ft_reading
 np.random.seed(123)
 
 class SawyerVarImpREPS():
@@ -124,8 +125,9 @@ class SawyerVarImpREPS():
 
         desired_traj = sawyer_data['des_traj']
         true_traj = sawyer_data['ee_traj']
-        force_traj = sawyer_data['ee_wrenches'][:,:3]
-        torques_traj = sawyer_data['ee_wrenches'][:,3:]
+        ee_wrenches = convert_list_str_ft_reading(sawyer_data['ee_wrenches'])
+        force_traj = ee_wrenches[:,:3]
+        torques_traj = ee_wrenches[:,3:]
 
         num_data = len(desired_traj)
 
@@ -207,7 +209,6 @@ class SawyerVarImpREPS():
                 pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.)
 
             else:
-
                 self._ctrlr.set_goal(goal_pos=traj[k, :], 
                            goal_ori=goal_ori, 
                            goal_vel=np.zeros(3), 
@@ -238,8 +239,6 @@ class SawyerVarImpREPS():
             self._logger.debug("index: %d, time_out: %d, finished: %d, pos_error:, %f"%(k, timed_out, finished, pos_error,))
 
             self._rate.sleep()
-
-        print np.asarray(ee_wrenches).shape
 
         return { 'des_traj':traj,
                  'ee_traj':np.asarray(ee_traj),
