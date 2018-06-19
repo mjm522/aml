@@ -3,6 +3,8 @@ import copy
 import rospy
 import numpy as np
 
+from aml_io.io_tools import load_data
+from aml_io.log_utils import aml_logging
 from aml_robot.sawyer_robot import SawyerArm
 
 from rl_algos.agents.gpreps import GPREPSOpt
@@ -31,6 +33,8 @@ class SawyerVarImpREPS():
 
     def __init__(self, joint_space, exp_params):
 
+        self._logger = aml_logging.get_logger(__name__)
+
         self._sawyer = SawyerArm('right')
 
         self._sawyer.move_to_joint_position([0.58546387,  0.4992666, 
@@ -53,13 +57,12 @@ class SawyerVarImpREPS():
         if joint_space:
             self._gen_traj = JSTrajGenerator(load_from_demo=True, **kwargs)
             self._ctrlr = JSPositionController(robot_interface=self._sawyer)
+            self._demo_traj = self._gen_traj.generate_traj()
         else:
-            self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
-            self._ctrlr = JSPositionController(robot_interface=self._sawyer)
-            # self._ctrlr = OSPositionController(robot_interface=self._sawyer)
+            # self._gen_traj = OSTrajGenerator(load_from_demo=True, **kwargs)
+            self._ctrlr = OSPositionController(robot_interface=self._sawyer)
+            self._demo_traj = load_data(os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_spring_exp_1/spring_exp_1_min_jerk_traj.pkl')
         
-        self._demo_traj = self._gen_traj.generate_traj()
-
         self._time_steps, self._dof = self._demo_traj['pos_traj'].shape
 
         self._total_timeout = 5.
@@ -105,10 +108,10 @@ class SawyerVarImpREPS():
         if Kp is None:
             return
         
-        self._ctrlr._kp = Kp
+        self._ctrlr._kp_p = Kp
 
         if Kd is not None:
-            self._ctrlr._kd = Kd
+            self._ctrlr._kd_p = Kd
 
 
     def reward(self, sawyer_data):
@@ -172,57 +175,56 @@ class SawyerVarImpREPS():
         finished = False
         start = rospy.get_time()
 
-        while not finished:
+        while not rospy.is_shutdown() and not finished:
 
             if self._joint_space:
                 cmd = traj[k, :]
+                # cmd = self.inverse_kinematics(pos=traj[k, :], ori=goal_ori, use_service=False)
             else:
-                cmd = self._sawyer.inverse_kinematics(pos=traj[k, :], ori=goal_ori, use_service=True)
-            
-            lin_jac = self._sawyer.jacobian()[:3,:]
+                # lin_jac = self._sawyer.jacobian()[:3,:]
 
-            if Kp is not None:
-                js_Kp = np.dot(lin_jac.T, Kp)
-                js_Kp = np.clip(js_Kp, 0.01, 1)
-                self._logger.debug("\n \n Kp \t {}".format(js_Kp))
-            else: 
-                js_Kp = None
+                if Kp is not None:
+                    # js_Kp = np.dot(lin_jac.T, Kp)
+                    os_Kp = np.clip(Kp, 0.01, 10)
+                    self._logger.debug("\n \n Kp \t {}".format(os_Kp))
+                else: 
+                    os_Kp = None
 
-            if Kd is not None:
-                js_Kd = np.dot(lin_jac.T, Kd)
-                js_Kd = np.clip(js_Kd, 0.5, 1)
-                self._logger.debug("\n \n Kd \t {}".format(js_Kd))
+                if Kd is not None:
+                    # js_Kd = np.dot(lin_jac.T, Kd)
+                    os_Kd = np.clip(Kd, 0.5, 1)
+                    self._logger.debug("\n \n Kd \t {}".format(os_Kd))
+                else:
+                    os_Kd = None
+
+                self.update_imp_params(os_Kp, os_Kd)
+
+            if self._joint_space:
+                self._ctrlr.set_goal(goal_js_pos=cmd,
+                                     goal_js_vel=None,
+                                     goal_js_acc=None)
+
+                pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.)
+
             else:
-                js_Kd = None
+                self._ctrlr.set_goal(goal_pos=traj[k, :], 
+                           goal_ori=goal_ori, 
+                           goal_vel=np.zeros(3), 
+                           goal_omg=np.zeros(3), 
+                           orientation_ctrl = True)
 
-            # self.update_imp_params(js_Kp, js_Kd)
+                pos_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
-            # if self._joint_space:
-            self._ctrlr.set_goal(goal_js_pos=cmd,
-                                 goal_js_vel=None,
-                                 goal_js_acc=None)
+            k += 1 
 
-            pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.)
-
-            # else:
-            #     self._ctrlr.set_goal(goal_pos=traj[k, :], 
-            #                goal_ori=goal_ori, 
-            #                goal_vel=np.zeros(3), 
-            #                goal_omg=np.zeros(3), 
-            #                orientation_ctrl = True)
-
-            #     pos_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
-
-            k += 1
-
-            print "pos_error:", k, pos_error
-
-            timed_out = self._total_timeout is not None and rospy.get_time()-start > self._total_timeout
+            if self._joint_space:
+                timed_out = self._total_timeout is not None and rospy.get_time()-start > self._total_timeout
+            else:
+                timed_out = False #self._total_timeout is not None and rospy.get_time()-start > self._total_timeout
 
             finished = bool(k >= self._time_steps or timed_out)
 
-            print cmd
-            print k, timed_out, finished
+            self._logger.debug("index: %d, time_out: %d, finished: %d, pos_error:, %f"%(k, timed_out, finished, pos_error,))
 
             self._rate.sleep()
 
@@ -247,8 +249,8 @@ class SawyerVarImpREPS():
     def execute_policy(self, w=None):
 
         if w is not None:
-            Kp = np.ones(3)+w[:3]
-            Kd = np.ones(3)+w[3:]
+            Kp = np.ones(3)*8.0 + w[:3]
+            Kd = np.ones(3)*np.sqrt(0.001) + w[3:]
         else:
             Kp = Kd = None
 
@@ -263,7 +265,7 @@ def main():
     from aml_playground.peg_in_hole_reps.exp_params.experiment_var_imp_params import exp_params
     rospy.init_node('sawyer_var_imp')
     svi = SawyerVarImpREPS(False, exp_params)
-    svi.execute_policy()
+    svi.execute_policy(w=np.array([1.,1.,1.,0.,0.,0.]))
     svi._ctrlr.set_active(False)
 
 
