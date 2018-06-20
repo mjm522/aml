@@ -1,17 +1,13 @@
 import os
-import gym
 import time
 import math
 import random
 import numpy as np
 import pybullet as pb
-from gym import spaces
-from gym.utils import seeding
 from aml_io.log_utils import aml_logging
 from aml_rl_envs.aml_rl_env import AMLRlEnv
 from aml_rl_envs.sawyer.sawyer import Sawyer
 from aml_rl_envs.utils.collect_demo import plot_demo
-from aml_rl_envs.controller.imp_ctrlr import ImpController
 from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
 
@@ -23,26 +19,11 @@ class SawyerEnv(AMLRlEnv):
 
         self._logger = aml_logging.get_logger(__name__)
 
-        self._action_repeat = config['action_repeat']
-
-        self._goal_box = np.array([0.5, 1.,-0.35]) #x,y,z 
-
         self._demo2follow = demo2follow
         
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
         self._reset()
-        
-        self._goal_ori = np.asarray(pb.getEulerFromQuaternion((-0.52021453, -0.49319602,  0.47898476, 0.50666373)))
-
-        #facing sawyer, from left side
-        hole1 = np.array([0., -0.725*0.15, 0.])
-        hole2 = np.array([0., -0.425*0.15, 0.])
-        hole3 = np.array([0., 0., 0.0])
-        hole4 = np.array([0., 0.375*0.15, 0.])
-        hole5 = np.array([0., 0.775*0.15, 0.])
-
-        self._hole_locs = [hole1, hole2, hole3, hole4, hole5]
 
     def _reset(self, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
 
@@ -57,8 +38,6 @@ class SawyerEnv(AMLRlEnv):
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
 
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
-
-        # self._imp_ctrlr = ImpController(robot_interface=self._sawyer)
 
         self.simple_step()
         
@@ -88,9 +67,9 @@ class SawyerEnv(AMLRlEnv):
 
             # desired_force = np.dot(ee_M_traj[k][:3,:3], desired_traj[k+1]-desired_traj[k])
 
-            # reaction_force = force_traj[k,:] #*-1
+            reaction_force = force_traj[k,:] #*-1
 
-            # penalty_force = reaction_force # - np.dot(reaction_force, desired_force)*(desired_force/np.linalg.norm(desired_force))
+            penalty_force = reaction_force # - np.dot(reaction_force, desired_force)*(desired_force/np.linalg.norm(desired_force))
 
             penalty_traj[k] = np.linalg.norm(force_traj[k,:])#np.linalg.det(ee_data_traj[k]['task_irr'])
 
@@ -116,11 +95,16 @@ class SawyerEnv(AMLRlEnv):
 
         # raw_input("press")
 
-        penalty = -0.5*np.sum(sigmoid(penalty_traj)) - 0.8*np.sum(sigmoid(closeness_traj))
+        force_penalty = 0.5*np.sum(sigmoid(penalty_traj)) + 0.5*np.sum(sigmoid(np.diff(penalty_traj)))
+
+        penalty =  -force_penalty + 1.5*np.sum(sigmoid(closeness_traj))
 
         self._logger.debug("*******************************************************************")
-        self._logger.debug("penalty_force \t %f"%(penalty,))
+        self._logger.debug("penalty_force \t %f"%(force_penalty,))
         self._logger.debug("*******************************************************************")
+
+        self._penalty = {'force':force_penalty,
+                 'total':penalty}
 
         return penalty
 
@@ -138,7 +122,7 @@ class SawyerEnv(AMLRlEnv):
         # plot_demo(dmp, color=[1,0,0], start_idx=0, life_time=0., cid=self._cid)
 
         if ee_ori is None:
-            goal_ori = None#(2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02)
+            goal_ori = (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02) #None#
         else:
             goal_ori = pb.getQuaternionFromEuler(ee_ori)
 
@@ -173,7 +157,7 @@ class SawyerEnv(AMLRlEnv):
                 if Kd is not None:
                     js_Kd = np.dot(lin_jac.T, Kd)
                     js_Kd = np.clip(js_Kd, 0.5, 1)
-                    self._logger.debug("\n \n Kp \t {}".format(js_Kd))
+                    self._logger.debug("\n \n Kd \t {}".format(js_Kd))
                 else:
                     js_Kd = None
 
