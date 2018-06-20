@@ -13,20 +13,16 @@ from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
 class SawyerEnv(AMLRlEnv):
     
-    def __init__(self, demo2follow=None, config=SAWYER_ENV_CONFIG):
+    def __init__(self, config=SAWYER_ENV_CONFIG):
 
         self._config = config
 
         self._logger = aml_logging.get_logger(__name__)
-
-        self._goal_box = np.array([0.5, 1.,-0.35]) #x,y,z
         
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
         self._reset()
         
-        self._goal_ori = np.asarray(pb.getEulerFromQuaternion((-0.52021453, -0.49319602,  0.47898476, 0.50666373)))
-
     def _reset(self, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
 
         self.setup_env()
@@ -138,9 +134,9 @@ class SawyerEnv(AMLRlEnv):
 
         return penalty
 
-    def fwd_simulate(self, traj, ee_ori=None, joint_space=False, Kp=None, Kd=None):
+    def fwd_simulate(self, traj, ee_ori=None, policy=None):
         """
-        implement the traj
+        the part of the code to move the robot along a trajectory
         """
         ee_traj = []
         # ee_M_traj = []
@@ -158,31 +154,34 @@ class SawyerEnv(AMLRlEnv):
 
         for k in range(traj.shape[0]):
 
-            if joint_space:
-
-                cmd = traj[k, :]
-
+            #for variable impedance, we will have to compute
+            #parameters for each time
+            if policy is not None:
+                w  = policy.compute_w(context=traj[k, :])
+                Kp = np.ones(3)+w[:3]
+                Kd = np.ones(3)+w[3:]
             else:
+                Kp, Kd = None, None
 
-                cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
+            cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
 
-                if Kp is not None:
-                    lin_jac = self._sawyer.state()['jacobian']
-                    js_Kp = np.dot(lin_jac.T, Kp)
-                    js_Kp = np.clip(js_Kp, 0.01, 1)
-                    self._logger.debug("\n \n Kp \t {}".format(js_Kp))
-                    # print "actual \t", self._sawyer.state()['ee_vel']
-                    # print "computed \t", np.dot(lin_jac, self._sawyer.state()['velocity'])
-                    # raw_input("press to continue")
-                else: 
-                    js_Kp = None
+            if Kp is not None:
+                lin_jac = self._sawyer.state()['jacobian']
+                js_Kp = np.dot(lin_jac.T, Kp)
+                js_Kp = np.clip(js_Kp, 0.01, 1)
+                self._logger.debug("\n \n Kp \t {}".format(js_Kp))
+                # print "actual \t", self._sawyer.state()['ee_vel']
+                # print "computed \t", np.dot(lin_jac, self._sawyer.state()['velocity'])
+                # raw_input("press to continue")
+            else: 
+                js_Kp = None
 
-                if Kd is not None:
-                    js_Kd = np.dot(lin_jac.T, Kd)
-                    js_Kd = np.clip(js_Kd, 0.5, 1)
-                    self._logger.debug("\n \n Kd \t {}".format(js_Kd))
-                else:
-                    js_Kd = None
+            if Kd is not None:
+                js_Kd = np.dot(lin_jac.T, Kd)
+                js_Kd = np.clip(js_Kd, 0.5, 1)
+                self._logger.debug("\n \n Kd \t {}".format(js_Kd))
+            else:
+                js_Kd = None
 
             self._sawyer.apply_action(cmd, js_Kp, js_Kd)
 
@@ -212,41 +211,20 @@ class SawyerEnv(AMLRlEnv):
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
                  'other_ee_data':ee_data_traj }
         
-    def context(self):
-        """
-        Context could be the extension of the spring
-        this needs to be thought and redefined.
-        atpresent it is a simple scalar value
-        """
 
-        s = np.random.uniform(-0.1, 0.1)
-
-        lf = 0.5 + s 
-
-        self._reset(lf=lf)     
-
-        return np.array([s])
-
-
-    def execute_policy(self, w=None, s=None, show_demo=False):
+    def execute_policy(self, policy=None, show_demo=False):
         """
         this function takes in two arguments
-        w := policy parameters, here stiffness and damping terms
-        s := context of the policy
+        policy function, here stiffness and damping terms
+        context of the policy
         """
-
-        if w is not None:
-            Kp = np.ones(3)+w[:3]
-            Kd = np.ones(3)+w[3:]
-        else:
-            Kp = Kd = None
 
         if show_demo:
             plot_demo(self._traj2pull, start_idx=0, life_time=4, cid=self._cid)
 
-        traj_draw= self.fwd_simulate(traj=self._traj2pull, Kp=Kp, Kd=Kd)
+        traj_draw= self.fwd_simulate(traj=self._traj2pull, policy=policy)
      
-        reward = self.reward(traj_draw) #+ 4*np.linalg.norm(js_Kp)
+        reward = self.reward(traj_draw)
         
         return traj_draw, reward
 
