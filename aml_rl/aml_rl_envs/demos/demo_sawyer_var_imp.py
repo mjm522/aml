@@ -18,7 +18,7 @@ def main():
                             bounds=np.array([[-0.5, -0.5, -0.5, -0.5, -0.5, -0.5],
                                              [ 0.5, 0.5,  0.5, 0.5, 0.5,  0.5]]))
 
-    traj_draw, reward = env.execute_policy(policy=policy, show_demo=False)
+    traj_draw, reward = env.execute_policy(policy=None, show_demo=False)
     
     raw_input("\n\n\nPress enter to exit")
       

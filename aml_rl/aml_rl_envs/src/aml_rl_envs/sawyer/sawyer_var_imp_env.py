@@ -60,7 +60,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=1000.):
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,0.17]), K=10.): #-0.05467355
         """
         this function creates a virtual spring between 
         the mean position = this position is on the table when the peg touches the table
@@ -126,7 +126,8 @@ class SawyerEnv(AMLRlEnv):
         penalty =  -force_penalty + 1.5*np.sum(sigmoid(closeness_traj))
 
         self._logger.debug("\n*****************************************************************")
-        self._logger.debug("penalty_force \t %f"%(force_penalty,))
+        # self._logger.debug("penalty_force \t %f"%(force_penalty,))
+        self._logger.debug("penalty_force \t %f"%(np.sum(penalty_traj),))
         self._logger.debug("*******************************************************************")
 
         self._penalty = {'force':force_penalty,
@@ -195,7 +196,6 @@ class SawyerEnv(AMLRlEnv):
             # ee_M_traj.append(self._sawyer.state()['inertia'])
 
             full_contacts_list.append(self.get_contact_details())
-
             ee_wrenches.append(self._sawyer.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._sawyer.get_ee_wrench(local=True))
 

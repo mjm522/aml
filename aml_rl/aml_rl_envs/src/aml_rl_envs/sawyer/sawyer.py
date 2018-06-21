@@ -26,7 +26,9 @@ class Sawyer(AMLRlRobot):
 
         self._ee_index = self._joint_tags['right_poking_stick_tip_fixed'] #self._joint_tags['right_j6']
 
-        self._ft_sensor_jnt = self._joint_tags['right_j6']
+        self._ft_sensor_jnt = self._ee_index#self._joint_tags['right_j6']
+
+        self.enable_force_torque_sensors(joint_idx=self._ft_sensor_jnt)
 
         self._head_jnt =  1 #self._joint_tags['head_pan']
 
