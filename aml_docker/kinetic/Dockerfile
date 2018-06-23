@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 
 # Dependencies for baxter and sawyer simulator
 RUN apt-get update && \ 
-    apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
+    apt-get -y install sudo python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-kinetic-convex-decomposition ros-kinetic-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs \
                        ros-kinetic-joystick-drivers ros-kinetic-xacro ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-cv-bridge \
