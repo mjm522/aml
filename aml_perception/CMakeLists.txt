@@ -75,9 +75,9 @@ add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAM
 # add_executable(subs ${PROJECT_CODE_SOURCE}/subs.cpp)
 # target_link_libraries(subs ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 
-add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
-target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs )
-add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
+#add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
+#target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs )
+#add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
 
 
 #############
