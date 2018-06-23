@@ -13,6 +13,8 @@ from aml_rl_envs.sawyer.sawyer import Sawyer
 from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
+SAWYER_ENV_CONFIG['ctrl_type'] = 'torque'
+SAWYER_CONFIG['ctrl_type'] = 'torque'
 
 class SawyerEnv(AMLRlEnv):
     
@@ -28,7 +30,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._demo2follow = demo2follow
         
-        AMLRlEnv.__init__(self, config, set_gravity=True)
+        AMLRlEnv.__init__(self, config, set_gravity=False)
 
         self._reset()
         
@@ -53,15 +55,22 @@ class SawyerEnv(AMLRlEnv):
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
         
-        pb.resetBasePositionAndOrientation(self._table_id, [0.7, 0., 0.6], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
+        pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.08734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
-        self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.11, physicsClientId=self._cid)
-        #0.6876992
-        pb.resetBasePositionAndOrientation(self._box_id, [0.7076992,  -0.11391704,  0.61987786], pb.getQuaternionFromEuler([0., 0., -3.14/2]), physicsClientId=self._cid) 
+        # self._box_id = pb.loadURDF(os.path.join(self._urdf_root_path,"peg_hole/square_hole_vertical_18x22.urdf"), useFixedBase=True, globalScaling = 0.11, physicsClientId=self._cid)
+
+        # pb.resetBasePositionAndOrientation(self._box_id, [0.69028195, -0.08618135, -.08734368], pb.getQuaternionFromEuler([0., 0., -3.14/2]), physicsClientId=self._cid) 
+
+        self._box_id = pb.loadURDF('/home/br/gitlibs/trimesh/demos/old/demos.urdf', useFixedBase=True, globalScaling = 0.009, physicsClientId=self._cid)
+
+
+        pb.resetBasePositionAndOrientation(self._box_id, [0.69028195, -0.08618135, .0], pb.getQuaternionFromEuler([3*np.pi/2, 0., 0.]), physicsClientId=self._cid) 
                         
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
 
-        self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid)
+        initial_angle = [0.5775459,  0.35958105, -1.4546709,   1.94019824,  1.84663965,  1.72250488, 4.50212891]
+    
+        self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos=initial_angle)
 
         self.simple_step()
         

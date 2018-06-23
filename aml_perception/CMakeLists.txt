@@ -33,10 +33,10 @@ catkin_python_setup()
 #   FILES
 # )
 
-add_message_files(
-  FILES
-  PCLCustomMsg.msg
-)
+#add_message_files(
+#  FILES
+#  PCLCustomMsg.msg
+#)
 
 generate_messages(
   DEPENDENCIES

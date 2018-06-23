@@ -99,13 +99,21 @@ class OSPositionController(OSController):
             delta_ori       = quatdiff(goal_ori, curr_ori)
             delta_omg       = goal_omg - curr_omg
 
-
             if np.linalg.norm(delta_ori) < self._angular_threshold:
                 delta_ori = np.zeros(delta_ori.shape)
                 delta_omg = np.zeros(delta_omg.shape)
 
-            delta           = np.hstack([self._kp_p*delta_pos + self._kd_p*delta_vel, 
-                                         self._kp_o*delta_ori + self._kd_o*delta_omg])
+            if isinstance(self._kp_p, float):
+                self._kp_p = np.ones(3)*self._kp_p
+            if isinstance(self._kp_o, float):
+                self._kp_o = np.ones(3)*self._kp_o
+            if isinstance(self._kd_p, float):
+                self._kd_p = np.ones(3)*self._kd_p
+            if isinstance(self._kd_o, float):
+                self._kd_o = np.ones(3)*self._kd_o
+
+            delta           = np.hstack([np.multiply(self._kp_p,delta_pos) + np.multiply(self._kd_p,delta_vel), 
+                                         np.multiply(self._kp_o,delta_ori) + np.multiply(self._kd_o,delta_omg)])
         else:
 
             jac_ee          = jac_ee[0:3,:]

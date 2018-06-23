@@ -33,7 +33,6 @@ def ray_test(env):
 
     return np.asarray(result[0][3])
 
-
 def make_demo(y_dir=1):
     #y_dir = 1 to draw from left to right when facing sawyer (sawyer._jnt_postns[0]=0.15703139)
     #y_dir = -1 to draw from right to left when facing sawyer (sawyer._jnt_postns[0]=0.15703139-np.pi/2)
@@ -65,7 +64,6 @@ def make_demo(y_dir=1):
     save_csv_data(file_name, ee_demo)
 
     raw_input("press any key to exit")
-
 
 def plot_data(z_dir=1):
 
@@ -261,7 +259,6 @@ def plot_data(z_dir=1):
         data_name = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/contacts_data_imp2_' + str(round(lf,3)) + '.pkl'
         save_data(filename=data_name, data=contacts_data_list)
 
-
 def check_s_w(joint_space=False):
 
     ps = SawyerImpREPS(joint_space, exp_params)
@@ -301,12 +298,14 @@ def reps(joint_space=False):
 
     rewards = []
     params  = []
+    force_penalties = []
+    goal_penalties = []
 
     ps = SawyerImpREPS(joint_space, exp_params)
 
     # make_demo(ps._sim_env)
 
-    plt.figure("Mean reward")
+    plt.figure("Reward plots", figsize=(15,15))
     plt.ion()
 
     for i in range(100):
@@ -319,19 +318,38 @@ def reps(joint_space=False):
 
         w = policy.compute_w(s, transform=True, explore=False)
 
-        _, mean_reward = ps._eval_env.execute_policy(w, s, show_demo=False)
+        _, reward = ps._eval_env.execute_policy(w, s, show_demo=False)
+
+        mean_reward = ps._eval_env._penalty['total']
+        force_penalty = ps._eval_env._penalty['force']
 
         print "Parameter found*****************************************: \t", w
         print "mean_reward \t", mean_reward
 
         if mean_reward > -1000:
             rewards.append(mean_reward)
+
+        force_penalties.append(force_penalty)
+
+        goal_penalties.append(force_penalty+mean_reward)
         
         params.append(np.hstack([w,s,mean_reward]))
 
         ps._eval_env._reset()
         plt.clf()
-        plt.plot(rewards, 'b')
+        plt.subplot(311)
+        plt.title('Total reward')
+        plt.plot(rewards, 'r')
+        plt.ylabel("mag")
+        plt.subplot(312)
+        plt.title('Force felt')
+        plt.plot(force_penalties, 'g')
+        plt.ylabel("mag")
+        plt.subplot(313)
+        plt.title('Goal Closeness')
+        plt.plot(goal_penalties, 'b')
+        plt.xlabel("iterations")
+        plt.ylabel("mag")
         plt.pause(0.00001)
         plt.draw()
 
@@ -402,21 +420,18 @@ def visualise_data(file_='right2left'): #right2left left2right
         # raw_input(k)
 
 
-
-
-
 def main(test):
 
     # plot_data()
 
     # make_demo()
 
-    visualise_data()
+    # visualise_data()
 
-    # if test:
-    #     check_s_w()
-    # else:
-    #     reps()
+    if test:
+        check_s_w()
+    else:
+        reps()
 
 
 if __name__=="__main__":

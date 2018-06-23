@@ -40,7 +40,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         self._logger = aml_logging.get_logger(__name__)
 
         # Load aml_logo
-        load_aml_logo("/robot/head_display")
+        # load_aml_logo("/robot/head_display")
 
         # these values are from the baxter urdf file
         self._jnt_limits = [{'lower': -1.70167993878, 'upper': 1.70167993878},
@@ -303,9 +303,9 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
 
         try:
             state['ft_reading'] = self._ft.ft_reading()
-
+ 
         except:
-            pass
+            state['ft_reading'] = None
 
         state['timestamp'] = {'secs': now.secs, 'nsecs': now.nsecs}
         try:
@@ -608,8 +608,13 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
         success = False
         soln = None
 
+        if ori is not None:
+            #expects a pykdl quaternion which is of type x,y,z,w 
+            if isinstance(ori, np.quaternion):
+                ori = np.array([ori.x, ori.y, ori.z, ori.w])
+
         if use_service:
-            success, soln = self._ik_baxter.ik_service_request(pos=pos, ori=ori, seed_angles=seed, null_space_goal=null_space_goal, use_advanced_options=True)
+            success, soln = self._ik_sawyer.ik_service_request(pos=pos, ori=ori, seed_angles=seed, null_space_goal=null_space_goal, use_advanced_options=True)
         else:
             soln = self._kinematics.inverse_kinematics(position=pos, orientation=ori, seed=seed)
 

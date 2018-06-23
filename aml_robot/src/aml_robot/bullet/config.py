@@ -21,7 +21,7 @@ config = {'cam': CAM_INFO }
 
 
 SAWYER_BULLET_CONFIG = {
-	'ee_link_idx': 16,
+	'ee_link_idx': 20,
 	'ee_link_name': 'right_hand'
 }
 
@@ -78,4 +78,17 @@ config_pisa_hand_right_noabd = {
 	'ee_link_name': 'right_hand'
 }
 
-config_hand_world = config_pisa_hand_right_noabd
+config_sawyer_peg = {
+	'show_debug_info': True,
+	'orientation_offset': [3.141592654, 1.570796327, 3.141592654], #3.141592654
+	'update_ori': False,
+	'update_pos': True,
+	'dt': 0.0167,
+	'record_training_data': True,
+	'training_data_file': 'data_test.pkl',
+	'steps_per_frame': 5,
+	'ee_link_idx': 21,
+	'ee_link_name': 'right_hand'
+}
+
+config_hand_world = config_sawyer_peg
