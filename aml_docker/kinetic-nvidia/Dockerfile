@@ -6,6 +6,12 @@ FROM osrf/ros:kinetic-desktop-full
 # ENV PATH /usr/local/nvidia/bin:${PATH}
 # ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 
+ARG http_proxy
+ARG https_proxy
+
+ENV http_proxy=$http_proxy
+ENV https_proxy=$https_proxy
+
 # installs avahi for local network discovery (required for using the real robot)
 RUN apt-get update && apt-get install -y \
     avahi-daemon avahi-utils

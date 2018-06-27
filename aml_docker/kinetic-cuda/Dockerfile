@@ -9,7 +9,11 @@ FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
+ARG http_proxy
+ARG https_proxy
 
+ENV http_proxy=$http_proxy
+ENV https_proxy=$https_proxy
 
 
 # install packages
@@ -69,7 +73,7 @@ RUN apt-get update && apt-get install -y \
 
 # Dependencies for baxter and sawyer simulator
 RUN apt-get update && \ 
-    apt-get -y install python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
+    apt-get -y install sudo python-pip python-scipy libprotobuf-dev protobuf-compiler libboost-all-dev \
                        ros-kinetic-convex-decomposition ros-kinetic-ivcon \
                        git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs \
                        ros-kinetic-joystick-drivers ros-kinetic-xacro ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-cv-bridge \

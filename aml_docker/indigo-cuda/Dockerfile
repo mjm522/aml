@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python-rosdep \
     python-rosinstall \
     python-vcstools \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # setup environment
