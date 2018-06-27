@@ -12,27 +12,29 @@ from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
 class SawyerEnv(AMLRlEnv):
-    
+
     def __init__(self, config=SAWYER_ENV_CONFIG):
 
         self._config = config
 
         self._logger = aml_logging.get_logger(__name__)
-        
+
         AMLRlEnv.__init__(self, config, set_gravity=True)
 
+        self.spring_line = None
+
         self._reset()
-        
+
     def _reset(self, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
 
         self.setup_env()
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
-        
+
         pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.08734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
-        
+
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
 
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
@@ -62,9 +64,9 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=1000.): #-0.05467355
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=1000., max_expected_force=300): #-0.05467355
         """
-        this function creates a virtual spring between 
+        this function creates a virtual spring between
         the mean position = this position is on the table when the peg touches the table
         and the current end effector point
         the spring constant is K
@@ -72,16 +74,20 @@ class SawyerEnv(AMLRlEnv):
         """
 
         ee_tip = self._sawyer.state()['ee_point']
-        
+
         x = np.linalg.norm(mean_pos-ee_tip)
 
-        force_dir = (mean_pos-ee_tip)/x                                                                                                                                                                                          
+        force_dir = (mean_pos-ee_tip)/x
         force = K*x*force_dir
 
-        pb.addUserDebugLine(mean_pos, ee_tip, lifeTime=8, 
-                            lineColorRGB=[0,0,1], lineWidth=4, 
+        old_line = self.spring_line
+        color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
+        self.spring_line = pb.addUserDebugLine(mean_pos, ee_tip, lifeTime=0,
+                            lineColorRGB=[color, 0, 1-color], lineWidth=12,
                             physicsClientId=self._cid)
-        
+        if old_line is not None:
+            pb.removeUserDebugItem(old_line)
+
         pb.applyExternalForce(objectUniqueId=self._sawyer._robot_id,
                               linkIndex=self._sawyer._ee_index,
                               forceObj=force,
@@ -91,7 +97,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._spring_force = force
 
-        
+
 
     def reward(self, traj):
         '''
@@ -180,7 +186,7 @@ class SawyerEnv(AMLRlEnv):
                 # print "actual \t", self._sawyer.state()['ee_vel']
                 # print "computed \t", np.dot(lin_jac, self._sawyer.state()['velocity'])
                 # raw_input("press to continue")
-            else: 
+            else:
                 js_Kp = None
 
             if Kd is not None:
@@ -200,6 +206,7 @@ class SawyerEnv(AMLRlEnv):
 
             state = self._sawyer.state()
             state['spring_force'] = self._spring_force
+            state['req_traj'] = traj[k, :]
 
             ee_data_traj.append(state)
 
@@ -214,12 +221,12 @@ class SawyerEnv(AMLRlEnv):
             self.simple_step()
 
         return { 'ee_traj':np.asarray(ee_traj),
-                 'traj':traj, 
-                 'contact_details':full_contacts_list, 
+                 'traj':traj,
+                 'contact_details':full_contacts_list,
                  'ee_wrenches':np.asarray(ee_wrenches),
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
                  'other_ee_data':ee_data_traj }
-        
+
 
     def execute_policy(self, policy=None, show_demo=False):
         """
@@ -232,9 +239,9 @@ class SawyerEnv(AMLRlEnv):
             plot_demo(self._traj2pull, start_idx=0, life_time=4, cid=self._cid)
 
         traj_draw= self.fwd_simulate(traj=self._traj2pull, policy=policy)
-     
+
         reward = self.reward(traj_draw)
-        
+
         return traj_draw, reward
 
     def context(self):
@@ -247,7 +254,7 @@ class SawyerEnv(AMLRlEnv):
         Get contact details of every contact when the peg is in contact with any part of the hole.
         '''
 
-        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19, 
+        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19,
                               bodyB=self._table_id, physicsClientId=self._cid)
         contact_details = []
 
