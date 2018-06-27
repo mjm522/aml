@@ -6,25 +6,21 @@ import numpy as np
 import pybullet as pb
 import matplotlib.pyplot as plt
 from aml_io.io_tools import save_data, load_data
-from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
-from aml_lfd.utilities.smooth_demo_traj import SmoothDemoTraj
 from aml_rl_envs.utils.collect_demo import plot_demo, draw_trajectory
-from aml_playground.peg_in_hole_reps.controller.sawyer_var_imp_reps import SawyerImpREPS
+from aml_playground.peg_in_hole_reps.controller.sawyer_var_imp_reps import SawyerVarImpREPS
 #get the experiment params
 from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.utils.data_utils import save_csv_data
-from aml_playground.peg_in_hole_reps.exp_params.experiment_imp_params import exp_params
+from aml_playground.peg_in_hole_reps.exp_params.experiment_var_imp_params import exp_params
 
-def reps(joint_space=False):
+def reps():
 
     rewards = []
     params  = []
     force_penalties = []
     goal_penalties = []
 
-    ps = SawyerImpREPS(joint_space, exp_params)
-
-    # make_demo(ps._sim_env)
+    ps = SawyerVarImpREPS(exp_params)
 
     plt.figure("Reward plots", figsize=(15,15))
     plt.ion()
@@ -33,13 +29,9 @@ def reps(joint_space=False):
 
         print "Episode \t", i
 
-        s = ps._eval_env.context()
-
         policy = ps._gpreps.run()
 
-        w = policy.compute_w(s, transform=True, explore=False)
-
-        _, reward = ps._eval_env.execute_policy(w, s, show_demo=False)
+        _, reward = ps._eval_env.execute_policy(policy=policy,show_demo=False)
 
         mean_reward = ps._eval_env._penalty['total']
         force_penalty = ps._eval_env._penalty['force']
@@ -54,7 +46,7 @@ def reps(joint_space=False):
 
         goal_penalties.append(force_penalty+mean_reward)
         
-        params.append(np.hstack([w,s,mean_reward]))
+        params.append(np.hstack([mean_reward]))
 
         ps._eval_env._reset()
         plt.clf()
@@ -75,5 +67,14 @@ def reps(joint_space=False):
         plt.draw()
 
     file_name = os.environ['AML_DATA'] + '/aml_lfd/right_sawyer_exp_peg_in_hole/params.csv'
-    save_csv_data(file_name, np.asarray(params))
+    # save_csv_data(file_name, np.asarray(params))
     raw_input("Press any key to exit")
+
+
+def main():
+
+    reps()
+
+
+if __name__ == '__main__':
+    main()
