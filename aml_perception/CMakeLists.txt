@@ -60,24 +60,24 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
 )
 
-SET(LINK_LIBS ${PCL_LIBRARIES})
+#SET(LINK_LIBS ${PCL_LIBRARIES})
 
-SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
+#SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
               # ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
 
-add_library(proj_libs STATIC ${PROJ_LIBS})
+#add_library(proj_libs STATIC ${PROJ_LIBS})
 
 
-add_executable(test_clnt ${PROJECT_SOURCE_DIR}/tests/test_pcl.cpp)
-target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
-add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_executable(test_clnt ${PROJECT_SOURCE_DIR}/tests/test_pcl.cpp)
+#target_link_libraries(test_clnt ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
+#add_dependencies(test_clnt ${PROJECT_NAME}_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add_executable(subs ${PROJECT_CODE_SOURCE}/subs.cpp)
 # target_link_libraries(subs ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs)
 
-add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
-target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs )
-add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
+#add_executable(pcl_server ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)
+#target_link_libraries(pcl_server ${LINK_LIBS} ${catkin_LIBRARIES} proj_libs )
+#add_dependencies(pcl_server ${PROJECT_NAME}_generate_messages_cpp)
 
 
 #############
