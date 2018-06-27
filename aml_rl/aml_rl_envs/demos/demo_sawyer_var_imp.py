@@ -25,10 +25,11 @@ def main():
     
         raw_input("\n\n\nPress enter to continue")
 
-        if not os.path.exists(os.environ['AML_DATA']+'/aml_playground/'):
-            os.makedirs(os.environ['AML_DATA']+'/aml_playground/')
+        save_dir = os.environ['AML_DATA'] + '/aml_playground/'
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
 
-        save_data(filename=os.environ['AML_DATA']+'/aml_playground/sawyer_bullet.pkl', data=traj_draw['other_ee_data'])
+        save_data(filename=save_dir+'/sawyer_bullet.pkl', data=traj_draw['other_ee_data'])
 
         env._reset()
       
