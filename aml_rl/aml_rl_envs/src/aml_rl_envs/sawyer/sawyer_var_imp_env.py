@@ -62,7 +62,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,0.17]), K=1000.): #-0.05467355
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=1000.): #-0.05467355
         """
         this function creates a virtual spring between 
         the mean position = this position is on the table when the peg touches the table

@@ -29,6 +29,8 @@ def main():
             os.makedirs(os.environ['AML_DATA']+'/aml_playground/')
 
         save_data(filename=os.environ['AML_DATA']+'/aml_playground/sawyer_bullet.pkl', data=traj_draw['other_ee_data'])
+
+        env._reset()
       
 if __name__=="__main__":
 
