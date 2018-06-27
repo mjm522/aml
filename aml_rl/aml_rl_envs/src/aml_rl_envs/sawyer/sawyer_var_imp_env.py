@@ -62,7 +62,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=1000.): #-0.05467355
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), K=10.): #-0.05467355
         """
         this function creates a virtual spring between 
         the mean position = this position is on the table when the peg touches the table
@@ -149,6 +149,8 @@ class SawyerEnv(AMLRlEnv):
         ee_wrenches = []
         ee_wrenches_local = []
         ee_data_traj = []
+        context_list = []
+        param_list = []
 
         # plot_demo(traj, color=[1,0,0], start_idx=0, life_time=0., cid=self._cid)
 
@@ -164,9 +166,12 @@ class SawyerEnv(AMLRlEnv):
             #for variable impedance, we will have to compute
             #parameters for each time
             if policy is not None:
-                w  = policy.compute_w(context=self.context())
+                s = self.context()
+                w  = policy.compute_w(context=s)
                 Kp = np.ones(3)+w[:3]
                 Kd = np.ones(3)+w[3:]
+                context_list.append(copy.deepcopy(s))
+                param_list.append(copy.deepcopy(w))
             else:
                 Kp, Kd = None, None
 
@@ -218,7 +223,9 @@ class SawyerEnv(AMLRlEnv):
                  'contact_details':full_contacts_list, 
                  'ee_wrenches':np.asarray(ee_wrenches),
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
-                 'other_ee_data':ee_data_traj }
+                 'other_ee_data':ee_data_traj,
+                 'contexts':context_list,
+                 'params':param_list}
         
 
     def execute_policy(self, policy=None, show_demo=False):
@@ -231,11 +238,11 @@ class SawyerEnv(AMLRlEnv):
         if show_demo:
             plot_demo(self._traj2pull, start_idx=0, life_time=4, cid=self._cid)
 
-        traj_draw= self.fwd_simulate(traj=self._traj2pull, policy=policy)
+        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy)
      
         reward = self.reward(traj_draw)
         
-        return traj_draw, reward
+        return traj_draw['contexts'], traj_draw['params'], traj_draw, reward
 
     def context(self):
 
