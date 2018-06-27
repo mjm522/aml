@@ -37,12 +37,14 @@ class SawyerEnv(AMLRlEnv):
 
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
 
+        self._spring_force = np.zeros(3)
+
         self.simple_step()
 
         self.spring_pull_traj()
 
 
-    def spring_pull_traj(self, offset=np.array([0.,0.,0.20])):
+    def spring_pull_traj(self, offset=np.array([0.,0.,0.80])):
         """
         generate a trajectory to pull the
         spring upwards. The end point is directly above the current point
@@ -60,7 +62,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,0.17]), K=10.): #-0.05467355
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,0.17]), K=1000.): #-0.05467355
         """
         this function creates a virtual spring between 
         the mean position = this position is on the table when the peg touches the table
@@ -86,6 +88,8 @@ class SawyerEnv(AMLRlEnv):
                               posObj=ee_tip,
                               flags=pb.WORLD_FRAME,
                               physicsClientId=self._cid)
+
+        self._spring_force = force
 
         
 
@@ -155,10 +159,12 @@ class SawyerEnv(AMLRlEnv):
 
         for k in range(traj.shape[0]):
 
+            self.virtual_spring()
+
             #for variable impedance, we will have to compute
             #parameters for each time
             if policy is not None:
-                w  = policy.compute_w(context=traj[k, :])
+                w  = policy.compute_w(context=self.context())
                 Kp = np.ones(3)+w[:3]
                 Kd = np.ones(3)+w[3:]
             else:
@@ -184,13 +190,18 @@ class SawyerEnv(AMLRlEnv):
             else:
                 js_Kd = None
 
+            # js_Kp = np.ones(7)*0.01
+
             self._sawyer.apply_action(cmd, js_Kp, js_Kd)
 
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
 
-            ee_data_traj.append(self._sawyer.state())
+            state = self._sawyer.state()
+            state['spring_force'] = self._spring_force
+
+            ee_data_traj.append(state)
 
             #desired Mass traj
             # ee_M_traj.append(self._sawyer.state()['inertia'])
@@ -198,8 +209,6 @@ class SawyerEnv(AMLRlEnv):
             full_contacts_list.append(self.get_contact_details())
             ee_wrenches.append(self._sawyer.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._sawyer.get_ee_wrench(local=True))
-
-            self.virtual_spring()
 
             # time.sleep(0.1)
             self.simple_step()
@@ -227,6 +236,10 @@ class SawyerEnv(AMLRlEnv):
         reward = self.reward(traj_draw)
         
         return traj_draw, reward
+
+    def context(self):
+
+        return self._spring_force
 
 
     def get_contact_details(self):

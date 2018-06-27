@@ -5,6 +5,7 @@ import copy
 import numpy as np
 from aml_rl_envs.sawyer.sawyer_var_imp_env import SawyerEnv
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
+from aml_io.io_tools import save_data
 
 def main():
 
@@ -18,9 +19,16 @@ def main():
                             bounds=np.array([[-0.5, -0.5, -0.5, -0.5, -0.5, -0.5],
                                              [ 0.5, 0.5,  0.5, 0.5, 0.5,  0.5]]))
 
-    traj_draw, reward = env.execute_policy(policy=None, show_demo=False)
+    while True:
     
-    raw_input("\n\n\nPress enter to exit")
+        traj_draw, reward = env.execute_policy(policy=None, show_demo=False)
+    
+        raw_input("\n\n\nPress enter to continue")
+
+        if not os.path.exists(os.environ['AML_DATA']+'/aml_playground/'):
+            os.makedirs(os.environ['AML_DATA']+'/aml_playground/')
+
+        save_data(filename=os.environ['AML_DATA']+'/aml_playground/sawyer_bullet.pkl', data=traj_draw['other_ee_data'])
       
 if __name__=="__main__":
 
