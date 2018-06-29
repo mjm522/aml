@@ -13,7 +13,7 @@ class ContextModel(REPSFwdModel):
         self._std  = None
 
     def add_data(self, datum):
-
+        
         assert len(datum) == self._context_dim
         self._data.append(datum)
     
