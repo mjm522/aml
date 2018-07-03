@@ -295,7 +295,9 @@ class Sawyer(AMLRlRobot):
 
         # jac = np.hstack([np.asarray(linear_jacobian).reshape(3,7), np.asarray(langular_jacobian).reshape(3,7)])
 
-        jac = np.asarray(linear_jacobian).reshape(3,7)
+        lin_jac = np.asarray(linear_jacobian).reshape(3,7)
+
+        ang_jac = np.asarray(angular_jacobian).reshape(3,7)
 
         #
         # return np.delete(jacobian, 1, 1)
@@ -312,4 +314,4 @@ class Sawyer(AMLRlRobot):
 
         # print jacobian
 
-        return jac
+        return np.vstack([lin_jac, ang_jac])

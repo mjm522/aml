@@ -36,7 +36,7 @@ class SawyerEnv(AMLRlEnv):
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
-        SAWYER_CONFIG['ctrl_type'] = 'torque'
+        SAWYER_CONFIG['ctrl_type'] = 'pos'#'torque'
 
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
 
@@ -107,6 +107,8 @@ class SawyerEnv(AMLRlEnv):
 
     def torque_controller(self, x_des, dx_des=np.zeros(3), ddx_des=np.zeros(3), Kp=None, Kd=None):
 
+        des_ori = np.array([-1.539, 0.121, 2.695])
+
         if Kp is None:
             Kp = np.ones(3)
 
@@ -114,23 +116,38 @@ class SawyerEnv(AMLRlEnv):
             Kd =  np.ones(3)
 
         state = self._sawyer.state()
-        lin_jac = state['jacobian']
+        jac = state['jacobian']
         x = state['ee_point']
         dx = state['ee_vel']
+        dw = state['ee_omg']
+
+        theta = state['ee_ori']
+        theta = np.asarray(pb.getEulerFromQuaternion((theta[1],theta[2],theta[3], theta[0])))
 
         ee_wrench = self._sawyer.get_ee_wrench(local=False)
 
-        jac_inv = np.linalg.pinv(lin_jac)
+        jac_inv = np.linalg.pinv(jac)
         Mee_inv = state['Mee_inv']
 
-        Kp_term = np.dot(Mee_inv, np.dot( np.diag(Kp), (x_des-x) ) )
-        Kd_term = np.dot(Mee_inv, np.dot( np.diag(Kd), (dx_des-dx) ) )
+        err_ee_pos = np.hstack([x_des,  des_ori]) - np.hstack([x, theta])
+        err_ee_vel = np.hstack([dx_des, np.zeros(3)]) - np.hstack([dx, dw])
+
+        des_ee_acc = np.hstack([ddx_des, np.zeros(3)])
+
+        Kp_aug = np.diag(np.hstack([Kp, np.ones(3)*1]))
+        Kd_aug = np.diag(np.hstack([Kd, np.ones(3)*1]))
+
+        Kp_term = np.dot(Mee_inv, np.dot( Kp_aug, err_ee_pos ) )
+
+        Kd_term = np.dot(Mee_inv, np.dot( Kd_aug, err_ee_vel ) )
+
+        # Kp_term = np.dot(Mee_inv, np.dot( np.diag(Kp), (x_des-x) ) )
+        # Kd_term = 0*np.dot(Mee_inv, np.dot( np.diag(Kd), (dx_des-dx) ) )
         # f_term = 
-
-        u = np.dot(jac_inv, (ddx_des + Kp_term + Kd_term))
-
         # import pdb
         # pdb.set_trace()
+
+        u = np.dot(jac_inv, (des_ee_acc + Kp_term + Kd_term))
 
         return u
 
@@ -169,9 +186,9 @@ class SawyerEnv(AMLRlEnv):
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[k])
 
-        force_traj = sigmoid(0.5*penalty_traj + 0.5*np.hstack([np.diff(penalty_traj), 0.]) )
+        force_traj = 0.5*sigmoid(penalty_traj) + 0.5*sigmoid( np.hstack( [np.diff(penalty_traj), 0] ))
 
-        goal_traj =  sigmoid(1.5*closeness_traj)
+        goal_traj =  1.5*sigmoid(closeness_traj)
 
         reward_traj = -force_traj  + goal_traj
 
@@ -212,7 +229,7 @@ class SawyerEnv(AMLRlEnv):
 
         for k in range(traj.shape[0]):
 
-            # self.virtual_spring()
+            self.virtual_spring()
 
             #for variable impedance, we will have to compute
             #parameters for each time
@@ -233,7 +250,7 @@ class SawyerEnv(AMLRlEnv):
             if self._sawyer._ctrl_type == 'pos':
                 
                 if Kp is not None:
-                    lin_jac = self._sawyer.state()['jacobian']
+                    lin_jac = self._sawyer.state()['jacobian'][:3,:]
                     js_Kp = np.dot(lin_jac.T, Kp)
                     js_Kp = np.clip(js_Kp, 0.01, 1)
                     self._logger.debug("\n \n Kp \t {}".format(js_Kp))
@@ -242,7 +259,7 @@ class SawyerEnv(AMLRlEnv):
 
                 if Kd is not None:
                     js_Kd = np.dot(lin_jac.T, Kd)
-                    js_Kd = np.clip(js_Kd, 0.5, 1)
+                    js_Kd = np.clip(js_Kd, 0.5, 10)
                     self._logger.debug("\n \n Kd \t {}".format(js_Kd))
                 else:
                     js_Kd = None
@@ -251,8 +268,8 @@ class SawyerEnv(AMLRlEnv):
                 self._sawyer.apply_action(cmd, js_Kp, js_Kd)
             
             elif self._sawyer._ctrl_type == 'torque':
-                Kp = np.ones(3)*18.
-                Kd = np.ones(3)*2
+                # Kp = np.ones(3)*0.0001
+                # Kd = np.ones(3)*0.
                 cmd = self.torque_controller(x_des=traj[k, :], dx_des=np.zeros(3), ddx_des=np.zeros(3), Kp=Kp, Kd=Kd)
                 print "\n\n\n\n\n\n\n\n\n\n", cmd
                 self._sawyer.apply_action(cmd)
@@ -349,7 +366,7 @@ class SawyerEnv(AMLRlEnv):
 def main():
 
     env = SawyerEnv()
-    env.execute_policy()
+    env.execute_policy(policy=None)
     raw_input("Press enter to exit")
 
 
