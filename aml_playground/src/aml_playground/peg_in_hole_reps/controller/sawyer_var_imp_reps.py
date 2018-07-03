@@ -22,7 +22,7 @@ class SawyerVarImpREPS():
         sim_config = copy.deepcopy(SAWYER_ENV_CONFIG)
 
         sim_config['renders']  = False
-        eval_config['renders'] = True #True
+        eval_config['renders'] = False
 
         self._eval_env = SawyerEnv(config=eval_config)
 

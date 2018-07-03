@@ -31,12 +31,12 @@ def reps():
 
         policy = ps._gpreps.run()
 
-        _, reward = ps._eval_env.execute_policy(policy=policy,show_demo=False)
+        s_list, w_list, _, reward = ps._eval_env.execute_policy(policy=policy,show_demo=False)
 
         mean_reward = ps._eval_env._penalty['total']
         force_penalty = ps._eval_env._penalty['force']
 
-        print "Parameter found*****************************************: \t", w
+        print "Parameter found*****************************************: \t", np.mean(w_list, 0)
         print "mean_reward \t", mean_reward
 
         if mean_reward > -1000:
