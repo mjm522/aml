@@ -9,11 +9,11 @@ FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG http_proxy
-ARG https_proxy
+#ARG http_proxy
+#ARG https_proxy
 
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
+#ENV http_proxy=$http_proxy
+#ENV https_proxy=$https_proxy
 
 
 # install packages
