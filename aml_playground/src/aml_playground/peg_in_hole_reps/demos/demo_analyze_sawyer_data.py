@@ -7,11 +7,11 @@ import scipy.signal as sig
 import matplotlib.pyplot as plt
 from aml_io.io_tools import load_data
 from scipy.interpolate import interp1d
-from sklearn.mixture import GaussianMixture
+# from sklearn.mixture import GaussianMixture
 from file_paths_spring import replay_data_path, replay_data_files
 from aml_playground.peg_in_hole_reps.utilities.draw_frame import draw_frame
 from aml_playground.peg_in_hole_reps.utilities.utils import convert_list_str_ft_reading
-from aml_playground.peg_in_hole_reps.utilities.visualization import visualize_3d_gmm, visualize_2d_gmm
+# from aml_playground.peg_in_hole_reps.utilities.visualization import visualize_3d_gmm, visualize_2d_gmm
 
 # replay_data_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/sawyer/spring_exp_1/'
 # replay_data_files = ['spring_exp_1.pkl']

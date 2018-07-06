@@ -12,37 +12,44 @@ from aml_rl_envs.utils.collect_demo import plot_demo
 from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
 class SawyerEnv(AMLRlEnv):
-    
+
     def __init__(self, config=SAWYER_ENV_CONFIG):
 
         self._config = config
 
         self._logger = aml_logging.get_logger(__name__)
-        
-        AMLRlEnv.__init__(self, config, set_gravity=True)
+
+        AMLRlEnv.__init__(self, config, set_gravity=False)
+
+        self.spring_line = None
 
         self._reset()
-        
+
     def _reset(self, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
 
         self.setup_env()
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
-        
+
         pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.08734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
-        
+
         SAWYER_CONFIG['enable_force_torque_sensors'] = True
+        SAWYER_CONFIG['ctrl_type'] = 'pos'#'torque'
 
         self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
 
+        self._spring_force = np.zeros(3)
+
         self.simple_step()
+
+        self.configure_spring()
 
         self.spring_pull_traj()
 
 
-    def spring_pull_traj(self, offset=np.array([0.,0.,0.20])):
+    def spring_pull_traj(self, offset=np.array([0.,0.,0.80])):
         """
         generate a trajectory to pull the
         spring upwards. The end point is directly above the current point
@@ -60,9 +67,13 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,0.17]), K=10.): #-0.05467355
+    def configure_spring(self, K=10):
+
+        self._spring_K = K
+
+    def virtual_spring(self, mean_pos=np.array([0.5261433,0.26867631,-0.05467355]), max_expected_force=300): #-0.05467355
         """
-        this function creates a virtual spring between 
+        this function creates a virtual spring between
         the mean position = this position is on the table when the peg touches the table
         and the current end effector point
         the spring constant is K
@@ -70,16 +81,20 @@ class SawyerEnv(AMLRlEnv):
         """
 
         ee_tip = self._sawyer.state()['ee_point']
-        
+
         x = np.linalg.norm(mean_pos-ee_tip)
 
-        force_dir = (mean_pos-ee_tip)/x                                                                                                                                                                                          
-        force = K*x*force_dir
+        force_dir = (mean_pos-ee_tip)/x
+        force = self._spring_K*x*force_dir
 
-        pb.addUserDebugLine(mean_pos, ee_tip, lifeTime=8, 
-                            lineColorRGB=[0,0,1], lineWidth=4, 
+        old_line = self.spring_line
+        color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
+        self.spring_line = pb.addUserDebugLine(mean_pos, ee_tip, lifeTime=0,
+                            lineColorRGB=[color, 0, 1-color], lineWidth=12,
                             physicsClientId=self._cid)
-        
+        if old_line is not None:
+            pb.removeUserDebugItem(old_line)
+
         pb.applyExternalForce(objectUniqueId=self._sawyer._robot_id,
                               linkIndex=self._sawyer._ee_index,
                               forceObj=force,
@@ -87,7 +102,56 @@ class SawyerEnv(AMLRlEnv):
                               flags=pb.WORLD_FRAME,
                               physicsClientId=self._cid)
 
-        
+        self._spring_force = force
+
+
+    def torque_controller(self, x_des, dx_des=np.zeros(3), ddx_des=np.zeros(3), Kp=None, Kd=None):
+
+        des_ori = np.array([-1.539, 0.121, 2.695])
+
+        if Kp is None:
+            Kp = np.ones(3)
+
+        if Kd is None:
+            Kd =  np.ones(3)
+
+        state = self._sawyer.state()
+        jac = state['jacobian']
+        x = state['ee_point']
+        dx = state['ee_vel']
+        dw = state['ee_omg']
+
+        theta = state['ee_ori']
+        theta = np.asarray(pb.getEulerFromQuaternion((theta[1],theta[2],theta[3], theta[0])))
+
+        ee_wrench = self._sawyer.get_ee_wrench(local=False)
+
+        jac_inv = np.linalg.pinv(jac)
+        Mee_inv = state['Mee_inv']
+
+        err_ee_pos = np.hstack([x_des,  des_ori]) - np.hstack([x, theta])
+        err_ee_vel = np.hstack([dx_des, np.zeros(3)]) - np.hstack([dx, dw])
+
+        des_ee_acc = np.hstack([ddx_des, np.zeros(3)])
+
+        Kp_aug = np.diag(np.hstack([Kp, np.ones(3)*1]))
+        Kd_aug = np.diag(np.hstack([Kd, np.ones(3)*1]))
+
+        Kp_term = np.dot(Mee_inv, np.dot( Kp_aug, err_ee_pos ) )
+
+        Kd_term = np.dot(Mee_inv, np.dot( Kd_aug, err_ee_vel ) )
+
+        # Kp_term = np.dot(Mee_inv, np.dot( np.diag(Kp), (x_des-x) ) )
+        # Kd_term = 0*np.dot(Mee_inv, np.dot( np.diag(Kd), (dx_des-dx) ) )
+        # f_term = 
+        # import pdb
+        # pdb.set_trace()
+
+        u = np.dot(jac_inv, (des_ee_acc + Kp_term + Kd_term))
+
+        return u
+
+
 
     def reward(self, traj):
         '''
@@ -99,6 +163,7 @@ class SawyerEnv(AMLRlEnv):
 
         desired_traj = traj['traj']
         true_traj = traj['ee_traj']
+        ee_vel_traj = traj['ee_vel_traj']
         ee_data_traj = traj['other_ee_data']
         force_traj = traj['ee_wrenches'][:,:3]
         torques_traj = traj['ee_wrenches'][:,3:]
@@ -117,34 +182,43 @@ class SawyerEnv(AMLRlEnv):
 
             penalty_force = reaction_force # - np.dot(reaction_force, desired_force)*(desired_force/np.linalg.norm(desired_force))
 
-            penalty_traj[k] = np.linalg.norm(force_traj[k,:])#np.linalg.det(ee_data_traj[k]['task_irr'])
+            penalty_traj[k] = np.linalg.norm(np.multiply( force_traj[k,:],  ee_vel_traj[k, :]) ) #np.linalg.det(ee_data_traj[k]['task_irr'])
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[k])
 
-        force_penalty = 0.5*np.sum(sigmoid(penalty_traj)) + 0.5*np.sum(sigmoid(np.diff(penalty_traj)))
+        force_traj = 0.5*sigmoid(penalty_traj) + 0.5*sigmoid( np.hstack( [np.diff(penalty_traj), 0] ))
 
-        penalty =  -force_penalty + 1.5*np.sum(sigmoid(closeness_traj))
+        goal_traj =  1.5*sigmoid(closeness_traj)
+
+        reward_traj = -force_traj  + goal_traj
+
+        penalty = np.sum( reward_traj )
 
         self._logger.debug("\n*****************************************************************")
         # self._logger.debug("penalty_force \t %f"%(force_penalty,))
         self._logger.debug("penalty_force \t %f"%(np.sum(penalty_traj),))
         self._logger.debug("*******************************************************************")
 
-        self._penalty = {'force':force_penalty,
-                 'total':penalty}
+        self._penalty = {
+                 'force':np.sum(force_traj),
+                 'total':penalty,
+                 'reward_traj':reward_traj}
 
-        return penalty
+        return self._penalty
 
-    def fwd_simulate(self, traj, ee_ori=None, policy=None):
+    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True):
         """
         the part of the code to move the robot along a trajectory
         """
         ee_traj = []
+        ee_vel_traj = []
         # ee_M_traj = []
         full_contacts_list = []
         ee_wrenches = []
         ee_wrenches_local = []
         ee_data_traj = []
+        context_list = []
+        param_list = []
 
         # plot_demo(traj, color=[1,0,0], start_idx=0, life_time=0., cid=self._cid)
 
@@ -155,42 +229,62 @@ class SawyerEnv(AMLRlEnv):
 
         for k in range(traj.shape[0]):
 
+            self.virtual_spring()
+
             #for variable impedance, we will have to compute
             #parameters for each time
             if policy is not None:
-                w  = policy.compute_w(context=traj[k, :])
-                Kp = np.ones(3)+w[:3]
-                Kd = np.ones(3)+w[3:]
+                s = self.context()
+                w  = policy.compute_w(context=s)
+                Kp =  np.ones(3)+ w[:3]
+                Kd =  np.ones(3)+ w[3:]
+                context_list.append(copy.deepcopy(s))
+                param_list.append(copy.deepcopy(w))
             else:
                 Kp, Kd = None, None
 
-            cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
+            # js_Kp = np.ones(7)*1.5#np.dot(lin_jac.T, Kp)
+            # js_Kd = None
+            # js_Kd = np.ones(7)*1000#np.clip(js_Kp, 0.01, 1)
 
-            if Kp is not None:
-                lin_jac = self._sawyer.state()['jacobian']
-                js_Kp = np.dot(lin_jac.T, Kp)
-                js_Kp = np.clip(js_Kp, 0.01, 1)
-                self._logger.debug("\n \n Kp \t {}".format(js_Kp))
-                # print "actual \t", self._sawyer.state()['ee_vel']
-                # print "computed \t", np.dot(lin_jac, self._sawyer.state()['velocity'])
-                # raw_input("press to continue")
-            else: 
-                js_Kp = None
+            if self._sawyer._ctrl_type == 'pos':
+                
+                if Kp is not None:
+                    lin_jac = self._sawyer.state()['jacobian'][:3,:]
+                    js_Kp = np.dot(lin_jac.T, Kp)
+                    js_Kp = np.clip(js_Kp, 0.01, 1)
+                    self._logger.debug("\n \n Kp \t {}".format(js_Kp))
+                else:
+                    js_Kp = None
 
-            if Kd is not None:
-                js_Kd = np.dot(lin_jac.T, Kd)
-                js_Kd = np.clip(js_Kd, 0.5, 1)
-                self._logger.debug("\n \n Kd \t {}".format(js_Kd))
-            else:
-                js_Kd = None
+                if Kd is not None:
+                    js_Kd = np.dot(lin_jac.T, Kd)
+                    js_Kd = np.clip(js_Kd, 0.5, 10)
+                    self._logger.debug("\n \n Kd \t {}".format(js_Kd))
+                else:
+                    js_Kd = None
 
-            self._sawyer.apply_action(cmd, js_Kp, js_Kd)
+                cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
+                self._sawyer.apply_action(cmd, js_Kp, js_Kd)
+            
+            elif self._sawyer._ctrl_type == 'torque':
+                # Kp = np.ones(3)*0.0001
+                # Kd = np.ones(3)*0.
+                cmd = self.torque_controller(x_des=traj[k, :], dx_des=np.zeros(3), ddx_des=np.zeros(3), Kp=Kp, Kd=Kd)
+                print "\n\n\n\n\n\n\n\n\n\n", cmd
+                self._sawyer.apply_action(cmd)
 
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
 
-            ee_data_traj.append(self._sawyer.state())
+            state = self._sawyer.state()
+            state['spring_force'] = self._spring_force
+            state['req_traj'] = traj[k, :]
+
+            ee_data_traj.append(state)
+
+            ee_vel_traj.append(state['ee_vel'])
 
             #desired Mass traj
             # ee_M_traj.append(self._sawyer.state()['inertia'])
@@ -199,20 +293,21 @@ class SawyerEnv(AMLRlEnv):
             ee_wrenches.append(self._sawyer.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._sawyer.get_ee_wrench(local=True))
 
-            self.virtual_spring()
-
-            # time.sleep(0.1)
+            time.sleep(0.1)
             self.simple_step()
 
         return { 'ee_traj':np.asarray(ee_traj),
-                 'traj':traj, 
-                 'contact_details':full_contacts_list, 
+                 'ee_vel_traj':np.asarray(ee_vel_traj),
+                 'traj':traj,
+                 'contact_details':full_contacts_list,
                  'ee_wrenches':np.asarray(ee_wrenches),
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
-                 'other_ee_data':ee_data_traj }
+                 'other_ee_data':ee_data_traj,
+                 'contexts':context_list,
+                 'params':param_list}
         
 
-    def execute_policy(self, policy=None, show_demo=False):
+    def execute_policy(self, policy=None, show_demo=False, sinusoid=False):
         """
         this function takes in two arguments
         policy function, here stiffness and damping terms
@@ -222,11 +317,25 @@ class SawyerEnv(AMLRlEnv):
         if show_demo:
             plot_demo(self._traj2pull, start_idx=0, life_time=4, cid=self._cid)
 
-        traj_draw= self.fwd_simulate(traj=self._traj2pull, policy=policy)
+
+        if sinusoid:
+            ##create sinusoid
+            ori = copy.deepcopy(self._traj2pull)
+            
+            flipped = np.flip(ori,0)
+
+            self._traj2pull = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
+
+        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy)
      
         reward = self.reward(traj_draw)
         
-        return traj_draw, reward
+        return traj_draw['contexts'], traj_draw['params'], traj_draw, reward['reward_traj']
+        
+
+    def context(self):
+
+        return self._spring_force
 
 
     def get_contact_details(self):
@@ -234,7 +343,7 @@ class SawyerEnv(AMLRlEnv):
         Get contact details of every contact when the peg is in contact with any part of the hole.
         '''
 
-        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19, 
+        full_details = pb.getContactPoints(bodyA=self._sawyer._robot_id, linkIndexA=19,
                               bodyB=self._table_id, physicsClientId=self._cid)
         contact_details = []
 
@@ -251,3 +360,15 @@ class SawyerEnv(AMLRlEnv):
                 contact_details.append(details)
 
         return contact_details
+
+
+
+def main():
+
+    env = SawyerEnv()
+    env.execute_policy(policy=None)
+    raw_input("Press enter to exit")
+
+
+if __name__ == '__main__':
+    main()

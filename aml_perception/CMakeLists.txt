@@ -60,7 +60,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
 )
 
-SET(LINK_LIBS ${PCL_LIBRARIES})
+#SET(LINK_LIBS ${PCL_LIBRARIES})
 
 #SET(PROJ_LIBS ${PROJECT_CODE_SOURCE}/pcl_processing.cpp)
               # ${PROJECT_CODE_SOURCE}/pcl_utils_server.cpp)

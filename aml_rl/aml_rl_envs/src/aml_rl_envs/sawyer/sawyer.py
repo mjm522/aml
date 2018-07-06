@@ -95,16 +95,15 @@ class Sawyer(AMLRlRobot):
         jnt_poss, jnt_vels, jnt_reaction_forces, jnt_applied_torques = self.get_jnt_state()
 
         jac = self.jacobian(jnt_poss)
-        M, Mee = self.get_ee_mass_matrix(jac=jac, jnt_pos=jnt_poss)
+        M, Mee_inv = self.get_ee_mass_matrix(jac=jac, jnt_pos=jnt_poss)
 
         state = {}
         state['position'] = np.asarray(jnt_poss)
         state['velocity'] = np.asarray(jnt_vels)
         state['effort'] = np.asarray(jnt_reaction_forces)
         state['jacobian'] = jac
-        state['inertia'] = Mee
-        state['task_irr'] = np.eye(7) - np.dot(jac.T, np.dot( np.dot(np.linalg.inv(M), jac.T), Mee).T)
-
+        state['inertia'] = M
+        state['Mee_inv'] = Mee_inv
         state['ee_point'] = ee_pos
         
         if ori_type != 'quat':
@@ -197,7 +196,7 @@ class Sawyer(AMLRlRobot):
         # M = np.delete(M, self._head_jnt, axis=0)
         # M = np.delete(M, self._head_jnt, axis=1)
 
-        return M, np.linalg.pinv( np.dot( np.dot( jac, np.linalg.pinv(M) ), jac.T ) )
+        return M, np.dot( np.dot( jac, np.linalg.pinv(M) ), jac.T )
 
 
     def set_joint_state(self, joint_state):
@@ -296,7 +295,9 @@ class Sawyer(AMLRlRobot):
 
         # jac = np.hstack([np.asarray(linear_jacobian).reshape(3,7), np.asarray(langular_jacobian).reshape(3,7)])
 
-        jac = np.asarray(linear_jacobian).reshape(3,7)
+        lin_jac = np.asarray(linear_jacobian).reshape(3,7)
+
+        ang_jac = np.asarray(angular_jacobian).reshape(3,7)
 
         #
         # return np.delete(jacobian, 1, 1)
@@ -313,4 +314,4 @@ class Sawyer(AMLRlRobot):
 
         # print jacobian
 
-        return jac
+        return np.vstack([lin_jac, ang_jac])

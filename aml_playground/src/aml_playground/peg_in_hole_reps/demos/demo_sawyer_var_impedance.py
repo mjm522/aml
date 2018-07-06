@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from aml_io.io_tools import save_data, load_data
 from aml_ctrl.utilities.min_jerk_interp import MinJerkInterp
 from aml_lfd.utilities.smooth_demo_traj import SmoothDemoTraj
-from aml_playground.peg_in_hole_reps.controller.sawyer_var_imp_reps import SawyerVarImpREPS
+from aml_playground.peg_in_hole_reps.controller.real_sawyer_var_imp_reps import SawyerVarImpREPS
 #get the experiment params
 from aml_rl_envs.utils.data_utils import save_csv_data
 from aml_playground.peg_in_hole_reps.exp_params.experiment_var_imp_params import exp_params

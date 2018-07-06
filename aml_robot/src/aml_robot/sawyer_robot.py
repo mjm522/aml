@@ -118,7 +118,7 @@ class SawyerArm(intera_interface.Limb, RobotInterface):
     def _configure_gripper(self):
 
         try:
-            self._gripper = intera_interface.Gripper(self._limb)
+            self._gripper = intera_interface.Gripper('{0}_gripper'.format(self._limb))
             if not (self._gripper.is_calibrated() or self._gripper.calibrate() == True):
                 self._logger.error("({0}_gripper) calibration failed.".format(self._gripper.name))
                 raise
