@@ -23,7 +23,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
  
 
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip==9.0.3 && \
     pip install protobuf && \
     pip install pandas
 
