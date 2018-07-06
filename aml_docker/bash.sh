@@ -43,7 +43,7 @@ xdocker run -it \
        --network="host" \
        --privileged \
        --env="QT_X11_NO_MITSHM=1" \
-       --workdir="/home/$USER" \
+       --workdir="/home/$USER/Projects/aml_ws" \
        --volume="${ROOT_DIR}/avahi-configs:/etc/avahi" \
        --volume="/home/$USER:/home/$USER" \
        --volume="/etc/group:/etc/group:ro" \
