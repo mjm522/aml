@@ -23,7 +23,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
  
 
-RUN pip install --upgrade pip==9.0.3 && \
+RUN pip install --upgrade pip && \
     pip install protobuf && \
     pip install pandas
 
@@ -39,8 +39,7 @@ RUN bin/bash -c "cd /tmp && \
                  python setup.py install"
 RUN rm -rf /tmp/pybox2d*
 
-RUN pip install --upgrade pip==9.0.3 && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
+RUN pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy six PySide && \
     pip install --upgrade \
     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *CPU*
