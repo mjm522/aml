@@ -31,7 +31,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.08734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
+        pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.98734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
@@ -49,7 +49,7 @@ class SawyerEnv(AMLRlEnv):
         self.spring_pull_traj()
 
 
-    def spring_pull_traj(self, offset=np.array([0.,0.,0.80])):
+    def spring_pull_traj(self, offset=np.array([0.,0.,0.5])):
         """
         generate a trajectory to pull the
         spring upwards. The end point is directly above the current point
@@ -67,7 +67,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def configure_spring(self, K=10):
+    def configure_spring(self, K=3):
 
         self._spring_K = K
 
@@ -90,7 +90,7 @@ class SawyerEnv(AMLRlEnv):
         old_line = self.spring_line
         color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
         self.spring_line = pb.addUserDebugLine(mean_pos, ee_tip, lifeTime=0,
-                            lineColorRGB=[color, 0, 1-color], lineWidth=12,
+                            lineColorRGB=[color, 1-color, 0], lineWidth=12,
                             physicsClientId=self._cid)
         if old_line is not None:
             pb.removeUserDebugItem(old_line)
@@ -169,9 +169,8 @@ class SawyerEnv(AMLRlEnv):
         torques_traj = traj['ee_wrenches'][:,3:]
 
         num_data = len(desired_traj)
-
-        penalty_traj = np.zeros(num_data)
-
+        penalty_force_traj = np.zeros(num_data)
+        penalty_work_traj = np.zeros(num_data)
         closeness_traj = np.zeros(num_data)
 
         for k in range(num_data-1):
@@ -182,26 +181,29 @@ class SawyerEnv(AMLRlEnv):
 
             penalty_force = reaction_force # - np.dot(reaction_force, desired_force)*(desired_force/np.linalg.norm(desired_force))
 
-            penalty_traj[k] = np.linalg.norm(np.multiply( force_traj[k,:],  ee_vel_traj[k, :]) ) #np.linalg.det(ee_data_traj[k]['task_irr'])
+            penalty_force_traj[k] = np.linalg.norm(force_traj[k,:])
+
+            penalty_work_traj[k] = np.linalg.norm(np.multiply( force_traj[k,:],  ee_vel_traj[k, :]) ) #np.linalg.det(ee_data_traj[k]['task_irr'])
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[k])
 
-        force_traj = 0.5*sigmoid(penalty_traj) + 0.5*sigmoid( np.hstack( [np.diff(penalty_traj), 0] ))
+        work_force_penalty = 0.5*sigmoid(penalty_work_traj) + 0.5*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
 
-        goal_traj =  1.5*sigmoid(closeness_traj)
+        goal_penalty =  2.0*sigmoid(closeness_traj)
 
-        reward_traj = -force_traj  + goal_traj
+        reward_traj = -work_force_penalty  - goal_penalty
 
-        penalty = np.sum( reward_traj )
+        total_penalty = np.sum( reward_traj )
 
         self._logger.debug("\n*****************************************************************")
-        # self._logger.debug("penalty_force \t %f"%(force_penalty,))
-        self._logger.debug("penalty_force \t %f"%(np.sum(penalty_traj),))
+        self._logger.debug("penalty_force \t %f"%(np.sum(penalty_force_traj),))
+        self._logger.debug("work done \t %f"%(np.sum(penalty_work_traj),))
+        self._logger.debug("goal_penalty \t %f"%(np.sum(closeness_traj),))
         self._logger.debug("*******************************************************************")
 
         self._penalty = {
-                 'force':np.sum(force_traj),
-                 'total':penalty,
+                 'force':np.sum(penalty_force_traj),
+                 'total':total_penalty,
                  'reward_traj':reward_traj}
 
         return self._penalty
@@ -219,6 +221,7 @@ class SawyerEnv(AMLRlEnv):
         ee_data_traj = []
         context_list = []
         param_list = []
+        spring_force = []
 
         # plot_demo(traj, color=[1,0,0], start_idx=0, life_time=0., cid=self._cid)
 
@@ -236,8 +239,23 @@ class SawyerEnv(AMLRlEnv):
             if policy is not None:
                 s = self.context()
                 w  = policy.compute_w(context=s)
-                Kp =  np.ones(3)+ w[:3]
-                Kd =  np.ones(3)+ w[3:]
+                # w = np.zeros(6)
+                
+                # ee_pos, ee_ori = self._sawyer.get_ee_pose()
+
+                # x_tilde = (traj[k, :] - ee_pos)
+
+                # Kp_calc = np.divide(self._spring_force, x_tilde) #np.clip(np.random.randn(3), -0.5, 2.5)#
+
+                # if np.any(np.isnan(Kp_calc)) or np.any(np.isinf(Kp_calc)):
+                #     Kp_calc = np.zeros(3)
+
+                # Kp =  np.ones(3) + Kp_calc #w[:3]
+                # Kd =  np.ones(3) + np.zeros(3)#w[3:]
+
+                Kp =  np.ones(3) + w[:3]
+                Kd =  np.ones(3) + w[3:]
+
                 context_list.append(copy.deepcopy(s))
                 param_list.append(copy.deepcopy(w))
             else:
@@ -249,16 +267,27 @@ class SawyerEnv(AMLRlEnv):
 
             if self._sawyer._ctrl_type == 'pos':
                 
+                # lin_jac = self._sawyer.state()['jacobian']
+                lin_jac = self._sawyer.state()['jacobian'][:3,:]
+                inertia_mat = self._sawyer.state()['inertia']
+
+                m_inv_j_trans = np.dot(np.linalg.inv(inertia_mat),lin_jac.T)
+                # print self._sawyer.state()['jacobian'][:3,:]
+                # raw_input()
+
                 if Kp is not None:
-                    lin_jac = self._sawyer.state()['jacobian'][:3,:]
-                    js_Kp = np.dot(lin_jac.T, Kp)
-                    js_Kp = np.clip(js_Kp, 0.01, 1)
+                    # js_Kp = np.dot(np.linalg.pinv(lin_jac), Kp)
+                    # js_Kp = np.dot(m_inv_j_trans[:,:3],Kp)
+                    js_Kp = np.diag(np.dot(np.dot(lin_jac.T, np.diag(Kp)), lin_jac))
+                    js_Kp = np.clip(js_Kp, 0.01, 10)
                     self._logger.debug("\n \n Kp \t {}".format(js_Kp))
                 else:
                     js_Kp = None
 
                 if Kd is not None:
-                    js_Kd = np.dot(lin_jac.T, Kd)
+                    # js_Kd = np.dot(np.linalg.pinv(lin_jac), Kd)
+                    # js_Kd = np.dot(m_inv_j_trans[:,:3],Kd)
+                    js_Kd = np.diag(np.dot(np.dot(lin_jac.T, np.diag(Kd)), lin_jac))
                     js_Kd = np.clip(js_Kd, 0.5, 10)
                     self._logger.debug("\n \n Kd \t {}".format(js_Kd))
                 else:
@@ -266,6 +295,7 @@ class SawyerEnv(AMLRlEnv):
 
                 cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
                 self._sawyer.apply_action(cmd, js_Kp, js_Kd)
+                # self._sawyer.apply_action(cmd, np.ones(7)*2, np.ones(7)*2)
             
             elif self._sawyer._ctrl_type == 'torque':
                 # Kp = np.ones(3)*0.0001
@@ -277,6 +307,7 @@ class SawyerEnv(AMLRlEnv):
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
+            spring_force.append(copy.deepcopy(self._spring_force))
 
             state = self._sawyer.state()
             state['spring_force'] = self._spring_force
@@ -293,7 +324,7 @@ class SawyerEnv(AMLRlEnv):
             ee_wrenches.append(self._sawyer.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._sawyer.get_ee_wrench(local=True))
 
-            time.sleep(0.1)
+            # time.sleep(0.1)
             self.simple_step()
 
         return { 'ee_traj':np.asarray(ee_traj),
@@ -301,13 +332,14 @@ class SawyerEnv(AMLRlEnv):
                  'traj':traj,
                  'contact_details':full_contacts_list,
                  'ee_wrenches':np.asarray(ee_wrenches),
+                 'spring_force':np.asarray(spring_force),
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
                  'other_ee_data':ee_data_traj,
                  'contexts':context_list,
                  'params':param_list}
         
 
-    def execute_policy(self, policy=None, show_demo=False, sinusoid=False):
+    def execute_policy(self, policy=None, show_demo=True, sinusoid=False):
         """
         this function takes in two arguments
         policy function, here stiffness and damping terms
@@ -315,7 +347,7 @@ class SawyerEnv(AMLRlEnv):
         """
 
         if show_demo:
-            plot_demo(self._traj2pull, start_idx=0, life_time=4, cid=self._cid)
+            plot_demo(self._traj2pull, start_idx=0, life_time=0, cid=self._cid)
 
 
         if sinusoid:
@@ -335,7 +367,9 @@ class SawyerEnv(AMLRlEnv):
 
     def context(self):
 
-        return self._spring_force
+        return self._sawyer.get_ee_wrench(local=True)[:3]
+
+        # return self._spring_force
 
 
     def get_contact_details(self):
@@ -366,8 +400,9 @@ class SawyerEnv(AMLRlEnv):
 def main():
 
     env = SawyerEnv()
-    env.execute_policy(policy=None)
-    raw_input("Press enter to exit")
+    while True:
+        env.execute_policy(policy=1.)
+        raw_input("Press enter to exit")
 
 
 if __name__ == '__main__':

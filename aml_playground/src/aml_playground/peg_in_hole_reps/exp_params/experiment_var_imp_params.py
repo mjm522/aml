@@ -10,7 +10,7 @@ gpreps_params_1['context_dim'] = 3
 gpreps_params_1['context_feature_dim'] = 10
 gpreps_params_1['x_dim']= 3
 gpreps_params_1['w_bounds'] = np.array([[-0.5, -0.5, -0.5, -0.5, -0.5, -0.5],
-                                        [ 1.5, 1.5,  1.5, 1.5, 1.5,  1.5]])
+                                        [ 3  ,    3,    3,    3,    3,    3]])
 
 experiment_1 = {
     
