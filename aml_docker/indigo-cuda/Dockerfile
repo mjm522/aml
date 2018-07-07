@@ -88,7 +88,7 @@ RUN apt-get update && \
                        build-essential python-dev swig python-pygame && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip==9.0.3 && \
     pip install protobuf && \
     pip install pandas
 
@@ -101,8 +101,7 @@ RUN rm -rf /tmp/pybox2d*
 
 
 #six PySide
-RUN pip install --upgrade pip && \
-    pip install --upgrade certifi && \
+RUN pip install --upgrade certifi && \
     pip install numpy numpy-quaternion pygame matplotlib==1.5.3 Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl

@@ -9,11 +9,11 @@ FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG http_proxy
-ARG https_proxy
+#ARG http_proxy
+#ARG https_proxy
 
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
+#ENV http_proxy=$http_proxy
+#ENV https_proxy=$https_proxy
 
 
 # install packages
@@ -101,8 +101,7 @@ RUN pip install --upgrade pip==9.0.3 && \
 
 
 #six PySide
-RUN pip install --upgrade pip==9.0.3 && \
-    pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy && \
+RUN pip install numpy numpy-quaternion pygame decorator ipython jupyter matplotlib Pillow scipy && \
     pip install --upgrade \ 
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl
 # TENSOR FLOW *GPU*
