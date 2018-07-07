@@ -10,16 +10,14 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 from rl_algos.forward_models.context_model import ContextModel
 from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
 
-from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG
-
 np.random.seed(123)
 
 class SawyerVarImpREPS():
 
     def __init__(self, exp_params):
 
-        eval_config = copy.deepcopy(SAWYER_ENV_CONFIG)
-        sim_config = copy.deepcopy(SAWYER_ENV_CONFIG)
+        eval_config = copy.deepcopy(exp_params['env_params'])
+        sim_config = copy.deepcopy(exp_params['env_params'])
 
         sim_config['renders']  = False
         eval_config['renders'] = False

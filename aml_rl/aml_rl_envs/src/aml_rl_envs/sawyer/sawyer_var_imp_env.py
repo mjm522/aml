@@ -9,11 +9,10 @@ from aml_io.log_utils import aml_logging
 from aml_rl_envs.aml_rl_env import AMLRlEnv
 from aml_rl_envs.sawyer.sawyer import Sawyer
 from aml_rl_envs.utils.collect_demo import plot_demo
-from aml_rl_envs.sawyer.config import SAWYER_ENV_CONFIG, SAWYER_CONFIG
 
 class SawyerEnv(AMLRlEnv):
 
-    def __init__(self, config=SAWYER_ENV_CONFIG):
+    def __init__(self, config):
 
         self._config = config
 
@@ -35,16 +34,13 @@ class SawyerEnv(AMLRlEnv):
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
-        SAWYER_CONFIG['enable_force_torque_sensors'] = True
-        SAWYER_CONFIG['ctrl_type'] = 'pos'#'torque'
-
-        self._sawyer = Sawyer(config=SAWYER_CONFIG, cid=self._cid, jnt_pos = jnt_pos)
+        self._sawyer = Sawyer(config=self._config['robot_config'], cid=self._cid, jnt_pos = jnt_pos)
 
         self._spring_force = np.zeros(3)
 
         self.simple_step()
 
-        self.configure_spring()
+        self.configure_spring(self._config['spring_stiffness'])
 
         self.spring_pull_traj()
 
@@ -67,7 +63,7 @@ class SawyerEnv(AMLRlEnv):
                                      np.ones(100)*start_ee[1],
                                      np.linspace(start_ee[2], end_ee[2], 100)]).T
 
-    def configure_spring(self, K=3):
+    def configure_spring(self, K):
 
         self._spring_K = K
 
@@ -187,9 +183,9 @@ class SawyerEnv(AMLRlEnv):
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[k])
 
-        work_force_penalty = 0.5*sigmoid(penalty_work_traj) + 0.5*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
+        work_force_penalty = self._config['work_weight']*sigmoid(penalty_work_traj) + self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
 
-        goal_penalty =  2.0*sigmoid(closeness_traj)
+        goal_penalty =  self._config['goal_weight']*sigmoid(closeness_traj)
 
         reward_traj = -work_force_penalty  - goal_penalty
 
