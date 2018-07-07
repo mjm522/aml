@@ -36,7 +36,6 @@ from aml_playground.peg_in_hole_reps.utilities.utils import convert_list_str_ft_
 # data['tip_state']['angular_vel']
 # data['tip_state']['force']
 # data['tip_state']['torque']
-
 def lpf(data):
     b, a = sig.butter(3, 0.05)
     y = sig.filtfilt(b, a, data)
