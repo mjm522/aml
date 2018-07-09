@@ -14,5 +14,5 @@ if command_exists nvidia-docker && [ -z "$AML_DOCKER_NOFORCE_INTEL" ]; then
 else
       alias xdocker="docker"
       extra_params=--device=/dev/dri:/dev/dri
-      echo "nvidia-docker does not exist"
+      echo "nvidia-docker does not exist (falling back to docker)"
 fi

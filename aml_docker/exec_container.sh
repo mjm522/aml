@@ -26,6 +26,5 @@ source ${ROOT_DIR}/aml_aliases.sh
 
 
 echo 'Entering container:' $1
-xdocker exec -it $1 ${extra_params} \
-				 bash
+xdocker exec -it $1 bash
 # -c "source /opt/ros/kinetic/setup.bash && /bin/bash"
