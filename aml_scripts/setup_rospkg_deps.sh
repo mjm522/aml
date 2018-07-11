@@ -34,6 +34,7 @@ fi
 wstool update
 wstool merge sawyer_robot/sawyer_robot.rosinstall
 wstool merge sawyer_simulator/sawyer_simulator.rosinstall
+wstool merge https://raw.githubusercontent.com/RethinkRobotics/sawyer_moveit/master/sawyer_moveit.rosinstall
 wstool update
 rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
