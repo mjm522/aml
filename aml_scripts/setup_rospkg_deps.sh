@@ -19,6 +19,7 @@ rm -rf sawyer*
 rm -rf aruco_ros
 rm -rf pisa-iit-soft-hand
 wstool init .
+git clone https://github.com/ros-planning/moveit_robots.git
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
   wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
