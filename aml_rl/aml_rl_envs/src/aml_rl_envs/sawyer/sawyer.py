@@ -285,12 +285,12 @@ class Sawyer(AMLRlRobot):
 
 
         linear_jacobian, angular_jacobian = pb.calculateJacobian(bodyUniqueId=self._robot_id,
-                                                                linkIndex=self._ee_index,
-                                                                localPosition=[0.,0.,0.],
-                                                                objPositions=list(joint_pos),
-                                                                objVelocities=np.zeros(len(joint_pos)).tolist(),
-                                                                objAccelerations=np.zeros(len(joint_pos)).tolist(),
-                                                                physicsClientId=self._cid)
+                                                                 linkIndex=self._ee_index,
+                                                                 localPosition=[0.,0.,0.],
+                                                                 objPositions=list(joint_pos),
+                                                                 objVelocities=np.zeros(len(joint_pos)).tolist(),
+                                                                 objAccelerations=np.zeros(len(joint_pos)).tolist(),
+                                                                 physicsClientId=self._cid)
     
 
         # jac = np.hstack([np.asarray(linear_jacobian).reshape(3,7), np.asarray(langular_jacobian).reshape(3,7)])

@@ -129,7 +129,7 @@ class AMLRlRobot(object):
         return movable_jnts
 
 
-    def apply_ctrl(self, motor, cmd, Kp=None, Kd=None):
+    def apply_ctrl(self, motor, cmd, cmd_vel=None,  Kp=None, Kd=None):
 
         if self._ctrl_type == 'torque':
 
