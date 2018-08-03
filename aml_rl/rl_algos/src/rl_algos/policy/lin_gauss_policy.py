@@ -10,7 +10,7 @@ class LinGaussPolicy():
     """
 
     def __init__(self, w_dim, context_feature_dim, variance, 
-                 initial_params, bounds=None, covariance_scale=1.0, gamma=0.0, random_state=None):
+                 initial_params, bounds=None, covariance_scale=1.0, gamma=0.0, random_state=None, transform=True):
 
         #initial guess of w
         self._w_init = initial_params
@@ -40,6 +40,8 @@ class LinGaussPolicy():
         self._inv_scaling /= self._variance
 
         self._mean = self.inv_scale_w(self._w_init)
+
+        self._transform = transform
 
         #function handle to feaurize the context infomration
         self.transform_context = self.featurize_context()
@@ -89,7 +91,7 @@ class LinGaussPolicy():
 
     def compute_w(self, context, explore=True, transform=True):
 
-        if transform:
+        if self._transform:
             context_feature = self.transform_context(context)
         else:
             context_feature = context

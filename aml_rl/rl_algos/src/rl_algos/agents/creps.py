@@ -22,7 +22,7 @@ class CREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 
                        num_samples_per_update, num_old_datasets, 
-                       env, policy, min_eta=1e-8):
+                       env, policy, min_eta=1e-8, transform_context=True):
         
         #epsilon in the algorithm
         self._entropy_boud = entropy_bound
@@ -45,6 +45,8 @@ class CREPSOpt():
 
         self._itr = 0
 
+        self._transform_context = transform_context
+
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 
         self._context_obs_history = deque(maxlen=self._num_samples_per_update)
@@ -62,7 +64,11 @@ class CREPSOpt():
         tau_i, R_sw_i = self._env.execute_policy(w_i, s_i)
 
         #store the data
-        self._context_obs_history.append(self._policy.transform_context(s_i))
+        if self._transform_context:
+            self._context_obs_history.append(self._policy.transform_context(s_i))
+        else:
+            self._context_obs_history.append(s_i)
+            
         self._policy_w_history.append(w_i)
         self._rewards_history.append(R_sw_i)
 

@@ -23,8 +23,8 @@ class GPREPSOpt():
 
     def __init__(self, entropy_bound, num_policy_updates, 
                        num_samples_per_update, num_old_datasets,
-                       env, context_model, traj_rollout_model,
-                       policy, min_eta=1e-8, num_data_to_collect=20, num_fake_data=30):
+                       env, context_model, force_model, reward_model,
+                       policy, min_eta=1e-8, num_data_to_collect=20, num_fake_data=30, transform_context=True):
 
         self._logger = aml_logging.get_logger(__name__)
 
@@ -54,7 +54,11 @@ class GPREPSOpt():
 
         self._context_model = context_model
 
-        self._traj_model = traj_rollout_model
+        self._force_predict_model = force_model
+
+        self._reward_model =  reward_model
+
+        self._transform_context = transform_context
 
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 
@@ -67,17 +71,18 @@ class GPREPSOpt():
 
         return self._context_model.sample()
 
-    def predict_reward(self, s, w):
+    def predict_reward(self, s, w=None):
 
-        new_mu = self._traj_model.predict(s=s, w=w)
+        return self._reward_model.predict(s)
 
-        return None, new_mu
+    def predict_force(self, x_t_plus1, x_t):
+
+        return self._force_predict_model.predict(x_t_plus1, x_t)
 
     def learn_fwd_model(self):
 
         self._context_model.fit()
-
-        self._traj_model.fit()
+        self._force_predict_model.fit()
 
 
     def artificial_data(self):
@@ -85,12 +90,16 @@ class GPREPSOpt():
         #get the context
         s_i = self.sample_context()
         #compute policy params for each context
-        w_i = self._policy.compute_w(context=s_i, transform=True)
+        w_i = self._policy.compute_w(context=s_i)
         #execute the policy in the environment
-        tau_i, R_sw_i = self.predict_reward(s=s_i, w=w_i)
+        R_sw_i = self.predict_reward(s=s_i, w=w_i)
 
         #store the data
-        self._context_obs_history.append(self._policy.transform_context(s_i))
+        if self._transform_context:
+            self._context_obs_history.append(self._policy.transform_context(s_i))
+        else:
+            self._context_obs_history.append(s_i)
+
         self._policy_w_history.append(w_i)
         self._rewards_history.append(R_sw_i[0])
 
@@ -103,22 +112,6 @@ class GPREPSOpt():
         S = np.asarray(self._context_obs_history)
         w = np.asarray(self._policy_w_history)
         R = np.asarray(self._rewards_history).flatten()
-
-        # import matplotlib.pyplot as plt
-
-        # data_S = np.asarray(self._context_data)
-        # data_R = np.asarray(self._reward_data)
-
-        # plt.figure("S")
-        # plt.plot(S[:,0], 'g')
-        # plt.plot(data_S[:,0], 'r')
-
-        # plt.figure("R")
-        # plt.plot(data_R, 'r')
-        # plt.plot(R, 'g')
-
-        # plt.show(False)
-        
         n_samples_per_update = len(R)
 
         # Definition of the dual function
@@ -165,7 +158,6 @@ class GPREPSOpt():
     def collect_data(self):
 
         if len(self._context_model._data) < self._num_data_to_collect:
-
             num_trials = 20
         else:
             num_trials = 1
@@ -174,21 +166,28 @@ class GPREPSOpt():
 
             self._logger.debug("Collect data itr:=\t%d"%(k))
 
+            #get the context
+            s_k = self._env.context()
+            #compute policy params for each context
+            w_k = self._policy.compute_w(s_k)
             #execute the policy in the environment
-            #s_k = context
-            #w_k = params
-            s_k, w_k, tau_k, R_sw_k = self._env.execute_policy(self._policy, show_demo=False)
+            tau_k, R_sw_k = self._env.execute_policy(self._policy)
+
+            self._context_model.add_data(datum=s_k)
+
+            self._force_predict_model.add_data(traj=tau_k)
 
             if num_trials == 20:
 
-                for s, w, r in zip(s_k, w_k, R_sw_k):
-                    self._traj_model.add_data(w=w, r=r)
-                    self._context_model.add_data(datum=s)
-                    self._context_obs_history.append(self._policy.transform_context(s))
-                    self._policy_w_history.append(w)
-                    self._rewards_history.append(r)
+                if self._transform_context:
+                    self._context_obs_history.append(self._policy.transform_context(s_k))
+                else:
+                    self._context_obs_history.append(s_k)
 
-            self._env._reset() 
+                self._policy_w_history.append(w_k)
+                self._rewards_history.append(R_sw_k)
+
+            self._env._reset()
     
         if num_trials == 20:
 
@@ -217,5 +216,3 @@ class GPREPSOpt():
                 self.update_policy(weights)
 
         return self._policy
-
-            
