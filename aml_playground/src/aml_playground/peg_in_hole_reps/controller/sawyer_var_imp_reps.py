@@ -8,7 +8,8 @@ from aml_rl_envs.utils.data_utils import save_csv_data, load_csv_data
 #for gpreps
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 from rl_algos.forward_models.context_model import ContextModel
-from rl_algos.forward_models.traj_rollout_model import TrajRolloutModel
+from rl_algos.forward_models.reward_model import RewardModel
+from rl_algos.forward_models.state_predict_model import StatePredictModel
 
 np.random.seed(123)
 
@@ -46,11 +47,16 @@ class SawyerVarImpREPS():
         context_model = ContextModel(context_dim=exp_params['context_dim'], 
                                     num_data_points=exp_params['num_samples_fwd_data'])
 
-        traj_model = TrajRolloutModel(w_dim=exp_params['w_dim'], 
+        reward_model = RewardModel(w_dim=exp_params['w_dim'], 
                                       x_dim=exp_params['x_dim'], 
                                       cost=self._sim_env.reward, 
                                       context_model=context_model, 
                                       num_data_points=exp_params['num_samples_fwd_data'])
+
+
+        force_model = StatePredictModel(x_dim=exp_params['sp_x_dim'], 
+                                        y_dim=exp_params['sp_y_dim'], 
+                                        num_data_points=exp_params['num_samples_fwd_data'])
 
         self._gpreps = GPREPSOpt(entropy_bound=exp_params['entropy_bound'], 
                                   num_policy_updates=exp_params['num_policy_updates'], 
@@ -58,7 +64,8 @@ class SawyerVarImpREPS():
                                   num_old_datasets=exp_params['num_old_datasets'],  
                                   env=self._sim_env,
                                   context_model=context_model, 
-                                  traj_rollout_model=traj_model,
+                                  reward_model=reward_model,
+                                  force_model=force_model,
                                   policy=policy,
                                   min_eta=exp_params['min_eta'], 
                                   num_data_to_collect=exp_params['num_data_to_collect'], 
