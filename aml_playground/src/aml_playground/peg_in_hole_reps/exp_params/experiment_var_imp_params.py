@@ -10,6 +10,8 @@ gpreps_params_1['initial_params'] = 0. * np.ones(6)
 gpreps_params_1['context_dim'] = 3
 gpreps_params_1['context_feature_dim'] = 10
 gpreps_params_1['x_dim']= 3
+gpreps_params_1['sp_x_dim'] = 3
+gpreps_params_1['sp_y_dim'] = 3
 gpreps_params_1['w_bounds'] = np.array([[-0.5, -0.5, -0.5, -0.5, -0.5, -0.5],
                                         [ 3  ,    3,    3,    3,    3,    3]])
 
@@ -26,7 +28,7 @@ sawyer_env_1['robot_config'] = sawyer_1
 sawyer_env_1['spring_stiffness'] = 3
 sawyer_env_1['f_dot_weight'] = 0.5
 sawyer_env_1['work_weight'] = 0.5
-sawyer_env_1['goal_weight'] = 2.
+sawyer_env_1['goal_weight'] = 2.5
 
 
 experiment_1 = {
