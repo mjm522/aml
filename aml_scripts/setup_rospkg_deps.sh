@@ -19,6 +19,7 @@ rm -rf sawyer*
 rm -rf aruco_ros
 rm -rf pisa-iit-soft-hand
 wstool init .
+git clone https://github.com/ros-planning/moveit_robots.git
 
 if [ "$ROS_DISTRO" == "indigo" ]; then
   wstool merge aml/3rdparty/baxter/rethink_packages111.rosinstall
@@ -34,6 +35,7 @@ fi
 wstool update
 wstool merge sawyer_robot/sawyer_robot.rosinstall
 wstool merge sawyer_simulator/sawyer_simulator.rosinstall
+wstool merge https://raw.githubusercontent.com/RethinkRobotics/sawyer_moveit/master/sawyer_moveit.rosinstall
 wstool update
 rosdep install --from-path . --ignore-src --rosdistro ${ROS_DISTRO} -y -r
 cd ..
