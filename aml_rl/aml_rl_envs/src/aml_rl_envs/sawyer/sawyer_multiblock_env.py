@@ -22,7 +22,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._reset()
 
-    def _reset(self, num_boxes = 3, mass_diff = 2, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
+    def _reset(self, num_boxes = 3, mass_diff = 2, lf=0., sf=0., rf=0., r=0.):
 
         self.setup_env()
 
@@ -40,7 +40,7 @@ class SawyerEnv(AMLRlEnv):
 
             self._box_ids.append(pb.loadURDF(os.path.join(self._urdf_root_path,"box.urdf"), globalScaling=scale, physicsClientId=self._cid))
 
-            pb.resetBasePositionAndOrientation(self._box_ids[i], [0.5, -0.3 + box_pos_list[i+2], -0.3 + (0.05+0.15)*scale], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
+            pb.resetBasePositionAndOrientation(self._box_ids[i], [0.5, -0.5 + box_pos_list[i+2], -0.3 + (0.05+0.15)*scale], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
             pb.changeDynamics(self._box_ids[i], -1, mass = mass, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 
@@ -48,14 +48,28 @@ class SawyerEnv(AMLRlEnv):
 
         pb.setGravity(0., 0., -9.81)
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0.5, -0.3, -0.3], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
+        pb.resetBasePositionAndOrientation(self._table_id, [0.5, -0.5, -0.3], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
+
+        jnt_pos = [ 0.27109248, -0.77964891, 0.34093872, 1.84364996, -0.47501838, 0.58210338, 2.74335966 ]
 
         self._sawyer = Sawyer(config=self._config['robot_config'], cid=self._cid, jnt_pos = jnt_pos)
 
         self.simple_step()
 
+        self.push_traj()
+
+
+    def push_traj(self):
+
+        ee_pos, _ = self._sawyer.get_ee_pose()
+
+        target_pos = np.asarray(pb.getBasePositionAndOrientation(self._box_ids[len(self._box_ids)-1])[0]) - np.array([0,1,0])
+
+        self._traj2follow = np.vstack([np.ones(100)*ee_pos[0],
+                                          np.linspace(ee_pos[1], target_pos[1], 100),
+                                          np.ones(100)*ee_pos[2]]).T
 
 
     def torque_controller(self, x_des, dx_des=np.zeros(3), ddx_des=np.zeros(3), Kp=None, Kd=None):
@@ -275,7 +289,7 @@ class SawyerEnv(AMLRlEnv):
             ee_wrenches.append(self._sawyer.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._sawyer.get_ee_wrench(local=True))
 
-            # time.sleep(0.1)
+            time.sleep(0.1)
             self.simple_step()
 
         return { 'ee_traj':np.asarray(ee_traj),
@@ -298,18 +312,18 @@ class SawyerEnv(AMLRlEnv):
         """
 
         if show_demo:
-            plot_demo(self._traj2pull, start_idx=0, life_time=0, cid=self._cid)
+            plot_demo(self._traj2follow, start_idx=0, life_time=0, cid=self._cid)
 
 
         if sinusoid:
             ##create sinusoid
-            ori = copy.deepcopy(self._traj2pull)
+            ori = copy.deepcopy(self._traj2follow)
             
             flipped = np.flip(ori,0)
 
-            self._traj2pull = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
+            self._traj2follow = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
 
-        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy)
+        traj_draw = self.fwd_simulate(traj=self._traj2follow, policy=policy)
      
         reward = self.reward(traj_draw)
         
@@ -362,12 +376,30 @@ def main():
     #     data = env.execute_policy(policy=None, show_demo=False, sinusoid=True)
     #     save_data(data, file_name%(k))
     #     env._reset()
+    # [ 0.27109248 -0.77964891  0.34093872  1.84364996 -0.47501838  0.58210338  2.74335966]
 
-    while True:
-        # try:
-        env.simple_step()
-        # except KeyboardInterrupt:
-        #     break
+    # target_pos = np.array(pb.getBasePositionAndOrientation(env._box_ids[len(env._box_ids)-1])[0]) + np.array([0,0.15,0])
+
+    # _, target_ori = env._sawyer.get_ee_pose() 
+
+    data = env.execute_policy(policy=None, show_demo=True, sinusoid=False)
+    # while True:
+    #     try:
+
+    #         # cmd = env._sawyer.inv_kin(target_pos, (2.73469166e-02, 9.99530233e-01, 3.31521029e-04, 1.38329146e-02))
+
+    #         # env._sawyer.set_joint_state(cmd)
+
+    #         # ee_pos, _ = env._sawyer.get_ee_pose()
+
+    #         # print np.linalg.norm(target_pos - ee_pos)
+
+    #         env.simple_step()
+
+    #     except KeyboardInterrupt:
+
+    #         # print "cmd:", cmd
+    #         break
         # raw_input("Press enter to exit")
 
 
