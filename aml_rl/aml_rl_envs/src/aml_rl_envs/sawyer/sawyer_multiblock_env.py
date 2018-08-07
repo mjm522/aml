@@ -46,7 +46,7 @@ class SawyerEnv(AMLRlEnv):
 
             mass += mass_diff
 
-        pb.setGravity(0., 0.,-9.81)
+        pb.setGravity(0., 0., -9.81)
 
         pb.resetBasePositionAndOrientation(self._table_id, [0.5, -0.3, -0.3], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
@@ -121,20 +121,20 @@ class SawyerEnv(AMLRlEnv):
         u_traj = traj['u_list']
 
         num_data = len(desired_traj)
-        penalty_force_traj = np.zeros(num_data)
+        # penalty_force_traj = np.zeros(num_data)
         penalty_u_traj = np.zeros(num_data)
         closeness_traj = np.zeros(num_data)
 
         for k in range(num_data-1):
 
             #it should be sum since des force traj is negative of spring force
-            penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
+            # penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
 
             penalty_u_traj[k] = np.linalg.norm(u_traj[k])
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[-1]) 
 
-        u_force_penalty = self._config['u_weight']*sigmoid(penalty_u_traj) + self._config['f_des_weight']*sigmoid(penalty_force_traj)#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
+        u_force_penalty = self._config['u_weight']*sigmoid(penalty_u_traj) 
 
         goal_penalty =  self._config['goal_weight']*sigmoid(closeness_traj)
 
@@ -143,13 +143,11 @@ class SawyerEnv(AMLRlEnv):
         total_penalty = -np.sum( reward_traj )
 
         self._logger.debug("\n*****************************************************************")
-        self._logger.debug("penalty_force \t %f"%(np.sum(penalty_force_traj),))
         self._logger.debug("u penalty \t %f"%(np.sum(penalty_u_traj),))
         self._logger.debug("goal_penalty \t %f"%(np.sum(closeness_traj),))
         self._logger.debug("*******************************************************************")
 
         self._penalty = {
-                 'force':np.sum(penalty_force_traj),
                  'total':total_penalty,
                  'reward_traj':reward_traj}
 
@@ -169,7 +167,6 @@ class SawyerEnv(AMLRlEnv):
         ee_data_traj = []
         context_list = []
         param_list = []
-        spring_force = []
         u_list = []
 
         # plot_demo(traj, color=[1,0,0], start_idx=0, life_time=0., cid=self._cid)
@@ -180,8 +177,6 @@ class SawyerEnv(AMLRlEnv):
             goal_ori = pb.getQuaternionFromEuler(ee_ori)
 
         for k in range(traj.shape[0]):
-
-            self.virtual_spring()
 
             #for variable impedance, we will have to compute
             #parameters for each time
@@ -263,11 +258,10 @@ class SawyerEnv(AMLRlEnv):
             ee_pos, ee_ori = self._sawyer.get_ee_pose()
 
             ee_traj.append(ee_pos)
-            state_traj.append(self._spring_mean-ee_pos)
-            spring_force.append(copy.deepcopy(self._spring_force))
+            # state_traj.append(self._spring_mean-ee_pos)
+            # spring_force.append(copy.deepcopy(self._spring_force))
 
             state = self._sawyer.state(ori_type = 'eul')
-            state['spring_force'] = self._spring_force
             state['req_traj'] = traj[k, :]
 
             ee_data_traj.append(state)
@@ -290,7 +284,6 @@ class SawyerEnv(AMLRlEnv):
                  'traj':traj,
                  'contact_details':full_contacts_list,
                  'ee_wrenches':np.asarray(ee_wrenches),
-                 'spring_force':np.asarray(spring_force),
                  'ee_wrenches_local':np.asarray(ee_wrenches_local),
                  'other_ee_data':ee_data_traj,
                  'contexts':context_list,
