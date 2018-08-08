@@ -183,8 +183,8 @@ class SawyerEnv(AMLRlEnv):
 
             penalty_u_traj[k] = np.linalg.norm(u_traj[k])
 
-            # closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[-1])
-            closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
+            closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
+            # closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
             
 
         u_penalty = self._config['u_weight']*penalty_u_traj
@@ -211,7 +211,7 @@ class SawyerEnv(AMLRlEnv):
 
         return self._penalty
 
-    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True, explore=True):
+    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True, explore=True, jnt_space = False):
         """
         the part of the code to move the robot along a trajectory
         """
@@ -243,7 +243,11 @@ class SawyerEnv(AMLRlEnv):
             #parameters for each time
             if policy is not None:
                 s = self.context()
+                # w  = np.abs(np.random.randn(7))*100#olicy[k].compute_w(context=s, explore=explore)
                 w  = policy[k].compute_w(context=s, explore=explore)
+
+
+                # print "\n\n\nkps", w 
                 # w = np.zeros(6)
                 
                 # ee_pos, ee_ori = self._sawyer.get_ee_pose()
@@ -257,9 +261,13 @@ class SawyerEnv(AMLRlEnv):
 
                 # Kp =  np.ones(3) + Kp_calc #w[:3]
                 # Kd =  np.ones(3) + np.zeros(3)#w[3:]
+                if jnt_space:
+                    Kp = np.ones(7)*0.001 + w
+                    Kd = None
 
-                Kp =  np.ones(3)*0.01 + w[:3]
-                Kd =  np.ones(3)*0.01 + w[3:]
+                else:
+                    Kp =  np.ones(3)*0.01 + w[:3]
+                    Kd =  np.ones(3)*0.01 + w[3:]
 
                 context_list.append(copy.deepcopy(s))
                 param_list.append(copy.deepcopy(w))
@@ -283,8 +291,12 @@ class SawyerEnv(AMLRlEnv):
                 if Kp is not None:
                     # js_Kp = np.dot(np.linalg.pinv(lin_jac), Kp)
                     # js_Kp = np.dot(m_inv_j_trans[:,:3],Kp)
-                    js_Kp = np.dot(np.dot(lin_jac.T, np.diag(Kp)), lin_jac)
-                    js_Kp = np.clip(js_Kp, 0.01, 10)
+                    if jnt_space:
+                        js_Kp = np.diag(Kp)
+                    else:
+                        js_Kp = np.dot(np.dot(lin_jac.T, np.diag(Kp)), lin_jac)
+
+                    js_Kp = np.clip(js_Kp, 0.001, 10)
                     
                 else:
                     js_Kp = None
@@ -292,29 +304,39 @@ class SawyerEnv(AMLRlEnv):
                 if Kd is not None:
                     # js_Kd = np.dot(np.linalg.pinv(lin_jac), Kd)
                     # js_Kd = np.dot(m_inv_j_trans[:,:3],Kd)
-                    js_Kd = np.dot(np.dot(lin_jac.T, np.diag(Kd)), lin_jac)
+                    if jnt_space:
+                        js_Kd = np.diag(Kd)
+                    else:
+                        js_Kd = np.dot(np.dot(lin_jac.T, np.diag(Kd)), lin_jac)
+
                     js_Kd = np.clip(js_Kd, 0., 10)
 
                 else:
                     js_Kd = None
 
-                self._logger.debug("\n \n EE Param Kp \n {}".format(w[:3]))  
-                self._logger.debug("\n \n EE Kp \n {}".format(Kp))
+                if not jnt_space:
+                    self._logger.debug("\n \n EE Param Kp \n {}".format(w[:3]))  
+                    self._logger.debug("\n \n EE Kp \n {}".format(Kp))
+                    self._logger.debug("\n \n EE Parm Kd \n {}".format(w[3:]))
+                    self._logger.debug("\n \n EE Kd \n {}".format(Kd))
+                    self._logger.debug("\n \n JS Kd \n {}".format(np.diag(js_Kd)))
                 self._logger.debug("\n \n JS Kp \n {}".format(np.diag(js_Kp)))
-                self._logger.debug("\n \n EE Parm Kd \n {}".format(w[3:]))
-                self._logger.debug("\n \n EE Kd \n {}".format(Kd))
-                self._logger.debug("\n \n JS Kd \n {}".format(np.diag(js_Kd)))
                 self._logger.debug("\n#############################################################")
 
                 cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
 
+                # print "\n\n", cmd
+                # raw_input()
                 state = self._sawyer.state(ori_type = 'eul')
+
+                if js_Kd is None:
+                    js_Kd = np.diag(np.ones(7)*10)
 
                 u = np.diag(np.dot(js_Kp, (cmd-state['position'])) + np.dot(js_Kd, (-state['velocity'])))
 
                 u_list.append(u)
 
-                self._sawyer.apply_action(cmd, np.diag(js_Kp), np.diag(js_Kd))
+                self._sawyer.apply_action(cmd, Kp = np.diag(js_Kp), Kd = np.diag(js_Kd))
                 # self._sawyer.apply_action(cmd, np.ones(7)*2, np.ones(7)*2)
             
             elif self._sawyer._ctrl_type == 'torque':
@@ -361,7 +383,7 @@ class SawyerEnv(AMLRlEnv):
                  'params':param_list,
                  'u_list':u_list,}
         
-    def execute_policy(self, policy=None, show_demo=True, sinusoid=False, explore=True):
+    def execute_policy(self, policy=None, show_demo=True, sinusoid=False, explore=True, jnt_space = False):
         """
         this function takes in two arguments
         policy function, here stiffness and damping terms
@@ -380,7 +402,7 @@ class SawyerEnv(AMLRlEnv):
 
             self._traj2pull = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
 
-        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy, explore=explore)
+        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy, explore=explore, jnt_space = jnt_space)
      
         reward = self.reward(traj_draw)
         

@@ -59,12 +59,12 @@ class CREPSOpt():
         self._rewards_history = np.empty([1, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
 
 
-    def add_data(self, sample_no):
+    def add_data(self, sample_no, jnt_space = False):
 
         self._env._reset()
 
         #execute the policy in the environment
-        tau_i, R_sw_i = self._env.execute_policy(self._policy)
+        tau_i, R_sw_i = self._env.execute_policy(self._policy, jnt_space = jnt_space)
 
         for i, (s_i, w_i, R_i) in enumerate(zip(tau_i['contexts'], tau_i['params'], R_sw_i['reward_traj'])):
             #store the data
@@ -155,11 +155,11 @@ class CREPSOpt():
 
 
 
-    def run(self, smooth_policy=False):
+    def run(self, smooth_policy=False, jnt_space = False):
         #main loop
         for k in range(self._num_samples_per_update): #30
 
-            self.add_data(sample_no=k)
+            self.add_data(sample_no=k, jnt_space = jnt_space)
 
             if (self._itr%self._num_policy_updates == 0): #15
 

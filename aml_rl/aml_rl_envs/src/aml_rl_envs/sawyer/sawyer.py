@@ -264,9 +264,10 @@ class Sawyer(AMLRlRobot):
                 self.apply_ctrl(motor, motor_commands[action])
             else:
                 if Kd is None:
-                    self.apply_ctrl(motor, motor_commands[action], Kp[action])
+                    # motor, cmd, cmd_vel=None,  Kp=None, Kd=None
+                    self.apply_ctrl(motor = motor, cmd = motor_commands[action], Kp = Kp[action])
                 else:
-                    self.apply_ctrl(motor, motor_commands[action], Kp[action], Kd[action])
+                    self.apply_ctrl(motor = motor, cmd = motor_commands[action], Kp = Kp[action], Kd = Kd[action])
 
 
     def joint_names(self):
