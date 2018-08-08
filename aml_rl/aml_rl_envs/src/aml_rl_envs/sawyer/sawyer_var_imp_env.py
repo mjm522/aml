@@ -22,6 +22,10 @@ class SawyerEnv(AMLRlEnv):
 
         self.spring_line = None
 
+        self._num_traj_points = self._config['num_traj_points']
+
+        self._reward_gamma = np.asarray([self._config['reward_gamma']**k for k in range(self._num_traj_points)])
+
         self._reset()
 
     def _reset(self, lf=0., sf=0., rf=0., r=0., jnt_pos = None):
@@ -58,9 +62,11 @@ class SawyerEnv(AMLRlEnv):
 
         end_ee = self._spring_base + offset
 
-        self._traj2pull = np.vstack([np.ones(100)*self._spring_base[0],
-                                     np.ones(100)*self._spring_base[1],
-                                     np.linspace(self._spring_base[2], end_ee[2], 100)]).T
+        self._target_point = end_ee
+
+        self._traj2pull = np.vstack([np.ones(self._num_traj_points)*self._spring_base[0],
+                                     np.ones(self._num_traj_points)*self._spring_base[1],
+                                     np.linspace(self._spring_base[2], end_ee[2], self._num_traj_points)]).T
 
         self._des_force_traj = -self._spring_K*(self._spring_mean-self._traj2pull)
 
@@ -160,38 +166,42 @@ class SawyerEnv(AMLRlEnv):
 
         desired_traj = traj['traj']
         true_traj = traj['ee_traj']
-        ee_vel_traj = traj['ee_vel_traj']
-        ee_data_traj = traj['other_ee_data']
+        # ee_vel_traj = traj['ee_vel_traj']
         force_traj = traj['ee_wrenches'][:,:3]
-        torques_traj = traj['ee_wrenches'][:,3:]
+        # torques_traj = traj['ee_wrenches'][:,3:]
         u_traj = traj['u_list']
 
-        num_data = len(desired_traj)
-        penalty_force_traj = np.zeros(num_data)
-        penalty_u_traj = np.zeros(num_data)
-        closeness_traj = np.zeros(num_data)
 
-        for k in range(num_data-1):
+        penalty_force_traj = np.zeros(self._num_traj_points)
+        penalty_u_traj = np.zeros(self._num_traj_points)
+        closeness_traj = np.zeros(self._num_traj_points)
+
+        for k in range(self._num_traj_points-1):
 
             #it should be sum since des force traj is negative of spring force
             penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
 
             penalty_u_traj[k] = np.linalg.norm(u_traj[k])
 
-            closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[-1]) 
+            # closeness_traj[k] =  np.linalg.norm(desired_traj[k]-true_traj[-1])
+            closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
+            
 
-        u_force_penalty = self._config['u_weight']*sigmoid(penalty_u_traj) + self._config['f_des_weight']*sigmoid(penalty_force_traj)#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
+        u_penalty = self._config['u_weight']*penalty_u_traj
 
-        goal_penalty =  self._config['goal_weight']*sigmoid(closeness_traj)
+        force_penalty = self._config['f_des_weight']*penalty_force_traj#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
 
-        reward_traj = u_force_penalty  + goal_penalty
+        goal_penalty =  self._config['goal_weight']*closeness_traj
 
-        total_penalty = -np.sum( reward_traj )
+        reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) )
+
+        total_penalty = np.sum( reward_traj )
 
         self._logger.debug("\n*****************************************************************")
-        self._logger.debug("penalty_force \t %f"%(np.sum(penalty_force_traj),))
-        self._logger.debug("u penalty \t %f"%(np.sum(penalty_u_traj),))
-        self._logger.debug("goal_penalty \t %f"%(np.sum(closeness_traj),))
+        self._logger.debug("penalty_force \t %f"%(np.sum(force_penalty),))
+        self._logger.debug("u penalty \t %f"%(np.sum(u_penalty),))
+        self._logger.debug("goal_penalty \t %f"%(np.sum(goal_penalty),))
+        self._logger.debug("total_penalty \t %f"%(total_penalty),) 
         self._logger.debug("*******************************************************************")
 
         self._penalty = {
@@ -201,7 +211,7 @@ class SawyerEnv(AMLRlEnv):
 
         return self._penalty
 
-    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True):
+    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True, explore=True):
         """
         the part of the code to move the robot along a trajectory
         """
@@ -225,7 +235,7 @@ class SawyerEnv(AMLRlEnv):
         else:
             goal_ori = pb.getQuaternionFromEuler(ee_ori)
 
-        for k in range(traj.shape[0]):
+        for k in range(self._num_traj_points):
 
             self.virtual_spring()
 
@@ -233,7 +243,7 @@ class SawyerEnv(AMLRlEnv):
             #parameters for each time
             if policy is not None:
                 s = self.context()
-                w  = policy.compute_w(context=s)
+                w  = policy[k].compute_w(context=s, explore=explore)
                 # w = np.zeros(6)
                 
                 # ee_pos, ee_ori = self._sawyer.get_ee_pose()
@@ -248,8 +258,8 @@ class SawyerEnv(AMLRlEnv):
                 # Kp =  np.ones(3) + Kp_calc #w[:3]
                 # Kd =  np.ones(3) + np.zeros(3)#w[3:]
 
-                Kp =  np.ones(3) + w[:3]
-                Kd =  np.ones(3) + w[3:]
+                Kp =  np.ones(3)*0.01 + w[:3]
+                Kd =  np.ones(3)*0.01 + w[3:]
 
                 context_list.append(copy.deepcopy(s))
                 param_list.append(copy.deepcopy(w))
@@ -275,7 +285,7 @@ class SawyerEnv(AMLRlEnv):
                     # js_Kp = np.dot(m_inv_j_trans[:,:3],Kp)
                     js_Kp = np.dot(np.dot(lin_jac.T, np.diag(Kp)), lin_jac)
                     js_Kp = np.clip(js_Kp, 0.01, 10)
-                    self._logger.debug("\n \n Kp \t {}".format(np.diag(js_Kp)))
+                    
                 else:
                     js_Kp = None
 
@@ -284,9 +294,17 @@ class SawyerEnv(AMLRlEnv):
                     # js_Kd = np.dot(m_inv_j_trans[:,:3],Kd)
                     js_Kd = np.dot(np.dot(lin_jac.T, np.diag(Kd)), lin_jac)
                     js_Kd = np.clip(js_Kd, 0., 10)
-                    self._logger.debug("\n \n Kd \t {}".format(np.diag(js_Kd)))
+
                 else:
                     js_Kd = None
+
+                self._logger.debug("\n \n EE Param Kp \n {}".format(w[:3]))  
+                self._logger.debug("\n \n EE Kp \n {}".format(Kp))
+                self._logger.debug("\n \n JS Kp \n {}".format(np.diag(js_Kp)))
+                self._logger.debug("\n \n EE Parm Kd \n {}".format(w[3:]))
+                self._logger.debug("\n \n EE Kd \n {}".format(Kd))
+                self._logger.debug("\n \n JS Kd \n {}".format(np.diag(js_Kd)))
+                self._logger.debug("\n#############################################################")
 
                 cmd = self._sawyer.inv_kin(ee_pos=traj[k, :].tolist(), ee_ori=goal_ori)
 
@@ -343,7 +361,7 @@ class SawyerEnv(AMLRlEnv):
                  'params':param_list,
                  'u_list':u_list,}
         
-    def execute_policy(self, policy=None, show_demo=True, sinusoid=False):
+    def execute_policy(self, policy=None, show_demo=True, sinusoid=False, explore=True):
         """
         this function takes in two arguments
         policy function, here stiffness and damping terms
@@ -362,11 +380,11 @@ class SawyerEnv(AMLRlEnv):
 
             self._traj2pull = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
 
-        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy)
+        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy, explore=explore)
      
         reward = self.reward(traj_draw)
         
-        return traj_draw, reward['total'] #traj_draw['contexts'], traj_draw['params'], traj_draw['state_traj'], traj_draw['ee_wrenches_local'][:,:3], reward['reward_traj'], traj_draw
+        return traj_draw, reward #traj_draw['contexts'], traj_draw['params'], traj_draw['state_traj'], traj_draw['ee_wrenches_local'][:,:3], reward['reward_traj'], traj_draw
         
 
     def context(self):

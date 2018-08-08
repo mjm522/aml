@@ -192,8 +192,8 @@ def reps():
 
 def main():
 
-    reps()
-    # test_params()
+    # reps()
+    test_params()
 
 
 if __name__ == '__main__':
