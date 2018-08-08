@@ -16,7 +16,6 @@ from aml_playground.peg_in_hole_reps.utilities.utils import convert_list_str_ft_
 # replay_data_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/sawyer/spring_exp_1/'
 # replay_data_files = ['spring_exp_1.pkl']
 
-
 # replay_data_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/sawyer/replayed_data/data_with_ft_test/'
 # /home/br/catkin_ws/baxter_ws/src/aml/aml_data/aml_lfd/sawyer_replayed_data_ft_set/side2_fw/90deg_04.pkl
 # replay_data_files = ['90deg_03.pkl'#,
@@ -244,9 +243,6 @@ def fit_gmm(force_list):
             print " "
         print int(l/10), best_gmm.predict(data_to_fit[l,:].reshape(1, -1))
 
-
-
-
     print best_gmm.means_.shape
 
     # visualize_3d_gmm(points, best_gmm.weights_, best_gmm.means_.T, np.sqrt(best_gmm.covariances_).T)
@@ -344,11 +340,19 @@ def visualise_data(file_='right2left', show_plots = True): #right2left left2righ
 
             # file_name_traj = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/' + file_ +'_images_traj_' + str(k)+ '.png'
 
-            fig_force = plot_(left_data=np.asarray(f_list[k]),
+            # fig_force = plot_(left_data=np.asarray(f_list[k]),
+            #   right_data=trans_force_list_before_resample[k],
+            #   f_title="force - trans-force",
+            #   p_title=file_name,
+            #   names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+            #   do_clf=False,
+            #   ylabels=['N', 'N'])
+
+            fig_force = plot_(left_data=np.asarray(pos_list[k]),
               right_data=trans_force_list_before_resample[k],
-              f_title="force - trans-force",
+              f_title="force - extension",
               p_title=file_name,
-              names=['Fx', 'tranFx', 'Fy', 'tranFy', 'Fz', 'tranFz'],
+              names=['Fx', 'Px', 'Fy', 'Py', 'Fz', 'Pz'],
               do_clf=False,
               ylabels=['N', 'N'])
 
@@ -362,13 +366,13 @@ def visualise_data(file_='right2left', show_plots = True): #right2left left2righ
             #   l_lpf=True,
             #   r_lpf=True)
 
-            fig_vel = plot_(right_data=np.asarray(ang_vels_list[k]),
-              left_data=np.asarray(lin_vels_list[k]),
-              f_title="lin-vel <=> ang-vel",
-              p_title=file_,
-              names=['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz'],
-              do_clf=False,
-              ylabels=['m/s', 'rad/s'])
+            # fig_vel = plot_(right_data=np.asarray(ang_vels_list[k]),
+            #   left_data=np.asarray(lin_vels_list[k]),
+            #   f_title="lin-vel <=> ang-vel",
+            #   p_title=file_,
+            #   names=['Vx', 'Wx', 'Vy', 'Wy', 'Vz', 'Wz'],
+            #   do_clf=False,
+            #   ylabels=['m/s', 'rad/s'])
 
             # fig_force_re = plot_(right_data=resampled_force_list[k],
             #                   left_data=np.asarray(f_list[k]),
@@ -378,13 +382,13 @@ def visualise_data(file_='right2left', show_plots = True): #right2left left2righ
             #                   do_clf=False,
             #                   ylabels=['N', 'N'])
 
-            fig_pos_re = plot_(right_data=resampled_pos_list[k],
-                              left_data=np.asarray(pos_list[k]),
-                              f_title="sample - resamples - pos",
-                              p_title=file_,
-                              names=['x', 'R-x', 'y', 'R-y', 'z', 'R-z'],
-                              do_clf=False,
-                              ylabels=['m', 'm'])
+            # fig_pos_re = plot_(right_data=resampled_pos_list[k],
+            #                   left_data=np.asarray(pos_list[k]),
+            #                   f_title="sample - resamples - pos",
+            #                   p_title=file_,
+            #                   names=['x', 'R-x', 'y', 'R-y', 'z', 'R-z'],
+            #                   do_clf=False,
+            #                   ylabels=['m', 'm'])
 
             # fig_ori_re = plot_(right_data=resampled_ori_list[k],
             #           left_data=np.asarray(ori_list[k]),
@@ -397,10 +401,11 @@ def visualise_data(file_='right2left', show_plots = True): #right2left left2righ
             # plt.savefig(file_name_force)
             plt.draw()
             plt.pause(0.00001)
-            raw_input()
+            # raw_input()
 
             if (k > 0) and ((k+1)%10==0):
-                plt.close("force - trans-force")
+                raw_input()
+                plt.close("force - extension")
 
 def save_to_csv():
 

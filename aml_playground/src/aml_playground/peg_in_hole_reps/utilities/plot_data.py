@@ -68,3 +68,43 @@ def plot_params(data):
     plt.plot(force_traj[:,2], w_list[:,2])
     
     plt.show()
+
+def xyz_plot(**kwargs):
+    # kwargs['data'] : list of np.arrays of shape [:,3]
+    # kwargs['labels'] : corresponding list of triples for labels. Eg. (['px','py','pz'],['kx','ky','kz'],...)
+    # kwargs['title'] : plot title
+
+
+    data = kwargs['data']
+
+    labelling = False
+
+    if 'labels' in kwargs.keys():
+        labels = kwargs['labels']
+        labelling = True
+
+
+    num_cols = len(data)
+
+    if 'title' in kwargs.keys():
+        plt.figure(kwargs['title'])
+
+    for i in range(num_cols):
+
+        plt.subplot(3, num_cols, i + 0)
+        if labelling:
+            plt.title(labels[i][0])
+        plt.plot(data[i][:,0])
+
+        plt.subplot(3, num_cols, i + num_cols)
+        if labelling:
+            plt.title(labels[i][1])
+        plt.plot(data[i][:,1])
+
+        plt.subplot(3, num_cols, i + 2*num_cols)
+        if labelling:
+            plt.title(labels[i][2])
+        plt.plot(data[i][:,2])
+
+
+
