@@ -2,6 +2,7 @@ import copy
 import itertools
 import numpy as np
 from collections import deque
+from rl_algos.utils.utils import lpf
 from scipy.optimize import fmin_l_bfgs_b
 from rl_algos.utils.utils import logsumexp
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
@@ -26,6 +27,9 @@ class CREPSOpt():
         
         #epsilon in the algorithm
         self._entropy_boud = entropy_bound
+
+        self._time_steps = len(policy)
+
         #initial params
         self._w_init = initial_params
         #pi(w|s) in the algorithm
@@ -39,7 +43,8 @@ class CREPSOpt():
         #to execute the policy
         self._env = env
         #param dim
-        self._w_dim = self._policy._w_dim
+        self._w_dim = self._policy[0]._w_dim
+        self._c_dim = len(self._env.context())
 
         self._min_eta = min_eta
 
@@ -49,38 +54,38 @@ class CREPSOpt():
 
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 
-        self._context_obs_history = deque(maxlen=self._num_samples_per_update)
-        self._policy_w_history = deque(maxlen=self._num_samples_per_update)
-        self._rewards_history = deque(maxlen=self._num_samples_per_update)
+        self._context_obs_history = np.empty([self._c_dim, self._time_steps, self._num_samples_per_update]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+        self._policy_w_history = np.empty([self._w_dim, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+        self._rewards_history = np.empty([1, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
 
 
-    def add_data(self):
+    def add_data(self, sample_no):
 
-        #get the context
-        s_i = self._env.context()
-        #compute policy params for each context
-        w_i = self._policy.compute_w(s_i)
+        self._env._reset()
+
         #execute the policy in the environment
         tau_i, R_sw_i = self._env.execute_policy(self._policy)
 
-        #store the data
-        if self._transform_context:
-            self._context_obs_history.append(self._policy.transform_context(s_i))
-        else:
-            self._context_obs_history.append(s_i)
+        for i, (s_i, w_i, R_i) in enumerate(zip(tau_i['contexts'], tau_i['params'], R_sw_i['reward_traj'])):
+            #store the data
+            if self._transform_context:
+                self._context_obs_history[:, i, sample_no] = self._policy.transform_context(s_i)
+            else:
+                self._context_obs_history[:, i, sample_no] = s_i
             
-        self._policy_w_history.append(w_i)
-        self._rewards_history.append(R_sw_i)
+            self._policy_w_history[:, i, sample_no] = w_i
+
+            self._rewards_history[:, i, sample_no] = R_i
 
         #sample count
         self._itr += 1
 
 
-    def opt_dual_function(self):
+    def opt_dual_function(self, time_step):
 
-        S = np.asarray(self._context_obs_history)
-        w = np.asarray(self._policy_w_history)
-        R = np.asarray(self._rewards_history).flatten()
+        S = self._context_obs_history[:, time_step, :].T
+        w = self._policy_w_history[:, time_step, :].T
+        R = self._rewards_history[:, time_step, :].flatten()
         
         n_samples_per_update = len(R)
 
@@ -118,24 +123,54 @@ class CREPSOpt():
 
         return weights, eta, theta
 
-    def update_policy(self, weights):
+    def update_policy(self, weights, time_step):
 
-        self._policy.fit(weights=weights, 
-                         S=np.asarray(self._context_obs_history), 
-                         B=np.asarray(self._policy_w_history))
+        self._policy[time_step].fit(weights=weights, 
+                                    S=self._context_obs_history[:, time_step, :].T, 
+                                    B=self._policy_w_history[:, time_step, :].T)
+
+    def smooth_policy(self):
+
+        len_policy = len(self._policy)
+        w_r, w_c = self._policy[0]._w.shape
+        s_r, s_c = self._policy[0]._sigma.shape
+        w_traj = np.zeros([w_r, w_c, len_policy])
+        sigma_traj = np.zeros([s_r, s_c, len_policy])
+
+        for k, pol in enumerate(self._policy):
+            w_traj[:,:,k] = pol._w
+            sigma_traj[:,:,k]=pol._sigma
+
+        for r in range(w_r):
+            for c in range(w_c):
+                w_traj[r,c,:] = lpf(w_traj[r,c,:])
+
+        for r in range(s_r):
+            for c in range(s_c):
+                sigma_traj[r,c,:] = lpf(sigma_traj[r,c,:])
+
+        for k in range(len_policy):
+            self._policy[k]._w = w_traj[:,:,k]
+            self._policy[k]._sigma = sigma_traj[:,:,k]
 
 
-    def run(self):
+
+    def run(self, smooth_policy=False):
         #main loop
-        for k in range(self._num_samples_per_update):
+        for k in range(self._num_samples_per_update): #30
 
-            self.add_data()
+            self.add_data(sample_no=k)
 
-            if (self._itr%self._num_policy_updates == 0):
+            if (self._itr%self._num_policy_updates == 0): #15
 
-                weights, eta, theta = self.opt_dual_function()
+                for i in range(self._time_steps):
 
-                self.update_policy(weights)
+                    weights, eta, theta = self.opt_dual_function(time_step=i)
+
+                    self.update_policy(weights=weights, time_step=i)
+
+            if smooth_policy:
+                self.smooth_policy()
 
         return self._policy
 
