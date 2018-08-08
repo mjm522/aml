@@ -1,8 +1,27 @@
 import os
 import copy
 import numpy as np
-from experiment_params import gpreps_params
 from aml_rl_envs.sawyer.config import SAWYER_CONFIG, SAWYER_ENV_CONFIG
+
+gpreps_params = {
+    'w_dim':4,
+    'initial_params': 0. * np.ones(4),
+    'entropy_bound':2.0,
+    'context_dim':3,
+    'context_feature_dim':10,
+    'x_dim':10, #input param dimension of GP
+    'policy_variance':0.03,
+    'random_state':np.random.RandomState(0),
+    'num_policy_updates':25,
+    'num_old_datasets':1,
+    'min_eta':1e-8, 
+    'num_data_to_collect':20, 
+    'num_fake_data':30,
+    'num_samples_per_update':30,
+    'num_samples_fwd_data':50,
+    'w_bounds': np.array([[-0.015, -0.013, 0., 0.],[ 0.015,  0.013, 0., 0.05]])
+}
+
 
 gpreps_params_1 = copy.deepcopy(gpreps_params)
 gpreps_params_1['w_dim'] = 6
