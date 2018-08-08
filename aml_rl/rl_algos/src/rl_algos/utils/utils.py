@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.signal as sig
 from scipy.misc import logsumexp
 #borrowed from https://github.com/rock-learning/bolero/blob/master/bolero/utils/mathext.py
 
@@ -20,3 +21,9 @@ def logsumexp(a, axis=None, b=None):
         out = np.log(np.sum(np.exp(a - a_max), axis=0))
     out += a_max
     return out
+
+
+def lpf(data):
+    b, a = sig.butter(3, 0.05)
+    y = sig.filtfilt(b, a, data)
+    return y
