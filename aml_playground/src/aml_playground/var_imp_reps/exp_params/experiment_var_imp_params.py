@@ -52,6 +52,7 @@ sawyer_env_1['f_des_weight'] = 0.
 sawyer_env_1['u_weight'] = 0.0
 sawyer_env_1['num_traj_points'] = 100
 sawyer_env_1['reward_gamma'] = 0.9
+sawyer_env_1['ramp_traj_flag'] = False
 
 experiment_1 = {
     'experiment_name':'exp_1',

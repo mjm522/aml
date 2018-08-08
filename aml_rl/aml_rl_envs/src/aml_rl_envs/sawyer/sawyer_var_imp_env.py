@@ -46,10 +46,10 @@ class SawyerEnv(AMLRlEnv):
 
         self.configure_spring(self._config['spring_stiffness'])
 
-        self.spring_pull_traj()
+        self.spring_pull_traj(ramp_traj=self._config[''])
 
 
-    def spring_pull_traj(self, offset=np.array([0.,0.,0.5])):
+    def spring_pull_traj(self, offset=np.array([0.,0.,0.5]), ramp_traj=True):
         """
         generate a trajectory to pull the
         spring upwards. The end point is directly above the current point
@@ -64,9 +64,12 @@ class SawyerEnv(AMLRlEnv):
 
         self._target_point = end_ee
 
-        self._traj2pull = np.vstack([np.ones(self._num_traj_points)*self._spring_base[0],
-                                     np.ones(self._num_traj_points)*self._spring_base[1],
-                                     np.linspace(self._spring_base[2], end_ee[2], self._num_traj_points)]).T
+        if ramp_traj:
+            self._traj2pull = np.vstack([np.ones(self._num_traj_points)*self._spring_base[0],
+                                         np.ones(self._num_traj_points)*self._spring_base[1],
+                                         np.linspace(self._spring_base[2], end_ee[2], self._num_traj_points)]).T
+        else:
+            self._traj2pull = np.tile(self._target_point, (self._num_traj_points, 1))
 
         self._des_force_traj = -self._spring_K*(self._spring_mean-self._traj2pull)
 
