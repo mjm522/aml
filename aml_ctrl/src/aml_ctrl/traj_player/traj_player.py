@@ -36,6 +36,8 @@ class TrajPlayer():
                                                data_name_prefix=data_name_prefix,
                                                num_samples_per_file=1, 
                                                record_rate = 100)
+        # import baxter_interface
+        # self._head = baxter_interface.Head()
 
     def player(self):
 
@@ -48,6 +50,8 @@ class TrajPlayer():
         if self._collect_data:
 
             self._record_sample.start_record(task_action={})
+
+        angle = -0.9
 
         while not finished:
 
@@ -78,6 +82,13 @@ class TrajPlayer():
                                        goal_js_acc=goal_js_acc)
 
                 js_pos_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=self._timeout)
+
+                # angle += 0.01
+
+                # if angle >= 0:
+                #     angle = 0.
+
+                # self._head.set_pan(angle, speed=0.1, timeout=0)
 
             t += 1
 

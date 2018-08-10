@@ -46,7 +46,7 @@ class SawyerEnv(AMLRlEnv):
 
         self.configure_spring(self._config['spring_stiffness'])
 
-        self.spring_pull_traj(ramp_traj=self._config[''])
+        self.spring_pull_traj(ramp_traj=self._config['ramp_traj_flag'])
 
 
     def spring_pull_traj(self, offset=np.array([0.,0.,0.5]), ramp_traj=True):
@@ -165,7 +165,7 @@ class SawyerEnv(AMLRlEnv):
         '''
 
         def sigmoid(x):
-            return 1 / (1 + np.exp(-x))
+            return 1. / (1. + np.exp(-x))
 
         desired_traj = traj['traj']
         true_traj = traj['ee_traj']
@@ -179,7 +179,7 @@ class SawyerEnv(AMLRlEnv):
         penalty_u_traj = np.zeros(self._num_traj_points)
         closeness_traj = np.zeros(self._num_traj_points)
 
-        for k in range(self._num_traj_points-1):
+        for k in range(self._num_traj_points):
 
             #it should be sum since des force traj is negative of spring force
             penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
@@ -188,7 +188,13 @@ class SawyerEnv(AMLRlEnv):
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
             # closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
-            
+            if k == self._num_traj_points-1:
+                closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])*self._config['finishing_weight']
+
+            if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.05:
+                print "\n\n\n\n\n\n\nreached goal....\n\n\n\n\n\n\n"
+                closeness_traj[k] = 0.0
+            #     raw_input()
 
         u_penalty = self._config['u_weight']*penalty_u_traj
 
@@ -198,7 +204,11 @@ class SawyerEnv(AMLRlEnv):
 
         reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) )
 
-        total_penalty = np.sum( reward_traj )
+        # import matplotlib.pyplot as plt
+        # plt.plot(reward_traj)
+        # plt.show()
+
+        total_penalty = np.sum( reward_traj ) 
 
         self._logger.debug("\n*****************************************************************")
         self._logger.debug("penalty_force \t %f"%(np.sum(force_penalty),))

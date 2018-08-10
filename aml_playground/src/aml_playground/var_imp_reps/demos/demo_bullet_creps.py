@@ -12,7 +12,7 @@ initial_params = .001 * np.ones(exp_params['gpreps_params']['w_dim'])
 num_policy_updates = 20
 n_samples_per_update = 20
 variance = 0.03
-n_episodes = 160
+n_episodes = 30
 time_steps=100
 
 rewards = []
@@ -21,6 +21,9 @@ env_params = exp_params['env_params']
 env_params['renders'] = False
 
 env = SawyerEnv(env_params)
+
+env_params['renders'] = False
+trail_env = SawyerEnv(env_params)
 
 policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=9, variance=0.03, 
                          initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
@@ -40,11 +43,11 @@ while it < (n_episodes):
 
         print "Episode \t", it
 
-        policy = mycreps.run(smooth_policy=True, jnt_space = True)
+        policy = mycreps.run(smooth_policy=True, jnt_space = False)
 
-        env._reset()
+        trail_env._reset()
 
-        traj_draw, reward = env.execute_policy(policy=policy, explore=False, jnt_space = True)
+        traj_draw, reward = trail_env.execute_policy(policy=policy, explore=False, jnt_space = False)
         
         rewards.append(reward['total'])
 
@@ -61,7 +64,7 @@ while it < (n_episodes):
     except KeyboardInterrupt:
         break
 
-c = raw_input("Save data? (y/N)")
+c = 'y'#raw_input("Save data? (y/N)")
 
 if c == 'y':
     print "Saving to %s"%exp_params['param_file_name']

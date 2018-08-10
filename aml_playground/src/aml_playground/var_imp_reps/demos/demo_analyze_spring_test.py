@@ -9,10 +9,10 @@ from aml_io.io_tools import load_data
 from scipy.interpolate import interp1d
 
 
-file_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_only_X_with_reward_goal_point_cumsum_after_gamma_smooth_policy.pkl'
+file_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_only_x_after_fix_2_extern_Aug_10_2018_04_02_12.pkl'
 
 
-def xyz_plot(data, labels = None, title = None, multiplot = None):
+def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = None):
     ''' 
 
     Args : 
@@ -42,6 +42,11 @@ def xyz_plot(data, labels = None, title = None, multiplot = None):
 
         plt.subplot(3, num_cols, i + 1)
         plt.plot(data[i][:,0])
+
+        if axis_labels is not None:
+            plt.xlabel(axis_labels[i][0][0])
+            plt.ylabel(axis_labels[i][0][1])
+
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,0])
@@ -50,6 +55,11 @@ def xyz_plot(data, labels = None, title = None, multiplot = None):
 
         plt.subplot(3, num_cols, i + num_cols + 1)
         plt.plot(data[i][:,1])
+
+        if axis_labels is not None:
+            plt.xlabel(axis_labels[i][1][0])
+            plt.ylabel(axis_labels[i][1][1])
+
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,1])
@@ -58,6 +68,11 @@ def xyz_plot(data, labels = None, title = None, multiplot = None):
 
         plt.subplot(3, num_cols, i + 2*num_cols + 1)
         plt.plot(data[i][:,2])
+        
+        if axis_labels is not None:
+            plt.xlabel(axis_labels[i][2][0])
+            plt.ylabel(axis_labels[i][2][1])
+
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,2])
@@ -82,8 +97,9 @@ def visualise_data(show_plots = True): #right2left left2right
 
         plotdata = [ee_traj, w_list[:,:3], w_list[:,3:]]
         labels = [['ee_x','ee_y','ee_z'], ['kp_x','kp_y','kp_z'], ['kd_x','kd_y','kd_z']]
-
-        xyz_plot(data = plotdata, labels = labels, multiplot = { 1 : [req_traj] } ,title = "Test Impedance Learning")
+        axis_labels = None
+        
+        xyz_plot(data = plotdata, labels = labels, axis_labels=axis_labels, multiplot = { 1 : [req_traj] } ,title = "Test Impedance Learning")
 
         print i
 
