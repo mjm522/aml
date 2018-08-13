@@ -7,3 +7,6 @@ SAWYER_CONFIG = copy.deepcopy(AML_RL_ROBOT_CONFIG)
 
 SAWYER_ENV_CONFIG['is_discrete'] = False
 SAWYER_ENV_CONFIG['action_repeat'] = 1
+
+SAWYER_ENV_CONFIG['ctrl_type'] = 'pos'
+SAWYER_ENV_CONFIG['ctrl_type'] = 'pos'
