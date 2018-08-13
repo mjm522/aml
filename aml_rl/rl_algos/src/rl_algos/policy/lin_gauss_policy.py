@@ -86,8 +86,7 @@ class LinGaussPolicy():
 
         P = np.diag(weights)
         #equation 12 from paper
-        self._w = np.linalg.pinv(S.T.dot(P).dot(S) + np.eye(S.shape[1]) *
-                                self._gamma).dot(S.T).dot(P).dot(B).T
+        self._w = (np.linalg.pinv(S.T.dot(P).dot(S) + np.eye(S.shape[1])*self._gamma)).dot(S.T).dot(P).dot(B).T
 
     def compute_w(self, context, explore=True, transform=True):
 
