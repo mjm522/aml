@@ -335,7 +335,7 @@ class PointMassEnv():
 
         ee_vel = self._point_mass.get_ee_velocity()[0]
 
-        return np.hstack([ ee_pos, ee_vel]) #, self._point_mass.get_ee_wrench(local=True)[:3] 
+        return np.hstack([ ee_pos, ee_vel, self._spring_force]) #, self._point_mass.get_ee_wrench(local=True)[:3] 
 
 
 class DummyPolicy():

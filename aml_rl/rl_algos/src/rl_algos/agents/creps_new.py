@@ -93,9 +93,22 @@ class CREPSOpt():
         def g(x):  # Objective function
             eta = x[0]
             theta = x[1:]
-            return (eta * self._entropy_boud + theta.T.dot(S.mean(axis=0)) +
-                    eta * logsumexp((R - theta.dot(S.T)) / eta,
-                                    b=1.0 / n_samples_per_update))
+
+            s_mean = S.mean(axis=0)
+            R_over_eta = (R-theta.dot(S.T))/eta
+            log_sum_exp = logsumexp(R_over_eta, b=1.0/n_samples_per_update)
+            Z = np.exp(R_over_eta - R_over_eta.max())
+            Z_sum = Z.sum()
+
+            f = eta*(self._entropy_boud + log_sum_exp) + theta.T.dot(s_mean)
+            d_eta = self._entropy_boud + log_sum_exp - Z.dot(R_over_eta)/Z_sum
+            d_theta = s_mean - Z.dot(S)/Z_sum
+
+            return f, np.append(d_eta, d_theta)
+
+            # return (eta * self._entropy_boud + theta.T.dot(S.mean(axis=0)) +
+            #         eta * logsumexp((R - theta.dot(S.T)) / eta,
+            #                         b=1.0 / n_samples_per_update))
 
         # Lower bound for Lagrange parameters eta and theta
         bounds = np.vstack(([[self._min_eta, None]], np.tile(None, (S.shape[1], 2))))
@@ -104,7 +117,8 @@ class CREPSOpt():
 
         # Perform the actual optimization of the dual function
         #r = NLP(g, x0, lb=lb).solve('ralg', iprint=-10)
-        r = fmin_l_bfgs_b(g, x0, approx_grad=True, bounds=bounds)
+        # r = fmin_l_bfgs_b(g, x0, approx_grad=True, bounds=bounds)
+        r = fmin_l_bfgs_b(g, x0, bounds=bounds)
         # Fetch optimal lagrangian parameter eta. Corresponds to a temperature
         # of a softmax distribution
         eta = r[0][0]
