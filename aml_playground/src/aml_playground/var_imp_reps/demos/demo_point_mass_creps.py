@@ -20,11 +20,11 @@ time_steps=100
 rewards = []
 
 env_params = exp_params['env_params']
-env_params['renders'] = True
+env_params['renders'] = False
 
 env = PointMassEnv(env_params)
 
-env_params['renders'] = False
+env_params['renders'] = True
 trail_env = PointMassEnv(env_params)
 
 policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, 
@@ -65,13 +65,21 @@ while it < (n_episodes):
 
         traj_draw['mean_reward'] = reward['total']
 
+        params = np.asarray(traj_draw['params'])
+
         data.append(traj_draw)
 
         it += 1
 
+        plt.figure(1)
         plt.plot(rewards, 'b')
+
+        plt.figure(2)
+        plt.cla()
+        plt.plot(params[:,2])
         plt.draw()
         plt.pause(0.0001)
+
 
     except KeyboardInterrupt:
         break
