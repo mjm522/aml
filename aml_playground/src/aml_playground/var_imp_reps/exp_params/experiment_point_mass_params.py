@@ -63,8 +63,25 @@ experiment_1 = {
     'param_file_name':os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_smooth_off_1_with_sigmoid.pkl',
 }
 
+#u penalisation
 experiment_2 =  copy.deepcopy(experiment_1)
-experiment_2['env_params']['u_weight'] = 0.001
+experiment_2['env_params']['u_weight'] = 0.0001
 experiment_2['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_smooth_off_2.pkl'
 
-exp_params = experiment_2
+
+#this worked
+experiment_3 =  copy.deepcopy(experiment_1)
+point_mass_env['spring_stiffness'] = 1.0
+experiment_3['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiff1.pkl'
+
+#this worked too
+experiment_4 =  copy.deepcopy(experiment_1)
+point_mass_env['spring_stiffness'] = 2.0
+experiment_4['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif2.pkl'
+
+#this worked too
+experiment_5 =  copy.deepcopy(experiment_1)
+point_mass_env['spring_stiffness'] = 3.0
+experiment_5['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif2.pkl'
+
+exp_params = experiment_5

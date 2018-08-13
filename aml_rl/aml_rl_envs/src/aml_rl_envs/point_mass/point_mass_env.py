@@ -41,13 +41,6 @@ class PointMassEnv():
 
         self._point_mass = PointMass(cid=self._cid, config=POINT_MASS_CONFIG,  scale=0.5)
 
-        # self._table_id = pb.loadURDF(os.path.join(self._config['urdf_root_path'],"table.urdf"), useFixedBase=True, 
-        #                                                    globalScaling=0.5, physicsClientId=self._cid)
-        
-        # pb.resetBasePositionAndOrientation(self._table_id, [0., 0., .1], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
-
-        # pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
-
         self._spring_force = np.zeros(3)
 
         pb.setTimeStep(self._time_step, physicsClientId=self._cid)
@@ -97,10 +90,12 @@ class PointMassEnv():
 
         ee_tip = self._point_mass.get_ee_pose()[0]
 
-        x = np.linalg.norm(self._spring_mean-ee_tip)
+        # x = np.linalg.norm(self._spring_mean-ee_tip)
 
-        force_dir = (self._spring_mean-ee_tip)/x
-        force = self._spring_K*x*force_dir
+        # force_dir = (self._spring_mean-ee_tip)/x
+        # force = self._spring_K*x*force_dir
+
+        force = self._spring_K*(self._spring_mean-ee_tip)
 
         old_line = self._spring_line
         color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
@@ -223,7 +218,7 @@ class PointMassEnv():
 
             self.simple_step()
 
-            # self.virtual_spring()
+            self.virtual_spring()
 
             #for variable impedance, we will have to compute
             #parameters for each time
@@ -260,8 +255,6 @@ class PointMassEnv():
                 u = np.dot(js_Kp, (traj[k, :]-ee_pos)) + np.dot(js_Kd, -ee_vel)
 
                 # print "\n\n\n\n\n\n\n\n",u, "\n\n\n\n\n\n\n"
-
-                # raw_input()
 
                 self._point_mass.apply_action(u=u)
 
