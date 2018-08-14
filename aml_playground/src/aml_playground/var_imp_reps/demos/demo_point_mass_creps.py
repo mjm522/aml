@@ -27,18 +27,18 @@ env = PointMassEnv(env_params)
 env_params['renders'] = True
 trail_env = PointMassEnv(env_params)
 
-policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, 
-                         initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
+# policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, 
+#                          initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
 
-# kp_traj = np.zeros_like(env._des_force_traj)
-# kp_traj[:,2] = env._des_force_traj[:,2]
+kp_traj = np.zeros_like(env._des_force_traj)
+kp_traj[:,2] = env._des_force_traj[:,2]
 
-# kd_traj = np.ones_like(env._des_force_traj)*2
-# kd_traj[:,2] = np.sqrt(env._des_force_traj[:,2])
+kd_traj = np.ones_like(env._des_force_traj)*2
+kd_traj[:,2] = np.sqrt(env._des_force_traj[:,2])
 
-# ctrl_traj = np.hstack([kp_traj,kd_traj])
+ctrl_traj = np.hstack([kp_traj,kd_traj])
 
-# policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params)
+policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params)
 
 mycreps = CREPSOpt(entropy_bound=exp_params['gpreps_params']['entropy_bound'], initial_params=initial_params, num_policy_updates=num_policy_updates, 
                    num_samples_per_update=n_samples_per_update, num_old_datasets=1, 
@@ -65,7 +65,7 @@ while it < (n_episodes):
 
         traj_draw['mean_reward'] = reward['total']
 
-        params = np.asarray(traj_draw['params'])
+        params = np.asarray(traj_draw['u_list'])
 
         data.append(traj_draw)
 

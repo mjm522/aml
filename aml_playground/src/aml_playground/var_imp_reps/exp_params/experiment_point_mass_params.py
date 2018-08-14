@@ -93,9 +93,11 @@ experiment_6['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_wo
 
 experiment_7 =  copy.deepcopy(experiment_1)
 experiment_7['env_params']['spring_stiffness'] = 3.0
-experiment_7['env_params']['reward_gamma'] = .99
+experiment_7['env_params']['reward_gamma'] = 1.
 experiment_7['env_params']['ramp_traj_flag'] = True
-experiment_7['env_params']['u_weight'] = 0.01
+experiment_7['env_params']['u_weight'] = 0.1
+experiment_7['env_params']['goal_weight'] = 0.5
+experiment_7['gpreps_params']['entropy_bound'] = 0.
 experiment_7['gpreps_params']['context_dim'] = 9
 experiment_7['gpreps_params']['context_feature_dim'] = 9
 experiment_7['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_2.pkl'

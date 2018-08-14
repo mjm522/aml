@@ -45,6 +45,8 @@ class PointMassEnv():
 
         pb.setTimeStep(self._time_step, physicsClientId=self._cid)
 
+        self._spring_force_old = np.zeros(3)
+
         self.simple_step()
 
         self.configure_spring(self._config['spring_stiffness'])
@@ -228,7 +230,8 @@ class PointMassEnv():
                 # const = 12
                 # w  = np.abs(np.random.randn(6))*100
                 #np.hstack([np.ones(3)*const, 0.01*np.ones(3)*np.sqrt(const)])#np.abs(np.random.randn(6))*0.001
-                w  = np.multiply(tmp, policy[k].compute_w(context=s, explore=explore))
+                w_tmp = policy[k].compute_w(context=s, explore=explore)
+                w  = np.multiply(tmp, w_tmp)
                 # print w
 
                 Kp =  w[:3]#np.ones(3)*1 + w[:3]
@@ -265,12 +268,16 @@ class PointMassEnv():
 
             ee_pos, ee_ori = state['ee_point'], state['ee_ori']
 
+            # print "new \t", np.round(self._spring_force,3)
+            # print "old \t", np.round(s[6:], 3)
+
+            # raw_input()
+
             # print "ee_pos \t", ee_pos
 
             context_list.append(copy.deepcopy(s))
-            param_list.append(copy.deepcopy(w))
-
-            u_list.append(u)
+            param_list.append(copy.deepcopy(u))
+            u_list.append(w_tmp)
             ee_traj.append(copy.deepcopy(ee_pos))
             state_traj.append(self._spring_mean-ee_pos)
             spring_force.append(copy.deepcopy(self._spring_force))
@@ -335,7 +342,11 @@ class PointMassEnv():
 
         ee_vel = self._point_mass.get_ee_velocity()[0]
 
-        return np.hstack([ ee_pos, ee_vel, self._spring_force]) #, self._point_mass.get_ee_wrench(local=True)[:3] 
+        s = np.hstack([ ee_pos, ee_vel, self._spring_force_old])
+
+        self._spring_force_old = self._spring_force
+
+        return s #, self._point_mass.get_ee_wrench(local=True)[:3] 
 
 
 class DummyPolicy():
