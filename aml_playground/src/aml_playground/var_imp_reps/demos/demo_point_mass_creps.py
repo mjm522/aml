@@ -14,7 +14,7 @@ initial_params = .001 * np.ones(exp_params['gpreps_params']['w_dim'])
 num_policy_updates = 20
 n_samples_per_update = 20
 variance = 0.03
-n_episodes = 30
+n_episodes = 1000
 time_steps=100
 
 rewards = []
@@ -24,7 +24,7 @@ env_params['renders'] = False
 
 env = PointMassEnv(env_params)
 
-env_params['renders'] = True
+env_params['renders'] = False
 trail_env = PointMassEnv(env_params)
 
 # policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, 
@@ -38,7 +38,10 @@ kd_traj[:,2] = np.sqrt(env._des_force_traj[:,2])
 
 ctrl_traj = np.hstack([kp_traj,kd_traj])
 
-policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params)
+policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params, set_frm_data=True)
+
+w_list = np.zeros([6,9,time_steps])
+sigma_list = np.zeros([6,6,time_steps])
 
 mycreps = CREPSOpt(entropy_bound=exp_params['gpreps_params']['entropy_bound'], initial_params=initial_params, num_policy_updates=num_policy_updates, 
                    num_samples_per_update=n_samples_per_update, num_old_datasets=1, 
@@ -65,24 +68,44 @@ while it < (n_episodes):
 
         traj_draw['mean_reward'] = reward['total']
 
-        params = np.asarray(traj_draw['u_list'])
+        params = np.asarray(traj_draw['params'])
+
+        ee_traj = np.asarray(traj_draw['ee_traj'])
+
+        req_traj = np.asarray(traj_draw['traj'])
 
         data.append(traj_draw)
 
         it += 1
 
-        plt.figure(1)
+        plt.figure('Reward')
         plt.plot(rewards, 'b')
 
-        plt.figure(2)
+        plt.figure('Kp')
         plt.cla()
         plt.plot(params[:,2])
+
+        plt.figure('Traj')
+        plt.cla()
+        plt.plot(req_traj[:,2], 'r')
+        plt.plot(ee_traj[:,2], 'g')
+
         plt.draw()
         plt.pause(0.0001)
 
 
+
+
     except KeyboardInterrupt:
         break
+
+for k in range(time_steps):
+    w_list[:,:,k] = policy[k]._w
+    sigma_list[:,:,k] = policy[k]._sigma
+
+
+data[-1]['last_w_list'] = w_list
+data[-1]['last_sigma_list'] = sigma_list
 
 c = 'y'#raw_input("Save data? (y/N)")
 

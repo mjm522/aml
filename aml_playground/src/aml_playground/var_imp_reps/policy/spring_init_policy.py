@@ -1,10 +1,12 @@
+import os
 import numpy as np
+from aml_io.io_tools import load_data
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 
 np.random.seed(123)
 random_state = np.random.RandomState(0)
 
-def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params):
+def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params, set_frm_data=False):
 
     num_steps = given_traj.shape[0]
 
@@ -18,21 +20,30 @@ def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params
     state_matrix = np.hstack([given_traj,vel,given_force_traj])
 
     policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=9, variance=0.03, 
-                         initial_params=.001 * np.ones(exp_params['gpreps_params']['w_dim']), bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(num_steps)]
+                         initial_params=.001 * np.ones(exp_params['gpreps_params']['w_dim']), bounds=exp_params['gpreps_params']['w_bounds'],   random_state=random_state, transform=False) for _ in range(num_steps)]
+
+    if set_frm_data:
+        data = load_data(os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_7.pkl')
 
     for i in range(num_steps):
 
-        s = np.reshape(state_matrix[i,:],[state_dim,1])
-        f = np.reshape(given_ctrl_traj[i,:], [ctrl_dim,1])
+        if not set_frm_data:
 
-        # print np.dot(s,s.T)
+            s = np.reshape(state_matrix[i,:],[state_dim,1])
+            f = np.reshape(given_ctrl_traj[i,:], [ctrl_dim,1])
 
-        s_st_inv = np.linalg.pinv(np.dot(s,s.T))
+            # print np.dot(s,s.T)
 
-        policy_seq[i,:] = np.dot(f, np.dot(s.T, s_st_inv))
+            s_st_inv = np.linalg.pinv(np.dot(s,s.T))
 
-        policy[i]._w = policy_seq[i,:]
-        policy[i]._sigma = np.eye(exp_params['gpreps_params']['w_dim'])*0.1
+            policy_seq[i,:] = np.dot(f, np.dot(s.T, s_st_inv))
+
+            policy[i]._w = policy_seq[i,:]
+            policy[i]._sigma = np.eye(exp_params['gpreps_params']['w_dim'])*0.1
+
+        else:
+            policy[i]._w = data[-1]['last_w_list'][:,:,i]
+            policy[i]._sigma = data[-1]['last_sigma_list'][:,:,i]
 
     return policy
 

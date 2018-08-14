@@ -130,8 +130,9 @@ class PointMassEnv():
         # ee_vel_traj = traj['ee_vel_traj']
         force_traj = traj['ee_wrenches'][:,:3]
         # torques_traj = traj['ee_wrenches'][:,3:]
-        u_traj = traj['u_list']
+        u_traj = np.asarray(traj['u_list'])
 
+        delta_u_traj = np.diff(u_traj, 0)
 
         # import matplotlib.pyplot as plt
         # plt.subplot(3,1,1)
@@ -147,6 +148,7 @@ class PointMassEnv():
 
         penalty_force_traj = np.zeros(self._num_traj_points)
         penalty_u_traj = np.zeros(self._num_traj_points)
+        penalty_delta_u_traj = np.zeros(self._num_traj_points)
         closeness_traj = np.zeros(self._num_traj_points)
 
         for k in range(self._num_traj_points):
@@ -154,7 +156,9 @@ class PointMassEnv():
             #it should be sum since des force traj is negative of spring force
             penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
 
-            penalty_u_traj[k] = np.linalg.norm(u_traj[k])
+            penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
+
+            penalty_delta_u_traj[k] = np.linalg.norm(delta_u_traj[k,:])
 
             closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
             # closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
@@ -167,11 +171,13 @@ class PointMassEnv():
 
         u_penalty = self._config['u_weight']*penalty_u_traj
 
+        delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
+
         force_penalty = self._config['f_des_weight']*penalty_force_traj#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
 
         goal_penalty =  self._config['goal_weight']*closeness_traj
 
-        reward_traj = -sigmoid(np.cumsum( np.multiply( (u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ))
+        reward_traj = -sigmoid(np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ))
 
         # import matplotlib.pyplot as plt
         # plt.plot(reward_traj)
@@ -182,6 +188,7 @@ class PointMassEnv():
         self._logger.debug("\n*****************************************************************")
         self._logger.debug("penalty_force \t %f"%(np.sum(force_penalty),))
         self._logger.debug("u penalty \t %f"%(np.sum(u_penalty),))
+        self._logger.debug("delta_u penalty \t %f"%(np.sum(delta_u_penalty),))
         self._logger.debug("goal_penalty \t %f"%(np.sum(goal_penalty),))
         self._logger.debug("total_penalty \t %f"%(total_penalty),) 
         self._logger.debug("*******************************************************************")
@@ -276,8 +283,8 @@ class PointMassEnv():
             # print "ee_pos \t", ee_pos
 
             context_list.append(copy.deepcopy(s))
-            param_list.append(copy.deepcopy(u))
-            u_list.append(w_tmp)
+            param_list.append(copy.deepcopy(w_tmp))
+            u_list.append(u)
             ee_traj.append(copy.deepcopy(ee_pos))
             state_traj.append(self._spring_mean-ee_pos)
             spring_force.append(copy.deepcopy(self._spring_force))
