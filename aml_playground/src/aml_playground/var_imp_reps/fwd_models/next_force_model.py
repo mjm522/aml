@@ -12,9 +12,9 @@ class NextForcePredictModel():
     def fit(self, X=None, Y=None):
         pass
 
-    def predict_force(self, x_t_plus1, x_t):
+    def predict_force(self, spring_mean, x_t):
         """
         send in next state
         """
 
-        return -self._K*(x_t_plus1-x_t)
+        return self._K*(spring_mean-x_t)

@@ -34,6 +34,11 @@ class PointMass():
 
         pb.resetBasePositionAndOrientation(self._robot_id, self._base_pos, self._base_ori, physicsClientId=self._cid)
 
+        tmp_id = pb.loadURDF(join(self._config['urdf_root_path'],"box2.urdf"), globalScaling=self._scale, 
+                                                                  useFixedBase=False, physicsClientId=self._cid)
+
+        pb.resetBasePositionAndOrientation(tmp_id, (0.,0.,1.03), self._base_ori, physicsClientId=self._cid)
+
 
     def simple_step(self):
         pb.stepSimulation(physicsClientId=self._cid)

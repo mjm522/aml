@@ -6,7 +6,7 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 np.random.seed(123)
 random_state = np.random.RandomState(0)
 
-def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params, set_frm_data=False):
+def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params, set_frm_data=None):
 
     num_steps = given_traj.shape[0]
 
@@ -22,12 +22,12 @@ def create_init_policy(given_traj, given_force_traj, given_ctrl_traj, exp_params
     policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=9, variance=0.03, 
                          initial_params=.001 * np.ones(exp_params['gpreps_params']['w_dim']), bounds=exp_params['gpreps_params']['w_bounds'],   random_state=random_state, transform=False) for _ in range(num_steps)]
 
-    if set_frm_data:
-        data = load_data(os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_7.pkl')
+    if set_frm_data is not None:
+        data = load_data(set_frm_data)
 
     for i in range(num_steps):
 
-        if not set_frm_data:
+        if  set_frm_data is None:
 
             s = np.reshape(state_matrix[i,:],[state_dim,1])
             f = np.reshape(given_ctrl_traj[i,:], [ctrl_dim,1])

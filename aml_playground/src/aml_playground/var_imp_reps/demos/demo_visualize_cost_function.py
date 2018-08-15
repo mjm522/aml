@@ -10,7 +10,7 @@ from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import 
 
 
 env_params = exp_params['env_params']
-env_params['renders'] = False
+env_params['renders'] = True
 
 env = PointMassEnv(env_params)
 
@@ -32,7 +32,7 @@ class DummyPolicy():
         # Kp = 0.6;
         # Kd = 0.8;
         # self._w_list = np.tile( np.hstack([np.ones(3)*Kp, np.ones(3)*Kd]) , (200, 1) )
-        tmp = np.array([ 1./1000.,  1./1000., 1./1000.,  1./np.sqrt(1000.),  1./np.sqrt(1000.),  1./np.sqrt(1000.)])
+        tmp = np.ones(6) #np.array([ 1./1000.,  1./1000., 1./1000.,  1./np.sqrt(1000.),  1./np.sqrt(1000.),  1./np.sqrt(1000.)])
         self._w_list = np.multiply(data[-1]['params'][t], tmp)
 
     def compute_w(self, context, explore):
@@ -58,8 +58,8 @@ axis_labels =[ [ ['steps', 'm'], ['steps', 'm'] , ['steps', 'm']  ],
 
 mean_reward = [data[i]['mean_reward']  for i in range(len(data))]
 
-plt.figure()
-xyz_plot(data=plotdata, labels=labels, axis_labels=axis_labels, multiplot={ 1 : [req_traj] } ,title="Test Impedance Learning with 2 external stiffness")
+# plt.figure()
+# xyz_plot(data=plotdata, labels=labels, axis_labels=axis_labels, multiplot={ 1 : [req_traj] } ,title="Test Impedance Learning with 2 external stiffness")
 
 # param_traj_kp = np.zeros(len(w_list))
 # param_traj_kd = np.zeros(len(w_list))

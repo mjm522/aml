@@ -32,7 +32,8 @@ def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = 
         assert len(labels) == num_cols
 
     if title is not None:
-        plt.figure(title)
+        plt.figure(figsize=(20,10))
+        plt.title(title)
 
     multiplotting = False
     if multiplot is not None:
@@ -42,6 +43,8 @@ def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = 
 
         plt.subplot(3, num_cols, i + 1)
         plt.plot(data[i][:,0])
+        # plt.xlim([0,100])
+        # plt.ylim([0,1])
 
         if axis_labels is not None:
             plt.xlabel(axis_labels[i][0][0])
@@ -50,11 +53,15 @@ def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = 
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,0])
+                # plt.xlim([0,100])
+                # plt.ylim([0,1])
         if labelling:
             plt.title(labels[i][0])
 
         plt.subplot(3, num_cols, i + num_cols + 1)
         plt.plot(data[i][:,1])
+        # plt.xlim([0,100])
+        # plt.ylim([0,1])
 
         if axis_labels is not None:
             plt.xlabel(axis_labels[i][1][0])
@@ -63,11 +70,15 @@ def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = 
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,1])
+                # plt.xlim([0,100])
+                # plt.ylim([0,1])
         if labelling:
             plt.title(labels[i][1])
 
         plt.subplot(3, num_cols, i + 2*num_cols + 1)
         plt.plot(data[i][:,2])
+        # plt.xlim([0,100])
+        # plt.ylim([0,1])
         
         if axis_labels is not None:
             plt.xlabel(axis_labels[i][2][0])
@@ -76,6 +87,8 @@ def xyz_plot(data, labels = None, axis_labels = None, title = None, multiplot = 
         if multiplotting == True and i+1 in multiplot.keys():
             for j in range(len(multiplot[i+1])):
                 plt.plot(multiplot[i+1][j][:,2])
+                # plt.xlim([0,100])
+                # plt.ylim([0,1])
         if labelling:
             plt.title(labels[i][2])
 

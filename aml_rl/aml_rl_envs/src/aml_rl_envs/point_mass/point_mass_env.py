@@ -27,6 +27,10 @@ class PointMassEnv():
 
         self._cid = setup_bullet_visualizer(self._config['renders'])
 
+        self._force_predict_model = self._config['force_predict_model']
+
+        self._param_scale = self._config['param_scale']
+
         pb.setGravity(0,0,0., physicsClientId=self._cid)
 
         self._reset()
@@ -99,13 +103,13 @@ class PointMassEnv():
 
         force = self._spring_K*(self._spring_mean-ee_tip)
 
-        old_line = self._spring_line
-        color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
-        self._spring_line = pb.addUserDebugLine(self._spring_mean, ee_tip, lifeTime=0,
-                            lineColorRGB=[color, 1-color, 0], lineWidth=12,
-                            physicsClientId=self._cid)
-        if old_line is not None:
-            pb.removeUserDebugItem(old_line)
+        # old_line = self._spring_line
+        # color = np.linalg.norm(force) / float(max_expected_force) # safe to exceed 1.0
+        # self._spring_line = pb.addUserDebugLine(self._spring_mean, ee_tip, lifeTime=0,
+        #                     lineColorRGB=[color, 1-color, 0], lineWidth=12,
+        #                     physicsClientId=self._cid)
+        # if old_line is not None:
+        #     pb.removeUserDebugItem(old_line)
 
         pb.applyExternalForce(objectUniqueId=self._point_mass._robot_id,
                               linkIndex=-1,
@@ -177,7 +181,11 @@ class PointMassEnv():
 
         goal_penalty =  self._config['goal_weight']*closeness_traj
 
-        reward_traj = -sigmoid(np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ))
+        if self._config['enable_sigmoid']:
+
+            reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) )
+        else:
+            reward_traj = -np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) 
 
         # import matplotlib.pyplot as plt
         # plt.plot(reward_traj)
@@ -221,11 +229,7 @@ class PointMassEnv():
         else:
             goal_ori = pb.getQuaternionFromEuler(ee_ori)
 
-        tmp = np.array([ 1000.,  1000., 1000.,  np.sqrt(1000.),  np.sqrt(1000.),  np.sqrt(1000.)])
-
         for k in range(self._num_traj_points):
-
-            self.simple_step()
 
             self.virtual_spring()
 
@@ -238,7 +242,7 @@ class PointMassEnv():
                 # w  = np.abs(np.random.randn(6))*100
                 #np.hstack([np.ones(3)*const, 0.01*np.ones(3)*np.sqrt(const)])#np.abs(np.random.randn(6))*0.001
                 w_tmp = policy[k].compute_w(context=s, explore=explore)
-                w  = np.multiply(tmp, w_tmp)
+                w  = np.multiply(self._param_scale, w_tmp)
                 # print w
 
                 Kp =  w[:3]#np.ones(3)*1 + w[:3]
@@ -266,7 +270,12 @@ class PointMassEnv():
 
                 # print "\n\n\n\n\n\n\n\n",u, "\n\n\n\n\n\n\n"
 
-                self._point_mass.apply_action(u=u)
+                if self._force_predict_model is not None:
+                    u_fwd = -self._force_predict_model.predict_force(spring_mean=self._spring_mean, x_t=ee_pos)
+                else:
+                    u_fwd = np.zeros(3)
+
+                self._point_mass.apply_action(u=u+u_fwd)
 
             else:
                 js_Kp, js_Kd = None, None
@@ -298,6 +307,8 @@ class PointMassEnv():
 
             ee_wrenches.append(self._point_mass.get_ee_wrench(local=False))
             ee_wrenches_local.append(self._point_mass.get_ee_wrench(local=True))
+
+            self.simple_step()
 
         # raw_input()
 
