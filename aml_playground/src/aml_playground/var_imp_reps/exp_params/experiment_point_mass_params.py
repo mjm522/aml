@@ -113,8 +113,8 @@ experiment_7['start_policy'] = os.environ['AML_DATA'] + '/aml_playground/imp_wor
 experiment_7['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_11_with_all_weighting.pkl'
 
 experiment_8 =  copy.deepcopy(experiment_1)
-param_scale = 5.
-kd_scale = 0.
+param_scale = 100.
+kd_scale = 1.
 experiment_8['env_params']['spring_stiffness'] = 3.0
 experiment_8['env_params']['reward_gamma'] = 1.
 experiment_8['env_params']['ramp_traj_flag'] = False

@@ -20,7 +20,7 @@ time_steps=100
 rewards = []
 
 env_params = exp_params['env_params']
-env_params['renders'] = True
+env_params['renders'] = False
 
 env = PointMassEnv(env_params)
 
