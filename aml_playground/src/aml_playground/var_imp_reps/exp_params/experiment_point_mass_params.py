@@ -113,6 +113,7 @@ experiment_7['start_policy'] = os.environ['AML_DATA'] + '/aml_playground/imp_wor
 experiment_7['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_11_with_all_weighting.pkl'
 
 experiment_8 =  copy.deepcopy(experiment_1)
+param_scale = 5.
 kd_scale = 0.
 experiment_8['env_params']['spring_stiffness'] = 3.0
 experiment_8['env_params']['reward_gamma'] = 1.
@@ -125,7 +126,7 @@ experiment_8['gpreps_params']['entropy_bound'] = 2.
 experiment_8['gpreps_params']['context_dim'] = 9
 experiment_8['gpreps_params']['context_feature_dim'] = 9
 experiment_8['env_params']['enable_sigmoid'] = False
-experiment_8['env_params']['param_scale'] = np.array([ 5., 5., 5., kd_scale*np.sqrt(5.),  kd_scale*np.sqrt(5.),  kd_scale*np.sqrt(5.)])
+experiment_8['env_params']['param_scale'] = np.array([ param_scale, param_scale, param_scale, kd_scale*np.sqrt(param_scale),  kd_scale*np.sqrt(param_scale),  kd_scale*np.sqrt(param_scale)])
 experiment_8['env_params']['force_predict_model'] = NextForcePredictModel(spring_k=experiment_8['env_params']['spring_stiffness'])
 experiment_8['start_policy'] = None#os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_spring_stiif5_6.pkl'
 experiment_8['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_exp_7_2_with_all_weighting.pkl'
