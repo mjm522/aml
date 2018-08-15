@@ -67,6 +67,8 @@ experiment_1 = {
     'max_itr':100,
     'gpreps_params':gpreps_params_1,
     'env_params':point_mass_env,
+    'n_episodes':60,
+    'time_steps':100,
     'param_file_name':os.environ['AML_DATA'] + '/aml_playground/imp_worlds/creps_data_point_mass_smooth_off_1_with_sigmoid.pkl',
 }
 
@@ -115,6 +117,7 @@ experiment_7['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_wo
 experiment_8 =  copy.deepcopy(experiment_1)
 param_scale = 100.
 kd_scale = 1.
+experiment_8['n_episodes']=1000
 experiment_8['env_params']['spring_stiffness'] = 3.0
 experiment_8['env_params']['reward_gamma'] = 1.
 experiment_8['env_params']['ramp_traj_flag'] = False

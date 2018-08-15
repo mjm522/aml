@@ -14,8 +14,7 @@ initial_params = .001 * np.ones(exp_params['gpreps_params']['w_dim'])
 num_policy_updates = 20
 n_samples_per_update = 20
 variance = 0.03
-n_episodes = 60
-time_steps=100
+time_steps=exp_params['time_steps']
 
 rewards = []
 
@@ -50,7 +49,7 @@ plt.ion()
 data = []
 
 it = 0
-while it < (n_episodes):
+while it < (exp_params['n_episodes']):
 
     try:
 
