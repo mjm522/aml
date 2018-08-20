@@ -96,8 +96,8 @@ class LinGaussPolicy():
             context_feature = context
 
         if explore:
-            w =  self._random_state.multivariate_normal(
-                self._w.dot(context_feature), self._sigma, size=[1])[0]
+            w =  np.abs(self._random_state.multivariate_normal(
+                self._w.dot(context_feature), self._sigma, size=[1])[0])
         else:
             w = self._w.dot(context_feature)
 
@@ -109,12 +109,16 @@ class LinGaussPolicy():
         return w
 
     def scale_w(self, w):
+
+        return w
         
-        return np.multiply(self._scaling, w)
+        # return np.multiply(self._scaling, w)
 
     def inv_scale_w(self, w):
 
-        return np.multiply(self._inv_scaling, w)
+        return w
+
+        # return np.multiply(self._inv_scaling, w)
 
     def featurize_context(self):
 

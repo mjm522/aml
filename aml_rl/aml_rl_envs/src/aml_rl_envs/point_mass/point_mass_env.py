@@ -134,7 +134,7 @@ class PointMassEnv():
         # ee_vel_traj = traj['ee_vel_traj']
         force_traj = traj['ee_wrenches'][:,:3]
         # torques_traj = traj['ee_wrenches'][:,3:]
-        u_traj = np.asarray(traj['u_list'])
+        u_traj = np.asarray(traj['params'])
 
         delta_u_traj = np.diff(u_traj, 0)
 
@@ -158,7 +158,7 @@ class PointMassEnv():
         for k in range(self._num_traj_points):
 
             #it should be sum since des force traj is negative of spring force
-            penalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
+            # p enalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
 
             penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
 
@@ -177,24 +177,30 @@ class PointMassEnv():
 
         delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
 
-        force_penalty = self._config['f_des_weight']*penalty_force_traj#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
+        # force_penalty = self._config['f_des_weight']*penalty_force_traj#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
 
         goal_penalty =  self._config['goal_weight']*closeness_traj
 
         if self._config['enable_sigmoid']:
 
-            reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) )
-        else:
-            reward_traj = -np.cumsum( np.multiply( (u_penalty + delta_u_penalty + force_penalty  + goal_penalty), self._reward_gamma ) ) 
+            u_reward_traj = -sigmoid(np.multiply( u_penalty, self._reward_gamma ) )
+            delta_u_reward_traj = -sigmoid(np.multiply(delta_u_penalty, self._reward_gamma ) )
+            goal_reward_traj = -sigmoid(np.multiply( goal_penalty, self._reward_gamma ) )
+            reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
 
-        # import matplotlib.pyplot as plt
-        # plt.plot(reward_traj)
-        # plt.show()
+            # reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + delta_u_penalty  + goal_penalty), self._reward_gamma ) ) )
+            # delta_u_reward_traj = -np.cumsum( np.multiply(delta_u_penalty, self._reward_gamma ) )
+            # goal_reward_traj = -np.cumsum( np.multiply( goal_penalty, self._reward_gamma ) )
+            # reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
+        else:
+            u_reward_traj = -np.multiply( u_penalty, self._reward_gamma ) 
+            delta_u_reward_traj = -np.multiply(delta_u_penalty, self._reward_gamma ) 
+            goal_reward_traj = -np.multiply( goal_penalty, self._reward_gamma ) 
+            reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
 
         total_penalty = np.sum( reward_traj ) 
 
         self._logger.debug("\n*****************************************************************")
-        self._logger.debug("penalty_force \t %f"%(np.sum(force_penalty),))
         self._logger.debug("u penalty \t %f"%(np.sum(u_penalty),))
         self._logger.debug("delta_u penalty \t %f"%(np.sum(delta_u_penalty),))
         self._logger.debug("goal_penalty \t %f"%(np.sum(goal_penalty),))
@@ -204,6 +210,9 @@ class PointMassEnv():
         self._penalty = {
                  'force':np.sum(penalty_force_traj),
                  'total':total_penalty,
+                 'u_reward_traj':u_reward_traj,
+                 'delta_u_reward_traj':delta_u_reward_traj,
+                 'goal_reward_traj':goal_reward_traj,
                  'reward_traj':reward_traj}
 
         return self._penalty

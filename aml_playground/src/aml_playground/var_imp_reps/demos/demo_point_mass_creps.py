@@ -1,8 +1,10 @@
 import numpy as np
+import tensorflow as tf
 import matplotlib.pyplot as plt
 from rl_algos.agents.creps_new import CREPSOpt
 from aml_io.io_tools import save_data, load_data
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
+from rl_algos.policy.neural_network_policy import NeuralNetPolicy
 from aml_rl_envs.point_mass.point_mass_env import PointMassEnv
 from aml_playground.var_imp_reps.policy.spring_init_policy import create_init_policy
 from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
@@ -26,18 +28,21 @@ env = PointMassEnv(env_params)
 env_params['renders'] = False
 trail_env = PointMassEnv(env_params)
 
-# policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, 
-#                          initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
+sess=tf.Session()
 
-kp_traj = np.zeros_like(env._des_force_traj)
-kp_traj[:,2] = env._des_force_traj[:,2]
+policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, covariance_scale=1.0, initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
 
-kd_traj = np.ones_like(env._des_force_traj)*2
-kd_traj[:,2] = np.sqrt(env._des_force_traj[:,2])
+# policy = [ NeuralNetPolicy(sess=sess, w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], bounds=exp_params['gpreps_params']['w_bounds'], learning_rate=0.01, scope="policy_estimator_%s"%i) for i in range(time_steps)]
 
-ctrl_traj = np.hstack([kp_traj,kd_traj])
+# kp_traj = np.zeros_like(env._des_force_traj)
+# kp_traj[:,2] = env._des_force_traj[:,2]
 
-policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params, set_frm_data=exp_params['start_policy'])
+# kd_traj = np.ones_like(env._des_force_traj)*2
+# kd_traj[:,2] = np.sqrt(env._des_force_traj[:,2])
+
+# ctrl_traj = np.hstack([kp_traj,kd_traj])
+
+# policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params, set_frm_data=exp_params['start_policy'])
 
 w_list = np.zeros([6,9,time_steps])
 sigma_list = np.zeros([6,6,time_steps])
@@ -55,7 +60,7 @@ while it < (exp_params['n_episodes']):
 
         print "Episode \t", it
 
-        policy = mycreps.run(smooth_policy=False, jnt_space=False)
+        policy = mycreps.run(smooth_policy=exp_params['smooth_policy'], jnt_space=False)
 
         trail_env._reset()
 
@@ -66,6 +71,8 @@ while it < (exp_params['n_episodes']):
         traj_draw['mean_reward'] = reward['total']
 
         params = np.asarray(traj_draw['params'])
+
+        u_list = np.asarray(traj_draw['u_list'])
 
         ee_traj = np.asarray(traj_draw['ee_traj'])
 
@@ -78,14 +85,42 @@ while it < (exp_params['n_episodes']):
         plt.figure('Reward')
         plt.plot(rewards, 'b')
 
-        plt.figure('Kp')
+        plt.figure('Kp-Kd-u')
+        plt.subplot(3,1,1)
         plt.cla()
+        plt.title('Kp')
         plt.plot(params[:,2])
+        plt.subplot(3,1,2)
+        plt.cla()
+        plt.title('Kd')
+        plt.plot(params[:,5])
+        plt.subplot(3,1,3)
+        plt.cla()
+        plt.title('u')
+        plt.plot(u_list[:,2])
 
         plt.figure('Traj')
         plt.cla()
         plt.plot(req_traj[:,2], 'r')
         plt.plot(ee_traj[:,2], 'g')
+
+        plt.figure('Reward traj')
+        plt.subplot(4,1,1)
+        plt.cla()
+        plt.plot(reward['u_reward_traj'], 'b')
+        plt.title('u_reward_traj')
+        plt.subplot(4,1,2)
+        plt.cla()
+        plt.plot(reward['delta_u_reward_traj'], 'b')
+        plt.title('delta_u_reward_traj')
+        plt.subplot(4,1,3)
+        plt.cla()
+        plt.plot(reward['goal_reward_traj'], 'b')
+        plt.title('goal reward')
+        plt.subplot(4,1,4)
+        plt.cla()
+        plt.plot(reward['reward_traj'], 'b')
+        plt.title('total')
 
         plt.draw()
         plt.pause(0.0001)
@@ -104,7 +139,7 @@ for k in range(time_steps):
 data[-1]['last_w_list'] = w_list
 data[-1]['last_sigma_list'] = sigma_list
 
-c = 'y'#raw_input("Save data? (y/N)")
+c=raw_input("Save data? (y/N)")
 
 if c == 'y':
     print "Saving to %s"%exp_params['param_file_name']
