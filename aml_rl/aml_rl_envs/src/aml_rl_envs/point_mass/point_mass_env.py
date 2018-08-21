@@ -217,7 +217,7 @@ class PointMassEnv():
 
         return self._penalty
 
-    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True, explore=True, jnt_space=False):
+    def fwd_simulate(self, traj, ee_ori=None, policy=None, inv_kin=True, explore=True, jnt_space=False, policy_per_time_step = True):
         """
         the part of the code to move the robot along a trajectory
         """
@@ -250,7 +250,10 @@ class PointMassEnv():
                 # const = 12
                 # w  = np.abs(np.random.randn(6))*100
                 #np.hstack([np.ones(3)*const, 0.01*np.ones(3)*np.sqrt(const)])#np.abs(np.random.randn(6))*0.001
-                w_tmp = policy[k].compute_w(context=s, explore=explore)
+                if policy_per_time_step:
+                    w_tmp = policy[k].compute_w(context=s, explore=explore)
+                else:
+                    w_tmp = policy.compute_w(context=s, explore=explore)
                 w  = np.multiply(self._param_scale, w_tmp)
                 # print w
 
@@ -334,7 +337,7 @@ class PointMassEnv():
                  'params':param_list,
                  'u_list':u_list,}
         
-    def execute_policy(self, policy=None, show_demo=False, sinusoid=False, explore=True, jnt_space = False):
+    def execute_policy(self, policy=None, show_demo=False, sinusoid=False, explore=True, jnt_space = False, policy_per_time_step = True):
         """
         this function takes in two arguments
         policy function, here stiffness and damping terms
@@ -354,7 +357,7 @@ class PointMassEnv():
         #     self._traj2pull = np.vstack([ori, flipped, ori, flipped, ori, flipped, ori, flipped])
 
 
-        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy, explore=explore, jnt_space = jnt_space)
+        traj_draw = self.fwd_simulate(traj=self._traj2pull, policy=policy, explore=explore, jnt_space = jnt_space, policy_per_time_step = policy_per_time_step)
      
         reward = self.reward(traj_draw)
         

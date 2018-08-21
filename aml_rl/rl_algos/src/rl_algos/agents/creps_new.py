@@ -23,12 +23,15 @@ class CREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 
                        num_samples_per_update, num_old_datasets, 
-                       env, policy, min_eta=1e-8, transform_context=True):
+                       env, policy, min_eta=1e-8, transform_context=True,
+                       policy_per_time_step = True):
         
+        self._policy_per_time_step = policy_per_time_step
         #epsilon in the algorithm
         self._entropy_boud = entropy_bound
 
-        self._time_steps = len(policy)
+        if self._policy_per_time_step:
+            self._time_steps = len(policy)
 
         #initial params
         self._w_init = initial_params
@@ -43,7 +46,10 @@ class CREPSOpt():
         #to execute the policy
         self._env = env
         #param dim
-        self._w_dim = self._policy[0]._w_dim
+        if self._policy_per_time_step:
+            self._w_dim = self._policy[0]._w_dim
+        else:
+            self._w_dim = self._policy._w_dim
         self._c_dim = len(self._env.context())
 
         self._min_eta = min_eta
@@ -54,9 +60,14 @@ class CREPSOpt():
 
         #data storing lists  by setting a maximum length we are able to 
         #remember the history as well. 
-        self._context_obs_history = np.empty([self._c_dim, self._time_steps, self._num_samples_per_update]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
-        self._policy_w_history = np.empty([self._w_dim, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
-        self._rewards_history = np.empty([1, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+        if self._policy_per_time_step:
+            self._context_obs_history = np.empty([self._c_dim, self._time_steps, self._num_samples_per_update]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._policy_w_history = np.empty([self._w_dim, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._rewards_history = np.empty([1, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+        else:
+            self._context_obs_history = np.empty([self._c_dim, self._num_samples_per_update]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._policy_w_history = np.empty([self._w_dim, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._rewards_history = np.empty([1, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
 
 
     def add_data(self, sample_no, jnt_space = False):
@@ -64,18 +75,29 @@ class CREPSOpt():
         self._env._reset()
 
         #execute the policy in the environment
-        tau_i, R_sw_i = self._env.execute_policy(self._policy, jnt_space = jnt_space)
+        tau_i, R_sw_i = self._env.execute_policy(self._policy, jnt_space = jnt_space, policy_per_time_step = self._policy_per_time_step)
 
         for i, (s_i, w_i, R_i) in enumerate(zip(tau_i['contexts'], tau_i['params'], R_sw_i['reward_traj'])):
             #store the data
-            if self._transform_context:
-                self._context_obs_history[:, i, sample_no] = self._policy.transform_context(s_i)
-            else:
-                self._context_obs_history[:, i, sample_no] = s_i
-            
-            self._policy_w_history[:, i, sample_no] = w_i
+            if self._policy_per_time_step:
+                if self._transform_context:
+                    self._context_obs_history[:, i, sample_no] = self._policy.transform_context(s_i)
+                else:
+                    self._context_obs_history[:, i, sample_no] = s_i
+                
+                self._policy_w_history[:, i, sample_no] = w_i
 
-            self._rewards_history[:, i, sample_no] = R_i
+                self._rewards_history[:, i, sample_no] = R_i
+
+            else:
+                if self._transform_context:
+                    self._context_obs_history[:, sample_no] = self._policy.transform_context(s_i)
+                else:
+                    self._context_obs_history[:, sample_no] = s_i
+                
+                self._policy_w_history[:, sample_no] = w_i
+
+                self._rewards_history[:, sample_no] = R_i
 
         #sample count
         self._itr += 1
@@ -83,9 +105,14 @@ class CREPSOpt():
 
     def opt_dual_function(self, time_step):
 
-        S = self._context_obs_history[:, time_step, :].T
-        w = self._policy_w_history[:, time_step, :].T
-        R = self._rewards_history[:, time_step, :].flatten()
+        if time_step is not None:
+            S = self._context_obs_history[:, time_step, :].T
+            w = self._policy_w_history[:, time_step, :].T
+            R = self._rewards_history[:, time_step, :].flatten()
+        else:
+            S = self._context_obs_history[:, :].T
+            w = self._policy_w_history[:, :].T
+            R = self._rewards_history[:, :].flatten()
         
         n_samples_per_update = len(R)
 
@@ -137,35 +164,58 @@ class CREPSOpt():
 
         return weights, eta, theta
 
-    def update_policy(self, weights, time_step):
+    def update_policy(self, weights, time_step = None):
 
-        self._policy[time_step].fit(weights=weights, 
-                                    S=self._context_obs_history[:, time_step, :].T, 
-                                    B=self._policy_w_history[:, time_step, :].T)
+        if time_step is not None:
+            self._policy[time_step].fit(weights=weights, 
+                                        S=self._context_obs_history[:, time_step, :].T, 
+                                        B=self._policy_w_history[:, time_step, :].T)
+        else:
+            self._policy.fit(weights=weights, 
+                                        S=self._context_obs_history[:, :].T, 
+                                        B=self._policy_w_history[:, :].T)
+
 
     def smooth_policy(self):
 
-        len_policy = len(self._policy)
-        w_r, w_c = self._policy[0]._w.shape
-        s_r, s_c = self._policy[0]._sigma.shape
-        w_traj = np.zeros([w_r, w_c, len_policy])
-        sigma_traj = np.zeros([s_r, s_c, len_policy])
+        if self._policy_per_time_step:
+            len_policy = len(self._policy)
+            w_r, w_c = self._policy[0]._w.shape
+            s_r, s_c = self._policy[0]._sigma.shape
+            w_traj = np.zeros([w_r, w_c, len_policy])
+            sigma_traj = np.zeros([s_r, s_c, len_policy])
 
-        for k, pol in enumerate(self._policy):
-            w_traj[:,:,k] = pol._w
-            sigma_traj[:,:,k]=pol._sigma
+            for k, pol in enumerate(self._policy):
+                w_traj[:,:,k] = pol._w
+                sigma_traj[:,:,k]=pol._sigma
 
-        for r in range(w_r):
-            for c in range(w_c):
-                w_traj[r,c,:] = lpf(w_traj[r,c,:])
+            for r in range(w_r):
+                for c in range(w_c):
+                    w_traj[r,c,:] = lpf(w_traj[r,c,:])
 
-        for r in range(s_r):
-            for c in range(s_c):
-                sigma_traj[r,c,:] = lpf(sigma_traj[r,c,:])
+            for r in range(s_r):
+                for c in range(s_c):
+                    sigma_traj[r,c,:] = lpf(sigma_traj[r,c,:])
 
-        for k in range(len_policy):
-            self._policy[k]._w = w_traj[:,:,k]
-            self._policy[k]._sigma = sigma_traj[:,:,k]
+            for k in range(len_policy):
+                self._policy[k]._w = w_traj[:,:,k]
+                self._policy[k]._sigma = sigma_traj[:,:,k]
+        else:
+            w_r, w_c = self._policy._w.shape
+            s_r, s_c = self._policy._sigma.shape
+            w_traj = np.zeros([w_r, w_c])
+            sigma_traj = np.zeros([s_r, s_c])
+
+            for r in range(w_r):
+                for c in range(w_c):
+                    w_traj[r,c] = lpf(w_traj[r,c])
+
+            for r in range(s_r):
+                for c in range(s_c):
+                    sigma_traj[r,c] = lpf(sigma_traj[r,c])
+
+            self._policy._w = w_traj
+            self._policy._sigma = sigma_traj
 
 
 
@@ -177,11 +227,17 @@ class CREPSOpt():
 
             if (self._itr%self._num_policy_updates == 0): #15
 
-                for i in range(self._time_steps):
+                if self._policy_per_time_step:
 
-                    weights, eta, theta = self.opt_dual_function(time_step=i)
+                    for i in range(self._time_steps):
 
-                    self.update_policy(weights=weights, time_step=i)
+                        weights, eta, theta = self.opt_dual_function(time_step=i)
+
+                        self.update_policy(weights=weights, time_step=i)
+                else:
+                    weights, eta, theta = self.opt_dual_function(time_step=None)
+
+                    self.update_policy(weights=weights, time_step=None)
 
             if smooth_policy:
                 self.smooth_policy()
