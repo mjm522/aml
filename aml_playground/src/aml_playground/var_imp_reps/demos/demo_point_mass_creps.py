@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from rl_algos.agents.creps_new import CREPSOpt
 from aml_io.io_tools import save_data, load_data
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
-from rl_algos.policy.neural_network_policy import NeuralNetPolicy
+# from rl_algos.policy.neural_network_policy import NeuralNetPolicy
 from aml_rl_envs.point_mass.point_mass_env import PointMassEnv
 from aml_playground.var_imp_reps.policy.spring_init_policy import create_init_policy
 from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
@@ -18,6 +18,8 @@ n_samples_per_update = 20
 variance = 0.03
 time_steps=exp_params['time_steps']
 
+policy_per_time_step = exp_params['gpreps_params']['policy_per_time_step']
+
 rewards = []
 
 env_params = exp_params['env_params']
@@ -28,9 +30,12 @@ env = PointMassEnv(env_params)
 env_params['renders'] = False
 trail_env = PointMassEnv(env_params)
 
-sess=tf.Session()
+# sess=tf.Session()
 
-policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, covariance_scale=1.0, initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
+if policy_per_time_step:
+    policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, covariance_scale=1.0, initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False) for _ in range(time_steps)]
+else: 
+    policy = LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], variance=0.03, covariance_scale=1.0, initial_params=initial_params, bounds=exp_params['gpreps_params']['w_bounds'], random_state=random_state, transform=False)
 
 # policy = [ NeuralNetPolicy(sess=sess, w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=exp_params['gpreps_params']['context_feature_dim'], bounds=exp_params['gpreps_params']['w_bounds'], learning_rate=0.01, scope="policy_estimator_%s"%i) for i in range(time_steps)]
 
@@ -47,7 +52,7 @@ policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_fe
 w_list = np.zeros([6,9,time_steps])
 sigma_list = np.zeros([6,6,time_steps])
 
-mycreps = CREPSOpt(entropy_bound=exp_params['gpreps_params']['entropy_bound'], initial_params=initial_params, num_policy_updates=num_policy_updates, num_samples_per_update=n_samples_per_update, num_old_datasets=1, env=env, policy=policy, transform_context=False)
+mycreps = CREPSOpt(entropy_bound=exp_params['gpreps_params']['entropy_bound'], initial_params=initial_params, num_policy_updates=num_policy_updates, num_samples_per_update=n_samples_per_update, num_old_datasets=1, env=env, policy=policy, transform_context=False, policy_per_time_step = policy_per_time_step)
 
 plt.ion()
 
@@ -64,7 +69,7 @@ while it < (exp_params['n_episodes']):
 
         trail_env._reset()
 
-        traj_draw, reward = trail_env.execute_policy(policy=policy, explore=False, jnt_space=False)
+        traj_draw, reward = trail_env.execute_policy(policy=policy, explore=False, jnt_space=False, policy_per_time_step = policy_per_time_step)
         
         rewards.append(reward['total'])
 
