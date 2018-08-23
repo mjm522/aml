@@ -131,72 +131,74 @@ class PointMassEnv():
 
         desired_traj = traj['traj']
         true_traj = traj['ee_traj']
-        # ee_vel_traj = traj['ee_vel_traj']
-        force_traj = traj['ee_wrenches'][:,:3]
-        # torques_traj = traj['ee_wrenches'][:,3:]
-        u_traj = np.asarray(traj['params'])
 
+        u_traj = np.asarray(traj['u_list'])
         delta_u_traj = np.diff(u_traj, 0)
+        
+        param_traj = np.asarray(traj['params'])
+        delta_param_traj = np.diff(param_traj, 0)
 
-        # import matplotlib.pyplot as plt
-        # plt.subplot(3,1,1)
-        # plt.plot(desired_traj[:,0],'r')
-        # plt.plot(true_traj[:,0],'g')
-        # plt.subplot(3,1,2)
-        # plt.plot(desired_traj[:,1],'r')
-        # plt.plot(true_traj[:,1],'g')
-        # plt.subplot(3,1,3)
-        # plt.plot(desired_traj[:,2],'r')
-        # plt.plot(true_traj[:,2],'g')
-        # plt.show()
-
-        penalty_force_traj = np.zeros(self._num_traj_points)
         penalty_u_traj = np.zeros(self._num_traj_points)
         penalty_delta_u_traj = np.zeros(self._num_traj_points)
+       
+        penalty_param_traj = np.zeros(self._num_traj_points)
+        penalty_delta_param_traj = np.zeros(self._num_traj_points)
+
         closeness_traj = np.zeros(self._num_traj_points)
 
         for k in range(self._num_traj_points):
 
             #it should be sum since des force traj is negative of spring force
-            # p enalty_force_traj[k] = np.linalg.norm(self._des_force_traj[k,:] + force_traj[k,:])
 
             penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
-
             penalty_delta_u_traj[k] = np.linalg.norm(delta_u_traj[k,:])
 
+            penalty_param_traj[k] = np.linalg.norm(param_traj[k,:])
+            penalty_delta_param_traj[k] = np.linalg.norm(delta_param_traj[k,:])
+            
             closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
-            # closeness_traj[k] =  np.linalg.norm(self._target_point-true_traj[-1])
-            if k == self._num_traj_points-1:
+
+            if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.01:
                 closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])*self._config['finishing_weight']
 
-            if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.05:
-                # print "\n\n\n\n\n\n\nreached goal....\n\n\n\n\n\n\n"
-                closeness_traj[k] = 0.0
+        ####################
 
         u_penalty = self._config['u_weight']*penalty_u_traj
-
         delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
 
-        # force_penalty = self._config['f_des_weight']*penalty_force_traj#self._config['f_dot_weight']*sigmoid( np.hstack( [np.diff(penalty_force_traj), 0] ))
+        param_penalty = self._config['param_weight']*penalty_param_traj
+        delta_param_penalty = self._config['delta_param_weight']*penalty_delta_param_traj
 
         goal_penalty =  self._config['goal_weight']*closeness_traj
 
+        ####################
+        u_reward_traj = -np.multiply( u_penalty, self._reward_gamma ) 
+        delta_u_reward_traj = -np.multiply(delta_u_penalty, self._reward_gamma )
+
+        param_reward_traj = -np.multiply( param_penalty, self._reward_gamma ) 
+        delta_param_reward_traj = -np.multiply( delta_param_penalty, self._reward_gamma ) 
+
+        goal_reward_traj = -np.multiply( goal_penalty, self._reward_gamma ) 
+
+        ####################
+        if self._config['enable_cumsum']:
+
+            u_reward_traj = np.cumsum(u_reward_traj)
+            delta_u_reward_traj = np.cumsum(delta_u_reward_traj)
+            param_reward_traj = np.cumsum(param_reward_traj)
+            delta_param_reward_traj = np.cumsum(delta_param_reward_traj)
+            goal_reward_traj = -np.cumsum(goal_reward_traj)
+
+        ####################
         if self._config['enable_sigmoid']:
 
-            u_reward_traj = -sigmoid(np.multiply( u_penalty, self._reward_gamma ) )
-            delta_u_reward_traj = -sigmoid(np.multiply(delta_u_penalty, self._reward_gamma ) )
-            goal_reward_traj = -sigmoid(np.multiply( goal_penalty, self._reward_gamma ) )
-            reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
-
-            # reward_traj = -sigmoid( np.cumsum( np.multiply( (u_penalty + delta_u_penalty  + goal_penalty), self._reward_gamma ) ) )
-            # delta_u_reward_traj = -np.cumsum( np.multiply(delta_u_penalty, self._reward_gamma ) )
-            # goal_reward_traj = -np.cumsum( np.multiply( goal_penalty, self._reward_gamma ) )
-            # reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
-        else:
-            u_reward_traj = -np.multiply( u_penalty, self._reward_gamma ) 
-            delta_u_reward_traj = -np.multiply(delta_u_penalty, self._reward_gamma ) 
-            goal_reward_traj = -np.multiply( goal_penalty, self._reward_gamma ) 
-            reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj
+            u_reward_traj = sigmoid(u_reward_traj )
+            delta_u_reward_traj = sigmoid(delta_u_reward_traj )
+            param_reward_traj = sigmoid(param_reward_traj)
+            delta_param_reward_traj = sigmoid(delta_param_reward_traj)
+            goal_reward_traj = sigmoid(goal_reward_traj )
+        
+        reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj + param_reward_traj + delta_param_reward_traj
 
         total_penalty = np.sum( reward_traj ) 
 
@@ -208,11 +210,12 @@ class PointMassEnv():
         self._logger.debug("*******************************************************************")
 
         self._penalty = {
-                 'force':np.sum(penalty_force_traj),
                  'total':total_penalty,
                  'u_reward_traj':u_reward_traj,
                  'delta_u_reward_traj':delta_u_reward_traj,
                  'goal_reward_traj':goal_reward_traj,
+                 'param_reward_traj':param_reward_traj,
+                 'delta_param_reward_traj':delta_param_reward_traj,
                  'reward_traj':reward_traj}
 
         return self._penalty
