@@ -94,9 +94,12 @@ class GenerateDocument():
         self._doc.generate_pdf(clean_tex=False)
 
 
-def create_experiment_document(exp_name):
+def create_experiment_document(exp_name, new_sub_folder=None):
 
-    exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
+    if new_sub_folder is not None:
+        exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
+    else:
+        exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/' + new_sub_folder + '/'
 
     if not os.path.exists(exp_dir):
         os.makedirs(exp_dir)
