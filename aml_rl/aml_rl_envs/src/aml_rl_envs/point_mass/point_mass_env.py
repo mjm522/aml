@@ -131,6 +131,8 @@ class PointMassEnv():
 
         desired_traj = traj['traj']
         true_traj = traj['ee_traj']
+        ee_vel_traj = traj['ee_vel_traj']
+        
 
         u_traj = np.asarray(traj['u_list'])
         delta_u_traj = np.diff(u_traj, 0)
@@ -138,38 +140,61 @@ class PointMassEnv():
         param_traj = np.asarray(traj['params'])
         delta_param_traj = np.diff(param_traj, 0)
 
-        penalty_u_traj = np.zeros(self._num_traj_points)
-        penalty_delta_u_traj = np.zeros(self._num_traj_points)
+        # penalty_u_traj = np.zeros(self._num_traj_points)
+        # penalty_delta_u_traj = np.zeros(self._num_traj_points)
        
-        penalty_param_traj = np.zeros(self._num_traj_points)
-        penalty_delta_param_traj = np.zeros(self._num_traj_points)
+        # penalty_param_traj = np.zeros(self._num_traj_points)
+        # penalty_delta_param_traj = np.zeros(self._num_traj_points)
 
-        closeness_traj = np.zeros(self._num_traj_points)
+        # state_penalty_traj = np.zeros(self._num_traj_points)
 
-        for k in range(self._num_traj_points):
+        Q1 = self._config['goal_pos_weight']
+        Q2 = self._config['goal_vel_weight']
 
-            #it should be sum since des force traj is negative of spring force
+        R1 = self._config['u_weight']
+        R2 = self._config['delta_u_weight']
+        R3 = self._config['param_weight']
+        R4 = self._config['delta_param_weight']
+        
+        goal_pos_traj = desired_traj-true_traj
 
-            penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
-            penalty_delta_u_traj[k] = np.linalg.norm(delta_u_traj[k,:])
+        goal_pos_penalty = np.diag(goal_pos_traj.dot(Q1).dot(goal_pos_traj.T))
 
-            penalty_param_traj[k] = np.linalg.norm(param_traj[k,:])
-            penalty_delta_param_traj[k] = np.linalg.norm(delta_param_traj[k,:])
+        goal_vel_penalty = np.diag(ee_vel_traj.dot(Q2).dot(ee_vel_traj.T))
+
+        goal_penalty = goal_pos_penalty + goal_vel_penalty
+
+        u_penalty = np.diag(u_traj.dot(R1).dot(u_traj.T))
+        delta_u_penalty = np.diag(delta_u_traj.dot(R2).dot(delta_u_traj.T))
+
+        param_penalty = np.diag(param_traj.dot(R3).dot(param_traj.T))
+        delta_param_penalty = np.diag(delta_param_traj.dot(R4).dot(delta_param_traj.T))
+
+
+        # for k in range(self._num_traj_points):
+
+        #     #it should be sum since des force traj is negative of spring force
+
+        #     penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
+        #     penalty_delta_u_traj[k] = np.linalg.norm(delta_u_traj[k,:])
+
+        #     penalty_param_traj[k] = np.linalg.norm(param_traj[k,:])
+        #     penalty_delta_param_traj[k] = np.linalg.norm(delta_param_traj[k,:])
             
-            closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
+        #     state_penalty_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
 
-            if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.01:
-                closeness_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])*self._config['finishing_weight']
+        #     if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.01:
+        #         state_penalty_traj[k] =  self._config['finishing_weight'] #np.linalg.norm(desired_traj[k,:]-true_traj[k,:])*
 
         ####################
 
-        u_penalty = self._config['u_weight']*penalty_u_traj
-        delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
+        # u_penalty = self._config['u_weight']*penalty_u_traj
+        # delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
 
-        param_penalty = self._config['param_weight']*penalty_param_traj
-        delta_param_penalty = self._config['delta_param_weight']*penalty_delta_param_traj
+        # param_penalty = self._config['param_weight']*penalty_param_traj
+        # delta_param_penalty = self._config['delta_param_weight']*penalty_delta_param_traj
 
-        goal_penalty =  self._config['goal_weight']*closeness_traj
+        # goal_penalty =  self._config['goal_weight']*state_penalty_traj
 
         ####################
         u_reward_traj = -np.multiply( u_penalty, self._reward_gamma ) 
@@ -202,15 +227,18 @@ class PointMassEnv():
 
         total_penalty = np.sum( reward_traj ) 
 
-        self._logger.debug("\n*****************************************************************")
-        self._logger.debug("u penalty \t %f"%(np.sum(u_penalty),))
-        self._logger.debug("delta_u penalty \t %f"%(np.sum(delta_u_penalty),))
-        self._logger.debug("goal_penalty \t %f"%(np.sum(goal_penalty),))
-        self._logger.debug("total_penalty \t %f"%(total_penalty),) 
-        self._logger.debug("*******************************************************************")
+        # self._logger.debug("\n*****************************************************************")
+        # self._logger.debug("u penalty \t %f"%(np.sum(u_penalty),))
+        # self._logger.debug("delta_u penalty \t %f"%(np.sum(delta_u_penalty),))
+        # self._logger.debug("goal_penalty \t %f"%(np.sum(goal_penalty),))
+        # self._logger.debug("total_penalty \t %f"%(total_penalty),) 
+        # self._logger.debug("*******************************************************************")
 
         self._penalty = {
                  'total':total_penalty,
+                 'goal_pos_penalty':goal_pos_penalty,
+                 'goal_vel_penalty':goal_vel_penalty,
+                 'goal_penalty':goal_penalty,
                  'u_reward_traj':u_reward_traj,
                  'delta_u_reward_traj':delta_u_reward_traj,
                  'goal_reward_traj':goal_reward_traj,

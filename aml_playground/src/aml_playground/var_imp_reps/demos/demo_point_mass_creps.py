@@ -117,7 +117,6 @@ while it < (exp_params['n_episodes']):
         plt.plot(ee_vel_traj[:,2], 'b')
         plt.title('velocity')
         
-
         plt.figure('Reward traj')
         plt.subplot(6,1,1)
         plt.cla()
@@ -144,9 +143,23 @@ while it < (exp_params['n_episodes']):
         plt.plot(reward['reward_traj'], 'b')
         plt.title('total')
 
+        plt.figure("Penalty traj")
+        plt.subplot(3,1,1)
+        plt.cla()
+        plt.plot(reward['goal_pos_penalty'], 'b')
+        plt.title('goal_pos_penalty')
+        plt.subplot(3,1,2)
+        plt.cla()
+        plt.plot(reward['goal_vel_penalty'], 'b')
+        plt.title('goal_vel_penalty')
+        plt.subplot(3,1,3)
+        plt.cla()
+        plt.plot(reward['goal_penalty'], 'b')
+        plt.title('goal_penalty')
+
+
         plt.draw()
         plt.pause(0.0001)
-
 
 
 
