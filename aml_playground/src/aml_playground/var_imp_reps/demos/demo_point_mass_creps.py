@@ -89,35 +89,95 @@ while it < (exp_params['n_episodes']):
 
         it += 1
 
-        plt.figure('Reward')
+        ####################PLOT 1############################
+        plt.figure('Reward', figsize=(10,10))
         plt.plot(rewards, 'b')
 
-        plt.figure('Kp-Kd-u')
-        plt.subplot(3,1,1)
+
+        ####################PLOT 2############################
+        plt.figure('Kp-Kd-u', figsize=(10,10))
+        plt.subplot(3,3,1)
         plt.cla()
-        plt.title('Kp')
+        plt.title('Kp x')
+        plt.plot(params[:,0])
+
+        plt.subplot(3,3,2)
+        plt.cla()
+        plt.title('Kp y')
+        plt.plot(params[:,1])
+
+        plt.subplot(3,3,3)
+        plt.cla()
+        plt.title('Kp z')
         plt.plot(params[:,2])
-        plt.subplot(3,1,2)
+
+        plt.subplot(3,3,4)
         plt.cla()
-        plt.title('Kd')
+        plt.title('Kd x')
+        plt.plot(params[:,3])
+
+        plt.subplot(3,3,5)
+        plt.cla()
+        plt.title('Kd y')
+        plt.plot(params[:,4])
+
+        plt.subplot(3,3,6)
+        plt.cla()
+        plt.title('Kd z')
         plt.plot(params[:,5])
-        plt.subplot(3,1,3)
+
+        plt.subplot(3,3,7)
         plt.cla()
-        plt.title('u')
+        plt.title('U x')
+        plt.plot(u_list[:,0])
+
+        plt.subplot(3,3,8)
+        plt.cla()
+        plt.title('U y')
+        plt.plot(u_list[:,1])
+
+        plt.subplot(3,3,9)
+        plt.cla()
+        plt.title('U z')
         plt.plot(u_list[:,2])
 
-        plt.figure('Traj-Vel')
-        plt.subplot(2,1,1)
+        ####################PLOT 3############################
+        plt.figure('Traj-Vel', figsize=(10,10))
+        plt.subplot(2,3,1)
+        plt.cla()
+        plt.plot(req_traj[:,0], 'r')
+        plt.plot(ee_traj[:,0], 'g')
+        plt.title('traj x')
+
+        plt.subplot(2,3,2)
+        plt.cla()
+        plt.plot(req_traj[:,1], 'r')
+        plt.plot(ee_traj[:,1], 'g')
+        plt.title('traj y')
+
+        plt.subplot(2,3,3)
         plt.cla()
         plt.plot(req_traj[:,2], 'r')
         plt.plot(ee_traj[:,2], 'g')
-        plt.title('traj')
-        plt.subplot(2,1,2)
+        plt.title('traj z')
+
+        plt.subplot(2,3,4)
         plt.cla()
-        plt.plot(ee_vel_traj[:,2], 'b')
-        plt.title('velocity')
-        
-        plt.figure('Reward traj')
+        plt.plot(ee_vel_traj[:,0])
+        plt.title('vel x')
+
+        plt.subplot(2,3,5)
+        plt.cla()
+        plt.plot(ee_vel_traj[:,1])
+        plt.title('vel y')
+
+        plt.subplot(2,3,6)
+        plt.cla()
+        plt.plot(ee_vel_traj[:,2])
+        plt.title('vel z')
+
+        ####################PLOT 4############################
+        plt.figure('Reward traj', figsize=(10,10))
         plt.subplot(6,1,1)
         plt.cla()
         plt.plot(reward['u_reward_traj'], 'b')
@@ -143,7 +203,8 @@ while it < (exp_params['n_episodes']):
         plt.plot(reward['reward_traj'], 'b')
         plt.title('total')
 
-        plt.figure("Penalty traj")
+        ####################PLOT 5############################
+        plt.figure("Penalty traj", figsize=(10,10))
         plt.subplot(3,1,1)
         plt.cla()
         plt.plot(reward['goal_pos_penalty'], 'b')
