@@ -94,12 +94,9 @@ class GenerateDocument():
         self._doc.generate_pdf(clean_tex=False)
 
 
-def create_experiment_document(exp_name, new_sub_folder=None):
+def create_experiment_document(exp_name, image_folder):
 
-    if new_sub_folder is not None:
-        exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
-    else:
-        exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/' + new_sub_folder + '/'
+    exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
 
     if not os.path.exists(exp_dir):
         os.makedirs(exp_dir)
@@ -111,10 +108,9 @@ def create_experiment_document(exp_name, new_sub_folder=None):
     gen_doc = GenerateDocument(config)
     gen_doc.fill_document()
 
-    base_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/'
     
-    image_filenames = [ [base_path+'Kp-Kd-u.png', base_path+'Traj-Vel.png'],
-                      [base_path+'Reward.png', base_path+'Reward_traj.png',],
+    image_filenames = [ [image_folder+'Kp-Kd-u.png', image_folder+'Traj-Vel.png'],
+                      [image_folder+'Reward.png', image_folder+'Reward_traj.png',],
                       ]
     image_captions = [['Param values', 'Trajectory and Velocity'],['Mean reward', 'Reward splits']]
 
@@ -149,4 +145,4 @@ def create_experiment_document(exp_name, new_sub_folder=None):
 
 
 if __name__ == '__main__':
-    create_experiment_document(exp_name='trial')
+    create_experiment_document(exp_name='trial', image_folder=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/')
