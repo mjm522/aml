@@ -29,7 +29,7 @@ class GenerateDocument():
 
                 with self._doc.create(SubFigure(
                         position='b',
-                        width=NoEscape(r'0.45\linewidth'))) as left_image:
+                        width=NoEscape(r'0.5\linewidth'))) as left_image:
 
                     left_image.add_image(image_filenames[k][0],
                                           width=NoEscape(r'\linewidth'))
@@ -37,7 +37,7 @@ class GenerateDocument():
 
                 with self._doc.create(SubFigure(
                         position='b',
-                        width=NoEscape(r'0.45\linewidth'))) as right_image:
+                        width=NoEscape(r'0.5\linewidth'))) as right_image:
 
                     right_image.add_image(image_filenames[k][1],
                                            width=NoEscape(r'\linewidth'))
@@ -89,20 +89,19 @@ class GenerateDocument():
             with self._doc.create(Alignat(numbering=False, escape=False)) as agn:
                 agn.append(r'\sum_t \left( X^T_t Q_1 X_t + \dot{X}_t^T Q_2 \dot{X}_t + U^T_t R_1 U_t + \dot{U}_t^T R_2 \dot{U}_t + K^T_t R_3 K_t + \dot{K_t}^T R_4 \dot{K_t} \right)')
 
-    def finish(self, file_name=None):
+    def finish(self):
 
-        if file_name is None:
-            file_name = './basic_pdf'
-
-        self._doc.generate_pdf(file_name, clean_tex=False)
-        tex = self._doc.dumps()
         self._doc.generate_pdf(clean_tex=False)
 
 
+def create_experiment_document(exp_name):
 
-def main():
-    
-    config = {'file_name':'./basic',
+    exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
+
+    if not os.path.exists(exp_dir):
+        os.makedirs(exp_dir)
+
+    config = {'file_name':exp_dir+exp_name,
     'title':'Variable Impedance Learning',
     'authors':'Mike and Saif'}
 
@@ -145,5 +144,6 @@ def main():
     gen_doc.finish()
 
 
+
 if __name__ == '__main__':
-    main()
+    create_experiment_document(exp_name='trial')
