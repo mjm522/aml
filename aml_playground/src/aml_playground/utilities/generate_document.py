@@ -2,7 +2,6 @@ import os
 import numpy as np
 from pylatex.utils import italic, NoEscape
 from pylatex import Document, Math, Section, Subsection, Tabular, Tabularx, Command, Figure, SubFigure, NoEscape, Itemize, Alignat
-from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
 
 class GenerateDocument():
 
@@ -94,7 +93,7 @@ class GenerateDocument():
         self._doc.generate_pdf(clean_tex=False)
 
 
-def create_experiment_document(exp_name, image_folder):
+def create_experiment_document(exp_name, image_folder, exp_params):
 
     exp_dir = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/hyper_param_search/'
 
@@ -145,4 +144,9 @@ def create_experiment_document(exp_name, image_folder):
 
 
 if __name__ == '__main__':
-    create_experiment_document(exp_name='trial', image_folder=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/')
+    
+    from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
+    
+    create_experiment_document(exp_name='trial', 
+                               image_folder=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/',
+                               exp_params=exp_params)
