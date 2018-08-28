@@ -63,6 +63,7 @@ point_mass_env['enable_sigmoid'] = True
 point_mass_env['enable_cumsum'] = True
 point_mass_env['param_weight']  = 0.
 point_mass_env['delta_param_weight']  = 0.
+point_mass_env['only_pull_allowed'] = False
 point_mass_env['param_scale'] = np.array([ 1000.,  1000., 1000.,  np.sqrt(1000.),  np.sqrt(1000.),  np.sqrt(1000.)])
 
 
@@ -72,7 +73,7 @@ experiment_1 = {
     'gpreps_params':gpreps_params_1,
     'env_params':point_mass_env,
     'n_episodes':60,
-    'time_steps':100,
+    'time_steps':point_mass_env['num_traj_points'],
     'smooth_policy':False,
     'param_file_name':os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_smooth_off_1_with_sigmoid.pkl',
 }
@@ -141,34 +142,37 @@ experiment_8['start_policy'] = None#os.environ['AML_DATA'] + '/aml_playground/im
 experiment_8['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_7_6_with_all_equal_weighting.pkl'
 
 experiment_9 =  copy.deepcopy(experiment_1)
-kd_scale = 2.
+kd_scale = 10.
 kp_scale = (kd_scale**2.)/4.
-experiment_9['n_episodes']=1000
+experiment_9['n_episodes']=250
+experiment_9['env_params']['num_traj_points'] = 100
+experiment_9['time_steps'] = experiment_9['env_params']['num_traj_points']
 experiment_9['smooth_policy']=False
-experiment_9['env_params']['time_step'] = 0.5
+experiment_9['env_params']['time_step'] = 0.1
 experiment_9['env_params']['spring_stiffness'] = 3.0
 experiment_9['env_params']['reward_gamma'] = 1.#0.99
 experiment_9['env_params']['ramp_traj_flag'] = False
 
-experiment_9['env_params']['goal_pos_weight'] = np.eye(3)*1.75
+experiment_9['env_params']['goal_pos_weight'] = np.eye(3)*2.75
 experiment_9['env_params']['goal_vel_weight'] = np.eye(3)*0.
 
-experiment_9['env_params']['u_weight'] = np.eye(3)*0.
-experiment_9['env_params']['delta_u_weight'] = np.eye(3)*0.
+experiment_9['env_params']['u_weight'] = np.eye(3)*0.025
+experiment_9['env_params']['delta_u_weight'] = np.eye(3)*0.025
 
-experiment_9['env_params']['param_weight']  = np.eye(6)*0.25
-experiment_9['env_params']['delta_param_weight']  = np.eye(6)*0.25
+experiment_9['env_params']['param_weight'] = np.eye(6)*0.
+experiment_9['env_params']['delta_param_weight'] = np.eye(6)*0.
 
-experiment_9['env_params']['finishing_weight'] = 0.0
+experiment_9['env_params']['finishing_weight'] = 0.
 experiment_9['gpreps_params']['entropy_bound'] = 2.
 experiment_9['gpreps_params']['context_dim'] = 9
 experiment_9['gpreps_params']['context_feature_dim'] = 9
-experiment_9['gpreps_params']['policy_per_time_step'] = True
+experiment_9['gpreps_params']['policy_per_time_step'] = False
 experiment_9['env_params']['enable_sigmoid'] = False
 experiment_9['env_params']['enable_cumsum'] = False
 experiment_9['env_params']['param_scale'] = np.array([ kp_scale, kp_scale, kp_scale, kd_scale,  kd_scale,  kd_scale ])
-experiment_9['env_params']['force_predict_model'] = NextForcePredictModel(spring_k=experiment_9['env_params']['spring_stiffness'])
+experiment_9['env_params']['force_predict_model'] = None #NextForcePredictModel(spring_k=experiment_9['env_params']['spring_stiffness'])
 experiment_9['start_policy']=None#os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_spring_stiif5_6.pkl'
-experiment_9['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_single_policy.pkl'
+experiment_9['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_single_policy_bugfix.pkl'
+
 
 exp_params = experiment_9

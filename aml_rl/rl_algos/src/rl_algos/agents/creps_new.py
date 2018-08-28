@@ -23,15 +23,14 @@ class CREPSOpt():
 
     def __init__(self, entropy_bound, initial_params, num_policy_updates, 
                        num_samples_per_update, num_old_datasets, 
-                       env, policy, min_eta=1e-8, transform_context=True,
-                       policy_per_time_step = True):
+                       env, policy, time_steps=100, min_eta=1e-8, transform_context=True,
+                       policy_per_time_step=True):
         
         self._policy_per_time_step = policy_per_time_step
         #epsilon in the algorithm
         self._entropy_boud = entropy_bound
 
-        if self._policy_per_time_step:
-            self._time_steps = len(policy)
+        self._time_steps = time_steps
 
         #initial params
         self._w_init = initial_params
@@ -65,9 +64,9 @@ class CREPSOpt():
             self._policy_w_history = np.empty([self._w_dim, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
             self._rewards_history = np.empty([1, self._time_steps, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
         else:
-            self._context_obs_history = np.empty([self._c_dim, self._num_samples_per_update]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
-            self._policy_w_history = np.empty([self._w_dim, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
-            self._rewards_history = np.empty([1, self._num_samples_per_update])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._context_obs_history = np.empty([self._c_dim, self._num_samples_per_update*self._time_steps]) #[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._policy_w_history = np.empty([self._w_dim, self._num_samples_per_update*self._time_steps])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
+            self._rewards_history = np.empty([1, self._num_samples_per_update*self._time_steps])#[deque(maxlen=self._time_steps) for _ in range(self._num_samples_per_update)]
 
 
     def add_data(self, sample_no, jnt_space = False):
@@ -91,13 +90,13 @@ class CREPSOpt():
 
             else:
                 if self._transform_context:
-                    self._context_obs_history[:, sample_no] = self._policy.transform_context(s_i)
+                    self._context_obs_history[:, (self._time_steps*sample_no)+i] = self._policy.transform_context(s_i)
                 else:
-                    self._context_obs_history[:, sample_no] = s_i
+                    self._context_obs_history[:, (self._time_steps*sample_no)+i] = s_i
                 
-                self._policy_w_history[:, sample_no] = w_i
+                self._policy_w_history[:, (self._time_steps*sample_no)+i] = w_i
 
-                self._rewards_history[:, sample_no] = R_i
+                self._rewards_history[:, (self._time_steps*sample_no)+i] = R_i
 
         #sample count
         self._itr += 1

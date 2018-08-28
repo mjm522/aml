@@ -311,8 +311,6 @@ class PointMassEnv():
 
                 u = np.dot(js_Kp, (traj[k, :]-ee_pos)) + np.dot(js_Kd, -ee_vel)
 
-                # print "\n\n\n\n\n\n\n\n",u, "\n\n\n\n\n\n\n"
-
                 if self._force_predict_model is not None:
                     u_fwd = -self._force_predict_model.predict_force(spring_mean=self._spring_mean, x_t=ee_pos)
                 else:

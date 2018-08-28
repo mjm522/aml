@@ -109,7 +109,7 @@ def create_experiment_document(exp_name, image_folder, exp_params):
 
     
     image_filenames = [ [image_folder+'Kp-Kd-u.png', image_folder+'Traj-Vel.png'],
-                      [image_folder+'Reward.png', image_folder+'Reward_traj.png',],
+                      [image_folder+'Reward.png', image_folder+'Reward traj.png',],
                       ]
     image_captions = [['Param values', 'Trajectory and Velocity'],['Mean reward', 'Reward splits']]
 
@@ -120,6 +120,8 @@ def create_experiment_document(exp_name, image_folder, exp_params):
 
     if exp_params['env_params']['force_predict_model'] is not None:
         force_predict_model = True
+    else:
+        force_predict_model = False
 
     table_values=[exp_params['env_params']['goal_pos_weight'][0,0],
                   exp_params['env_params']['goal_vel_weight'][0,0],
