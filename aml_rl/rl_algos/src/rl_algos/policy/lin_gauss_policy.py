@@ -85,6 +85,7 @@ class LinGaussPolicy():
             raise ValueError("Computed non-finite covariance matrix.")
 
         P = np.diag(weights)
+
         #equation 12 from paper
         self._w = (np.linalg.pinv(S.T.dot(P).dot(S) + np.eye(S.shape[1])*self._gamma)).dot(S.T).dot(P).dot(B).T
 

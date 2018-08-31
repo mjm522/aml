@@ -25,7 +25,7 @@ env_params['renders'] = False
 
 env = SawyerEnv(env_params)
 
-env_params['renders'] = False
+env_params['renders'] = True
 trail_env = SawyerEnv(env_params)
 
 # policy = [ LinGaussPolicy(w_dim=exp_params['gpreps_params']['w_dim'], context_feature_dim=9, variance=0.03, 

@@ -112,7 +112,7 @@ class CREPSOpt():
             S = self._context_obs_history[:, :].T
             w = self._policy_w_history[:, :].T
             R = self._rewards_history[:, :].flatten()
-        
+
         n_samples_per_update = len(R)
 
         # Definition of the dual function

@@ -34,7 +34,7 @@ class SawyerEnv(AMLRlEnv):
 
         self._table_id = pb.loadURDF(os.path.join(self._urdf_root_path,"table.urdf"), useFixedBase=True, globalScaling=0.5, physicsClientId=self._cid)
 
-        pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.98734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
+        pb.resetBasePositionAndOrientation(self._table_id, [0.69028195, -0.08618135, -.2734368], [0, 0, -0.707, 0.707], physicsClientId=self._cid)
 
         pb.changeDynamics(self._table_id, -1, lateralFriction=lf, spinningFriction=sf, rollingFriction=rf, restitution=r, physicsClientId=self._cid)
 

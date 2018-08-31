@@ -21,6 +21,8 @@ class PointMassEnv():
 
         self._spring_line = None
 
+        self._z_only = self._config['z_only']
+
         self._logger = aml_logging.get_logger(__name__)
 
         self._reward_gamma = np.asarray([self._config['reward_gamma']**k for k in range(self._num_traj_points)])
@@ -140,29 +142,34 @@ class PointMassEnv():
         param_traj = np.asarray(traj['params'])
         delta_param_traj = np.diff(param_traj, 0)
 
-        # penalty_u_traj = np.zeros(self._num_traj_points)
-        # penalty_delta_u_traj = np.zeros(self._num_traj_points)
-       
-        # penalty_param_traj = np.zeros(self._num_traj_points)
-        # penalty_delta_param_traj = np.zeros(self._num_traj_points)
+        if self._z_only:
+            desired_traj = desired_traj[:,2][:,None]
+            true_traj =  true_traj[:,2][:,None]
+            ee_vel_traj =  ee_vel_traj[:,2][:,None]
+            u_traj = u_traj[:,2][:,None]
+            delta_u_traj= delta_u_traj[:,2][:,None]
 
-        # state_penalty_traj = np.zeros(self._num_traj_points)
 
         Q1 = self._config['goal_pos_weight']
-        Q2 = self._config['goal_vel_weight']
+        Q2 = self._config['goal_delta_pos_weight']
+        Q3 = self._config['goal_vel_weight']
 
         R1 = self._config['u_weight']
         R2 = self._config['delta_u_weight']
         R3 = self._config['param_weight']
         R4 = self._config['delta_param_weight']
         
-        goal_pos_traj = desired_traj-true_traj
+        goal_pos_traj = desired_traj - true_traj
+
+        goal_delta_pos_traj = np.diff(desired_traj, 0)
 
         goal_pos_penalty = np.diag(goal_pos_traj.dot(Q1).dot(goal_pos_traj.T))
 
-        goal_vel_penalty = np.diag(ee_vel_traj.dot(Q2).dot(ee_vel_traj.T))
+        goal_delta_pos_penalty = np.diag(goal_delta_pos_traj.dot(Q2).dot(goal_delta_pos_traj.T))
 
-        goal_penalty = goal_pos_penalty + goal_vel_penalty
+        goal_vel_penalty = np.diag(ee_vel_traj.dot(Q3).dot(ee_vel_traj.T))
+
+        goal_penalty = goal_pos_penalty + goal_delta_pos_penalty + goal_vel_penalty
 
         u_penalty = np.diag(u_traj.dot(R1).dot(u_traj.T))
         delta_u_penalty = np.diag(delta_u_traj.dot(R2).dot(delta_u_traj.T))
@@ -170,58 +177,36 @@ class PointMassEnv():
         param_penalty = np.diag(param_traj.dot(R3).dot(param_traj.T))
         delta_param_penalty = np.diag(delta_param_traj.dot(R4).dot(delta_param_traj.T))
 
-
-        # for k in range(self._num_traj_points):
-
-        #     #it should be sum since des force traj is negative of spring force
-
-        #     penalty_u_traj[k] = np.linalg.norm(u_traj[k,:])
-        #     penalty_delta_u_traj[k] = np.linalg.norm(delta_u_traj[k,:])
-
-        #     penalty_param_traj[k] = np.linalg.norm(param_traj[k,:])
-        #     penalty_delta_param_traj[k] = np.linalg.norm(delta_param_traj[k,:])
-            
-        #     state_penalty_traj[k] =  np.linalg.norm(desired_traj[k,:]-true_traj[k,:])
-
-        #     if np.linalg.norm(desired_traj[-1,:]-true_traj[k,:]) < 0.01:
-        #         state_penalty_traj[k] =  self._config['finishing_weight'] #np.linalg.norm(desired_traj[k,:]-true_traj[k,:])*
-
-        ####################
-
-        # u_penalty = self._config['u_weight']*penalty_u_traj
-        # delta_u_penalty = self._config['delta_u_weight']*penalty_delta_u_traj
-
-        # param_penalty = self._config['param_weight']*penalty_param_traj
-        # delta_param_penalty = self._config['delta_param_weight']*penalty_delta_param_traj
-
-        # goal_penalty =  self._config['goal_weight']*state_penalty_traj
-
-        ####################
-        u_reward_traj = -np.multiply( u_penalty, self._reward_gamma ) 
-        delta_u_reward_traj = -np.multiply(delta_u_penalty, self._reward_gamma )
-
-        param_reward_traj = -np.multiply( param_penalty, self._reward_gamma ) 
-        delta_param_reward_traj = -np.multiply( delta_param_penalty, self._reward_gamma ) 
-
-        goal_reward_traj = -np.multiply( goal_penalty, self._reward_gamma ) 
-
+        u_reward_traj = np.multiply( u_penalty, self._reward_gamma ) 
+        delta_u_reward_traj = np.multiply(delta_u_penalty, self._reward_gamma )
+        param_reward_traj = np.multiply( param_penalty, self._reward_gamma ) 
+        delta_param_reward_traj = np.multiply( delta_param_penalty, self._reward_gamma ) 
+        goal_reward_traj = np.multiply( goal_penalty, self._reward_gamma ) 
+        
         ####################
         if self._config['enable_cumsum']:
 
-            u_reward_traj = np.cumsum(u_reward_traj)
-            delta_u_reward_traj = np.cumsum(delta_u_reward_traj)
-            param_reward_traj = np.cumsum(param_reward_traj)
-            delta_param_reward_traj = np.cumsum(delta_param_reward_traj)
-            goal_reward_traj = -np.cumsum(goal_reward_traj)
+            u_reward_traj = -1.*np.flip(np.cumsum(u_reward_traj), 0)
+            delta_u_reward_traj = -1.*np.flip(np.cumsum(delta_u_reward_traj), 0)
+            param_reward_traj = -1.*np.flip(np.cumsum(param_reward_traj), 0)
+            delta_param_reward_traj = -1.*np.flip(np.cumsum(delta_param_reward_traj), 0)
+            goal_reward_traj = -1.*np.flip(np.cumsum(goal_reward_traj), 0)
+        
+        else:
+            u_reward_traj *= -1.
+            delta_u_reward_traj *= -1.
+            param_reward_traj *= -1.
+            delta_param_reward_traj *= -1. 
+            goal_reward_traj *= -1.
 
         ####################
         if self._config['enable_sigmoid']:
 
-            u_reward_traj = sigmoid(u_reward_traj )
-            delta_u_reward_traj = sigmoid(delta_u_reward_traj )
-            param_reward_traj = sigmoid(param_reward_traj)
-            delta_param_reward_traj = sigmoid(delta_param_reward_traj)
-            goal_reward_traj = sigmoid(goal_reward_traj )
+            u_reward_traj = -1.*sigmoid(u_reward_traj )
+            delta_u_reward_traj = -1.*sigmoid(delta_u_reward_traj )
+            param_reward_traj = -1.*sigmoid(param_reward_traj)
+            delta_param_reward_traj = -1.*sigmoid(delta_param_reward_traj)
+            goal_reward_traj = -1.*sigmoid(goal_reward_traj )
         
         reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj + param_reward_traj + delta_param_reward_traj
 
@@ -238,6 +223,7 @@ class PointMassEnv():
                  'total':total_penalty,
                  'goal_pos_penalty':goal_pos_penalty,
                  'goal_vel_penalty':goal_vel_penalty,
+                 'goal_delta_pos_penalty':goal_delta_pos_penalty,
                  'goal_penalty':goal_penalty,
                  'u_reward_traj':u_reward_traj,
                  'delta_u_reward_traj':delta_u_reward_traj,
@@ -286,16 +272,25 @@ class PointMassEnv():
                 else:
                     w_tmp = policy.compute_w(context=s, explore=explore)
                 w  = np.multiply(self._param_scale, w_tmp)
-                # print w
+                # print "k \t",k, "\t",  w
 
-                Kp =  w[:3]#np.ones(3)*1 + w[:3]
-                Kd =   w[3:] #0.01*np.ones(3)*np.sqrt(1) + w[3:]
+                if self._z_only:
+                    Kp = w[0]
+                    Kd = w[1]
+                else:
+                    Kp =  w[:3]#np.ones(3)*1 + w[:3]
+                    Kd =   w[3:] #0.01*np.ones(3)*np.sqrt(1) + w[3:]
 
                 # js_Kp = np.clip(Kp, 0.0, 100)
                 # js_Kd = np.clip(Kd, 0.0, 100)
 
-                js_Kp = np.diag(Kp)
-                js_Kd = np.diag(Kd)
+                if self._z_only:
+                    js_Kp = Kp
+                    js_Kd = Kd
+
+                else:
+                    js_Kp = np.diag(Kp)
+                    js_Kd = np.diag(Kd)
 
                 # if not jnt_space:
                 #     self._logger.debug("\n \n EE Param Kp \n {}".format(w[:3]))  
@@ -405,7 +400,10 @@ class PointMassEnv():
 
         self._spring_force_old = self._spring_force
 
-        return s #, self._point_mass.get_ee_wrench(local=True)[:3] 
+        if self._z_only:
+            return np.array([s[2], s[5], s[8]])
+        else:
+            return s #, self._point_mass.get_ee_wrench(local=True)[:3] 
 
 
 class DummyPolicy():

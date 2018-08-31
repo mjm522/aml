@@ -40,35 +40,63 @@ def exp_plot(rewards, reward_traj, traj_draw, save_path=None, plot_live=True, fi
 
     ####################PLOT 2############################
     plt.figure('Kp-Kd-u', figsize=figsize)
-    plt.subplot(3,3,1)
-    plt.cla()
-    plt.title('Kp x')
-    plt.plot(params[:,0])
+    if exp_params['env_params']['z_only']:
+        plt.subplot(3,3,1)
+        plt.cla()
+        plt.title('Kp x')
 
-    plt.subplot(3,3,2)
-    plt.cla()
-    plt.title('Kp y')
-    plt.plot(params[:,1])
+        plt.subplot(3,3,2)
+        plt.cla()
+        plt.title('Kp y')
 
-    plt.subplot(3,3,3)
-    plt.cla()
-    plt.title('Kp z')
-    plt.plot(params[:,2])
+        plt.subplot(3,3,3)
+        plt.cla()
+        plt.title('Kp z')
+        plt.plot(params[:,0])
 
-    plt.subplot(3,3,4)
-    plt.cla()
-    plt.title('Kd x')
-    plt.plot(params[:,3])
+        plt.subplot(3,3,4)
+        plt.cla()
+        plt.title('Kd x')
 
-    plt.subplot(3,3,5)
-    plt.cla()
-    plt.title('Kd y')
-    plt.plot(params[:,4])
+        plt.subplot(3,3,5)
+        plt.cla()
+        plt.title('Kd y')
 
-    plt.subplot(3,3,6)
-    plt.cla()
-    plt.title('Kd z')
-    plt.plot(params[:,5])
+        plt.subplot(3,3,6)
+        plt.cla()
+        plt.title('Kd z')
+        plt.plot(params[:,1])
+
+    else:
+        plt.subplot(3,3,1)
+        plt.cla()
+        plt.title('Kp x')
+        plt.plot(params[:,0])
+
+        plt.subplot(3,3,2)
+        plt.cla()
+        plt.title('Kp y')
+        plt.plot(params[:,1])
+
+        plt.subplot(3,3,3)
+        plt.cla()
+        plt.title('Kp z')
+        plt.plot(params[:,2])
+
+        plt.subplot(3,3,4)
+        plt.cla()
+        plt.title('Kd x')
+        plt.plot(params[:,3])
+
+        plt.subplot(3,3,5)
+        plt.cla()
+        plt.title('Kd y')
+        plt.plot(params[:,4])
+
+        plt.subplot(3,3,6)
+        plt.cla()
+        plt.title('Kd z')
+        plt.plot(params[:,5])
 
     plt.subplot(3,3,7)
     plt.cla()
@@ -149,15 +177,19 @@ def exp_plot(rewards, reward_traj, traj_draw, save_path=None, plot_live=True, fi
 
     ####################PLOT 5############################
     plt.figure("Penalty traj", figsize=figsize)
-    plt.subplot(3,1,1)
+    plt.subplot(4,1,1)
     plt.cla()
     plt.plot(reward_traj['goal_pos_penalty'], 'b')
     plt.title('goal_pos_penalty')
-    plt.subplot(3,1,2)
+    plt.subplot(4,1,2)
+    plt.cla()
+    plt.plot(reward_traj['goal_delta_pos_penalty'], 'b')
+    plt.title('goal_delta_pos_penalty')
+    plt.subplot(4,1,3)
     plt.cla()
     plt.plot(reward_traj['goal_vel_penalty'], 'b')
     plt.title('goal_vel_penalty')
-    plt.subplot(3,1,3)
+    plt.subplot(4,1,4)
     plt.cla()
     plt.plot(reward_traj['goal_penalty'], 'b')
     plt.title('goal_penalty')
@@ -266,8 +298,12 @@ def do_the_experiment(exp_params_local, plot_live=True):
 
     # policy = create_init_policy(env._traj2pull, env._des_force_traj, ctrl_traj, exp_params, set_frm_data=exp_params['start_policy'])
 
-    w_list = np.zeros([6,9,time_steps])
-    sigma_list = np.zeros([6,6,time_steps])
+    if exp_params['env_params']['z_only']:
+        w_list = np.zeros([2,3,time_steps])
+        sigma_list = np.zeros([2,2,time_steps])
+    else:
+        w_list = np.zeros([6,9,time_steps])
+        sigma_list = np.zeros([6,6,time_steps])
 
     mycreps = CREPSOpt(entropy_bound=exp_params_local['gpreps_params']['entropy_bound'], initial_params=initial_params, num_policy_updates=num_policy_updates, num_samples_per_update=n_samples_per_update, num_old_datasets=1, env=env, policy=policy, transform_context=False, policy_per_time_step = policy_per_time_step, time_steps=time_steps)
 
