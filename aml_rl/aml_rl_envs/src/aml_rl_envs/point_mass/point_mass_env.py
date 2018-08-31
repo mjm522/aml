@@ -186,11 +186,11 @@ class PointMassEnv():
         ####################
         if self._config['enable_cumsum']:
 
-            u_reward_traj = -1.*np.flip(np.cumsum(u_reward_traj), 0)
-            delta_u_reward_traj = -1.*np.flip(np.cumsum(delta_u_reward_traj), 0)
-            param_reward_traj = -1.*np.flip(np.cumsum(param_reward_traj), 0)
-            delta_param_reward_traj = -1.*np.flip(np.cumsum(delta_param_reward_traj), 0)
-            goal_reward_traj = -1.*np.flip(np.cumsum(goal_reward_traj), 0)
+            u_reward_traj = -1.*np.cumsum(u_reward_traj)
+            delta_u_reward_traj = -1.*np.cumsum(delta_u_reward_traj)
+            param_reward_traj = -1.*np.cumsum(param_reward_traj)
+            delta_param_reward_traj = -1.*np.cumsum(delta_param_reward_traj)
+            goal_reward_traj = -1.*np.cumsum(goal_reward_traj)
         
         else:
             u_reward_traj *= -1.
@@ -209,7 +209,7 @@ class PointMassEnv():
             goal_reward_traj = -1.*sigmoid(goal_reward_traj )
         
         reward_traj = u_reward_traj + delta_u_reward_traj + goal_reward_traj + param_reward_traj + delta_param_reward_traj
-
+        
         total_penalty = np.sum( reward_traj ) 
 
         # self._logger.debug("\n*****************************************************************")

@@ -115,6 +115,8 @@ class CREPSOpt():
 
         n_samples_per_update = len(R)
 
+        R = (R - R.min()) / (R.max() - R.min())
+
         # Definition of the dual function
         def g(x):  # Objective function
             eta = x[0]

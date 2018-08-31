@@ -8,7 +8,7 @@ from aml_io.io_tools import save_data, load_data
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 # from rl_algos.policy.neural_network_policy import NeuralNetPolicy
 from aml_rl_envs.point_mass.point_mass_env import PointMassEnv
-from aml_playground.utilities.generate_document import create_experiment_document
+# from aml_playground.utilities.generate_document import create_experiment_document
 from aml_playground.var_imp_reps.policy.spring_init_policy import create_init_policy
 from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
 
