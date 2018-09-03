@@ -271,6 +271,8 @@ class PointMassEnv():
                     w_tmp = policy[k].compute_w(context=s, explore=explore)
                 else:
                     w_tmp = policy.compute_w(context=s, explore=explore)
+                    # w_tmp = policy(context=s, explore=explore)
+                    
                 w  = np.multiply(self._param_scale, w_tmp)
                 # print "k \t",k, "\t",  w
 

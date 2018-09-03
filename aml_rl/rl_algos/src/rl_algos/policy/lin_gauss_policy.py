@@ -111,15 +111,15 @@ class LinGaussPolicy():
 
     def scale_w(self, w):
 
-        return w
+        # return w
         
-        # return np.multiply(self._scaling, w)
+        return np.multiply(self._scaling, w)
 
     def inv_scale_w(self, w):
 
-        return w
+        # return w
 
-        # return np.multiply(self._inv_scaling, w)
+        return np.multiply(self._inv_scaling, w)
 
     def featurize_context(self):
 

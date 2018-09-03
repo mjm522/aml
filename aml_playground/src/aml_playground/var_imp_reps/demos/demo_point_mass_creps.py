@@ -149,7 +149,10 @@ def do_the_experiment(exp_params_local, plot_live=True):
             it += 1
 
             if plot_live:
-                exp_plot(rewards=rewards, reward_traj=reward_traj, traj_draw=traj_draw, plot_live=plot_live, figsize=(5,5))
+                if it == exp_params_local['n_episodes'] -1:
+                    exp_plot(rewards=rewards, reward_traj=reward_traj, traj_draw=traj_draw, plot_live=plot_live, figsize=(18,10), save_path=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/new/')
+                else:
+                    exp_plot(rewards=rewards, reward_traj=reward_traj, traj_draw=traj_draw, plot_live=plot_live, figsize=(18,10))
 
         except KeyboardInterrupt:
             break
