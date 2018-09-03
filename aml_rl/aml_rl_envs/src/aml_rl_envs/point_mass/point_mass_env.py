@@ -292,15 +292,6 @@ class PointMassEnv():
                     js_Kp = np.diag(Kp)
                     js_Kd = np.diag(Kd)
 
-                # if not jnt_space:
-                #     self._logger.debug("\n \n EE Param Kp \n {}".format(w[:3]))  
-                #     self._logger.debug("\n \n EE Kp \n {}".format(Kp))
-                #     self._logger.debug("\n \n EE Parm Kd \n {}".format(w[3:]))
-                #     self._logger.debug("\n \n EE Kd \n {}".format(Kd))
-                #     self._logger.debug("\n \n JS Kd \n {}".format(np.diag(js_Kd)))
-                # self._logger.debug("\n \n JS Kp \n {}".format(np.diag(js_Kp)))
-                # self._logger.debug("\n#############################################################")
-
                 ee_pos = self._point_mass.get_ee_pose()[0]
                 ee_vel = self._point_mass.get_ee_velocity()[0]
 
@@ -392,9 +383,9 @@ class PointMassEnv():
 
         state = self._point_mass.state(ori_type = 'eul')
 
-        ee_pos = self._point_mass.get_ee_pose()[0]
+        ee_pos = self._target_point-self._point_mass.get_ee_pose()[0]
 
-        ee_vel = self._point_mass.get_ee_velocity()[0]
+        ee_vel = -self._point_mass.get_ee_velocity()[0]
 
         s = np.hstack([ ee_pos, ee_vel, self._spring_force_old])
 

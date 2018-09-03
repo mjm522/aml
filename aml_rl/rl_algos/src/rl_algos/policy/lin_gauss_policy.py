@@ -97,7 +97,7 @@ class LinGaussPolicy():
             context_feature = context
 
         if explore:
-            w =  np.abs(self._random_state.multivariate_normal(
+            w =  1.1*np.abs(np.random.multivariate_normal(
                 self._w.dot(context_feature), self._sigma, size=[1])[0])
         else:
             w = self._w.dot(context_feature)

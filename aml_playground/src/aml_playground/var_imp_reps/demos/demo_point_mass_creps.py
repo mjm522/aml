@@ -9,6 +9,7 @@ from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
 # from rl_algos.policy.neural_network_policy import NeuralNetPolicy
 from aml_rl_envs.point_mass.point_mass_env import PointMassEnv
 # from aml_playground.utilities.generate_document import create_experiment_document
+from aml_playground.var_imp_reps.utils.plot_util import exp_plot
 from aml_playground.var_imp_reps.policy.spring_init_policy import create_init_policy
 from aml_playground.var_imp_reps.exp_params.experiment_point_mass_params import exp_params
 
@@ -19,192 +20,6 @@ root_save_path = os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass
 kd_scales = range(2,7,1)
 timesteps = [x/100.0 for x in range(5,51,5)]
 force_model_enabled = [True, False]
-
-
-def exp_plot(rewards, reward_traj, traj_draw, save_path=None, plot_live=True, figsize=(10,10)):
-
-    params = np.asarray(traj_draw['params'])
-
-    u_list = np.asarray(traj_draw['u_list'])
-
-    ee_traj = np.asarray(traj_draw['ee_traj'])
-
-    req_traj = np.asarray(traj_draw['traj'])
-
-    ee_vel_traj = np.asarray(traj_draw['ee_vel_traj'])
-
-    ####################PLOT 1############################
-    plt.figure('Reward', figsize=figsize)
-    plt.plot(rewards, 'b')
-
-
-    ####################PLOT 2############################
-    plt.figure('Kp-Kd-u', figsize=figsize)
-    if exp_params['env_params']['z_only']:
-        plt.subplot(3,3,1)
-        plt.cla()
-        plt.title('Kp x')
-
-        plt.subplot(3,3,2)
-        plt.cla()
-        plt.title('Kp y')
-
-        plt.subplot(3,3,3)
-        plt.cla()
-        plt.title('Kp z')
-        plt.plot(params[:,0])
-
-        plt.subplot(3,3,4)
-        plt.cla()
-        plt.title('Kd x')
-
-        plt.subplot(3,3,5)
-        plt.cla()
-        plt.title('Kd y')
-
-        plt.subplot(3,3,6)
-        plt.cla()
-        plt.title('Kd z')
-        plt.plot(params[:,1])
-
-    else:
-        plt.subplot(3,3,1)
-        plt.cla()
-        plt.title('Kp x')
-        plt.plot(params[:,0])
-
-        plt.subplot(3,3,2)
-        plt.cla()
-        plt.title('Kp y')
-        plt.plot(params[:,1])
-
-        plt.subplot(3,3,3)
-        plt.cla()
-        plt.title('Kp z')
-        plt.plot(params[:,2])
-
-        plt.subplot(3,3,4)
-        plt.cla()
-        plt.title('Kd x')
-        plt.plot(params[:,3])
-
-        plt.subplot(3,3,5)
-        plt.cla()
-        plt.title('Kd y')
-        plt.plot(params[:,4])
-
-        plt.subplot(3,3,6)
-        plt.cla()
-        plt.title('Kd z')
-        plt.plot(params[:,5])
-
-    plt.subplot(3,3,7)
-    plt.cla()
-    plt.title('U x')
-    plt.plot(u_list[:,0])
-
-    plt.subplot(3,3,8)
-    plt.cla()
-    plt.title('U y')
-    plt.plot(u_list[:,1])
-
-    plt.subplot(3,3,9)
-    plt.cla()
-    plt.title('U z')
-    plt.plot(u_list[:,2])
-
-    ####################PLOT 3############################
-    plt.figure('Traj-Vel', figsize=figsize)
-    plt.subplot(2,3,1)
-    plt.cla()
-    plt.plot(req_traj[:,0], 'r')
-    plt.plot(ee_traj[:,0], 'g')
-    plt.title('traj x')
-
-    plt.subplot(2,3,2)
-    plt.cla()
-    plt.plot(req_traj[:,1], 'r')
-    plt.plot(ee_traj[:,1], 'g')
-    plt.title('traj y')
-
-    plt.subplot(2,3,3)
-    plt.cla()
-    plt.plot(req_traj[:,2], 'r')
-    plt.plot(ee_traj[:,2], 'g')
-    plt.title('traj z')
-
-    plt.subplot(2,3,4)
-    plt.cla()
-    plt.plot(ee_vel_traj[:,0])
-    plt.title('vel x')
-
-    plt.subplot(2,3,5)
-    plt.cla()
-    plt.plot(ee_vel_traj[:,1])
-    plt.title('vel y')
-
-    plt.subplot(2,3,6)
-    plt.cla()
-    plt.plot(ee_vel_traj[:,2])
-    plt.title('vel z')
-
-    ####################PLOT 4############################
-    plt.figure('Reward traj', figsize=figsize)
-    plt.subplot(6,1,1)
-    plt.cla()
-    plt.plot(reward_traj['u_reward_traj'], 'b')
-    plt.title('u_reward_traj')
-    plt.subplot(6,1,2)
-    plt.cla()
-    plt.plot(reward_traj['delta_u_reward_traj'], 'b')
-    plt.title('delta_u_reward_traj')
-    plt.subplot(6,1,3)
-    plt.cla()
-    plt.plot(reward_traj['param_reward_traj'], 'b')
-    plt.title('param_reward_traj')
-    plt.subplot(6,1,4)
-    plt.cla()
-    plt.plot(reward_traj['delta_param_reward_traj'], 'b')
-    plt.title('delta_param_reward_traj')
-    plt.subplot(6,1,5)
-    plt.cla()
-    plt.plot(reward_traj['goal_reward_traj'], 'b')
-    plt.title('goal reward')
-    plt.subplot(6,1,6)
-    plt.cla()
-    plt.plot(reward_traj['reward_traj'], 'b')
-    plt.title('total')
-
-    ####################PLOT 5############################
-    plt.figure("Penalty traj", figsize=figsize)
-    plt.subplot(4,1,1)
-    plt.cla()
-    plt.plot(reward_traj['goal_pos_penalty'], 'b')
-    plt.title('goal_pos_penalty')
-    plt.subplot(4,1,2)
-    plt.cla()
-    plt.plot(reward_traj['goal_delta_pos_penalty'], 'b')
-    plt.title('goal_delta_pos_penalty')
-    plt.subplot(4,1,3)
-    plt.cla()
-    plt.plot(reward_traj['goal_vel_penalty'], 'b')
-    plt.title('goal_vel_penalty')
-    plt.subplot(4,1,4)
-    plt.cla()
-    plt.plot(reward_traj['goal_penalty'], 'b')
-    plt.title('goal_penalty')
-
-    if plot_live:
-        plt.draw()
-        plt.pause(0.0001)
-
-    if save_path is not None:
-
-        plt.figure('Reward').savefig(save_path+'/Reward')
-        plt.figure('Kp-Kd-u').savefig(save_path+'/Kp-Kd-u')
-        plt.figure('Traj-Vel').savefig(save_path+'/Traj-Vel')
-        plt.figure('Reward traj').savefig(save_path+'/Reward traj')
-        plt.figure('Penalty traj').savefig(save_path+'/Penalty traj')
 
 
 def search_hyper_params(plot_live = False):
@@ -256,7 +71,6 @@ def search_hyper_params(plot_live = False):
                 if c == 'y':
                     print "Saving to %s"%exp_params_local['param_file_name']
                     save_data(data, save_path+'/data_file.pkl')
-
 
 def do_the_experiment(exp_params_local, plot_live=True):
 
@@ -318,6 +132,7 @@ def do_the_experiment(exp_params_local, plot_live=True):
         try:
 
             print "Episode \t", it
+
 
             policy = mycreps.run(smooth_policy=exp_params_local['smooth_policy'], jnt_space=False)
 

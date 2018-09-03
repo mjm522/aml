@@ -6,6 +6,7 @@ from rl_algos.utils.utils import lpf
 from scipy.optimize import fmin_l_bfgs_b
 from rl_algos.utils.utils import logsumexp
 from rl_algos.policy.lin_gauss_policy import LinGaussPolicy
+from aml_playground.var_imp_reps.utils.plot_util import exp_plot
 
 """
 
@@ -76,6 +77,14 @@ class CREPSOpt():
         #execute the policy in the environment
         tau_i, R_sw_i = self._env.execute_policy(self._policy, jnt_space = jnt_space, policy_per_time_step = self._policy_per_time_step)
 
+        
+        if (self._itr%self._num_policy_updates == 0):
+            cla = True
+        else:
+            cla = False
+        
+        # exp_plot(rewards=None, reward_traj=R_sw_i, traj_draw=tau_i, figsize=(5,5), cla=cla)
+
         for i, (s_i, w_i, R_i) in enumerate(zip(tau_i['contexts'], tau_i['params'], R_sw_i['reward_traj'])):
             #store the data
             if self._policy_per_time_step:
@@ -115,7 +124,7 @@ class CREPSOpt():
 
         n_samples_per_update = len(R)
 
-        R = (R - R.min()) / (R.max() - R.min())
+        # R = (R - R.min()) / (R.max() - R.min())
 
         # Definition of the dual function
         def g(x):  # Objective function
