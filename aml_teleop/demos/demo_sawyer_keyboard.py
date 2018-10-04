@@ -1,6 +1,6 @@
 import rospy
 from aml_robot.sawyer_robot import SawyerArm
-from sawyer_keyboard_config import OS_SAWYER_CONFIG
+from aml_teleop.keyboard_teleop.config import OS_SAWYER_CONFIG
 from aml_teleop.keyboard_teleop.os_teleop_ctrl import OSTeleopCtrl
 
 

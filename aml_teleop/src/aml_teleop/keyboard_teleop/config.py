@@ -1,18 +1,13 @@
 KEYBOARD_ROBOT_CONFIG = {}
 
-JS_TELEOP_CTRL = {
-    
-    'robot_joints':None, #these joints will be one to one mapped
-    'haptic_joints':None,
-    'scale_from_home': True,
-    'robot_home':None, # home position of baxter
-    'rate': 500, # rate of the controller
-    'ctrlr_type':'pos', #other options are 'vel', 'torq'
-}
 
 
-OS_TELEOP_CTRL = {
+OS_SAWYER_CONFIG = {
     
     'rate': 500, # rate of the controller
     'ctrlr_type':'pos', #other options are 'vel', 'torq'
+    'robot_max_speed': 0.20,
+    'robot_min_speed': 0.01,
+    'ori_speed_ratio': 1.0, # ----- ratio of ori change rate wrt translation
+    'custom_controls': None # ----- for custom keyboard commands, provide dict{'key':func}
 }

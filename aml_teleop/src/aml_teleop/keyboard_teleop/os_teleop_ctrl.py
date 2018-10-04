@@ -46,7 +46,7 @@ class OSTeleopCtrl(KeyboardRobotInterface):
         self._create_bindings()
 
         self._speed = 0.01
-        self._ori_speed_ratio = 0.5
+        self._ori_speed_ratio = self._config['ori_speed_ratio']
 
 
     def _create_bindings(self):
@@ -83,11 +83,17 @@ class OSTeleopCtrl(KeyboardRobotInterface):
 
     def _change_speed(self, inc):
 
-        if 0.0 < self._speed < self._config['robot_max_speed']:
-            self._speed += inc
-            print "New Speed: %f"%self._speed
-        else:
+        self._speed += inc
+        
+        if self._speed >= self._config['robot_max_speed']:
             print "Allowed Speed Limit reached!"
+            self._speed = self._config['robot_max_speed']
+
+        elif self._speed < 0:
+            print "Speed Cannot be reduced further"
+            self._speed = 0
+
+        print "New Speed: %f"%self._speed
 
 
     def _move_ee(self, axis, speed):
@@ -162,10 +168,10 @@ class OSTeleopCtrl(KeyboardRobotInterface):
 
     def run(self):
 
-        print("Controlling End Effector. Press ? for help, Esc to quit.")
+        print("\n\n\tControlling End Effector. Press ? for help, Esc to quit.")
         self._run()
 
-        print("Done.")
+        print("\nDone.")
 
 
 
