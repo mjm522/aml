@@ -140,7 +140,7 @@ class OSTeleopCtrl(KeyboardRobotInterface):
         # print self._robot.inv_kin(curr_ee_pos, curr_ee_ori)
         speed*= (self._speed*self._ori_speed_ratio)
 
-        if axis == 'y':
+        if axis == 'x':
 
             ori_des = curr_ee_ori + np.asarray([0,speed,0])
 
@@ -148,7 +148,7 @@ class OSTeleopCtrl(KeyboardRobotInterface):
 
             ori_des = curr_ee_ori + np.asarray([0,0,speed])
 
-        elif axis == 'x':
+        elif axis == 'y':
 
             ori_des = curr_ee_ori + np.asarray([speed,0,0])
 
