@@ -21,25 +21,30 @@ class OSTeleopCtrl(KeyboardRobotInterface):
             Args: 
                 rate : the rate of the controller in Hz (type int)
                 ctrlr_type : type of the controller (either = pos, vel, or torq)
+                robot_max_speed : speed limit
+                robot_min_speed : speed limit
+                ori_speed_ratio : ratio of ori change rate wrt translation
+                custom_controls : for custom keyboard commands, provide dict{'key': (func_handle, [<args>], "description"}
  
         """
-
+        
         if config['ctrlr_type'] == 'pos':
 
-            controller = OSPositionController(robot_interface)
+            self._ctrl_type = OSPositionController
 
         elif config['ctrlr_type'] == 'vel':
 
-            controller = OSVelocityController(robot_interface)
+            self._ctrl_type = OSTorqueController
 
         elif config['ctrlr_type'] == 'torq':
 
-            controller = OSTorqueController(robot_interface)
+            self._ctrl_type = OSTorqueController
 
         else:
 
             raise Exception("Unknown controller type passed!")
 
+        controller = self._ctrl_type(robot_interface)
 
         KeyboardRobotInterface.__init__(self, robot_interface, controller, config)
 
@@ -48,8 +53,17 @@ class OSTeleopCtrl(KeyboardRobotInterface):
         self._speed = 0.01
         self._ori_speed_ratio = self._config['ori_speed_ratio']
 
+    def compute_cmd(self):
+
+        pass
+
 
     def _create_bindings(self):
+
+        """
+         creates the keyboard bindings. Also adds the custom commands if provided in config file
+ 
+        """
 
         self._bindings = {
                         # ----- translation
@@ -73,15 +87,16 @@ class OSTeleopCtrl(KeyboardRobotInterface):
                         '-': (self._change_speed, [-0.01], "decrease spead by 0.01"),
                      }
 
-        if 'custom_commands' in self._config and  self._config['custom_commands'] is not None:
-            for key, value in self._config['custom_commands'].iteritems():
+        if 'custom_controls' in self._config and  self._config['custom_controls'] is not None:
+            print "YES!!!!"
+            for key, value in self._config['custom_controls'].iteritems():
                 self._bindings.setdefault(key, []).extend(value)
 
-    def compute_cmd(self):
-        
-        pass
-
     def _change_speed(self, inc):
+
+        """
+            function to change the rate of change of end-effector pose per keystroke
+        """
 
         self._speed += inc
         
@@ -97,6 +112,13 @@ class OSTeleopCtrl(KeyboardRobotInterface):
 
 
     def _move_ee(self, axis, speed):
+
+        """
+            moves the end-effector in the task space
+            Args:
+                axis : string (x,y,z) : axis along which to move the end-effector
+                speed : +1 or -1 : for direction
+        """
 
         curr_ee_pos, curr_ee_ori = self.get_robot_ee_pose()
 
@@ -126,10 +148,16 @@ class OSTeleopCtrl(KeyboardRobotInterface):
             lin_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
         print "current pose", curr_ee_pos
-        # self._robot.set_joint_state(cmd)
-        # print new_pos, new_ori
+
 
     def _turn_ee(self, axis, speed):
+
+        """
+            turns the end-effector in the task space
+            Args:
+                axis : string (x,y,z) : axis along which to rotate the end-effector
+                speed : +1 or -1 : for direction
+        """
 
         curr_ee_pos, curr_ee_ori = self.get_robot_ee_pose()
 
@@ -165,12 +193,21 @@ class OSTeleopCtrl(KeyboardRobotInterface):
                                orientation_ctrl = True)
             lin_error, ang_error, success, time_elapsed = self._ctrlr.wait_until_goal_reached(timeout=1.0)
 
+        print "current pose", curr_ee_pos
+
 
     def run(self):
 
-        print("\n\n\tControlling End Effector. Press ? for help, Esc to quit.")
+        """
+            The main function which runs the teleop code
+        """
+
+        self.enable_ctrlr()
+
+        print("\n\n\tControlling End Effector of %s. Press ? for help, Esc to quit."%type(self._robot).__name__)
         self._run()
 
+        self.disable_ctrlr()
         print("\nDone.")
 
 

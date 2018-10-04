@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="controller" default="pos"/>
+    <arg name="robot" default="sawyer"/>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aml_ctrl)/demos/rviz_configs/controllers_marker_follower.rviz"/>
+
+    <node pkg="aml_teleop" type="demo_keyboard_teleop.py" name="keyboard_teleop"
+          args="-c $(arg controller)
+                -r $(arg robot)"
+          output="screen">
+    </node>
+
+</launch>

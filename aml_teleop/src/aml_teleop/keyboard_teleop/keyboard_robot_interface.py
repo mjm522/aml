@@ -22,10 +22,6 @@ class KeyboardRobotInterface(TeleOp):
         self._getch = Getch()
 
 
-    def run(self):
-
-        raise NotImplementedError("Must be implemented in the subclass")
-
     def get_robot_ee_pose(self):
 
         return self._robot._state['ee_point'], self._robot._state['ee_ori']
@@ -41,7 +37,9 @@ class KeyboardRobotInterface(TeleOp):
 
             self._ctrlr.set_active(True)
 
-        else:
+    def disable_ctrlr(self):
+
+        if self._ctrlr.is_active():
 
             self._ctrlr.set_active(False)
 
@@ -59,7 +57,7 @@ class KeyboardRobotInterface(TeleOp):
                 print("command: %s" % (cmd[2],))
                 cmd[0](*cmd[1])
 
-            elif c == '/' or '?':
+            elif c == '/' or c == '?':
                 self._print_help()
 
             return False
@@ -74,8 +72,8 @@ class KeyboardRobotInterface(TeleOp):
 
     def _run(self):
         """
-        the main code that sends control commands to the
-        robot
+        the main code that gets keyboard input and 
+        sends control commands to the robot
         """        
         rate = rospy.Rate(self._config['rate'])
         
@@ -99,6 +97,11 @@ class KeyboardRobotInterface(TeleOp):
 
 
 class Getch:
+    """
+    class to get user input.
+    Reads only one keystroke at a time
+    """
+
     def __init__(self):
         import tty, sys
 
