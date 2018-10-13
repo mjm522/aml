@@ -11,8 +11,8 @@ from aml_teleop.keyboard_teleop.os_teleop_ctrl import OSTeleopCtrl
 
 def switch_baxter_arm():
 
-    teleop.disable_ctrlr()
     print "Switching arm... Please wait..."
+    teleop.disable_ctrlr()
     teleop._robot = next(arm_switcher)
     teleop._ctrlr = teleop._ctrl_type(teleop._robot)
     teleop.enable_ctrlr()
