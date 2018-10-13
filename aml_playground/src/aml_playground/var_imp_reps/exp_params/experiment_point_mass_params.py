@@ -143,17 +143,19 @@ experiment_8['start_policy'] = None#os.environ['AML_DATA'] + '/aml_playground/im
 experiment_8['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_7_6_with_all_equal_weighting.pkl'
 
 experiment_9 =  copy.deepcopy(experiment_1)
-kd_scale = 3.
+kd_scale = 5.
 kp_scale = (kd_scale**2.)/4.
 experiment_9['n_episodes']=45
 experiment_9['env_params']['num_traj_points'] = 100
 experiment_9['time_steps'] = experiment_9['env_params']['num_traj_points']
 experiment_9['smooth_policy']=False
 experiment_9['env_params']['time_step'] = 0.1
-experiment_9['env_params']['spring_stiffness'] = 3.0
-experiment_9['env_params']['reward_gamma'] = 0.99
+
+experiment_9['env_params']['spring_stiffness'] = 5.0
+experiment_9['env_params']['reward_gamma'] = 1.#0.99
 experiment_9['env_params']['ramp_traj_flag'] = False
-experiment_9['env_params']['goal_pos_weight'] = np.eye(3)*2.75
+
+experiment_9['env_params']['goal_pos_weight'] = np.eye(3)*3.5
 experiment_9['env_params']['goal_delta_pos_weight'] = np.eye(3)*0.
 experiment_9['env_params']['goal_vel_weight'] = np.eye(3)*0.
 experiment_9['env_params']['u_weight'] = np.eye(3)*0.15
@@ -222,6 +224,6 @@ experiment_10['env_params']['enable_cumsum'] = False
 experiment_10['env_params']['param_scale'] = np.array([ kp_scale, kd_scale])
 experiment_10['env_params']['force_predict_model'] = NextForcePredictModel(spring_k=experiment_10['env_params']['spring_stiffness'])
 experiment_10['start_policy']=None#os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_spring_stiif5_6.pkl'
-experiment_10['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_single_policy_bugfix.pkl'
+experiment_10['param_file_name']=os.environ['AML_DATA'] + '/aml_playground/imp_worlds/point_mass/creps_data_point_mass_exp_single_policy.pkl'
 
 exp_params = experiment_9
