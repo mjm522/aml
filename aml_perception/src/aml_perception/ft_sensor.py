@@ -7,7 +7,7 @@ from aml_io.log_utils import aml_logging
 
 class FTSensor():
 
-    def __init__(self, ip="10.0.11.189", port=50000, rate=300):
+    def __init__(self, ip="10.0.11.190", port=50000, rate=300):
 
         self._logger = aml_logging.get_logger(__name__)
 
@@ -42,3 +42,13 @@ class FTSensor():
     def ft_reading(self):
 
         return self._ft_reading
+
+if __name__ == '__main__':
+
+    rospy.init_node('FT_sensor_node', anonymous=True)
+    
+    ft = FTSensor(ip="10.0.11.190")
+
+    while not rospy.is_shutdown():
+        # ft.update("test")
+        print ft._ft_reading
