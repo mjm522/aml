@@ -4,6 +4,12 @@ import socket
 import numpy as np
 from aml_io.log_utils import aml_logging
 
+"""
+Instructions
+the ip is the ip param of the class FTSensor is computer to which
+FTSensor streams data.
+Make sure the same ip address is specified to the UDP sender in the FTSensor host PC
+"""
 
 class FTSensor():
 

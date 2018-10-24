@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 from aml_io.log_utils import aml_logging
 from aml_io.io_tools import save_data, load_data
