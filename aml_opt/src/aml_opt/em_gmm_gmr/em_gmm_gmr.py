@@ -1,23 +1,8 @@
 import numpy as np
 import numpy.matlib
 
-
-class R:
-    
-    def __init__(self, nbVar=2, nbStates=3, nbData=150):
-        self._mu = np.zeros([nbVar, nbStates])
-        self._sigma = np.zeros([nbVar, nbVar, nbStates])
-        self.H = np.zeros([nbStates, nbData])
-        # self.p = [{'A':None, 'b':None} for _ in range(nbFrames)]
-        self.nbData=nbData
-        self.currTar = np.zeros([nbVar-1, nbData])
-        self.currSigma = np.zeros([nbVar-1, nbVar-1, nbData])
-        self.kpDet = np.zeros(nbData)
-        self.kvDet = np.zeros(nbData)
-        self.ddxNorm = np.zeros(nbData)
-        self.Data = np.zeros([nbVar, nbData])
-
 class Model:
+    
     def __init__(self, data):
         
         self._nb_states = 3 #Number of Gaussians in the GMM
@@ -32,7 +17,6 @@ class Model:
 
         diagRegularizationFactor = 1e-4
 
-        #Matricization/flattening of tensor
         DataAll = data.reshape(data.shape[0], data.shape[1])
 
         TimingSep = np.linspace( np.min(DataAll[0,:] ), np.max( DataAll[0,:] ), self._nb_states+1 )
@@ -122,17 +106,11 @@ class EM_GMM_GMR:
         return L, gamma, gamma0
 
 
-    def estimate_attractor_path(self, DataIn, r):
-    
-        if DataIn.ndim == 1:
-            DataIn = DataIn.reshape(1, len(DataIn))
-        
-        nbData = DataIn.shape[1]
-        in_ = range(DataIn.shape[0])
-        out = range(in_[-1]+1, self.model._nb_var)
-        nbVarOut = len(out)
+    def gmm_products(self):
+        """
+        this function is not tested
+        """
 
-        # GMR to estimate attractor path and associated variations
         #GMM products 
         for i in range(self.model._nb_states):
             SigmaTmp = np.zeros([self.model._nb_var, self.model._nb_var])
@@ -149,44 +127,64 @@ class EM_GMM_GMR:
             r._mu[:,i] = np.dot( r._sigma[:,:,i], MuTmp)
 
 
+    def gmr(self, data_in):
+    
+        if data_in.ndim == 1:
+            data_in = data_in.reshape(1, len(data_in))
+        
+        nb_data = data_in.shape[1]
+        in_ = range(data_in.shape[0])
+        out = range(in_[-1]+1, self.model._nb_var)
+        nb_var_out = len(out)
+
+        # GMR to estimate attractor path and associated variations
+
+        weights = np.zeros([self.model._nb_states, nb_data])
+        data_out_mu = np.zeros([nb_var_out, nb_data])
+        data_out_sigma = np.zeros([nb_var_out, nb_var_out, nb_data])
+
         #GMR
-        for t in range(nbData):
+        for t in range(nb_data):
 
             #Compute activation weight
             for i in range(self.model._nb_states):
-                tmp = r._sigma[:,in_,i]
-                r.H[i,t] = self.model._priors[i] * self.gauss_PDF(DataIn[:,t], r._mu[in_, i], tmp[in_,:])
+                tmp = self.model._sigma[:,in_,i]
+                weights[i,t] = self.model._priors[i] * self.gauss_PDF(data_in[:,t], self.model._mu[in_, i], tmp[in_,:])
 
-            r.H[:,t][ r.H[:,t] < 1e-5] = 0.
-            r.H[:,t] = r.H[:,t]/np.sum(r.H[:,t])
+            weights[:,t][ weights[:,t] < 1e-5] = 0.
+            weights[:,t] = weights[:,t]/np.sum(weights[:,t])
             #Evaluate the current target 
-            currTar = np.zeros(nbVarOut)
-            currSigma = np.zeros([nbVarOut,nbVarOut])
+            data_mu_tmp = np.zeros(nb_var_out)
+            data_sigma_tmp = np.zeros([nb_var_out, nb_var_out])
 
             for i in range(self.model._nb_states):
                 
-                tmp1 = r._sigma[:, out, i]
-                tmp1 = tmp1[out,:]
+                #sigma[out,out,i]
+                tmp1 = self.model._sigma[:, out, i]
+                sig_out_out = tmp1[out,:]
 
-                tmp2 = r._sigma[:, in_, i]
-                tmp2 = tmp2[out, :]
+                #sigma[out,in,i]
+                tmp2 = self.model._sigma[:, in_, i]
+                sig_out_in = tmp2[out, :]
 
-                tmp3 = r._sigma[:, in_, i]
-                tmp3 = tmp3[in_, :]
+                #sigma[in, in, i]
+                tmp3 = self.model._sigma[:, in_, i]
+                sig_in_in = tmp3[in_, :]
 
-                tmp4 = r._sigma[:, out, i]
-                tmp4 = tmp4[in_, :]
+                #sigma[in, out, i]
+                tmp4 = self.model._sigma[:, out, i]
+                sig_in_out = tmp4[in_, :]
 
-                tarTmp = r._mu[out,i] + np.dot( np.divide( tmp2, tmp3), (DataIn[:,t]-r._mu[in_,i] ) )
-                SigmaTmp = tmp1 - np.dot( np.divide(tmp2, tmp3), tmp4)
+                tar_tmp = self.model._mu[out,i] + np.dot( np.dot( sig_out_in, np.linalg.inv(sig_in_in) ), (data_in[:,t]-self.model._mu[in_,i] ) )
+                sigma_tmp = sig_out_out - np.dot( np.dot( sig_out_in, np.linalg.inv(sig_in_in) ), sig_in_out)
 
-                currTar += r.H[i,t]*tarTmp
-                currSigma += r.H[i,t]*SigmaTmp #r.H(i,t)^2
+                data_mu_tmp += weights[i,t]*tar_tmp
+                data_sigma_tmp += weights[i,t]*sigma_tmp 
 
-            r.currTar[:,t] = currTar
-            r.currSigma[:,:,t] = currSigma
+            data_out_mu[:,t] = data_mu_tmp
+            data_out_sigma[:,:,t] = data_sigma_tmp
             
-        return r
+        return data_out_mu, data_out_sigma
 
     def gauss_PDF(self, data, mu, sigma):
         """
@@ -201,11 +199,11 @@ class EM_GMM_GMR:
         """
 
         if data.ndim == 1:
-            data = data.reshape(1, len(data), order='F')
+            data = data.reshape(1, len(data))
 
-        nb_var, nbData = data.shape
+        nb_var, nb_data = data.shape
 
-        data = data.T - np.matlib.repmat(mu.T, nbData, 1)
+        data = data.T - np.matlib.repmat(mu.T, nb_data, 1)
 
         prob = np.sum( np.multiply( np.dot( data, np.linalg.pinv(sigma) ), data) , 1)
 
