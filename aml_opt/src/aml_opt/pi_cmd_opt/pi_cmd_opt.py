@@ -80,11 +80,9 @@ class PICmdOpt(object):
         Args:
         u_list: input control trajectory
         """
-
         for k in range(self._cmd_dim):
             u_list[:,k][u_list[:,k] < self._cmd_min[k]] = self._cmd_min[k]
             u_list[:,k][u_list[:,k] > self._cmd_max[k]] = self._cmd_max[k]
-
         return u_list
 
     # Random variation of control command (a random change in the control command)
