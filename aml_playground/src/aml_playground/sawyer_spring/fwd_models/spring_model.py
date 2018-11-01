@@ -185,15 +185,15 @@ ctrl_constraints={
 }
 
 config = {
-    'max_iterations':200,
+    'max_iterations':800,
     'dt': 0.01,
-    'N':15,
-    'h':10.,
-    'rho': 1.5,#10.7,#0.2
+    'N':1,
+    'h':1.5,
+    'rho': 2.75,#10.7,#0.2
     'K':10,
     'cmd_dim': 1,
-    'state_dim': 2,
-    'random_seed': 123,
+    'state_dim': 1,
+    'random_seed': 1337,
     'init_policy': 'use_random',
     'ctrl_constraints':ctrl_constraints,
     }
@@ -204,18 +204,28 @@ class OptimCmd(PICmdOpt):
 
         PICmdOpt.__init__(self, config)
         self._model = env._model
+        self._goal = np.array([2.])
+        self._x = 0
+        self._dx = 0
+        self._x_old = 0.
+        self._dx_old = 0.
 
     def dynamics(self, x, u, dt=0.01):
+
+        f_total = u*(self._goal-x[0])-k*x[0]
+        self._dx = self._dx_old + f_total*dt
+        self._x = self._x_old + self._dx*dt
         
-        x_test = np.hstack([x, x*k])[None,:]
+        mean, var = self._model.predict( np.hstack([self._x_old , self._x_old*k])[None,:] )
 
-        mean, var = self._model.predict(x_test)
+        self._x_old = self._x
+        self._dx_old = self._dx
 
-        return mean
+        return self._x
 
     def cost(self, x, u, du, t):
-        s=k*x
-        return -10.* 1./((s-u*(s/k))**2+0.0001)
+        
+        return 10*(self._goal-self._x)**2 + 10*(u**2)
 
 
     def forward_rollout(self, u_list, k):
@@ -263,8 +273,9 @@ def main():
     #     x_final[k+1, :] =  pi_cmd.dynamics(x_final[k, :], u_list[:,k])
 
     # plt.plot(x_final[:,0], x_final[:,1])
-    plt.plot(u_list[:,0])
-    plt.show()
+    print u_list
+    # plt.plot(u_list[:,0])
+    # plt.show()
 
 
 if __name__ == '__main__':
