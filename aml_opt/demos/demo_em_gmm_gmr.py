@@ -31,7 +31,7 @@ for mean, cov in zip(means, covs):
 
 em = EM_GMM_GMR(data=data.T)
 em.run_em()
-mu_out, sigma_out = em.gmr(data_in=data_test[:,0])
+mu_out, sigma_out = em.gmr(data_in=data_test[:,0], in_=[0], out=[1])
 
 for i in range(3):
     print "Real Guassian %d mu \n"%i, means[i]
